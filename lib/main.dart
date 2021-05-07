@@ -15,13 +15,31 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:moodtag/artist_details.dart';
+import 'package:moodtag/artists_list.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MoodtagApp(title: 'Moodtag'));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MoodtagApp extends StatefulWidget {
+  MoodtagApp({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<MoodtagApp> {
+  final _artists = <String>[
+    'AC/DC',
+    'The Beatles',
+    'Deep Purple',
+    'The Rolling Stones'
+  ];
+  String _selectedArtist;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,55 +47,41 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: ArtistsList(title: 'Moodtag'),
-    );
-  }
-}
+      home: Navigator(
+        pages: [
+          MaterialPage(
+            key: ValueKey('ArtistsListPage'),
+            child: ArtistsListScreen(
+              title: 'Moodtag',
+              artists: _artists,
+              onTapped: _handleArtistTapped,
+            ),
+          ),
+          if (_selectedArtist != null)
+            ArtistDetailsPage(
+              title: 'Moodtag',
+              artist: _selectedArtist,
+            )
+        ],
+        onPopPage: (route, result) {
+          if (!route.didPop(result)) {
+            return false;
+          }
 
-class ArtistsList extends StatefulWidget {
-  ArtistsList({Key key, this.title}) : super(key: key);
+          // Update the list of pages by setting _selectedArtist to null
+          setState(() {
+            _selectedArtist = null;
+          });
 
-  final String title;
-
-  @override
-  _ArtistsListState createState() => _ArtistsListState();
-}
-
-class _ArtistsListState extends State<ArtistsList> {
-  final _artists = <String>[
-    'AC/DC',
-    'The Beatles',
-    'Deep Purple',
-    'The Rolling Stones'
-  ];
-  final _biggerFont = TextStyle(fontSize: 18.0);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: _buildArtistsList(),
-    );
-  }
-
-  Widget _buildArtistsList() {
-    return ListView.separated(
-        separatorBuilder: (pro, context) => Divider(color: Colors.black),
-        padding: EdgeInsets.all(16.0),
-        itemCount: _artists.length,
-        itemBuilder: (context, i) {
-          return _buildArtistRow(_artists[i]);
-        });
-  }
-
-  Widget _buildArtistRow(String artistName) {
-    return ListTile(
-      title: Text(
-        artistName,
-        style: _biggerFont,
+          return true;
+        },
       ),
     );
+  }
+
+  void _handleArtistTapped(String artist) {
+    setState(() {
+      _selectedArtist = artist;
+    });
   }
 }
