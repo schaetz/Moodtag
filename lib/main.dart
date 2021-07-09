@@ -15,8 +15,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:moodtag/artist_details.dart';
-import 'package:moodtag/artists_list.dart';
+import 'package:moodtag/screens/artist_details.dart';
+import 'package:moodtag/screens/artists_list.dart';
 
 void main() {
   runApp(MoodtagApp(title: 'Moodtag'));
