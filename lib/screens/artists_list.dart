@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:moodtag/models/artist.dart';
+import 'package:moodtag/models/library.dart';
 
 class ArtistsListScreen extends StatelessWidget {
+
   final String title;
-  final List<String> artists;
-  final ValueChanged<String> onTapped;
+  final ValueChanged<Artist> onTapped;
 
   final _biggerFont = TextStyle(fontSize: 18.0);
 
   ArtistsListScreen(
-      {this.title, @required this.artists, @required this.onTapped});
+      {this.title, @required this.onTapped});
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +20,25 @@ class ArtistsListScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: ListView.separated(
-        separatorBuilder: (pro, context) => Divider(color: Colors.black),
-        padding: EdgeInsets.all(16.0),
-        itemCount: artists.length,
-        itemBuilder: (context, i) {
-          return _buildArtistRow(artists[i], onTapped);
-        },
+      body: Consumer<Library>(
+        builder: (context, library, child) {
+          return ListView.separated(
+            separatorBuilder: (pro, context) => Divider(color: Colors.black),
+            padding: EdgeInsets.all(16.0),
+            itemCount: library.artists.length,
+            itemBuilder: (context, i) {
+              return _buildArtistRow(library.artists[i], onTapped);
+            },
+          );
+        }
       ),
     );
   }
 
-  Widget _buildArtistRow(String artist, ValueChanged<String> onTapped) {
+  Widget _buildArtistRow(Artist artist, ValueChanged<Artist> onTapped) {
     return ListTile(
       title: Text(
-        artist,
+        artist.name,
         style: _biggerFont,
       ),
       onTap: () => onTapped(artist),

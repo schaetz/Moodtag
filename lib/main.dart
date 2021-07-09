@@ -15,6 +15,10 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:moodtag/models/artist.dart';
+import 'package:moodtag/models/library.dart';
 import 'package:moodtag/screens/artist_details.dart';
 import 'package:moodtag/screens/artists_list.dart';
 
@@ -32,54 +36,61 @@ class MoodtagApp extends StatefulWidget {
 }
 
 class _AppState extends State<MoodtagApp> {
-  final _artists = <String>[
+
+  final _sampleArtistNames = <String>[
     'AC/DC',
     'The Beatles',
     'Deep Purple',
     'The Rolling Stones'
   ];
-  String _selectedArtist;
+  Artist _selectedArtist;
+
+  List<Artist> createSampleArtists() {
+    return _sampleArtistNames.map((name) => Artist(name)).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Moodtag',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
-      home: Navigator(
-        pages: [
-          MaterialPage(
-            key: ValueKey('ArtistsListPage'),
-            child: ArtistsListScreen(
-              title: 'Moodtag',
-              artists: _artists,
-              onTapped: _handleArtistTapped,
+    return ChangeNotifierProvider(
+      create: (context) => Library(createSampleArtists()),
+      child: MaterialApp(
+        title: 'Moodtag',
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+        ),
+        home: Navigator(
+          pages: [
+            MaterialPage(
+              key: ValueKey('ArtistsListPage'),
+              child: ArtistsListScreen(
+                title: 'Moodtag',
+                onTapped: _handleArtistTapped,
+              ),
             ),
-          ),
-          if (_selectedArtist != null)
-            ArtistDetailsPage(
-              title: 'Moodtag',
-              artist: _selectedArtist,
-            )
-        ],
-        onPopPage: (route, result) {
-          if (!route.didPop(result)) {
-            return false;
-          }
+            if (_selectedArtist != null)
+              ArtistDetailsPage(
+                title: 'Moodtag',
+                artist: _selectedArtist,
+              )
+          ],
+          onPopPage: (route, result) {
+            if (!route.didPop(result)) {
+              return false;
+            }
 
-          // Update the list of pages by setting _selectedArtist to null
-          setState(() {
-            _selectedArtist = null;
-          });
+            // Update the list of pages by setting _selectedArtist to null
+            setState(() {
+              _selectedArtist = null;
+            });
 
-          return true;
-        },
-      ),
+            return true;
+          },
+        ),
+      )
     );
   }
 
-  void _handleArtistTapped(String artist) {
+  void _handleArtistTapped(Artist artist) {
     setState(() {
       _selectedArtist = artist;
     });

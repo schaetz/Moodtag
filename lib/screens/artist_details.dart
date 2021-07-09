@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:moodtag/models/artist.dart';
+
 class ArtistDetailsPage extends Page {
   final String title;
-  final String artist;
+  final Artist artist;
 
   ArtistDetailsPage({this.title, this.artist}) : super(key: ValueKey(artist));
 
@@ -17,7 +19,7 @@ class ArtistDetailsPage extends Page {
 
 class ArtistDetailsScreen extends StatelessWidget {
   final String title;
-  final String artist;
+  final Artist artist;
 
   ArtistDetailsScreen({
     @required this.title,
