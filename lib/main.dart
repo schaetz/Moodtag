@@ -15,12 +15,16 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:moodtag/screens/tag_details.dart';
 import 'package:provider/provider.dart';
 
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
+import 'package:moodtag/models/tag.dart';
+
 import 'package:moodtag/screens/artist_details.dart';
 import 'package:moodtag/screens/artists_list.dart';
+import 'package:moodtag/screens/tags_list.dart';
 
 void main() {
   runApp(MoodtagApp(title: 'Moodtag'));
@@ -37,22 +41,36 @@ class MoodtagApp extends StatefulWidget {
 
 class _AppState extends State<MoodtagApp> {
 
-  final _sampleArtistNames = <String>[
+  static const _sampleArtistNames = <String>[
     'AC/DC',
     'The Beatles',
     'Deep Purple',
     'The Rolling Stones'
   ];
-  Artist _selectedArtist;
+  static const _sampleTagNames = <String>[
+    '80s',
+    'Rock',
+  ];
 
-  List<Artist> createSampleArtists() {
-    return _sampleArtistNames.map((name) => Artist(name)).toList();
+  Artist _selectedArtist;
+  Tag _selectedTag;
+  final showTagsList = true;
+  final sampleTags;
+  final sampleArtists;
+
+  _AppState._(this.sampleTags, this.sampleArtists);
+
+  factory _AppState() {
+      var sampleTags = _sampleTagNames.map((name) => Tag(name)).toList();
+      var sampleArtists = _sampleArtistNames.map((name) => Artist(name, sampleTags)).toList();
+
+      return new _AppState._(sampleTags, sampleArtists);
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => Library(createSampleArtists()),
+      create: (context) => Library(this.sampleArtists, this.sampleTags),
       child: MaterialApp(
         title: 'Moodtag',
         theme: ThemeData(
@@ -62,15 +80,25 @@ class _AppState extends State<MoodtagApp> {
           pages: [
             MaterialPage(
               key: ValueKey('ArtistsListPage'),
-              child: ArtistsListScreen(
+              child: showTagsList ? TagsListScreen(
                 title: 'Moodtag',
-                onTapped: _handleArtistTapped,
+                onTagTapped: _handleTagTapped,
+              ) : ArtistsListScreen(
+                title: 'Moodtag',
+                onArtistTapped: _handleArtistTapped,
               ),
             ),
             if (_selectedArtist != null)
               ArtistDetailsPage(
                 title: 'Moodtag',
                 artist: _selectedArtist,
+                onTagTapped: _handleTagTapped,
+              )
+            else if (_selectedTag != null)
+              TagDetailsPage(
+                title: 'Moodtag',
+                tag: _selectedTag,
+                onArtistTapped: _handleArtistTapped,
               )
           ],
           onPopPage: (route, result) {
@@ -81,6 +109,7 @@ class _AppState extends State<MoodtagApp> {
             // Update the list of pages by setting _selectedArtist to null
             setState(() {
               _selectedArtist = null;
+              _selectedTag = null;
             });
 
             return true;
@@ -93,6 +122,15 @@ class _AppState extends State<MoodtagApp> {
   void _handleArtistTapped(Artist artist) {
     setState(() {
       _selectedArtist = artist;
+      print('Tapped artist: ' + artist.name);
     });
   }
+
+  void _handleTagTapped(Tag tag) {
+    setState(() {
+      _selectedTag = tag;
+      print('Tapped tag: ' + tag.name);
+    });
+  }
+
 }

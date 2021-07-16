@@ -7,11 +7,11 @@ class Artist {
 
   String name;
   final List<Album> _albums = [];
-  final List<Tag> _tags = [];
+  final List<Tag> _tags;
 
   UnmodifiableListView<Album> get albums => UnmodifiableListView(_albums);
   UnmodifiableListView<Tag> get tags => UnmodifiableListView(_tags);
 
-  Artist(this.name);
+  Artist(this.name, this._tags);
 
 }

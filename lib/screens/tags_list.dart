@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
+import 'package:moodtag/models/tag.dart';
 
-class ArtistsListScreen extends StatelessWidget {
+class TagsListScreen extends StatelessWidget {
 
   final String title;
-  final ValueChanged<Artist> onArtistTapped;
+  final ValueChanged<Tag> onTagTapped;
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  ArtistsListScreen(
-      {this.title, @required this.onArtistTapped});
+  TagsListScreen(
+      {this.title, @required this.onTagTapped});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +25,9 @@ class ArtistsListScreen extends StatelessWidget {
           return ListView.separated(
             separatorBuilder: (pro, context) => Divider(color: Colors.black),
             padding: EdgeInsets.all(16.0),
-            itemCount: library.artists.length,
+            itemCount: library.tags.length,
             itemBuilder: (context, i) {
-              return _buildArtistRow(library.artists[i], onArtistTapped);
+              return _buildTagRow(library.tags[i], onTagTapped);
             },
           );
         }
@@ -35,13 +35,13 @@ class ArtistsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildArtistRow(Artist artist, ValueChanged<Artist> onTapped) {
+  Widget _buildTagRow(Tag tag, ValueChanged<Tag> onTapped) {
     return ListTile(
       title: Text(
-        artist.name,
+        tag.name,
         style: listEntryStyle,
       ),
-      onTap: () => onArtistTapped(artist),
+      onTap: () => onTagTapped(tag),
     );
   }
 
