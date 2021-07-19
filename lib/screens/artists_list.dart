@@ -32,6 +32,13 @@ class ArtistsListScreen extends StatelessWidget {
           );
         }
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showAddArtistDialog(context);
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.redAccent,
+      ),
     );
   }
 
@@ -42,6 +49,47 @@ class ArtistsListScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => onArtistTapped(artist),
+    );
+  }
+
+  void _showAddArtistDialog(context) async {
+    var newArtistName;
+    await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Enter the name of the artist:'),
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextField(
+                        onChanged: (value) => newArtistName = value
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: SimpleDialogOption(
+                      onPressed: () {
+                        if (newArtistName != null) {
+                          Provider.of<Library>(context, listen: false).addArtist(
+                            Artist(newArtistName));
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        );
+      }
     );
   }
 

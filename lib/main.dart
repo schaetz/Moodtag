@@ -54,7 +54,7 @@ class _AppState extends State<MoodtagApp> {
 
   Artist _selectedArtist;
   Tag _selectedTag;
-  final showTagsList = true;
+  final showTagsList = false;
   final sampleTags;
   final sampleArtists;
 
@@ -62,7 +62,7 @@ class _AppState extends State<MoodtagApp> {
 
   factory _AppState() {
       var sampleTags = _sampleTagNames.map((name) => Tag(name)).toList();
-      var sampleArtists = _sampleArtistNames.map((name) => Artist(name, sampleTags)).toList();
+      var sampleArtists = _sampleArtistNames.map((name) => Artist.withTags(name, sampleTags)).toList();
 
       return new _AppState._(sampleTags, sampleArtists);
   }

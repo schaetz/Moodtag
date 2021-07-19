@@ -12,6 +12,7 @@ class Artist {
   UnmodifiableListView<Album> get albums => UnmodifiableListView(_albums);
   UnmodifiableListView<Tag> get tags => UnmodifiableListView(_tags);
 
-  Artist(this.name, this._tags);
+  Artist(this.name) : this._tags = [];
+  Artist.withTags(this.name, this._tags);
 
 }
