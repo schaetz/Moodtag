@@ -122,6 +122,7 @@ class _AppState extends State<MoodtagApp> {
   void _handleArtistTapped(Artist artist) {
     setState(() {
       _selectedArtist = artist;
+      _selectedTag = null;
       print('Tapped artist: ' + artist.name);
     });
   }
@@ -129,6 +130,7 @@ class _AppState extends State<MoodtagApp> {
   void _handleTagTapped(Tag tag) {
     setState(() {
       _selectedTag = tag;
+      _selectedArtist = null;
       print('Tapped tag: ' + tag.name);
     });
   }
