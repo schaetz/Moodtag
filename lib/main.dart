@@ -50,6 +50,8 @@ class _AppState extends State<MoodtagApp> {
   static const _sampleTagNames = <String>[
     '80s',
     'Rock',
+    'Mellow',
+    'Cheerful'
   ];
 
   Artist _selectedArtist;
