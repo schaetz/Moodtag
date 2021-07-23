@@ -39,6 +39,10 @@ class MoodtagApp extends StatefulWidget {
   _AppState createState() => _AppState();
 }
 
+enum NavigationItem {
+  artists, tags
+}
+
 class _AppState extends State<MoodtagApp> {
 
   static const _sampleArtistNames = <String>[
@@ -56,7 +60,7 @@ class _AppState extends State<MoodtagApp> {
 
   Artist _selectedArtist;
   Tag _selectedTag;
-  final showTagsList = false;
+  bool showTagsList = false;
   final sampleTags;
   final sampleArtists;
 
@@ -84,9 +88,11 @@ class _AppState extends State<MoodtagApp> {
               key: ValueKey('ArtistsListPage'),
               child: showTagsList ? TagsListScreen(
                 title: 'Moodtag',
+                onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onTagTapped: _handleTagTapped,
               ) : ArtistsListScreen(
                 title: 'Moodtag',
+                onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onArtistTapped: _handleArtistTapped,
               ),
             ),
@@ -94,12 +100,14 @@ class _AppState extends State<MoodtagApp> {
               ArtistDetailsPage(
                 title: 'Moodtag',
                 artist: _selectedArtist,
+                onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onTagTapped: _handleTagTapped,
               )
             else if (_selectedTag != null)
               TagDetailsPage(
                 title: 'Moodtag',
                 tag: _selectedTag,
+                onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onArtistTapped: _handleArtistTapped,
               )
           ],
@@ -119,6 +127,17 @@ class _AppState extends State<MoodtagApp> {
         ),
       )
     );
+  }
+
+  void _handleBottomNavBarTapped(NavigationItem navigationItem) {
+    switch (navigationItem) {
+      case NavigationItem.artists:
+        showTagsList = false;
+        break;
+      case NavigationItem.tags:
+        showTagsList = true;
+        break;
+    }
   }
 
   void _handleArtistTapped(Artist artist) {

@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:moodtag/main.dart';
+import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
 
 class TagsListScreen extends StatelessWidget {
 
   final String title;
+  final ValueChanged<NavigationItem> onBottomNavBarTapped;
   final ValueChanged<Tag> onTagTapped;
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  TagsListScreen(
-      {this.title, @required this.onTagTapped});
+  TagsListScreen({
+    this.title,
+    @required this.onBottomNavBarTapped,
+    @required this.onTagTapped
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +38,7 @@ class TagsListScreen extends StatelessWidget {
           );
         }
       ),
+      bottomNavigationBar: MtBottomNavBar(onBottomNavBarTapped),
     );
   }
 
