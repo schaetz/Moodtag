@@ -38,7 +38,7 @@ class TagsListScreen extends StatelessWidget {
           );
         }
       ),
-      bottomNavigationBar: MtBottomNavBar(onBottomNavBarTapped),
+      bottomNavigationBar: MtBottomNavBar(NavigationItem.tags, onBottomNavBarTapped),
     );
   }
 

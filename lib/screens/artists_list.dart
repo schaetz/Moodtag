@@ -45,7 +45,7 @@ class ArtistsListScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         backgroundColor: Colors.redAccent,
       ),
-      bottomNavigationBar: MtBottomNavBar(onBottomNavBarTapped),
+      bottomNavigationBar: MtBottomNavBar(NavigationItem.artists, onBottomNavBarTapped),
     );
   }
 

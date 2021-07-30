@@ -45,6 +45,7 @@ enum NavigationItem {
 
 class _AppState extends State<MoodtagApp> {
 
+  static const appTitle = 'Moodtag';
   static const _sampleArtistNames = <String>[
     'AC/DC',
     'The Beatles',
@@ -60,7 +61,7 @@ class _AppState extends State<MoodtagApp> {
 
   Artist _selectedArtist;
   Tag _selectedTag;
-  bool showTagsList = false;
+  bool _showTagsList = false;
   final sampleTags;
   final sampleArtists;
 
@@ -78,36 +79,57 @@ class _AppState extends State<MoodtagApp> {
     return ChangeNotifierProvider(
       create: (context) => Library(this.sampleArtists, this.sampleTags),
       child: MaterialApp(
-        title: 'Moodtag',
+        title: appTitle,
         theme: ThemeData(
           primarySwatch: Colors.red,
         ),
-        home: Navigator(
+        initialRoute: '/artists',
+        routes: {
+          '/artists': (context) => ArtistsListScreen(
+            title: appTitle,
+            onBottomNavBarTapped: _handleBottomNavBarTapped,
+            onArtistTapped: _handleArtistTapped,
+          ),
+          '/tags': (context) => TagsListScreen(
+            title: appTitle,
+            onBottomNavBarTapped: _handleBottomNavBarTapped,
+            onTagTapped: _handleTagTapped,
+          ),
+          '/artists/details': (context) => ArtistDetailsScreen(
+            title: appTitle,
+            artist: _selectedArtist,
+            onTagTapped: _handleTagTapped,
+          ),
+          '/tags/details': (context) => TagDetailsScreen(
+            title: appTitle,
+            tag: _selectedTag,
+            onArtistTapped: _handleArtistTapped,
+          ),
+        },
+        /*home: Navigator(
           pages: [
             MaterialPage(
-              key: ValueKey('ArtistsListPage'),
-              child: showTagsList ? TagsListScreen(
-                title: 'Moodtag',
+              key: _showTagsList ? ValueKey('TagsListPage') : ValueKey('ArtistsListPage'),
+              child: _showTagsList ? TagsListScreen(
+                title: appTitle,
                 onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onTagTapped: _handleTagTapped,
               ) : ArtistsListScreen(
-                title: 'Moodtag',
+                title: appTitle,
                 onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onArtistTapped: _handleArtistTapped,
               ),
             ),
             if (_selectedArtist != null)
               ArtistDetailsPage(
-                title: 'Moodtag',
+                title: appTitle,
                 artist: _selectedArtist,
-                onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onTagTapped: _handleTagTapped,
               )
             else if (_selectedTag != null)
               TagDetailsPage(
-                title: 'Moodtag',
+                title: appTitle,
                 tag: _selectedTag,
-                onBottomNavBarTapped: _handleBottomNavBarTapped,
                 onArtistTapped: _handleArtistTapped,
               )
           ],
@@ -124,7 +146,7 @@ class _AppState extends State<MoodtagApp> {
 
             return true;
           },
-        ),
+        ),*/
       )
     );
   }
@@ -132,28 +154,29 @@ class _AppState extends State<MoodtagApp> {
   void _handleBottomNavBarTapped(NavigationItem navigationItem) {
     switch (navigationItem) {
       case NavigationItem.artists:
-        showTagsList = false;
+        _showTagsList = false;
         break;
       case NavigationItem.tags:
-        showTagsList = true;
+        _showTagsList = true;
         break;
     }
+    print('Show tags list: ' + _showTagsList.toString());
   }
 
   void _handleArtistTapped(Artist artist) {
-    setState(() {
-      _selectedArtist = artist;
-      _selectedTag = null;
-      print('Tapped artist: ' + artist.name);
-    });
+    _selectedArtist = artist;
+    //_selectedTag = null;
+    print('Tapped artist: ' + artist.name);
+
+    Navigator.pushNamed(context, '/artists/details');
   }
 
   void _handleTagTapped(Tag tag) {
-    setState(() {
-      _selectedTag = tag;
-      _selectedArtist = null;
-      print('Tapped tag: ' + tag.name);
-    });
+    _selectedTag = tag;
+    //_selectedArtist = null;
+    print('Tapped tag: ' + tag.name);
+
+    Navigator.pushNamed(context, '/tags/details');
   }
 
 }

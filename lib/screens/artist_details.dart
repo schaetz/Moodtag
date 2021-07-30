@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:moodtag/main.dart';
-import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
@@ -10,13 +8,11 @@ import 'package:moodtag/models/tag.dart';
 class ArtistDetailsPage extends Page {
   final String title;
   final Artist artist;
-  final ValueChanged<NavigationItem> onBottomNavBarTapped;
   final ValueChanged<Tag> onTagTapped;
 
   ArtistDetailsPage({
     this.title,
     @required this.artist,
-    @required this.onBottomNavBarTapped,
     @required this.onTagTapped
   }) : super(key: ValueKey(artist));
 
@@ -27,7 +23,6 @@ class ArtistDetailsPage extends Page {
           return ArtistDetailsScreen(
               title: title,
               artist: artist,
-              onBottomNavBarTapped: onBottomNavBarTapped,
               onTagTapped: onTagTapped,
           );
         });
@@ -37,15 +32,13 @@ class ArtistDetailsPage extends Page {
 class ArtistDetailsScreen extends StatelessWidget {
   final String title;
   final Artist artist;
-  final ValueChanged<NavigationItem> onBottomNavBarTapped;
   final ValueChanged<Tag> onTagTapped;
 
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
 
-  ArtistDetailsScreen({
+  const ArtistDetailsScreen({
     @required this.title,
     @required this.artist,
-    @required this.onBottomNavBarTapped,
     @required this.onTagTapped,
   });
 
@@ -76,7 +69,6 @@ class ArtistDetailsScreen extends StatelessWidget {
           );
         }
       ),
-      bottomNavigationBar: MtBottomNavBar(onBottomNavBarTapped),
     );
   }
 

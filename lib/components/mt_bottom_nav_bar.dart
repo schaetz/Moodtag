@@ -3,7 +3,7 @@ import 'package:moodtag/main.dart';
 
 class MtBottomNavBar extends BottomNavigationBar {
 
-  MtBottomNavBar(Function handleBottomNavBarTapped) : super(
+  MtBottomNavBar(NavigationItem activePage, Function handleBottomNavBarTapped) : super(
     items: const <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(Icons.library_music),
@@ -14,7 +14,9 @@ class MtBottomNavBar extends BottomNavigationBar {
         label: 'Tags',
       ),
     ],
+    currentIndex: activePage.index,
     onTap: (int newIndex) {
+      print(newIndex);
       if (newIndex == 1) {
         handleBottomNavBarTapped(NavigationItem.tags);
       } else {
