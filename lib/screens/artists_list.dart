@@ -10,7 +10,7 @@ class ArtistsListScreen extends StatelessWidget {
 
   final String title;
   final ValueChanged<NavigationItem> onBottomNavBarTapped;
-  final ValueChanged<Artist> onArtistTapped;
+  final ArtistChanged onArtistTapped;
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
@@ -33,7 +33,7 @@ class ArtistsListScreen extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             itemCount: library.artists.length,
             itemBuilder: (context, i) {
-              return _buildArtistRow(library.artists[i], onArtistTapped);
+              return _buildArtistRow(context, library.artists[i], onArtistTapped);
             },
           );
         }
@@ -49,13 +49,13 @@ class ArtistsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildArtistRow(Artist artist, ValueChanged<Artist> onTapped) {
+  Widget _buildArtistRow(BuildContext context, Artist artist, ArtistChanged onTapped) {
     return ListTile(
       title: Text(
         artist.name,
         style: listEntryStyle,
       ),
-      onTap: () => onArtistTapped(artist),
+      onTap: () => onArtistTapped(context, artist),
     );
   }
 

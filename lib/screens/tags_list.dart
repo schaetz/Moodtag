@@ -10,7 +10,7 @@ class TagsListScreen extends StatelessWidget {
 
   final String title;
   final ValueChanged<NavigationItem> onBottomNavBarTapped;
-  final ValueChanged<Tag> onTagTapped;
+  final TagChanged onTagTapped;
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
@@ -33,7 +33,7 @@ class TagsListScreen extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             itemCount: library.tags.length,
             itemBuilder: (context, i) {
-              return _buildTagRow(library.tags[i], onTagTapped);
+              return _buildTagRow(context, library.tags[i], onTagTapped);
             },
           );
         }
@@ -42,13 +42,13 @@ class TagsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTagRow(Tag tag, ValueChanged<Tag> onTapped) {
+  Widget _buildTagRow(BuildContext context, Tag tag, TagChanged onTapped) {
     return ListTile(
       title: Text(
         tag.name,
         style: listEntryStyle,
       ),
-      onTap: () => onTagTapped(tag),
+      onTap: () => onTagTapped(context, tag),
     );
   }
 

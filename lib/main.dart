@@ -43,6 +43,9 @@ enum NavigationItem {
   artists, tags
 }
 
+typedef ArtistChanged = void Function(BuildContext context, Artist artist);
+typedef TagChanged = void Function(BuildContext context, Tag artist);
+
 class _AppState extends State<MoodtagApp> {
 
   static const appTitle = 'Moodtag';
@@ -106,47 +109,6 @@ class _AppState extends State<MoodtagApp> {
             onArtistTapped: _handleArtistTapped,
           ),
         },
-        /*home: Navigator(
-          pages: [
-            MaterialPage(
-              key: _showTagsList ? ValueKey('TagsListPage') : ValueKey('ArtistsListPage'),
-              child: _showTagsList ? TagsListScreen(
-                title: appTitle,
-                onBottomNavBarTapped: _handleBottomNavBarTapped,
-                onTagTapped: _handleTagTapped,
-              ) : ArtistsListScreen(
-                title: appTitle,
-                onBottomNavBarTapped: _handleBottomNavBarTapped,
-                onArtistTapped: _handleArtistTapped,
-              ),
-            ),
-            if (_selectedArtist != null)
-              ArtistDetailsPage(
-                title: appTitle,
-                artist: _selectedArtist,
-                onTagTapped: _handleTagTapped,
-              )
-            else if (_selectedTag != null)
-              TagDetailsPage(
-                title: appTitle,
-                tag: _selectedTag,
-                onArtistTapped: _handleArtistTapped,
-              )
-          ],
-          onPopPage: (route, result) {
-            if (!route.didPop(result)) {
-              return false;
-            }
-
-            // Update the list of pages by setting _selectedArtist to null
-            setState(() {
-              _selectedArtist = null;
-              _selectedTag = null;
-            });
-
-            return true;
-          },
-        ),*/
       )
     );
   }
@@ -163,20 +125,20 @@ class _AppState extends State<MoodtagApp> {
     print('Show tags list: ' + _showTagsList.toString());
   }
 
-  void _handleArtistTapped(Artist artist) {
+  void _handleArtistTapped(BuildContext context, Artist artist) {
     _selectedArtist = artist;
     //_selectedTag = null;
     print('Tapped artist: ' + artist.name);
 
-    Navigator.pushNamed(context, '/artists/details');
+    Navigator.of(context).pushNamed('/artists/details');
   }
 
-  void _handleTagTapped(Tag tag) {
+  void _handleTagTapped(BuildContext context, Tag tag) {
     _selectedTag = tag;
     //_selectedArtist = null;
     print('Tapped tag: ' + tag.name);
 
-    Navigator.pushNamed(context, '/tags/details');
+    Navigator.of(context).pushNamed('/tags/details');
   }
 
 }

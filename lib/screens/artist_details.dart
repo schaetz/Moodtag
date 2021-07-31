@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:moodtag/main.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
@@ -8,7 +9,7 @@ import 'package:moodtag/models/tag.dart';
 class ArtistDetailsPage extends Page {
   final String title;
   final Artist artist;
-  final ValueChanged<Tag> onTagTapped;
+  final TagChanged onTagTapped;
 
   ArtistDetailsPage({
     this.title,
@@ -32,7 +33,7 @@ class ArtistDetailsPage extends Page {
 class ArtistDetailsScreen extends StatelessWidget {
   final String title;
   final Artist artist;
-  final ValueChanged<Tag> onTagTapped;
+  final TagChanged onTagTapped;
 
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
 
@@ -62,7 +63,7 @@ class ArtistDetailsScreen extends StatelessWidget {
                 Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: _buildTagChipsRow(artist.tags),
+                  children: _buildTagChipsRow(context, artist.tags),
                 )
               ]
             ),
@@ -72,15 +73,15 @@ class ArtistDetailsScreen extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildTagChipsRow(List<Tag> tags) {
+  List<Widget> _buildTagChipsRow(BuildContext context, List<Tag> tags) {
     return tags.map((tag) =>
-      _buildTagChip(tag, (value) { })
+      _buildTagChip(context, tag, (value) { })
     ).toList();
   }
 
-  Widget _buildTagChip(Tag tag, ValueChanged<Tag> onTapped) {
+  Widget _buildTagChip(BuildContext context, Tag tag, ValueChanged<Tag> onTapped) {
     return GestureDetector(
-      onTap: () => onTagTapped(tag),
+      onTap: () => onTagTapped(context, tag),
       child: Chip(
           label: Text(tag.name),
       ),
