@@ -9,7 +9,7 @@ import 'package:moodtag/models/library.dart';
 class ArtistsListScreen extends StatelessWidget {
 
   final String title;
-  final ValueChanged<NavigationItem> onBottomNavBarTapped;
+  final NavigationItemChanged onBottomNavBarTapped;
   final ArtistChanged onArtistTapped;
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
@@ -45,7 +45,7 @@ class ArtistsListScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         backgroundColor: Colors.redAccent,
       ),
-      bottomNavigationBar: MtBottomNavBar(NavigationItem.artists, onBottomNavBarTapped),
+      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists, onBottomNavBarTapped),
     );
   }
 

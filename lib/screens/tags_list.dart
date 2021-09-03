@@ -9,7 +9,7 @@ import 'package:moodtag/models/tag.dart';
 class TagsListScreen extends StatelessWidget {
 
   final String title;
-  final ValueChanged<NavigationItem> onBottomNavBarTapped;
+  final NavigationItemChanged onBottomNavBarTapped;
   final TagChanged onTagTapped;
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
@@ -38,7 +38,7 @@ class TagsListScreen extends StatelessWidget {
           );
         }
       ),
-      bottomNavigationBar: MtBottomNavBar(NavigationItem.tags, onBottomNavBarTapped),
+      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.tags, onBottomNavBarTapped),
     );
   }
 

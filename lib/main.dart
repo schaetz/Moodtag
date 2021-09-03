@@ -43,6 +43,7 @@ enum NavigationItem {
   artists, tags
 }
 
+typedef NavigationItemChanged = void Function(BuildContext context, NavigationItem item);
 typedef ArtistChanged = void Function(BuildContext context, Artist artist);
 typedef TagChanged = void Function(BuildContext context, Tag artist);
 
@@ -64,7 +65,6 @@ class _AppState extends State<MoodtagApp> {
 
   Artist _selectedArtist;
   Tag _selectedTag;
-  bool _showTagsList = false;
   final sampleTags;
   final sampleArtists;
 
@@ -113,16 +113,15 @@ class _AppState extends State<MoodtagApp> {
     );
   }
 
-  void _handleBottomNavBarTapped(NavigationItem navigationItem) {
+  void _handleBottomNavBarTapped(BuildContext context, NavigationItem navigationItem) {
     switch (navigationItem) {
       case NavigationItem.artists:
-        _showTagsList = false;
+        Navigator.of(context).pushReplacementNamed('/artists');
         break;
       case NavigationItem.tags:
-        _showTagsList = true;
+        Navigator.of(context).pushReplacementNamed('/tags');
         break;
     }
-    print('Show tags list: ' + _showTagsList.toString());
   }
 
   void _handleArtistTapped(BuildContext context, Artist artist) {
