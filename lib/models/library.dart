@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 
 import 'artist.dart';
+import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/helpers.dart';
@@ -29,11 +30,21 @@ class Library extends ChangeNotifier {
   List<Artist> getArtistsWithTag(Tag tag) =>
       _artists.where((artist) => artist.tags.contains(tag)).toList();
 
-  void createArtist(String artistName) {
+  Artist getArtistByName(String artistName) {
+    var artistsWithName = _artists.where((artist) => artist.name == artistName);
+    if (artistsWithName.isNotEmpty) {
+      return artistsWithName.first;
+    } else {
+      throw InvalidArgumentException();
+    }
+  }
+
+  void createArtist(String artistName, [List<Tag> tags]) {
     if (_doesArtistNameAlreadyExist(artistName)) {
       throw NameAlreadyTakenException('There is already an artist with the name "' + artistName + '".');
     } else {
-      _addArtist(Artist(artistName));
+      tags ??= [];
+      _addArtist(Artist.withTags(artistName, tags));
     }
   }
 

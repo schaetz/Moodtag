@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/models/library.dart';
+import 'package:moodtag/models/tag.dart';
 
-void showAddArtistDialog(context) async {
+void showAddArtistDialog(context, [Tag preselectedTag]) async {
   var newArtistName;
   await showDialog<String>(
       context: context,
@@ -27,14 +28,13 @@ void showAddArtistDialog(context) async {
                     padding: const EdgeInsets.only(left: 16.0),
                     child: SimpleDialogOption(
                       onPressed: () {
-                        if (newArtistName != null) {
-                          try {
-                            Provider.of<Library>(context, listen: false)
-                                .createArtist(newArtistName);
-                            Navigator.pop(context);
-                          } on NameAlreadyTakenException catch (e) {
-                            _showArtistCreationExceptionDialog(context, e.message);
-                          }
+                        if (newArtistName == null) {
+                          return;
+                        }
+                        if (preselectedTag != null) {
+                          _addOrEditArtistWithPreselectedTag(context, newArtistName, preselectedTag);
+                        } else {
+                          _addArtistWithoutPreselectedTag(context, newArtistName);
                         }
                       },
                       child: const Text('OK'),
@@ -47,6 +47,28 @@ void showAddArtistDialog(context) async {
         );
       }
   );
+}
+
+void _addArtistWithoutPreselectedTag(BuildContext context, String newArtistName) {
+  try {
+    Provider.of<Library>(context, listen: false)
+        .createArtist(newArtistName);
+    Navigator.pop(context);
+  } on NameAlreadyTakenException catch (e) {
+    _showArtistCreationExceptionDialog(context, e.message);
+  }
+}
+
+void _addOrEditArtistWithPreselectedTag(BuildContext context, String newArtistName, Tag preselectedTag) {
+  try {
+    Provider.of<Library>(context, listen: false)
+        .createArtist(newArtistName, [preselectedTag]);
+  } on NameAlreadyTakenException {
+    // TODO Cannot add to an unmodifiable list
+    //Provider.of<Library>(context, listen: false)
+    //    .getArtistByName(newArtistName).tags.add(preselectedTag);
+  }
+  Navigator.pop(context);
 }
 
 void _showArtistCreationExceptionDialog(BuildContext context, String exceptionMessage) {
