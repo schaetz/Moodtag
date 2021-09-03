@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:moodtag/main.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
+import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 
@@ -83,9 +84,13 @@ class ArtistsListScreen extends StatelessWidget {
                     child: SimpleDialogOption(
                       onPressed: () {
                         if (newArtistName != null) {
-                          Provider.of<Library>(context, listen: false).addArtist(
-                            Artist(newArtistName));
-                          Navigator.pop(context);
+                          try {
+                            Provider.of<Library>(context, listen: false)
+                                .createArtist(newArtistName);
+                            Navigator.pop(context);
+                          } on NameAlreadyTakenException catch (e) {
+                            _showArtistCreationExceptionDialog(context, e.message);
+                          }
                         }
                       },
                       child: const Text('OK'),
@@ -97,6 +102,22 @@ class ArtistsListScreen extends StatelessWidget {
           ],
         );
       }
+    );
+  }
+
+  void _showArtistCreationExceptionDialog(BuildContext context, String exceptionMessage) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Could not create artist'),
+          content: Text(exceptionMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK'),
+            ),
+          ],
+        )
     );
   }
 
