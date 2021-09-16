@@ -17,10 +17,10 @@ class MtBottomNavBar extends BottomNavigationBar {
     currentIndex: activePage.index,
     onTap: (int newIndex) {
       print(newIndex);
-      if (newIndex == 1) {
-        handleBottomNavBarTapped(context, NavigationItem.tags);
-      } else {
+      if (newIndex == 0 && activePage != NavigationItem.artists) {
         handleBottomNavBarTapped(context, NavigationItem.artists);
+      } else if (newIndex == 1 && activePage != NavigationItem.tags) {
+        handleBottomNavBarTapped(context, NavigationItem.tags);
       }
     },
   );
