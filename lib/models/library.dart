@@ -27,8 +27,11 @@ class Library extends ChangeNotifier {
     return UnmodifiableListView(tagsSorted);
   }
 
-  List<Artist> getArtistsWithTag(Tag tag) =>
-      _artists.where((artist) => artist.tags.contains(tag)).toList();
+  List<Artist> getArtistsWithTag(Tag tag) {
+    List<Artist> artistsWithTag = _artists.where((artist) => artist.tags.contains(tag)).toList();
+    artistsWithTag.sortArtistNames();
+    return artistsWithTag;
+  }
 
   Artist getArtistByName(String artistName) {
     var artistsWithName = _artists.where((artist) => artist.name == artistName);
