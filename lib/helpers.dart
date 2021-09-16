@@ -10,12 +10,14 @@ String dropThe(String artistName) {
 
 extension ArtistList on List<Artist> {
 
-  void sortArtistNames() => this.sort((a,b) => dropThe(a.name).compareTo(dropThe(b.name)));
+  void sortArtistNames() => this.sort((a,b) => dropThe(a.name.toLowerCase())
+      .compareTo(dropThe(b.name.toLowerCase())));
 
 }
 
 extension TagList on List<Tag> {
   
-  void sortTags() => this.sort((a,b) => a.name.compareTo(b.name));
+  void sortTags() => this.sort((a,b) => a.name.toLowerCase()
+      .compareTo(b.name.toLowerCase()));
   
 }
