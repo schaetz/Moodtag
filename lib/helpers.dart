@@ -21,3 +21,12 @@ extension TagList on List<Tag> {
       .compareTo(b.name.toLowerCase()));
   
 }
+
+List<String> processMultilineInput(String input) {
+  List<String> elementsWithDuplicates = input.split("\n");
+  elementsWithDuplicates = elementsWithDuplicates
+      .map((element) => element.trim()).toList();
+  elementsWithDuplicates.retainWhere((element) => element.isNotEmpty);
+  Set<String> uniqueElements = elementsWithDuplicates.toSet();
+  return uniqueElements.toList();
+}

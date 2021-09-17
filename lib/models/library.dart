@@ -51,8 +51,20 @@ class Library extends ChangeNotifier {
     }
   }
 
+  void createTag(String tagName) {
+    if (_doesTagNameAlreadyExist(tagName)) {
+      throw NameAlreadyTakenException('There is already a tag with the name "' + tagName + '".');
+    } else {
+      _addTag(Tag(tagName));
+    }
+  }
+
   bool _doesArtistNameAlreadyExist(String artistName) {
     return _artists.where((artist) => artist.name == artistName).isNotEmpty;
+  }
+
+  bool _doesTagNameAlreadyExist(String tagName) {
+    return _tags.where((tag) => tag.name == tagName).isNotEmpty;
   }
 
   void _addArtist(Artist artist) {

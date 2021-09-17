@@ -4,16 +4,16 @@ import 'package:provider/provider.dart';
 import 'exception_dialog.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/helpers.dart';
+import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
-import 'package:moodtag/models/tag.dart';
 
-void showAddArtistDialog(context, [Tag preselectedTag]) async {
+void showAddTagDialog(context, [Artist preselectedArtist]) async {
   var newInput;
   await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: const Text('Enter the name of the artist:'),
+          title: const Text('Enter one or multiple new tags (in separate lines):'),
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -31,10 +31,10 @@ void showAddArtistDialog(context, [Tag preselectedTag]) async {
                     padding: const EdgeInsets.only(left: 16.0),
                     child: SimpleDialogOption(
                       onPressed: () {
-                        if (newInput == null) {
+                        if (newInput == null || newInput.isEmpty) {
                           return;
                         }
-                        _addOrEditArtist(context, newInput, preselectedTag);
+                        _addOrEditTag(context, newInput, preselectedArtist);
                       },
                       child: const Text('OK'),
                     ),
@@ -48,32 +48,27 @@ void showAddArtistDialog(context, [Tag preselectedTag]) async {
   );
 }
 
-void _addOrEditArtist(BuildContext context, String newInput, Tag preselectedTag) {
+void _addOrEditTag(BuildContext context, String newInput, Artist preselectedArtist) {
   List<String> inputElements = processMultilineInput(newInput);
   List<String> errorElements = [];
 
-  for (String newArtistName in inputElements) {
+  for (String newTagName in inputElements) {
     try {
-      List<Tag> preselectedTagsList = preselectedTag != null
-          ? [preselectedTag] : [];
-      Provider.of<Library>(context, listen: false)
-          .createArtist(newArtistName, preselectedTagsList);
-
+      Provider.of<Library>(context, listen: false).createTag(newTagName);
       // TODO Cannot add to an unmodifiable list
       //Provider.of<Library>(context, listen: false)
       //    .getArtistByName(newArtistName).tags.add(preselectedTag);
-      //Navigator.pop(context);
     } on NameAlreadyTakenException {
-      // If there is a preselected tag, just ignore the exception
-      // and add the preselected tag to the existing artist
-      if (preselectedTag == null) {
-        errorElements.add(newArtistName);
+      // If there is a preselected artist, just ignore the exception
+      // and add the preselected artist to the existing tag
+      if (preselectedArtist == null) {
+        errorElements.add(newTagName);
       }
     }
   }
   Navigator.pop(context);
 
   if (errorElements.isNotEmpty) {
-    showExceptionDialog(context, 'Error while adding artists', 'One or several artists already exist');
+    showExceptionDialog(context, 'Error while adding tags', 'One or several tags already exist');
   }
 }
