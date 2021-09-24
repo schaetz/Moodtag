@@ -85,6 +85,9 @@ class _AppState extends State<MoodtagApp> {
         title: appTitle,
         theme: ThemeData(
           primarySwatch: Colors.red,
+          primaryColor: Colors.red,
+          accentColor: Colors.redAccent,
+          unselectedWidgetColor: Colors.grey
         ),
         initialRoute: '/artists',
         routes: {

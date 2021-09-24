@@ -1,11 +1,11 @@
 import 'dart:collection';
-import 'package:flutter/cupertino.dart';
 
 import 'artist.dart';
 import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/helpers.dart';
+import 'package:flutter/widgets.dart';
 
 /*
  * Main model of the app containing all artists with their properties
@@ -69,6 +69,7 @@ class Library extends ChangeNotifier {
 
   void _addArtist(Artist artist) {
     _artists.add(artist);
+    _addChangeListenerToNewArtist(artist);
     notifyListeners();
   }
 
@@ -87,6 +88,16 @@ class Library extends ChangeNotifier {
     notifyListeners();
   }
 
-  Library(this._artists, this._tags);
+  Library(artists, tags) {
+    // Copy the values into new data structures,
+    // otherwise sample artists will always have the same set of tags
+    this._artists = List.from(artists);
+    this._artists.forEach((artist) => _addChangeListenerToNewArtist(artist));
+    this._tags = List.from(tags);
+  }
+
+  _addChangeListenerToNewArtist(Artist artist) {
+    artist.addListener(() => this.notifyListeners());
+  }
 
 }

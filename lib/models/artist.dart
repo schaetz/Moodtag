@@ -3,8 +3,9 @@ import 'dart:collection';
 import 'album.dart';
 import 'package:moodtag/helpers.dart';
 import 'package:moodtag/models/tag.dart';
+import 'package:flutter/widgets.dart';
 
-class Artist {
+class Artist extends ChangeNotifier {
 
   String name;
   final List<Album> _albums = [];
@@ -19,6 +20,16 @@ class Artist {
   }
 
   Artist(this.name) : this._tags = [];
-  Artist.withTags(this.name, this._tags);
+  Artist.withTags(this.name, final List<Tag> tags) : _tags = List.from(tags);
+
+  void addTag(Tag tag) {
+    _tags.add(tag);
+    notifyListeners();
+  }
+
+  void removeTag(Tag tag) {
+    _tags.remove(tag);
+    notifyListeners();
+  }
 
 }
