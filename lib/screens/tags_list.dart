@@ -41,8 +41,8 @@ class TagsListScreen extends StatelessWidget {
         }
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showAddTagDialog(context);
+        onPressed: () => {
+          new AddTagDialog(context).show()
         },
         child: const Icon(Icons.add),
         backgroundColor: Colors.redAccent,
@@ -58,7 +58,7 @@ class TagsListScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => navigateToTagDetails(context, tag),
-      onLongPress: () => showDeleteDialog(context, tag)
+      onLongPress: () => new DeleteDialog(context, tag).show()
     );
   }
 

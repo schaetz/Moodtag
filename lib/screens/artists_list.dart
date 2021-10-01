@@ -41,8 +41,8 @@ class ArtistsListScreen extends StatelessWidget {
         }
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showAddArtistDialog(context);
+        onPressed: () => {
+          new AddArtistDialog(context).show()
         },
         child: const Icon(Icons.add),
         backgroundColor: Colors.redAccent,
@@ -58,7 +58,7 @@ class ArtistsListScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => navigateToArtistDetails(context, artist),
-      onLongPress: () => showDeleteDialog(context, artist)
+      onLongPress: () => new DeleteDialog(context, artist).show()
     );
   }
 

@@ -133,7 +133,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
       label: Text('+'),
       //backgroundColor: Colors.redAccent,
       onPressed: () => {
-        showAddTagDialog(context, artist)
+        new AddTagDialog.withPreselectedArtist(context, artist).show()
       }
     );
   }
