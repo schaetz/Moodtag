@@ -11,14 +11,14 @@ class TagsListScreen extends StatelessWidget {
 
   final String title;
   final NavigationItemChanged onBottomNavBarTapped;
-  final TagChanged onTagTapped;
+  final TagChanged navigateToTagDetails;
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   TagsListScreen({
     this.title,
     @required this.onBottomNavBarTapped,
-    @required this.onTagTapped
+    @required this.navigateToTagDetails
   });
 
   @override
@@ -34,7 +34,7 @@ class TagsListScreen extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             itemCount: library.tags.length,
             itemBuilder: (context, i) {
-              return _buildTagRow(context, library.tags[i], onTagTapped);
+              return _buildTagRow(context, library.tags[i], navigateToTagDetails);
             },
           );
         }
@@ -56,7 +56,7 @@ class TagsListScreen extends StatelessWidget {
         tag.name,
         style: listEntryStyle,
       ),
-      onTap: () => onTagTapped(context, tag),
+      onTap: () => navigateToTagDetails(context, tag),
     );
   }
 

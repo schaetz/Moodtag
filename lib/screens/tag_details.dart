@@ -10,12 +10,12 @@ import 'package:moodtag/models/tag.dart';
 class TagDetailsPage extends Page {
   final String title;
   final Tag tag;
-  final ArtistChanged onArtistTapped;
+  final ArtistChanged navigateToArtistDetails;
 
   TagDetailsPage({
     this.title,
     @required this.tag,
-    @required this.onArtistTapped
+    @required this.navigateToArtistDetails
   }) : super(key: ValueKey(tag));
 
   Route createRoute(BuildContext context) {
@@ -25,7 +25,7 @@ class TagDetailsPage extends Page {
           return TagDetailsScreen(
               title: title,
               tag: tag,
-              onArtistTapped: onArtistTapped
+              navigateToArtistDetails: navigateToArtistDetails
           );
         });
   }
@@ -34,7 +34,7 @@ class TagDetailsPage extends Page {
 class TagDetailsScreen extends StatelessWidget {
   final String title;
   final Tag tag;
-  final ArtistChanged onArtistTapped;
+  final ArtistChanged navigateToArtistDetails;
 
   static const tagNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
@@ -42,7 +42,7 @@ class TagDetailsScreen extends StatelessWidget {
   const TagDetailsScreen({
     @required this.title,
     @required this.tag,
-    @required this.onArtistTapped,
+    @required this.navigateToArtistDetails,
   });
 
   @override
@@ -68,7 +68,7 @@ class TagDetailsScreen extends StatelessWidget {
                     padding: EdgeInsets.all(16.0),
                     itemCount: library.getArtistsWithTag(tag).length,
                     itemBuilder: (context, i) {
-                      return _buildArtistRow(context, library.getArtistsWithTag(tag)[i], onArtistTapped);
+                      return _buildArtistRow(context, library.getArtistsWithTag(tag)[i], navigateToArtistDetails);
                     },
                   ),
                 ),
@@ -93,7 +93,7 @@ class TagDetailsScreen extends StatelessWidget {
         artist.name,
         style: listEntryStyle,
       ),
-      onTap: () => onArtistTapped(context, artist),
+      onTap: () => navigateToArtistDetails(context, artist),
     );
   }
 

@@ -94,22 +94,22 @@ class _AppState extends State<MoodtagApp> {
           '/artists': (context) => ArtistsListScreen(
             title: appTitle,
             onBottomNavBarTapped: _handleBottomNavBarTapped,
-            onArtistTapped: _handleArtistTapped,
+            navigateToArtistDetails: _navigateToArtistDetails,
           ),
           '/tags': (context) => TagsListScreen(
             title: appTitle,
             onBottomNavBarTapped: _handleBottomNavBarTapped,
-            onTagTapped: _handleTagTapped,
+            navigateToTagDetails: _navigateToTagDetails,
           ),
           '/artists/details': (context) => ArtistDetailsScreen(
             title: appTitle,
             artist: _selectedArtist,
-            onTagTapped: _handleTagTapped,
+            navigateToTagDetails: _navigateToTagDetails,
           ),
           '/tags/details': (context) => TagDetailsScreen(
             title: appTitle,
             tag: _selectedTag,
-            onArtistTapped: _handleArtistTapped,
+            navigateToArtistDetails: _navigateToArtistDetails,
           ),
         },
       )
@@ -127,18 +127,16 @@ class _AppState extends State<MoodtagApp> {
     }
   }
 
-  void _handleArtistTapped(BuildContext context, Artist artist) {
+  void _navigateToArtistDetails(BuildContext context, Artist artist) {
     _selectedArtist = artist;
-    //_selectedTag = null;
-    print('Tapped artist: ' + artist.name);
+    _selectedTag = null;
 
     Navigator.of(context).pushNamed('/artists/details');
   }
 
-  void _handleTagTapped(BuildContext context, Tag tag) {
+  void _navigateToTagDetails(BuildContext context, Tag tag) {
     _selectedTag = tag;
-    //_selectedArtist = null;
-    print('Tapped tag: ' + tag.name);
+    _selectedArtist = null;
 
     Navigator.of(context).pushNamed('/tags/details');
   }

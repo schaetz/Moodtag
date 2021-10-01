@@ -10,12 +10,12 @@ import 'package:moodtag/models/tag.dart';
 class ArtistDetailsPage extends Page {
   final String title;
   final Artist artist;
-  final TagChanged onTagTapped;
+  final TagChanged navigateToTagDetails;
 
   ArtistDetailsPage({
     this.title,
     @required this.artist,
-    @required this.onTagTapped
+    @required this.navigateToTagDetails
   }) : super(key: ValueKey(artist));
 
   Route createRoute(BuildContext context) {
@@ -25,7 +25,7 @@ class ArtistDetailsPage extends Page {
           return ArtistDetailsScreen(
               title: title,
               artist: artist,
-              onTagTapped: onTagTapped,
+              navigateToTagDetails: navigateToTagDetails,
           );
         });
   }
@@ -34,14 +34,14 @@ class ArtistDetailsPage extends Page {
 class ArtistDetailsScreen extends StatefulWidget {
   final String title;
   final Artist artist;
-  final TagChanged onTagTapped;
+  final TagChanged navigateToTagDetails;
 
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
 
   const ArtistDetailsScreen({
     @required this.title,
     @required this.artist,
-    @required this.onTagTapped,
+    @required this.navigateToTagDetails,
   });
 
   @override
