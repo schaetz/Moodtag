@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:moodtag/dialogs/add_artist_dialog.dart';
+import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
@@ -78,9 +78,7 @@ class TagDetailsScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          new AddArtistDialog.withPreselectedTag(context, tag).show();
-        },
+        onPressed: () => AddEntityDialog.openAddArtistDialog(context, preselectedTag: tag),
         child: const Icon(Icons.add),
         backgroundColor: Colors.redAccent,
       ),

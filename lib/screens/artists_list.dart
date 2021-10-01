@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:moodtag/main.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
-import 'package:moodtag/dialogs/add_artist_dialog.dart';
+import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
@@ -41,9 +41,7 @@ class ArtistsListScreen extends StatelessWidget {
         }
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {
-          new AddArtistDialog(context).show()
-        },
+        onPressed: () => AddEntityDialog.openAddArtistDialog(context),
         child: const Icon(Icons.add),
         backgroundColor: Colors.redAccent,
       ),
@@ -58,7 +56,7 @@ class ArtistsListScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => navigateToArtistDetails(context, artist),
-      onLongPress: () => new DeleteDialog(context, artist).show()
+      onLongPress: () => DeleteDialog.openNew<Artist>(context, artist)
     );
   }
 

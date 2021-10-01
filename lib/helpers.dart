@@ -30,3 +30,7 @@ List<String> processMultilineInput(String input) {
   Set<String> uniqueElements = elementsWithDuplicates.toSet();
   return uniqueElements.toList();
 }
+
+List<T> createListWithSingleElementOrEmpty<T>(T elementOrNull) {
+  return elementOrNull != null ? [elementOrNull] : [];
+}

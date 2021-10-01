@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:moodtag/dialogs/add_tag_dialog.dart';
+import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
@@ -132,9 +132,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     return InputChip(
       label: Text('+'),
       //backgroundColor: Colors.redAccent,
-      onPressed: () => {
-        new AddTagDialog.withPreselectedArtist(context, artist).show()
-      }
+      onPressed: () => AddEntityDialog.openAddTagDialog(context, preselectedArtist: artist)
     );
   }
 

@@ -4,6 +4,10 @@ import 'abstract_dialog.dart';
 
 class ExceptionDialog extends AbstractDialog {
 
+  static void openNew(BuildContext context, String exceptionHeadline, String exceptionMessage) {
+    new ExceptionDialog(context, exceptionHeadline, exceptionMessage).show();
+  }
+
   String exceptionHeadline;
   String exceptionMessage;
 

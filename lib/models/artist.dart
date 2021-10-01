@@ -7,6 +7,9 @@ import 'package:flutter/widgets.dart';
 
 class Artist extends ChangeNotifier {
 
+  static const denotationSingular = 'artist';
+  static const denotationPlural = 'artists';
+
   String name;
   final List<Album> _albums = [];
   final List<Tag> _tags;

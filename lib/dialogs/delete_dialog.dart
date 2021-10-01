@@ -6,9 +6,13 @@ import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
 
-class DeleteDialog extends AbstractDialog {
+class DeleteDialog<T> extends AbstractDialog {
 
-  var entity;
+  static void openNew<T>(BuildContext context, T entity) {
+    new DeleteDialog<T>(context, entity).show();
+  }
+
+  T entity;
 
   DeleteDialog(BuildContext context, this.entity) : super(context);
 
@@ -44,7 +48,7 @@ class DeleteDialog extends AbstractDialog {
     );
   }
 
-  String _determineDialogTextForDeleteEntity(BuildContext context, entity) {
+  String _determineDialogTextForDeleteEntity(BuildContext context, T entity) {
     final libraryProvider = Provider.of<Library>(context, listen: false);
 
     if (entity is Artist) {
@@ -62,7 +66,7 @@ class DeleteDialog extends AbstractDialog {
     }
   }
 
-  void _deleteEntity(BuildContext context, entity) {
+  void _deleteEntity(BuildContext context, T entity) {
     final libraryProvider = Provider.of<Library>(context, listen: false);
 
     if (entity is Artist) {
