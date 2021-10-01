@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'exception_dialog.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/helpers.dart';
+import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
 
@@ -51,23 +52,24 @@ void showAddArtistDialog(context, [Tag preselectedTag]) async {
 void _addOrEditArtist(BuildContext context, String newInput, Tag preselectedTag) {
   List<String> inputElements = processMultilineInput(newInput);
   List<String> errorElements = [];
+  final libraryProvider = Provider.of<Library>(context, listen: false);
 
   for (String newArtistName in inputElements) {
+    Artist newArtist;
+
     try {
       List<Tag> preselectedTagsList = preselectedTag != null
           ? [preselectedTag] : [];
-      Provider.of<Library>(context, listen: false)
-          .createArtist(newArtistName, preselectedTagsList);
-
-      // TODO Cannot add to an unmodifiable list
-      //Provider.of<Library>(context, listen: false)
-      //    .getArtistByName(newArtistName).tags.add(preselectedTag);
-      //Navigator.pop(context);
+      newArtist = libraryProvider.createArtist(newArtistName, preselectedTagsList);
     } on NameAlreadyTakenException {
       // If there is a preselected tag, just ignore the exception
-      // and add the preselected tag to the existing artist
+      // and add the preselected tag to the existing artist in "finally"
       if (preselectedTag == null) {
         errorElements.add(newArtistName);
+      }
+    } finally {
+      if (preselectedTag != null) {
+        newArtist.addTag(preselectedTag);
       }
     }
   }

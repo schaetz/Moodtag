@@ -42,20 +42,24 @@ class Library extends ChangeNotifier {
     }
   }
 
-  void createArtist(String artistName, [List<Tag> tags]) {
+  Artist createArtist(String artistName, [List<Tag> tags]) {
     if (_doesArtistNameAlreadyExist(artistName)) {
       throw NameAlreadyTakenException('There is already an artist with the name "' + artistName + '".');
     } else {
       tags ??= [];
-      _addArtist(Artist.withTags(artistName, tags));
+      Artist newArtist = Artist.withTags(artistName, tags);
+      _addArtist(newArtist);
+      return newArtist;
     }
   }
 
-  void createTag(String tagName) {
+  Tag createTag(String tagName) {
     if (_doesTagNameAlreadyExist(tagName)) {
       throw NameAlreadyTakenException('There is already a tag with the name "' + tagName + '".');
     } else {
-      _addTag(Tag(tagName));
+      Tag newTag = Tag(tagName);
+      _addTag(newTag);
+      return newTag;
     }
   }
 

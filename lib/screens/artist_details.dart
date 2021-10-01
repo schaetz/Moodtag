@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:moodtag/dialogs/add_tag_dialog.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
@@ -98,9 +99,13 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
   List<Widget> _buildTagChipsRow(BuildContext context, Library library, Artist artist) {
     final tagsToDisplay = _tagEditMode ? library.tags : artist.tags;
 
-    return tagsToDisplay.map(
-            (tag) => _buildTagChip(context, artist, tag, (value) { })
+    List<Widget> chipsList = tagsToDisplay.map(
+              (tag) => _buildTagChip(context, artist, tag, (value) { })
            ).toList();
+    if (_tagEditMode) {
+      chipsList.add(_buildAddTagChip(context, artist));
+    }
+    return chipsList;
   }
 
   Widget _buildTagChip(BuildContext context, Artist artist, Tag tag, ValueChanged<Tag> onTapped) {
@@ -121,6 +126,16 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     } else {
       onTapped(tag);
     }
+  }
+
+  Widget _buildAddTagChip(BuildContext context, Artist artist) {
+    return InputChip(
+      label: Text('+'),
+      //backgroundColor: Colors.redAccent,
+      onPressed: () => {
+        showAddTagDialog(context, artist)
+      }
+    );
   }
 
 }
