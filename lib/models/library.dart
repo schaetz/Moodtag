@@ -63,6 +63,17 @@ class Library extends ChangeNotifier {
     }
   }
 
+  void deleteArtist(Artist artist) {
+    _removeArtist(artist);
+  }
+
+  void deleteTag(Tag tag) {
+    for (Artist artist in getArtistsWithTag(tag)) {
+      artist.removeTag(tag);
+    }
+    _removeTag(tag);
+  }
+
   bool _doesArtistNameAlreadyExist(String artistName) {
     return _artists.where((artist) => artist.name == artistName).isNotEmpty;
   }

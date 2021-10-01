@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/dialogs/add_tag_dialog.dart';
+import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
 
@@ -57,6 +58,7 @@ class TagsListScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => navigateToTagDetails(context, tag),
+      onLongPress: () => showDeleteDialog(context, tag)
     );
   }
 
