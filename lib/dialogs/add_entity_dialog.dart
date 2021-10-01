@@ -129,12 +129,10 @@ class AddEntityDialog<E, O> extends AbstractDialog {
       newArtist = libraryProvider.createArtist(newArtistName, preselectedTagsList);
     } on NameAlreadyTakenException {
       // If there is a preselected tag, just ignore the exception
-      // and add the preselected tag to the existing artist in "finally"
+      // and add the preselected tag to the existing artist
       if (preselectedTag == null) {
         error = true;
-      }
-    } finally {
-      if (preselectedTag != null) {
+      } else {
         newArtist.addTag(preselectedTag);
       }
     }
