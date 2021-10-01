@@ -115,8 +115,11 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     closeDialog(context);
 
     if (errorElements.isNotEmpty) {
-      ExceptionDialog.openNew(context, 'Error while adding ${_getEntityDenotation(plural: true)}',
-          'One or several ${_getEntityDenotation(plural: true)} already exist');
+      final errorMessage = 'Error while adding ${_getEntityDenotation(plural: true)}: '
+        + 'One or several ${_getEntityDenotation(plural: true)} already exist';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage))
+      );
     }
   }
 
