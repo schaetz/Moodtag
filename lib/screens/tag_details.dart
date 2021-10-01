@@ -64,7 +64,7 @@ class TagDetailsScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: ListView.separated(
-                    separatorBuilder: (pro, context) => Divider(color: Colors.black),
+                    separatorBuilder: (context, _) => Divider(),
                     padding: EdgeInsets.all(16.0),
                     itemCount: library.getArtistsWithTag(tag).length,
                     itemBuilder: (context, i) {
@@ -80,7 +80,7 @@ class TagDetailsScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddEntityDialog.openAddArtistDialog(context, preselectedTag: tag),
         child: const Icon(Icons.add),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Theme.of(context).accentColor,
       ),
     );
   }

@@ -31,7 +31,7 @@ class TagsListScreen extends StatelessWidget {
       body: Consumer<Library>(
         builder: (context, library, child) {
           return ListView.separated(
-            separatorBuilder: (pro, context) => Divider(color: Colors.black),
+            separatorBuilder: (context, _) => Divider(),
             padding: EdgeInsets.all(16.0),
             itemCount: library.tags.length,
             itemBuilder: (context, i) {
@@ -43,7 +43,7 @@ class TagsListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddEntityDialog.openAddTagDialog(context),
         child: const Icon(Icons.add),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Theme.of(context).accentColor,
       ),
       bottomNavigationBar: MtBottomNavBar(context, NavigationItem.tags, onBottomNavBarTapped),
     );

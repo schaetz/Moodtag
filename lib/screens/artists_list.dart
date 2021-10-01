@@ -31,7 +31,7 @@ class ArtistsListScreen extends StatelessWidget {
       body: Consumer<Library>(
         builder: (context, library, child) {
           return ListView.separated(
-            separatorBuilder: (pro, context) => Divider(color: Colors.black),
+            separatorBuilder: (context, _) => Divider(),
             padding: EdgeInsets.all(16.0),
             itemCount: library.artists.length,
             itemBuilder: (context, i) {
@@ -43,7 +43,7 @@ class ArtistsListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddEntityDialog.openAddArtistDialog(context),
         child: const Icon(Icons.add),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Theme.of(context).accentColor,
       ),
       bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists, onBottomNavBarTapped),
     );
