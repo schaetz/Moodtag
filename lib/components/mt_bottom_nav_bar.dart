@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/main.dart';
+
+import 'package:moodtag/navigation.dart';
 
 class MtBottomNavBar extends BottomNavigationBar {
 

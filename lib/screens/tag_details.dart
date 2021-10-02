@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
-import 'package:moodtag/main.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
+import 'package:moodtag/navigation.dart';
 
 class TagDetailsPage extends Page {
   final String title;
@@ -23,7 +24,6 @@ class TagDetailsPage extends Page {
         settings: this,
         builder: (BuildContext context) {
           return TagDetailsScreen(
-              title: title,
               tag: tag,
               navigateToArtistDetails: navigateToArtistDetails
           );
@@ -32,7 +32,7 @@ class TagDetailsPage extends Page {
 }
 
 class TagDetailsScreen extends StatelessWidget {
-  final String title;
+
   final Tag tag;
   final ArtistChanged navigateToArtistDetails;
 
@@ -40,7 +40,6 @@ class TagDetailsScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   const TagDetailsScreen({
-    @required this.title,
     @required this.tag,
     @required this.navigateToArtistDetails,
   });
@@ -48,9 +47,7 @@ class TagDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: MtAppBar(),
       body: Consumer<Library>(
         builder: (context, library, child) {
           return Padding(

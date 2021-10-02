@@ -15,41 +15,36 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:moodtag/screens/tag_details.dart';
 import 'package:provider/provider.dart';
 
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
-
+import 'package:moodtag/navigation.dart';
 import 'package:moodtag/screens/artist_details.dart';
 import 'package:moodtag/screens/artists_list.dart';
+import 'package:moodtag/screens/tag_details.dart';
 import 'package:moodtag/screens/tags_list.dart';
 
 void main() {
-  runApp(MoodtagApp(title: 'Moodtag'));
+  runApp(MoodtagApp());
 }
 
-class MoodtagApp extends StatefulWidget {
-  MoodtagApp({Key key, this.title}) : super(key: key);
 
-  final String title;
+class MoodtagApp extends StatefulWidget {
+
+  static const appTitle = 'Moodtag';
+
+  MoodtagApp({Key key}) : super(key: key);
 
   @override
   _AppState createState() => _AppState();
+
 }
 
-enum NavigationItem {
-  artists, tags
-}
-
-typedef NavigationItemChanged = void Function(BuildContext context, NavigationItem item);
-typedef ArtistChanged = void Function(BuildContext context, Artist artist);
-typedef TagChanged = void Function(BuildContext context, Tag artist);
 
 class _AppState extends State<MoodtagApp> {
 
-  static const appTitle = 'Moodtag';
   static const _sampleArtistNames = <String>[
     'AC/DC',
     'The Beatles',
@@ -62,6 +57,7 @@ class _AppState extends State<MoodtagApp> {
     'Mellow',
     'Cheerful'
   ];
+  static const initialRoute = '/artists';
 
   Artist _selectedArtist;
   Tag _selectedTag;
@@ -82,7 +78,7 @@ class _AppState extends State<MoodtagApp> {
     return ChangeNotifierProvider(
       create: (context) => Library(this.sampleArtists, this.sampleTags),
       child: MaterialApp(
-        title: appTitle,
+        title: MoodtagApp.appTitle,
         theme: ThemeData(
           primarySwatch: Colors.red,
           primaryColor: Colors.red,
@@ -90,25 +86,21 @@ class _AppState extends State<MoodtagApp> {
           unselectedWidgetColor: Colors.grey,
           dividerColor: Colors.black54
         ),
-        initialRoute: '/artists',
+        initialRoute: initialRoute,
         routes: {
           '/artists': (context) => ArtistsListScreen(
-            title: appTitle,
             onBottomNavBarTapped: _handleBottomNavBarTapped,
             navigateToArtistDetails: _navigateToArtistDetails,
           ),
           '/tags': (context) => TagsListScreen(
-            title: appTitle,
             onBottomNavBarTapped: _handleBottomNavBarTapped,
             navigateToTagDetails: _navigateToTagDetails,
           ),
           '/artists/details': (context) => ArtistDetailsScreen(
-            title: appTitle,
             artist: _selectedArtist,
             navigateToTagDetails: _navigateToTagDetails,
           ),
           '/tags/details': (context) => TagDetailsScreen(
-            title: appTitle,
             tag: _selectedTag,
             navigateToArtistDetails: _navigateToArtistDetails,
           ),

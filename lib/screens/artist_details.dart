@@ -1,45 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
-import 'package:moodtag/main.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
+import 'package:moodtag/navigation.dart';
 
 class ArtistDetailsPage extends Page {
-  final String title;
+
   final Artist artist;
   final TagChanged navigateToTagDetails;
 
   ArtistDetailsPage({
-    this.title,
     @required this.artist,
     @required this.navigateToTagDetails
   }) : super(key: ValueKey(artist));
 
   Route createRoute(BuildContext context) {
     return MaterialPageRoute(
-        settings: this,
-        builder: (BuildContext context) {
-          return ArtistDetailsScreen(
-              title: title,
-              artist: artist,
-              navigateToTagDetails: navigateToTagDetails,
-          );
-        });
+      settings: this,
+      builder: (BuildContext context) {
+        return ArtistDetailsScreen(
+          artist: artist,
+          navigateToTagDetails: navigateToTagDetails,
+        );
+      });
   }
+
 }
 
 class ArtistDetailsScreen extends StatefulWidget {
-  final String title;
+
   final Artist artist;
   final TagChanged navigateToTagDetails;
 
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
 
   const ArtistDetailsScreen({
-    @required this.title,
     @required this.artist,
     @required this.navigateToTagDetails,
   });
@@ -56,9 +55,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: MtAppBar(),
       body: Consumer<Library>(
         builder: (context, library, child) {
           return Padding(

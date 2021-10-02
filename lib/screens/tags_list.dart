@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:moodtag/main.dart';
+import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
+import 'package:moodtag/navigation.dart';
 
 class TagsListScreen extends StatelessWidget {
 
@@ -25,9 +26,7 @@ class TagsListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: MtAppBar(),
       body: Consumer<Library>(
         builder: (context, library, child) {
           return ListView.separated(
