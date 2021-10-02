@@ -6,42 +6,15 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
-import 'package:moodtag/navigation.dart';
-
-class ArtistDetailsPage extends Page {
-
-  final Artist artist;
-  final TagChanged navigateToTagDetails;
-
-  ArtistDetailsPage({
-    @required this.artist,
-    @required this.navigateToTagDetails
-  }) : super(key: ValueKey(artist));
-
-  Route createRoute(BuildContext context) {
-    return MaterialPageRoute(
-      settings: this,
-      builder: (BuildContext context) {
-        return ArtistDetailsScreen(
-          artist: artist,
-          navigateToTagDetails: navigateToTagDetails,
-        );
-      });
-  }
-
-}
 
 class ArtistDetailsScreen extends StatefulWidget {
 
   final Artist artist;
-  final TagChanged navigateToTagDetails;
 
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
 
-  const ArtistDetailsScreen({
-    @required this.artist,
-    @required this.navigateToTagDetails,
-  });
+  ArtistDetailsScreen(BuildContext context) :
+        artist = ModalRoute.of(context).settings.arguments as Artist;
 
   @override
   State<StatefulWidget> createState() => _ArtistDetailsScreenState();
@@ -55,7 +28,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MtAppBar(),
+      appBar: MtAppBar(context),
       body: Consumer<Library>(
         builder: (context, library, child) {
           return Padding(

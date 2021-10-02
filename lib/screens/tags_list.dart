@@ -7,26 +7,17 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
-import 'package:moodtag/navigation.dart';
+import 'package:moodtag/navigation_item.dart';
+import 'package:moodtag/routes.dart';
 
 class TagsListScreen extends StatelessWidget {
 
-  final String title;
-  final NavigationItemChanged onBottomNavBarTapped;
-  final TagChanged navigateToTagDetails;
-
   static const listEntryStyle = TextStyle(fontSize: 18.0);
-
-  TagsListScreen({
-    this.title,
-    @required this.onBottomNavBarTapped,
-    @required this.navigateToTagDetails
-  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MtAppBar(),
+      appBar: MtAppBar(context),
       body: Consumer<Library>(
         builder: (context, library, child) {
           return ListView.separated(
@@ -34,7 +25,7 @@ class TagsListScreen extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             itemCount: library.tags.length,
             itemBuilder: (context, i) {
-              return _buildTagRow(context, library.tags[i], navigateToTagDetails);
+              return _buildTagRow(context, library.tags[i]);
             },
           );
         }
@@ -44,17 +35,17 @@ class TagsListScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).accentColor,
       ),
-      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.tags, onBottomNavBarTapped),
+      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.tags),
     );
   }
 
-  Widget _buildTagRow(BuildContext context, Tag tag, TagChanged onTapped) {
+  Widget _buildTagRow(BuildContext context, Tag tag) {
     return ListTile(
       title: Text(
         tag.name,
         style: listEntryStyle,
       ),
-      onTap: () => navigateToTagDetails(context, tag),
+      onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
       onLongPress: () => DeleteDialog.openNew<Tag>(context, tag)
     );
   }

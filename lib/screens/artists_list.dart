@@ -7,24 +7,17 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
-import 'package:moodtag/navigation.dart';
+import 'package:moodtag/navigation_item.dart';
+import 'package:moodtag/routes.dart';
 
 class ArtistsListScreen extends StatelessWidget {
 
-  final NavigationItemChanged onBottomNavBarTapped;
-  final ArtistChanged navigateToArtistDetails;
-
   static const listEntryStyle = TextStyle(fontSize: 18.0);
-
-  ArtistsListScreen({
-    @required this.onBottomNavBarTapped,
-    @required this.navigateToArtistDetails,
-  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MtAppBar(),
+      appBar: MtAppBar(context),
       body: Consumer<Library>(
         builder: (context, library, child) {
           return ListView.separated(
@@ -32,7 +25,7 @@ class ArtistsListScreen extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             itemCount: library.artists.length,
             itemBuilder: (context, i) {
-              return _buildArtistRow(context, library.artists[i], navigateToArtistDetails);
+              return _buildArtistRow(context, library.artists[i]);
             },
           );
         }
@@ -42,17 +35,17 @@ class ArtistsListScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).accentColor,
       ),
-      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists, onBottomNavBarTapped),
+      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists),
     );
   }
 
-  Widget _buildArtistRow(BuildContext context, Artist artist, ArtistChanged onTapped) {
+  Widget _buildArtistRow(BuildContext context, Artist artist) {
     return ListTile(
       title: Text(
         artist.name,
         style: listEntryStyle,
       ),
-      onTap: () => navigateToArtistDetails(context, artist),
+      onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist),
       onLongPress: () => DeleteDialog.openNew<Artist>(context, artist)
     );
   }

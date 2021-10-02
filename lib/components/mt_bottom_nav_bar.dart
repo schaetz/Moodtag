@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:moodtag/navigation.dart';
+import 'package:moodtag/navigation_item.dart';
+import 'package:moodtag/routes.dart';
 
 class MtBottomNavBar extends BottomNavigationBar {
 
-  MtBottomNavBar(BuildContext context, NavigationItem activePage, Function handleBottomNavBarTapped) : super(
+  MtBottomNavBar(BuildContext context, NavigationItem activePage) : super(
     items: const <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(Icons.library_music),
@@ -18,9 +19,9 @@ class MtBottomNavBar extends BottomNavigationBar {
     currentIndex: activePage.index,
     onTap: (int newIndex) {
       if (newIndex == 0 && activePage != NavigationItem.artists) {
-        handleBottomNavBarTapped(context, NavigationItem.artists);
+        Navigator.of(context).pushNamed(Routes.artistsList);
       } else if (newIndex == 1 && activePage != NavigationItem.tags) {
-        handleBottomNavBarTapped(context, NavigationItem.tags);
+        Navigator.of(context).pushNamed(Routes.tagsList);
       }
     },
   );

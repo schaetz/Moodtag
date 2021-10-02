@@ -15,16 +15,12 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:moodtag/routes.dart';
 import 'package:provider/provider.dart';
 
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
-import 'package:moodtag/navigation.dart';
-import 'package:moodtag/screens/artist_details.dart';
-import 'package:moodtag/screens/artists_list.dart';
-import 'package:moodtag/screens/tag_details.dart';
-import 'package:moodtag/screens/tags_list.dart';
 
 void main() {
   runApp(MoodtagApp());
@@ -57,10 +53,7 @@ class _AppState extends State<MoodtagApp> {
     'Mellow',
     'Cheerful'
   ];
-  static const initialRoute = '/artists';
 
-  Artist _selectedArtist;
-  Tag _selectedTag;
   final sampleTags;
   final sampleArtists;
 
@@ -86,52 +79,10 @@ class _AppState extends State<MoodtagApp> {
           unselectedWidgetColor: Colors.grey,
           dividerColor: Colors.black54
         ),
-        initialRoute: initialRoute,
-        routes: {
-          '/artists': (context) => ArtistsListScreen(
-            onBottomNavBarTapped: _handleBottomNavBarTapped,
-            navigateToArtistDetails: _navigateToArtistDetails,
-          ),
-          '/tags': (context) => TagsListScreen(
-            onBottomNavBarTapped: _handleBottomNavBarTapped,
-            navigateToTagDetails: _navigateToTagDetails,
-          ),
-          '/artists/details': (context) => ArtistDetailsScreen(
-            artist: _selectedArtist,
-            navigateToTagDetails: _navigateToTagDetails,
-          ),
-          '/tags/details': (context) => TagDetailsScreen(
-            tag: _selectedTag,
-            navigateToArtistDetails: _navigateToArtistDetails,
-          ),
-        },
+        initialRoute: Routes.initialRoute,
+        routes: Routes.instance().getRoutes()
       )
     );
-  }
-
-  void _handleBottomNavBarTapped(BuildContext context, NavigationItem navigationItem) {
-    switch (navigationItem) {
-      case NavigationItem.artists:
-        Navigator.of(context).pushReplacementNamed('/artists');
-        break;
-      case NavigationItem.tags:
-        Navigator.of(context).pushReplacementNamed('/tags');
-        break;
-    }
-  }
-
-  void _navigateToArtistDetails(BuildContext context, Artist artist) {
-    _selectedArtist = artist;
-    _selectedTag = null;
-
-    Navigator.of(context).pushNamed('/artists/details');
-  }
-
-  void _navigateToTagDetails(BuildContext context, Tag tag) {
-    _selectedTag = tag;
-    _selectedArtist = null;
-
-    Navigator.of(context).pushNamed('/tags/details');
   }
 
 }

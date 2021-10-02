@@ -1,0 +1,3 @@
+enum NavigationItem {
+  artists, tags
+}
