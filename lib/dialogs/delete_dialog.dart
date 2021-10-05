@@ -12,14 +12,14 @@ class DeleteDialog<T> extends AbstractDialog {
     new DeleteDialog<T>(context, entity).show();
   }
 
-  T entity;
+  T entityToDelete;
 
-  DeleteDialog(BuildContext context, this.entity) : super(context);
+  DeleteDialog(BuildContext context, this.entityToDelete) : super(context);
 
   @override
   StatelessWidget buildDialog(BuildContext context) {
     return SimpleDialog(
-      title: Text(_determineDialogTextForDeleteEntity(context, entity)),
+      title: Text(determineDialogTextForDeleteEntity(context)),
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(20.0),
@@ -30,7 +30,7 @@ class DeleteDialog<T> extends AbstractDialog {
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: SimpleDialogOption(
-                  onPressed: () => _deleteEntity(context, entity),
+                  onPressed: () => deleteEntity(context),
                   child: const Text('Yes'),
                 ),
               ),
@@ -48,14 +48,16 @@ class DeleteDialog<T> extends AbstractDialog {
     );
   }
 
-  String _determineDialogTextForDeleteEntity(BuildContext context, T entity) {
+  String determineDialogTextForDeleteEntity(BuildContext context) {
     final libraryProvider = Provider.of<Library>(context, listen: false);
 
-    if (entity is Artist) {
-      return 'Are you sure that you want to delete the artist "${entity.name}"?';
-    } else if (entity is Tag) {
-      final mainMessage = 'Are you sure that you want to delete the tag "${entity.name}"?';
-      final artistsWithTag = libraryProvider.getArtistsWithTag(entity).length;
+    if (entityToDelete is Artist) {
+      Artist artist = entityToDelete as Artist;
+      return 'Are you sure that you want to delete the artist "${artist.name}"?';
+    } else if (entityToDelete is Tag) {
+      Tag tag = entityToDelete as Tag;
+      final mainMessage = 'Are you sure that you want to delete the tag "${tag.name}"?';
+      final artistsWithTag = libraryProvider.getArtistsWithTag(tag).length;
       if (artistsWithTag > 0) {
         return mainMessage + ' There are currently ${artistsWithTag} artists which use this tag.';
       } else {
@@ -66,13 +68,13 @@ class DeleteDialog<T> extends AbstractDialog {
     }
   }
 
-  void _deleteEntity(BuildContext context, T entity) {
+  void deleteEntity(BuildContext context) {
     final libraryProvider = Provider.of<Library>(context, listen: false);
 
-    if (entity is Artist) {
-      libraryProvider.deleteArtist(entity);
-    } else if (entity is Tag) {
-      libraryProvider.deleteTag(entity);
+    if (entityToDelete is Artist) {
+      libraryProvider.deleteArtist(entityToDelete as Artist);
+    } else if (entityToDelete is Tag) {
+      libraryProvider.deleteTag(entityToDelete as Tag);
     } else {
       print('Error: Invalid entity');
     }
