@@ -15,12 +15,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:moodtag/routes.dart';
 import 'package:provider/provider.dart';
 
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
+import 'package:moodtag/navigation/routes.dart';
 
 void main() {
   runApp(MoodtagApp());

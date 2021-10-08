@@ -7,7 +7,7 @@ import 'package:moodtag/dialogs/remove_from_dialog.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
-import 'package:moodtag/routes.dart';
+import 'package:moodtag/navigation/routes.dart';
 
 class TagDetailsScreen extends StatelessWidget {
 

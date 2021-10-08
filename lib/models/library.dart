@@ -4,7 +4,7 @@ import 'artist.dart';
 import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/models/tag.dart';
-import 'package:moodtag/helpers.dart';
+import 'package:moodtag/utils/helpers.dart';
 import 'package:flutter/widgets.dart';
 
 /*

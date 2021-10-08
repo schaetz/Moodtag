@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'album.dart';
-import 'package:moodtag/helpers.dart';
 import 'package:moodtag/models/tag.dart';
+import 'package:moodtag/utils/helpers.dart';
 import 'package:flutter/widgets.dart';
 
 class Artist extends ChangeNotifier {

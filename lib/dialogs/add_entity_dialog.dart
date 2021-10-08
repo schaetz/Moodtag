@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'abstract_dialog.dart';
-import 'exception_dialog.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
-import 'package:moodtag/helpers.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
+import 'package:moodtag/utils/helpers.dart';
 
 /// Dialog for adding generic entities (artists or tags)
 ///

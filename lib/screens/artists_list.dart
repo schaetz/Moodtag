@@ -7,8 +7,8 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
-import 'package:moodtag/navigation_item.dart';
-import 'package:moodtag/routes.dart';
+import 'package:moodtag/navigation/navigation_item.dart';
+import 'package:moodtag/navigation/routes.dart';
 
 class ArtistsListScreen extends StatelessWidget {
 

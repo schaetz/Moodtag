@@ -1,5 +1,5 @@
-import 'models/artist.dart';
-import 'models/tag.dart';
+import '../models/artist.dart';
+import '../models/tag.dart';
 
 String dropThe(String artistName) {
   if (artistName.toLowerCase().startsWith("the ")) {
