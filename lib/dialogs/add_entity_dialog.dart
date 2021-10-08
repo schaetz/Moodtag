@@ -54,6 +54,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
               Expanded(
                 child: TextField(
                     maxLines: null,
+                    maxLength: 255,
                     onChanged: (value) => newInput = value.trim()
                 ),
               ),

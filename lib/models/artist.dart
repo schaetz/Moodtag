@@ -1,15 +1,16 @@
 import 'dart:collection';
 
+import 'abstract_entity.dart';
 import 'album.dart';
 import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/utils/helpers.dart';
-import 'package:flutter/widgets.dart';
 
-class Artist extends ChangeNotifier {
+class Artist extends AbstractEntity {
 
   static const denotationSingular = 'artist';
   static const denotationPlural = 'artists';
 
+  int id;
   String name;
   final List<Album> _albums = [];
   final List<Tag> _tags;
