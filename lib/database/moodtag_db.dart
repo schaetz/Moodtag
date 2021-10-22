@@ -18,6 +18,14 @@ class Tags extends Table {
   TextColumn get name => text().withLength(max: 255)();
 }
 
+class AssignedTags extends Table {
+  IntColumn get artist => integer().customConstraint('NOT NULL REFERENCES artists(id)')();
+  IntColumn get tag => integer().customConstraint('NOT NULL REFERENCES tags(id)')();
+
+  @override
+  Set<Column> get primaryKey => {artist, tag};
+}
+
 
 @DriftDatabase(tables: [Artists, Tags])
 class MoodtagDB extends _$MoodtagDB {
