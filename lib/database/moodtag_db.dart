@@ -35,7 +35,7 @@ class MoodtagDB extends _$MoodtagDB {
   @override
   int get schemaVersion => 1;
 
-  Future<List<Artist>> get allArtists => select(artists).get();
+  Stream<List<Artist>> get allArtists => select(artists).watch();
   Future<List<Tag>> get allTags => select(tags).get();
 
   Future<int> addArtist(ArtistsCompanion artist) {
