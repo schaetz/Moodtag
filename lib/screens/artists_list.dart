@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
+import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
-import 'package:moodtag/models/artist.dart';
-import 'package:moodtag/models/library.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -16,19 +16,31 @@ class ArtistsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+
     return Scaffold(
       appBar: MtAppBar(context),
-      body: Consumer<Library>(
-        builder: (context, library, child) {
+      body: StreamBuilder<List<Artist>>(
+        stream: bloc.artists,
+        builder: (context, snapshot) {
+          print(snapshot);
+
+          if (!snapshot.hasData) {
+            return const Align(
+              alignment: Alignment.center,
+              child: CircularProgressIndicator(),
+            );
+          }
+
           return ListView.separated(
             separatorBuilder: (context, _) => Divider(),
             padding: EdgeInsets.all(16.0),
-            itemCount: library.artists.length,
+            itemCount: snapshot.data.length,
             itemBuilder: (context, i) {
-              return _buildArtistRow(context, library.artists[i]);
+              return _buildArtistRow(context, snapshot.data[i]);
             },
           );
-        }
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddEntityDialog.openAddArtistDialog(context),

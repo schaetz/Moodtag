@@ -38,10 +38,10 @@ class MoodtagDB extends _$MoodtagDB {
   Stream<List<Artist>> get allArtists => select(artists).watch();
   Future<List<Tag>> get allTags => select(tags).get();
 
-  Future<int> addArtist(ArtistsCompanion artist) {
+  Future<int> createArtist(ArtistsCompanion artist) {
     return into(artists).insert(artist);
   }
-  Future<int> addTag(TagsCompanion tag) {
+  Future<int> createTag(TagsCompanion tag) {
     return into(tags).insert(tag);
   }
 

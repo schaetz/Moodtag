@@ -50,7 +50,7 @@ class TagDetailsScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddEntityDialog.openAddArtistDialog(context, preselectedTag: tag),
+        //onPressed: () => AddEntityDialog.openAddArtistDialog(context, preselectedTag: tag), TODO fix
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).accentColor,
       ),

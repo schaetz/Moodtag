@@ -18,4 +18,8 @@ class MoodtagBloc {
     _allArtists.close();
   }
 
+  Future createArtist(String name) {
+    return db.createArtist(ArtistsCompanion.insert(name: name));
+  }
+
 }

@@ -17,8 +17,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/models/artist.dart';
-import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -68,14 +68,15 @@ class _AppState extends State<MoodtagApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => Library(this.sampleArtists, this.sampleTags),
+    return Provider<MoodtagBloc>(
+      create: (_) => MoodtagBloc(),
+      dispose: (_, bloc) => bloc.close(),
       child: MaterialApp(
         title: MoodtagApp.appTitle,
         theme: ThemeData(
           primarySwatch: Colors.red,
           primaryColor: Colors.red,
-          accentColor: Colors.redAccent,
+          accentColor: Colors.redAccent, // TODO replace accentColor property
           unselectedWidgetColor: Colors.grey,
           dividerColor: Colors.black54
         ),

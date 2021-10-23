@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'abstract_dialog.dart';
+import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
-import 'package:moodtag/models/artist.dart';
-import 'package:moodtag/models/library.dart';
-import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/utils/helpers.dart';
 
 /// Dialog for adding generic entities (artists or tags)
@@ -81,6 +80,8 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     String denotationSingular = 'entity';
     String denotationPlural = 'entities';
 
+    /*
+    TODO Fix
     if (E == Artist) {
       denotationSingular = Artist.denotationSingular;
       denotationPlural = Artist.denotationPlural;
@@ -88,6 +89,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
       denotationSingular = Tag.denotationSingular;
       denotationPlural = Tag.denotationPlural;
     }
+     */
 
     return plural ? denotationPlural : denotationSingular;
   }
@@ -95,15 +97,17 @@ class AddEntityDialog<E, O> extends AbstractDialog {
   void _addOrEditEntity(BuildContext context, String newInput, O preselectedOther) {
     List<String> inputElements = processMultilineInput(newInput);
     List<String> errorElements = [];
-    Library libraryProvider = Provider.of<Library>(context, listen: false);
+    //Library libraryProvider = Provider.of<Library>(context, listen: false);
+    MoodtagBloc bloc = Provider.of<MoodtagBloc>(context, listen: false);
 
     for (String newEntityName in inputElements) {
       bool error;
 
       if (E == Artist) {
-        error = _addOrEditArtist(libraryProvider, newEntityName, preselectedOther as Tag);
+        var newArtistId = _addOrEditArtist(bloc, newEntityName, preselectedOther as Tag);
+        error = newArtistId != null;
       } else if (E == Tag) {
-        error = _addOrEditTag(libraryProvider, newEntityName, preselectedOther as Artist);
+        error = _addOrEditTag(bloc, newEntityName, preselectedOther as Artist);
       } else {
         error = true;
       }
@@ -123,32 +127,21 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     }
   }
 
-  bool _addOrEditArtist(Library libraryProvider, String newArtistName, Tag preselectedTag) {
-    Artist newArtist;
-    bool error = false;
+  Future<int> _addOrEditArtist(MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
+    final preselectedTagsList = createListWithSingleElementOrEmpty<Tag>(preselectedTag);
+    int newArtistId = await bloc.createArtist(newArtistName);
+    // TODO Error handling, upsert
+    // TODO Add preselected tags from preselectedTagsList
 
-    try {
-      final preselectedTagsList = createListWithSingleElementOrEmpty<Tag>(preselectedTag);
-      newArtist = libraryProvider.createArtist(newArtistName, preselectedTagsList);
-    } on NameAlreadyTakenException {
-      // If there is a preselected tag, just ignore the exception
-      // and add the preselected tag to the existing artist
-      if (preselectedTag == null) {
-        error = true;
-      } else {
-        newArtist.addTag(preselectedTag);
-      }
-    }
-
-    return error;
+    return newArtistId;
   }
 
-  bool _addOrEditTag(Library libraryProvider, String newTagName, Artist preselectedArtist) {
+  bool _addOrEditTag(MoodtagBloc bloc, String newTagName, Artist preselectedArtist) {
     Tag newTag;
     bool error = false;
 
     try {
-      newTag = libraryProvider.createTag(newTagName);
+      //newTag = bloc.createTag(newTagName); TODO fix
     } on NameAlreadyTakenException {
       // If there is a preselected artist, just ignore the exception
       // and add the preselected artist to the existing tag in "finally"
@@ -157,7 +150,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
       }
     } finally {
       if (preselectedArtist != null) {
-        preselectedArtist.addTag(newTag);
+        //preselectedArtist.addTag(newTag); TODO fix
       }
     }
 

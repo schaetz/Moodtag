@@ -102,7 +102,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     return InputChip(
       label: Text('+'),
       //backgroundColor: Theme.of(context).accentColor,
-      onPressed: () => AddEntityDialog.openAddTagDialog(context, preselectedArtist: artist)
+      //onPressed: () => AddEntityDialog.openAddTagDialog(context, preselectedArtist: artist) TODO fix
     );
   }
 
