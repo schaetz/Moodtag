@@ -8,25 +8,6 @@ import 'package:path/path.dart' as path;
 part 'moodtag_db.g.dart';
 
 
-class Artists extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(max: 255)();
-}
-
-class Tags extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(max: 255)();
-}
-
-class AssignedTags extends Table {
-  IntColumn get artist => integer().customConstraint('NOT NULL REFERENCES artists(id)')();
-  IntColumn get tag => integer().customConstraint('NOT NULL REFERENCES tags(id)')();
-
-  @override
-  Set<Column> get primaryKey => {artist, tag};
-}
-
-
 @DriftDatabase(
   tables: [Artists, Tags, AssignedTags],
   include: {'queries.drift'}

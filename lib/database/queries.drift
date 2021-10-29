@@ -1,4 +1,18 @@
-import 'moodtag_db.dart';
+CREATE TABLE artists (
+    id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE tags (
+    id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE assigned_tags (
+    artist INT NOT NULL REFERENCES artists(id),
+    tag INT NOT NULL REFERENCES tags(id),
+    PRIMARY KEY (artist, tag)
+);
 
 artistsWithTag:
     SELECT * FROM artists WHERE artists.id IN (
