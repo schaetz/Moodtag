@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'abstract_dialog.dart';
-import 'package:moodtag/models/artist.dart';
-import 'package:moodtag/models/library.dart';
-import 'package:moodtag/models/tag.dart';
+import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/database/moodtag_db.dart';
 
 class DeleteDialog<T> extends AbstractDialog {
 
@@ -19,7 +18,16 @@ class DeleteDialog<T> extends AbstractDialog {
   @override
   StatelessWidget buildDialog(BuildContext context) {
     return SimpleDialog(
-      title: Text(determineDialogTextForDeleteEntity(context)),
+      title: FutureBuilder<String>(
+        future: determineDialogTextForDeleteEntity(context),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasData) {
+            return Text(snapshot.data);
+          } else {
+            return Text('');
+          }
+        }
+      ),
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(20.0),
@@ -48,8 +56,8 @@ class DeleteDialog<T> extends AbstractDialog {
     );
   }
 
-  String determineDialogTextForDeleteEntity(BuildContext context) {
-    final libraryProvider = Provider.of<Library>(context, listen: false);
+  Future<String> determineDialogTextForDeleteEntity(BuildContext context) async {
+    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
 
     if (entityToDelete is Artist) {
       Artist artist = entityToDelete as Artist;
@@ -57,24 +65,24 @@ class DeleteDialog<T> extends AbstractDialog {
     } else if (entityToDelete is Tag) {
       Tag tag = entityToDelete as Tag;
       final mainMessage = 'Are you sure that you want to delete the tag "${tag.name}"?';
-      final artistsWithTag = libraryProvider.getArtistsWithTag(tag).length;
-      if (artistsWithTag > 0) {
-        return mainMessage + ' There are currently ${artistsWithTag} artists which use this tag.';
-      } else {
+      final artistsWithTag = bloc.artistsWithTag(tag);
+      if (await artistsWithTag.isEmpty) {
         return mainMessage + ' It is currently not assigned to any artist.';
+      } else {
+        return mainMessage + ' There are currently ${artistsWithTag.length} artists which use this tag.';
       }
     } else {
       return 'Error: Invalid entity';
     }
   }
 
-  void deleteEntity(BuildContext context) {
-    final libraryProvider = Provider.of<Library>(context, listen: false);
+  void deleteEntity(BuildContext context) async {
+    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
 
     if (entityToDelete is Artist) {
-      libraryProvider.deleteArtist(entityToDelete as Artist);
+      await bloc.deleteArtist(entityToDelete as Artist);
     } else if (entityToDelete is Tag) {
-      libraryProvider.deleteTag(entityToDelete as Tag);
+      await bloc.deleteTag(entityToDelete as Tag);
     } else {
       print('Error: Invalid entity');
     }

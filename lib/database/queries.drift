@@ -1,0 +1,6 @@
+import 'moodtag_db.dart';
+
+artistsWithTag:
+    SELECT * FROM artists WHERE artists.id IN (
+        SELECT artist FROM assigned_tags WHERE tag = :tagId
+    );

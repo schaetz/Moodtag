@@ -16,8 +16,10 @@ class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
   RemoveTagFromArtistDialog(BuildContext context, this.tagToRemove, this.artistToRemoveFrom) : super(context, tagToRemove);
 
   @override
-  String determineDialogTextForDeleteEntity(BuildContext context) {
-    return 'Do you want to remove the tag "${tagToRemove.name}" from the artist "${artistToRemoveFrom.name}"?';
+  Future<String> determineDialogTextForDeleteEntity(BuildContext context) {
+    return new Future<String>(() =>
+      'Do you want to remove the tag "${tagToRemove.name}" from the artist "${artistToRemoveFrom.name}"?'
+    );
   }
 
   @override
