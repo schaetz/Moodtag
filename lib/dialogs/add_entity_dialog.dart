@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'abstract_dialog.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/database/moodtag_db.dart';
+import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:moodtag/utils/helpers.dart';
 
@@ -93,28 +95,30 @@ class AddEntityDialog<E, O> extends AbstractDialog {
 
   void _addOrEditEntity(BuildContext context, String newInput, O preselectedOther) async {
     List<String> inputElements = processMultilineInput(newInput);
-    List<String> errorElements = [];
+    List<DbRequestResponse> exceptionResponses = [];
     final bloc = Provider.of<MoodtagBloc>(context, listen: false);
 
     for (String newEntityName in inputElements) {
-      bool error;
+      DbRequestResponse response;
 
       if (E == Artist) {
-        var newArtistId = await _addOrEditArtist(bloc, newEntityName, preselectedOther as Tag);
-        error = newArtistId != null;
+        response = await _addOrEditArtist(bloc, newEntityName, preselectedOther as Tag);
       } else if (E == Tag) {
-        error = await _addOrEditTag(bloc, newEntityName, preselectedOther as Artist);
+        response = await _addOrEditTag(bloc, newEntityName, preselectedOther as Artist);
       } else {
-        error = true;
+        response = new DbRequestResponse.fail(
+            new InvalidArgumentException('Invalid entity type')
+        );
       }
 
-      if (error)
-        errorElements.add(newEntityName);
+      if (response.didFail())
+        exceptionResponses.add(response);
     }
 
     closeDialog(context);
 
-    if (errorElements.isNotEmpty) {
+    if (exceptionResponses.isNotEmpty) {
+      // TODO Check exception type
       final errorMessage = 'Error while adding ${_getEntityDenotation(plural: true)}: '
         + 'One or several ${_getEntityDenotation(plural: true)} already exist';
       ScaffoldMessenger.of(context).showSnackBar(
@@ -123,38 +127,34 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     }
   }
 
-  Future<int> _addOrEditArtist(MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
-    int newArtistId = await bloc.createArtist(newArtistName); // TODO Error handling
-    Artist newArtist = await bloc.getArtistById(newArtistId);
+  Future<DbRequestResponse<Artist>> _addOrEditArtist(MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
+    final createArtistResponse = await bloc.createArtist(newArtistName);
 
-    if (preselectedTag != null) {
+    if (createArtistResponse.didSucceed() && preselectedTag != null) {
+      Artist newArtist = createArtistResponse.changedEntity;
       await bloc.assignTagToArtist(newArtist, preselectedTag);
     }
 
-    return newArtistId;
+    return createArtistResponse;
   }
 
-  Future<bool> _addOrEditTag(MoodtagBloc bloc, String newTagName, Artist preselectedArtist) async {
-    Tag newTag;
-    bool error = false;
-
-    await bloc.createTag(newTagName)
+  Future<DbRequestResponse<Tag>> _addOrEditTag(MoodtagBloc bloc, String newTagName, Artist preselectedArtist) async {
+    // TODO Change method analogously to _addOrEditArtist
+    int newTagId = await bloc.createTag(newTagName)
       .catchError((e) {
-        print(e.toString());
-        // TODO Check error type
         // If there is a preselected artist, just ignore the exception
         // and add the preselected artist to the existing tag in "whenComplete"
         if (preselectedArtist == null) {
-          error = true;
-        }
-      })
-      .whenComplete(() async => {
-        if (preselectedArtist != null) {
-          await bloc.assignTagToArtist(preselectedArtist, newTag)
+          return new DbRequestResponse.fail(e);
         }
       });
 
-    return error;
+    Tag newTag = await bloc.getTagById(newTagId);
+    if (preselectedArtist != null) {
+      await bloc.assignTagToArtist(preselectedArtist, newTag);
+    }
+
+    return new DbRequestResponse.success(newTag);
   }
 
 }
