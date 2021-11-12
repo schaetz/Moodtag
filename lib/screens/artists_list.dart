@@ -28,14 +28,14 @@ class ArtistsListScreen extends StatelessWidget {
           if (!snapshot.hasData) {
             return const Align(
               alignment: Alignment.center,
-              child: CircularProgressIndicator(),
+              child: Text('No artists yet', style: listEntryStyle),
             );
           }
 
           return ListView.separated(
             separatorBuilder: (context, _) => Divider(),
             padding: EdgeInsets.all(16.0),
-            itemCount: snapshot.data.length,
+            itemCount: snapshot.hasData ? snapshot.data.length : 0,
             itemBuilder: (context, i) {
               return _buildArtistRow(context, snapshot.data[i]);
             },

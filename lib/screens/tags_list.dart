@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
+import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
-import 'package:moodtag/models/library.dart';
-import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -16,16 +16,26 @@ class TagsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+
     return Scaffold(
       appBar: MtAppBar(context),
-      body: Consumer<Library>(
-        builder: (context, library, child) {
+      body: StreamBuilder<List<Tag>>(
+        stream: bloc.tags,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Align(
+              alignment: Alignment.center,
+              child: Text('No tags yet', style: listEntryStyle),
+            );
+          }
+
           return ListView.separated(
             separatorBuilder: (context, _) => Divider(),
             padding: EdgeInsets.all(16.0),
-            itemCount: library.tags.length,
+            itemCount: snapshot.hasData ? snapshot.data.length : 0,
             itemBuilder: (context, i) {
-              return _buildTagRow(context, library.tags[i]);
+              return _buildTagRow(context, snapshot.data[i]);
             },
           );
         }

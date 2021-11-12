@@ -20,7 +20,7 @@ class MoodtagDB extends _$MoodtagDB {
   int get schemaVersion => 1;
 
   Stream<List<Artist>> get allArtists => select(artists).watch();
-  Future<List<Tag>> get allTags => select(tags).get();
+  Stream<List<Tag>> get allTags => select(tags).watch();
   Stream<List<AssignedTag>> get allArtistTagPairs => select(assignedTags).watch();
 
 

@@ -10,6 +10,9 @@ class MoodtagBloc {
   final BehaviorSubject<List<Artist>> _allArtists = BehaviorSubject();
   Stream<List<Artist>> get artists => _allArtists;
 
+  final BehaviorSubject<List<Tag>> _allTags = BehaviorSubject();
+  Stream<List<Tag>> get tags => _allTags;
+
   // Solely for testing purposes
   final BehaviorSubject<List<AssignedTag>> _allArtistTagPairs = BehaviorSubject();
   Stream<List<AssignedTag>> get artistTagPairs => _allArtistTagPairs;
@@ -22,6 +25,7 @@ class MoodtagBloc {
   void close() {
     db.close();
     _allArtists.close();
+    _allTags.close();
     _allArtistTagPairs.close();
   }
 
