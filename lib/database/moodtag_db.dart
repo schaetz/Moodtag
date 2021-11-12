@@ -21,7 +21,12 @@ class MoodtagDB extends _$MoodtagDB {
 
   Stream<List<Artist>> get allArtists => select(artists).watch();
   Future<List<Tag>> get allTags => select(tags).get();
+  Stream<List<AssignedTag>> get allArtistTagPairs => select(assignedTags).watch();
 
+
+  //
+  // GET
+  //
   Future<Artist> getArtistById(int artistId) {
     return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull();
   }
@@ -31,27 +36,44 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
 
+  //
+  // CREATE
+  //
   Future<int> createArtist(ArtistsCompanion artist) {
     return into(artists).insert(artist);
   }
+
   Future<int> createTag(TagsCompanion tag) {
     return into(tags).insert(tag);
   }
+
   Future<int> assignTagToArtist(AssignedTagsCompanion artistTagPair) {
     return into(assignedTags).insert(artistTagPair);
   }
 
-  Future<int> deleteArtistById(int artistId) {
-    return (delete(artists)..where((a) => a.id.equals(artistId))).go();
+
+  //
+  // DELETE
+  //
+  Future deleteArtistById(int artistId) {
+    return Future.wait([
+      (delete(artists)..where((a) => a.id.equals(artistId))).go(),
+      (delete(assignedTags)..where((row) => row.artist.equals(artistId))).go()
+    ]);
   }
-  Future<int> deleteArtistByName(String name) {
-    return (delete(artists)..where((a) => a.name.equals(name))).go();
+
+  Future deleteTagById(int tagId) {
+    return Future.wait([
+      (delete(tags)..where((t) => t.id.equals(tagId))).go(),
+      (delete(assignedTags)..where((row) => row.tag.equals(tagId))).go()
+    ]);
   }
-  Future<int> deleteTagById(int tagId) {
-    return (delete(tags)..where((t) => t.id.equals(tagId))).go();
-  }
-  Future<int> deleteTagByName(String name) {
-    return (delete(tags)..where((t) => t.name.equals(name))).go();
+
+  Future removeTagFromArtist(int artistId, int tagId) {
+    return (delete(assignedTags)..where((row) =>
+        row.artist.equals(artistId)
+        & row.tag.equals(tagId)
+    )).go();
   }
 
 }

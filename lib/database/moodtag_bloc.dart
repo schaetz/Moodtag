@@ -10,15 +10,25 @@ class MoodtagBloc {
   final BehaviorSubject<List<Artist>> _allArtists = BehaviorSubject();
   Stream<List<Artist>> get artists => _allArtists;
 
+  // Solely for testing purposes
+  final BehaviorSubject<List<AssignedTag>> _allArtistTagPairs = BehaviorSubject();
+  Stream<List<AssignedTag>> get artistTagPairs => _allArtistTagPairs;
+
   MoodtagBloc() : db = MoodtagDB() {
     db.allArtists.listen(_allArtists.add);
+    db.allArtistTagPairs.listen(_allArtistTagPairs.add);
   }
 
   void close() {
     db.close();
     _allArtists.close();
+    _allArtistTagPairs.close();
   }
 
+
+  //
+  // Artists
+  //
   Future getArtistById(int id) {
     return db.getArtistById(id);
   }
@@ -38,13 +48,7 @@ class MoodtagBloc {
     }
     return new DbRequestResponse<Artist>.success(newArtist);
   }
-  
-  Future assignTagToArtist(Artist artist, Tag tag) {
-    return db.assignTagToArtist(
-        AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id)
-    );
-  }
-  
+
   Future deleteArtist(Artist artist) {
     return db.deleteArtistById(artist.id);
   }
@@ -54,6 +58,9 @@ class MoodtagBloc {
   }
 
 
+  //
+  // Tags
+  //
   Future getTagById(int id) {
     return db.getTagById(id);
   }
@@ -64,6 +71,24 @@ class MoodtagBloc {
 
   Future deleteTag(Tag tag) {
     return db.deleteTagById(tag.id);
+  }
+
+  Stream<List<Tag>> tagsForArtist(Artist artist) {
+    return db.tagsForArtist(artist.id).watch();
+  }
+
+
+  //
+  // Assigned tags
+  //
+  Future assignTagToArtist(Artist artist, Tag tag) {
+    return db.assignTagToArtist(
+        AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id)
+    );
+  }
+
+  Future removeTagFromArtist(Artist artist, Tag tag) {
+    return db.removeTagFromArtist(artist.id, tag.id);
   }
 
 }

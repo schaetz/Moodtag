@@ -1,8 +1,9 @@
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 
+import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
-import 'package:moodtag/models/artist.dart';
-import 'package:moodtag/models/tag.dart';
 
 class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
 
@@ -24,7 +25,8 @@ class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
 
   @override
   void deleteEntity(BuildContext context) {
-    artistToRemoveFrom.removeTag(tagToRemove);
+    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+    bloc.removeTagFromArtist(artistToRemoveFrom, tagToRemove);
 
     closeDialog(context);
   }

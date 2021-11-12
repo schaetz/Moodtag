@@ -64,7 +64,7 @@ class TagDetailsScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist),
-      onLongPress: () => RemoveTagFromArtistDialog.openNew(context, tag, artist)
+      //onLongPress: () => RemoveTagFromArtistDialog.openNew(context, tag, artist) TODO fix
     );
   }
 

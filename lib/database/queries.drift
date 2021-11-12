@@ -18,3 +18,8 @@ artistsWithTag:
     SELECT * FROM artists WHERE artists.id IN (
         SELECT artist FROM assigned_tags WHERE tag = :tagId
     );
+
+tagsForArtist:
+    SELECT * FROM tags WHERE tags.id IN (
+        SELECT tag FROM assigned_tags WHERE artist = :artistId
+    );
