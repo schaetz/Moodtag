@@ -95,6 +95,12 @@ class MoodtagBloc {
     return db.removeTagFromArtist(artist.id, tag.id);
   }
 
+  Future<bool> artistHasTag(Artist artist, Tag tag) {
+    return db.tagsForArtist(artist.id).get().then(
+            (tagsList) => tagsList.contains(tag)
+    );
+  }
+
 
   //
   // Helper methods
