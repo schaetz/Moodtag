@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
-import 'package:moodtag/dialogs/remove_from_dialog.dart';
+import 'package:moodtag/dialogs/remove_tag_from_artist_dialog.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/library.dart';
 import 'package:moodtag/models/tag.dart';
