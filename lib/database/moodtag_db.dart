@@ -31,8 +31,16 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull();
   }
 
+  Future<Artist> getArtistByName(String artistName) {
+    return (select(artists)..where((t) => t.name.equals(artistName))).getSingleOrNull();
+  }
+
   Future<Tag> getTagById(int tagId) {
     return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
+  }
+
+  Future<Tag> getTagByName(String tagName) {
+    return (select(tags)..where((t) => t.name.equals(tagName))).getSingleOrNull();
   }
 
 

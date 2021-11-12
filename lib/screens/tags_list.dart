@@ -23,6 +23,8 @@ class TagsListScreen extends StatelessWidget {
       body: StreamBuilder<List<Tag>>(
         stream: bloc.tags,
         builder: (context, snapshot) {
+          print(snapshot);
+
           if (!snapshot.hasData) {
             return const Align(
               alignment: Alignment.center,

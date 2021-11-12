@@ -2,6 +2,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'moodtag_db.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 
 class MoodtagBloc {
 
@@ -19,6 +20,7 @@ class MoodtagBloc {
 
   MoodtagBloc() : db = MoodtagDB() {
     db.allArtists.listen(_allArtists.add);
+    db.allTags.listen(_allTags.add);
     db.allArtistTagPairs.listen(_allArtistTagPairs.add);
   }
 
@@ -37,20 +39,13 @@ class MoodtagBloc {
     return db.getArtistById(id);
   }
 
-  Future<DbRequestResponse<Artist>> createArtist(String name) async {
-    Future<int> newArtistIdFuture = db.createArtist(ArtistsCompanion.insert(name: name));
-    Exception exception;
-    Artist newArtist = await newArtistIdFuture
-        .catchError((e) {
-          exception = e;
-          return null;
-        })
-        .then((newArtistId) async => await getArtistById(newArtistId));
+  Future getArtistByName(String name) {
+    return db.getArtistByName(name);
+  }
 
-    if (newArtist == null) {
-      return new DbRequestResponse<Artist>.fail(exception);
-    }
-    return new DbRequestResponse<Artist>.success(newArtist);
+  Future<DbRequestResponse<Artist>> createArtist(String name) async {
+    Future<int> createArtistFuture = db.createArtist(ArtistsCompanion.insert(name: name));
+    return _getCreatedEntityFromId<Artist>(createArtistFuture);
   }
 
   Future deleteArtist(Artist artist) {
@@ -69,8 +64,13 @@ class MoodtagBloc {
     return db.getTagById(id);
   }
 
-  Future createTag(String name) {
-    return db.createTag(TagsCompanion.insert(name: name));
+  Future getTagByName(String name) {
+    return db.getTagByName(name);
+  }
+
+  Future<DbRequestResponse<Tag>> createTag(String name) {
+    Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name));
+    return _getCreatedEntityFromId<Tag>(createTagFuture);
   }
 
   Future deleteTag(Tag tag) {
@@ -93,6 +93,37 @@ class MoodtagBloc {
 
   Future removeTagFromArtist(Artist artist, Tag tag) {
     return db.removeTagFromArtist(artist.id, tag.id);
+  }
+
+
+  //
+  // Helper methods
+  //
+  Future<DbRequestResponse<E>> _getCreatedEntityFromId<E>(Future<int> createEntityFuture) async {
+    Exception exception;
+    E newEntity = await createEntityFuture.catchError((e) {
+      exception = e;
+      return null;
+    }).then(
+      (newEntityId) async => await _getEntityById<E>(newEntityId)
+    );
+
+    if (newEntity == null) {
+      return new DbRequestResponse<E>.fail(exception);
+    }
+    return new DbRequestResponse<E>.success(newEntity);
+  }
+
+  Future _getEntityById<E>(int id) {
+    if (E == Artist) {
+      return db.getArtistById(id);
+    } else if (E == Tag) {
+      return db.getTagById(id);
+    } else {
+      return Future.error(
+          new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString())
+      );
+    }
   }
 
 }

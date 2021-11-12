@@ -66,7 +66,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
                     if (newInput == null || newInput.isEmpty) {
                       return;
                     }
-                    _addOrEditEntity(context, newInput, preselectedOtherEntity);
+                    _addEntity(context, newInput, preselectedOtherEntity);
                   },
                   child: const Text('OK'),
                 ),
@@ -93,7 +93,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     return plural ? denotationPlural : denotationSingular;
   }
 
-  void _addOrEditEntity(BuildContext context, String newInput, O preselectedOther) async {
+  void _addEntity(BuildContext context, String newInput, O preselectedOther) async {
     List<String> inputElements = processMultilineInput(newInput);
     List<DbRequestResponse> exceptionResponses = [];
     final bloc = Provider.of<MoodtagBloc>(context, listen: false);
@@ -102,9 +102,9 @@ class AddEntityDialog<E, O> extends AbstractDialog {
       DbRequestResponse response;
 
       if (E == Artist) {
-        response = await _addOrEditArtist(bloc, newEntityName, preselectedOther as Tag);
+        response = await _createArtist(bloc, newEntityName, preselectedOther as Tag);
       } else if (E == Tag) {
-        response = await _addOrEditTag(bloc, newEntityName, preselectedOther as Artist);
+        response = await _createTagOrEditExistingTag(bloc, newEntityName, preselectedOther as Artist);
       } else {
         response = new DbRequestResponse.fail(
             new InvalidArgumentException('Invalid entity type')
@@ -127,7 +127,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     }
   }
 
-  Future<DbRequestResponse<Artist>> _addOrEditArtist(MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
+  Future<DbRequestResponse<Artist>> _createArtist(MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
     final createArtistResponse = await bloc.createArtist(newArtistName);
 
     if (createArtistResponse.didSucceed() && preselectedTag != null) {
@@ -138,23 +138,21 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     return createArtistResponse;
   }
 
-  Future<DbRequestResponse<Tag>> _addOrEditTag(MoodtagBloc bloc, String newTagName, Artist preselectedArtist) async {
-    // TODO Change method analogously to _addOrEditArtist
-    int newTagId = await bloc.createTag(newTagName)
-      .catchError((e) {
-        // If there is a preselected artist, just ignore the exception
-        // and add the preselected artist to the existing tag in "whenComplete"
-        if (preselectedArtist == null) {
-          return new DbRequestResponse.fail(e);
-        }
-      });
+  Future<DbRequestResponse<Tag>> _createTagOrEditExistingTag(MoodtagBloc bloc, String newTagName, Artist preselectedArtist) async {
+    final createTagResponse = await bloc.createTag(newTagName);
 
-    Tag newTag = await bloc.getTagById(newTagId);
     if (preselectedArtist != null) {
-      await bloc.assignTagToArtist(preselectedArtist, newTag);
+      if (createTagResponse.didSucceed()) {
+        await bloc.assignTagToArtist(preselectedArtist, createTagResponse.changedEntity);
+      } else {
+        await bloc.getTagByName(newTagName)
+          .then(
+            (existingTag) async => await bloc.assignTagToArtist(preselectedArtist, existingTag)
+          );
+      }
     }
 
-    return new DbRequestResponse.success(newTag);
+    return createTagResponse;
   }
 
 }
