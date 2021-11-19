@@ -6,6 +6,8 @@ import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/invalid_argument_exception.dart';
+import 'package:moodtag/exceptions/name_already_taken_exception.dart';
+import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:moodtag/utils/helpers.dart';
 
@@ -102,12 +104,13 @@ class AddEntityDialog<E, O> extends AbstractDialog {
       DbRequestResponse response;
 
       if (E == Artist) {
-        response = await _createArtist(bloc, newEntityName, preselectedOther as Tag);
+        response = await _createArtistOrEditExistingArtist(bloc, newEntityName, preselectedOther as Tag);
       } else if (E == Tag) {
         response = await _createTagOrEditExistingTag(bloc, newEntityName, preselectedOther as Artist);
       } else {
         response = new DbRequestResponse.fail(
-            new InvalidArgumentException('Invalid entity type')
+          new InvalidArgumentException('Invalid entity type'),
+          [newEntityName]
         );
       }
 
@@ -118,21 +121,22 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     closeDialog(context);
 
     if (exceptionResponses.isNotEmpty) {
-      // TODO Check exception type
-      final errorMessage = 'Error while adding ${_getEntityDenotation(plural: true)}: '
-        + 'One or several ${_getEntityDenotation(plural: true)} already exist';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage))
-      );
+      showErrorInSnackbar(exceptionResponses, preselectedOther != null);
     }
   }
 
-  Future<DbRequestResponse<Artist>> _createArtist(MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
+  Future<DbRequestResponse<Artist>> _createArtistOrEditExistingArtist(MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
     final createArtistResponse = await bloc.createArtist(newArtistName);
 
-    if (createArtistResponse.didSucceed() && preselectedTag != null) {
-      Artist newArtist = createArtistResponse.changedEntity;
-      await bloc.assignTagToArtist(newArtist, preselectedTag);
+    if (preselectedTag != null) {
+      if (createArtistResponse.didSucceed()) {
+        await bloc.assignTagToArtist(createArtistResponse.changedEntity, preselectedTag);
+      } else {
+        await bloc.getArtistByName(newArtistName)
+            .then(
+              (existingArtist) async => await bloc.assignTagToArtist(existingArtist, preselectedTag)
+            );
+      }
     }
 
     return createArtistResponse;
@@ -153,6 +157,24 @@ class AddEntityDialog<E, O> extends AbstractDialog {
     }
 
     return createTagResponse;
+  }
+
+  void showErrorInSnackbar(List<DbRequestResponse> exceptionResponses, bool preselectedOther) {
+    UserFeedbackException userFeedbackException = getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
+
+    if (userFeedbackException is NameAlreadyTakenException && preselectedOther) {
+      // Do not show an error message if the already existing entity
+      // is assigned to a preselected other entity
+    } else {
+      final errorReason = userFeedbackException is NameAlreadyTakenException
+          ? 'One or several ${_getEntityDenotation(plural: true)} already exist'
+          : userFeedbackException.message;
+      final errorMessage = 'Error while adding ${_getEntityDenotation(plural: true)}: $errorReason';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage))
+      );
+    }
   }
 
 }

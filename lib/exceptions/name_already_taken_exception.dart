@@ -1,8 +1,14 @@
-class NameAlreadyTakenException implements Exception {
+import 'package:moodtag/exceptions/user_readable_exception.dart';
 
-  final String message;
+class NameAlreadyTakenException implements UserFeedbackException {
 
-  const NameAlreadyTakenException([this.message = ""]);
+  final String _message;
+  final ExceptionSeverity _severity = ExceptionSeverity.LOW;
+
+  const NameAlreadyTakenException([this._message = ""]);
+
+  String get message => _message;
+  ExceptionSeverity get severity => _severity;
 
   String toString() => "NameAlreadyTakenException: $message";
 

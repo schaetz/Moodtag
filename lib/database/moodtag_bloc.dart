@@ -45,7 +45,7 @@ class MoodtagBloc {
 
   Future<DbRequestResponse<Artist>> createArtist(String name) async {
     Future<int> createArtistFuture = db.createArtist(ArtistsCompanion.insert(name: name));
-    return _getCreatedEntityFromId<Artist>(createArtistFuture);
+    return _getCreatedEntityFromId<Artist>(createArtistFuture, name);
   }
 
   Future deleteArtist(Artist artist) {
@@ -70,7 +70,7 @@ class MoodtagBloc {
 
   Future<DbRequestResponse<Tag>> createTag(String name) {
     Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name));
-    return _getCreatedEntityFromId<Tag>(createTagFuture);
+    return _getCreatedEntityFromId<Tag>(createTagFuture, name);
   }
 
   Future deleteTag(Tag tag) {
@@ -105,7 +105,7 @@ class MoodtagBloc {
   //
   // Helper methods
   //
-  Future<DbRequestResponse<E>> _getCreatedEntityFromId<E>(Future<int> createEntityFuture) async {
+  Future<DbRequestResponse<E>> _getCreatedEntityFromId<E>(Future<int> createEntityFuture, String name) async {
     Exception exception;
     E newEntity = await createEntityFuture.catchError((e) {
       exception = e;
@@ -115,9 +115,9 @@ class MoodtagBloc {
     );
 
     if (newEntity == null) {
-      return new DbRequestResponse<E>.fail(exception);
+      return new DbRequestResponse<E>.fail(exception, [name]);
     }
-    return new DbRequestResponse<E>.success(newEntity);
+    return new DbRequestResponse<E>.success(newEntity, [name]);
   }
 
   Future _getEntityById<E>(int id) {
