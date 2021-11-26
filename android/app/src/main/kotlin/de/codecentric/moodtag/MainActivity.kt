@@ -1,4 +1,4 @@
-package com.example.moodtag
+package de.codecentric.moodtag
 
 import io.flutter.embedding.android.FlutterActivity
 
