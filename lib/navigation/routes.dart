@@ -36,3 +36,15 @@ class Routes {
   }
 
 }
+
+extension ModalRouteExt on ModalRoute {
+
+  static RoutePredicate withNames(String name1, String name2) {
+    return (Route<dynamic> route) {
+      return !route.willHandlePopInternally
+          && route is ModalRoute
+          && (route.settings.name == name1 || route.settings.name == name2);
+    };
+  }
+
+}

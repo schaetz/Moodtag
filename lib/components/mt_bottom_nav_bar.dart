@@ -19,9 +19,9 @@ class MtBottomNavBar extends BottomNavigationBar {
     currentIndex: activePage.index,
     onTap: (int newIndex) {
       if (newIndex == 0 && activePage != NavigationItem.artists) {
-        Navigator.of(context).pushNamed(Routes.artistsList);
+        Navigator.of(context).pushNamedAndRemoveUntil(Routes.artistsList, (route) => false);
       } else if (newIndex == 1 && activePage != NavigationItem.tags) {
-        Navigator.of(context).pushNamed(Routes.tagsList);
+        Navigator.of(context).pushNamedAndRemoveUntil(Routes.tagsList, (route) => false);
       }
     },
   );

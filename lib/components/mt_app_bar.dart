@@ -26,7 +26,11 @@ class MtAppBar extends AppBar {
         MoodtagApp.appTitle,
         style: titleLabelStyle,
       ),
-      onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(Routes.initialRoute)),
+      onTap: () => {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList))
+        }
+      },
     );
   }
 
