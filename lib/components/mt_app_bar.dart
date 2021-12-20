@@ -12,12 +12,12 @@ class MtAppBar extends AppBar {
     title: _buildTitle(context),
     actions: <Widget>[
       PopupMenuButton<String>(
-        onSelected: _handlePopupMenuItemTap,
-        itemBuilder: (BuildContext context) {
-          return popupMenuItems.map((choice) => _buildPopupMenuItem(choice)).toList();
+        itemBuilder: (BuildContext itemBuilderContext) {
+          return popupMenuItems.map((choice) => _buildPopupMenuItem(context, choice)).toList();
         },
+        onSelected: (value) => _handlePopupMenuItemTap(context, value),
       ),
-    ],
+    ]
   );
 
   static GestureDetector _buildTitle(BuildContext context) {
@@ -26,23 +26,21 @@ class MtAppBar extends AppBar {
         MoodtagApp.appTitle,
         style: titleLabelStyle,
       ),
-      onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(Routes.initialRoute))
+      onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(Routes.initialRoute)),
     );
   }
 
-  static PopupMenuItem<String> _buildPopupMenuItem(String choice) {
+  static PopupMenuItem<String> _buildPopupMenuItem(BuildContext context, String choice) {
     return PopupMenuItem<String>(
       value: choice,
       child: Text(choice),
-      onTap: () => _handlePopupMenuItemTap(choice),
     );
   }
 
-  static void _handlePopupMenuItemTap(String value) {
+  static void _handlePopupMenuItemTap(BuildContext context, String value) {
     switch (value) {
       case 'Spotify Import':
-        // TODO
-        print('Navigate to Spotify Import');
+        Navigator.of(context).pushNamed(Routes.spotifyImport);
         break;
     }
   }
