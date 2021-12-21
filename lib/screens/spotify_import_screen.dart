@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/utils/spotify_import.dart';
+import 'package:moodtag/navigation/routes.dart';
 
 class SpotifyImportScreen extends StatelessWidget {
 
@@ -11,7 +11,7 @@ class SpotifyImportScreen extends StatelessWidget {
       appBar: MtAppBar(context),
       body: Center(
         child: TextButton(
-          onPressed: () => _conductSpotifyImport(),
+          onPressed: () => _conductSpotifyImport(context),
           child: const Text('Start Spotify Import')
         ),
       )
@@ -20,7 +20,7 @@ class SpotifyImportScreen extends StatelessWidget {
 
 }
 
-void _conductSpotifyImport() {
-  getDataFromSpotify();
+void _conductSpotifyImport(context) {
+  Navigator.of(context).pushNamed(Routes.webView);
 }
 
