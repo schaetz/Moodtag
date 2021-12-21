@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/utils/spotify_import.dart';
 
 class SpotifyImportScreen extends StatelessWidget {
 
@@ -19,6 +21,6 @@ class SpotifyImportScreen extends StatelessWidget {
 }
 
 void _conductSpotifyImport() {
-  throw UnimplementedError(); // TODO
+  getDataFromSpotify();
 }
 
