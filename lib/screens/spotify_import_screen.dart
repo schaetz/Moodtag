@@ -35,7 +35,8 @@ void _conductSpotifyImport(context) {
         final accessToken = accessTokenResponseBodyJSON['access_token'];
         print('Obtained access token from Spotify: $accessToken');
 
-        getFollowedArtists(accessToken);
+        final followedArtists = await getFollowedArtists(accessToken);
+        print(followedArtists);
       }
     });
   } catch (e) {

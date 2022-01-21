@@ -21,7 +21,7 @@ String codeVerifier;
 
 Uri getSpotifyAuthUri() {
   var state = getRandomString(16);
-  var scope = 'user-read-private user-read-email';
+  var scope = 'user-follow-read user-library-read';
 
   final queryParameters = {
     'response_type': 'code',
@@ -60,7 +60,7 @@ Future<dynamic> getAccessToken(String authorizationCode) async {
   }
 }
 
-void getFollowedArtists(String accessToken) async {
+Future<List<String>> getFollowedArtists(String accessToken) async {
   final queryParameters = {
     'type': 'artist',
     'limit': '50',
@@ -75,12 +75,20 @@ void getFollowedArtists(String accessToken) async {
   final responseBodyJSON = json.decode(response.body);
 
   if (isHttpRequestSuccessful(response)) {
-    return responseBodyJSON;
+    return _parseFollowedArtists(responseBodyJSON);
   } else {
     final statusCode = response.statusCode;
     final message = responseBodyJSON['error']['message'];
     throw SpotifyImportException('Could not query followed artists: status $statusCode - message $message');
   }
+}
+
+List<String> _parseFollowedArtists(dynamic responseBodyJSON) {
+  List<String> followedArtistsNames = [];
+  for (final artistInfo in responseBodyJSON['artists']['items']) {
+    followedArtistsNames.add(artistInfo['name']);
+  }
+  return followedArtistsNames;
 }
 
 String _generateCodeChallenge() {
