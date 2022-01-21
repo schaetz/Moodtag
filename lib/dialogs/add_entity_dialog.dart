@@ -160,7 +160,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
   }
 
   void showErrorInSnackbar(List<DbRequestResponse> exceptionResponses, bool preselectedOther) {
-    UserFeedbackException userFeedbackException = getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
+    UserReadableException userFeedbackException = getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
 
     if (userFeedbackException is NameAlreadyTakenException && preselectedOther) {
       // Do not show an error message if the already existing entity

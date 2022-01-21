@@ -1,3 +1,5 @@
+import 'package:http/http.dart';
+
 import '../models/artist.dart';
 import '../models/tag.dart';
 
@@ -33,4 +35,8 @@ List<String> processMultilineInput(String input) {
 
 List<T> createListWithSingleElementOrEmpty<T>(T elementOrNull) {
   return elementOrNull != null ? [elementOrNull] : [];
+}
+
+bool isHttpRequestSuccessful(Response response) {
+  return response.statusCode.toString().startsWith('2');
 }

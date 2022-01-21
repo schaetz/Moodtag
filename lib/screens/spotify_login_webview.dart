@@ -4,6 +4,8 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/utils/spotify_import.dart';
 
+// Webview that displays the Spotify login page in a WebviewScaffold
+// and returns the obtained access token to the import screen on successful login
 class SpotifyLoginWebview extends StatelessWidget {
 
   @override
@@ -30,11 +32,10 @@ class SpotifyLoginWebview extends StatelessWidget {
     Uri uri = Uri.parse(url);
     print(uri.authority);
     print(uri.queryParameters);
+    print('uri: ' + uri.toString());
     if (isRedirectUri(uri)) {
-      if (uri.queryParameters.containsKey('code')) {
-        print('Obtained access token from Spotify: ${uri.queryParameters['code']}');
-      }
-      Navigator.of(context).pop();
+      final authorizationCode = uri.queryParameters.containsKey('code') ? uri.queryParameters['code'] : null;
+      Navigator.of(context).pop(authorizationCode);
     }
   }
 

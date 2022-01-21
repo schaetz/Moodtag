@@ -38,7 +38,7 @@ class DbRequestResponse<E> {
     return null;
   }
 
-  UserFeedbackException getUserFeedbackException() {
+  UserReadableException getUserFeedbackException() {
     if (isSqliteException()) {
       if (getSqliteException().extendedResultCode == 2067) {
         String alreadyExistingName = _getStringParameter(0);
@@ -62,12 +62,12 @@ class DbRequestResponse<E> {
 
 }
 
-UserFeedbackException getHighestSeverityExceptionForMultipleResponses(List<DbRequestResponse> exceptionResponses) {
+UserReadableException getHighestSeverityExceptionForMultipleResponses(List<DbRequestResponse> exceptionResponses) {
   ExceptionSeverity highestSeverity = ExceptionSeverity.LOW;
-  UserFeedbackException highestSeverityException;
+  UserReadableException highestSeverityException;
 
   for (DbRequestResponse response in exceptionResponses) {
-    UserFeedbackException userFeedbackException = response.getUserFeedbackException();
+    UserReadableException userFeedbackException = response.getUserFeedbackException();
 
     if (highestSeverityException == null || userFeedbackException.severity.index > highestSeverity.index) {
       highestSeverityException = userFeedbackException;
