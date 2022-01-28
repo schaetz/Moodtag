@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/exceptions/spotify_import_exception.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/structs/import_artists_arguments.dart';
 import 'package:moodtag/utils/spotify_import.dart';
 
 class SpotifyImportScreen extends StatelessWidget {
@@ -37,6 +38,14 @@ void _conductSpotifyImport(context) {
 
         final followedArtists = await getFollowedArtists(accessToken);
         print(followedArtists);
+
+        if (followedArtists.length == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("No followed artists found."))
+          );
+        } else {
+          Navigator.of(context).pushNamed(Routes.importArtistsList, arguments: new ImportArtistsArguments(followedArtists));
+        }
       }
     });
   } catch (e) {

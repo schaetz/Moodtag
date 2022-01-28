@@ -111,7 +111,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
   Widget _buildAddTagChip(BuildContext context, Artist artist) {
     return InputChip(
       label: Text('+'),
-      backgroundColor: Theme.of(context).accentColor,
+      backgroundColor: Theme.of(context).colorScheme.secondary,
       onPressed: () => AddEntityDialog.openAddTagDialog(context, preselectedArtist: artist)
     );
   }

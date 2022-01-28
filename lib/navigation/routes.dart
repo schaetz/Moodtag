@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:moodtag/screens/artist_details.dart';
 import 'package:moodtag/screens/artists_list.dart';
+import 'package:moodtag/screens/import_artists_list.dart';
 import 'package:moodtag/screens/spotify_import_screen.dart';
 import 'package:moodtag/screens/spotify_login_webview.dart';
 import 'package:moodtag/screens/tag_details.dart';
@@ -14,6 +15,7 @@ class Routes {
   static const tagsList = '/tags';
   static const tagsDetails = '/tags/details';
   static const spotifyImport = '/spotifyImport';
+  static const importArtistsList = '/import';
   static const webView = '/webView';
 
   static const initialRoute = artistsList;
@@ -34,6 +36,7 @@ class Routes {
       artistsDetails: (context) => ArtistDetailsScreen(context),
       tagsDetails: (context) => TagDetailsScreen(context),
       spotifyImport: (context) => SpotifyImportScreen(),
+      importArtistsList: (context) => ImportArtistsListScreen(),
       webView: (context) => SpotifyLoginWebview(),
     };
   }
