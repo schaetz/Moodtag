@@ -58,7 +58,7 @@ class ArtistsListScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist),
-      onLongPress: () => DeleteDialog.openNew<Artist>(context, artist)
+      onLongPress: () => DeleteDialog.openNew<Artist>(context, entityToDelete: artist)
     );
   }
 

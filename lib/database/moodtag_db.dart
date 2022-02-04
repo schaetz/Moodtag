@@ -84,6 +84,14 @@ class MoodtagDB extends _$MoodtagDB {
     )).go();
   }
 
+  Future deleteAllArtists() {
+    return delete(artists).go();
+  }
+
+  Future deleteAllTags() {
+    return delete(tags).go();
+  }
+
 }
 
 LazyDatabase _openConnection() {

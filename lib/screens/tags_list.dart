@@ -58,7 +58,7 @@ class TagsListScreen extends StatelessWidget {
         style: listEntryStyle,
       ),
       onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
-      onLongPress: () => DeleteDialog.openNew<Tag>(context, tag)
+      onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag)
     );
   }
 

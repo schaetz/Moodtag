@@ -56,6 +56,10 @@ class MoodtagBloc {
     return db.artistsWithTag(tag.id).watch();
   }
 
+  Future deleteAllArtists() {
+    return db.deleteAllArtists();
+  }
+
 
   //
   // Tags
@@ -79,6 +83,10 @@ class MoodtagBloc {
 
   Stream<List<Tag>> tagsForArtist(Artist artist) {
     return db.tagsForArtist(artist.id).watch();
+  }
+
+  Future deleteAllTags() {
+    return db.deleteAllTags();
   }
 
 

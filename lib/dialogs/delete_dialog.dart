@@ -7,13 +7,15 @@ import 'package:moodtag/database/moodtag_db.dart';
 
 class DeleteDialog<T> extends AbstractDialog {
 
-  static void openNew<T>(BuildContext context, T entity) {
-    new DeleteDialog<T>(context, entity).show();
+  static void openNew<T>(BuildContext context, {T entityToDelete, bool resetLibrary = false}) {
+    print(entityToDelete);
+    new DeleteDialog<T>(context, entityToDelete: entityToDelete, resetLibrary: resetLibrary).show();
   }
 
+  bool resetLibrary = false;
   T entityToDelete;
 
-  DeleteDialog(BuildContext context, this.entityToDelete) : super(context);
+  DeleteDialog(BuildContext context, {this.entityToDelete, this.resetLibrary = false}) : super(context);
 
   @override
   StatelessWidget buildDialog(BuildContext context) {
@@ -59,7 +61,10 @@ class DeleteDialog<T> extends AbstractDialog {
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) async {
     final bloc = Provider.of<MoodtagBloc>(context, listen: false);
 
-    if (entityToDelete is Artist) {
+    print(resetLibrary);
+    if (resetLibrary) {
+      return 'Are you sure that you want to reset the library and delete all artists and tags?';
+    } else if (entityToDelete is Artist) {
       Artist artist = entityToDelete as Artist;
       return 'Are you sure that you want to delete the artist "${artist.name}"?';
     } else if (entityToDelete is Tag) {
@@ -79,7 +84,10 @@ class DeleteDialog<T> extends AbstractDialog {
   void deleteEntity(BuildContext context) async {
     final bloc = Provider.of<MoodtagBloc>(context, listen: false);
 
-    if (entityToDelete is Artist) {
+    if (resetLibrary) {
+      await bloc.deleteAllArtists();
+      await bloc.deleteAllTags();
+    } else if (entityToDelete is Artist) {
       await bloc.deleteArtist(entityToDelete as Artist);
     } else if (entityToDelete is Tag) {
       await bloc.deleteTag(entityToDelete as Tag);
