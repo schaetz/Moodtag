@@ -13,6 +13,8 @@ import 'package:moodtag/navigation/routes.dart';
 class TagsListScreen extends StatelessWidget {
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
+  // TODO Define pale color in theme
+  static const listEntryStylePale = TextStyle(fontSize: 18.0, color: Colors.grey);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class TagsListScreen extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             itemCount: snapshot.hasData ? snapshot.data.length : 0,
             itemBuilder: (context, i) {
-              return _buildTagRow(context, snapshot.data[i]);
+              return _buildTagRow(context, bloc, snapshot.data[i]);
             },
           );
         }
@@ -51,11 +53,30 @@ class TagsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTagRow(BuildContext context, Tag tag) {
+  Widget _buildTagRow(BuildContext context, MoodtagBloc bloc, Tag tag) {
+    // TODO Return type of the artistsWithTag() call is a Stream, not a list of artists; needs to be fixed
+    //final artistsWithTag = bloc.artistsWithTag(tag);
     return ListTile(
-      title: Text(
-        tag.name,
-        style: listEntryStyle,
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              tag.name,
+              style: listEntryStyle,
+            ),
+          ),
+          Text(
+            // TODO Insert number of artists with tag
+            // artistsWithTag.length,
+            '0',
+            style: listEntryStylePale,
+          )
+        ],
+      ),
+      leading: Icon(
+        Icons.label
       ),
       onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
       onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag)
