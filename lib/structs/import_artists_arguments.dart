@@ -1,5 +1,5 @@
 class ImportArtistsArguments {
-  final List<String> artists;
+  final Set<String> artists;
 
   ImportArtistsArguments(this.artists);
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:moodtag/exceptions/spotify_import_exception.dart';
 
 import 'helpers.dart';
@@ -12,16 +13,19 @@ const authorizeSubroute = '/authorize';
 const accessTokenSubroute = '/api/token';
 
 const spotifyApiBaseUrl = 'api.spotify.com';
+const topArtistsSubroute = '/v1/me/top/artists';
 const followedArtistsSubroute = '/v1/me/following';
 
 const clientId = 'c6f54e34aabb42a9b8add087c8642857';
 const redirectUri = 'http://localhost:8888/callback';
 
+const topItemsLimit = 50;
+
 String codeVerifier;
 
 Uri getSpotifyAuthUri() {
   var state = getRandomString(16);
-  var scope = 'user-follow-read user-library-read';
+  var scope = 'user-follow-read user-top-read user-library-read';
 
   final queryParameters = {
     'response_type': 'code',
@@ -60,35 +64,88 @@ Future<dynamic> getAccessToken(String authorizationCode) async {
   }
 }
 
-Future<List<String>> getFollowedArtists(String accessToken) async {
+Future<Set<String>> getTopArtists(String accessToken, int limit) async {
+  if (limit <= topItemsLimit) {
+    return _getTopArtists(accessToken, limit, 0);
+  }
+
+  // Not sure if the Spotify API can actually return more than 50 top artists, so this might be obsolete
+  final requestsCount = (limit / topItemsLimit).ceil();
+  Set<String> topArtists = {};
+
+  for (var i=0; i < requestsCount; i++) {
+    var partLimit = topItemsLimit;
+    if (i == requestsCount - 1) {
+      partLimit = limit % topItemsLimit;
+    }
+    final offset = topItemsLimit * i;
+    topArtists.addAll(await _getTopArtists(accessToken, partLimit, offset));
+  }
+
+  return topArtists;
+}
+
+Future<Set<String>> getFollowedArtists(String accessToken) async {
   final queryParameters = {
     'type': 'artist',
     'limit': '50',
   };
-  final headers = {
-    'Authorization': "Bearer $accessToken",
-    'Content-Type': 'application/json',
-  };
 
   final uri = Uri.https(spotifyApiBaseUrl, followedArtistsSubroute, queryParameters);
-  final response = await http.get(uri, headers: headers);
-  final responseBodyJSON = json.decode(response.body);
+  final response = await http.get(uri, headers: _getHeader(accessToken));
 
-  if (isHttpRequestSuccessful(response)) {
-    return _parseFollowedArtists(responseBodyJSON);
-  } else {
-    final statusCode = response.statusCode;
-    final message = responseBodyJSON['error']['message'];
-    throw SpotifyImportException('Could not query followed artists: status $statusCode - message $message');
+  if (!isHttpRequestSuccessful(response)) {
+    throw SpotifyImportException(_getRequestErrorMessage(response));
   }
+
+  final responseBodyStructure = json.decode(response.body);
+  final followedArtists = Set<String>.from(
+      responseBodyStructure['artists']['items']?.map((item) => item['name'])
+  );
+  if (followedArtists == null) {
+    throw SpotifyImportException('The Spotify data could not be processed.');
+  }
+
+  return followedArtists;
 }
 
-List<String> _parseFollowedArtists(dynamic responseBodyJSON) {
-  List<String> followedArtistsNames = [];
-  for (final artistInfo in responseBodyJSON['artists']['items']) {
-    followedArtistsNames.add(artistInfo['name']);
+Future<Set<String>> _getTopArtists(String accessToken, int limit, int offset) async {
+  final queryParameters = {
+    'limit': limit.toString(),
+    'offset': offset.toString(),
+    'time_range': 'medium_term',
+  };
+
+  final uri = Uri.https(spotifyApiBaseUrl, topArtistsSubroute, queryParameters);
+  final response = await http.get(uri, headers: _getHeader(accessToken));
+
+  if (!isHttpRequestSuccessful(response)) {
+    throw SpotifyImportException(_getRequestErrorMessage(response));
   }
-  return followedArtistsNames;
+
+  final responseBodyMap = json.decode(response.body);
+  final topArtists = Set<String>.from(
+      responseBodyMap['items']?.map((item) => item['name'])
+  );
+  if (topArtists == null) {
+    throw SpotifyImportException('The Spotify data could not be processed.');
+  }
+
+  return topArtists;
+}
+
+String _getRequestErrorMessage(Response response) {
+  final statusCode = response.statusCode;
+  var messageAppendix = '';
+
+  try {
+    final responseBodyJSON = json.decode(response.body);
+    messageAppendix = '- message ' + responseBodyJSON['error']['message'];
+  } catch (e) {
+    // FormatException is thrown for statusCode 403 Forbidden
+  }
+
+  return 'Could not query artists: status $statusCode $messageAppendix';
 }
 
 String _generateCodeChallenge() {
@@ -100,4 +157,11 @@ String _generateCodeChallenge() {
       .replaceAll("+", "-")
       .replaceAll("/", "_");
   return base64UrlEncoded;
+}
+
+Object _getHeader(String accessToken) {
+  return {
+    'Authorization': "Bearer $accessToken",
+    'Content-Type': 'application/json',
+  };
 }

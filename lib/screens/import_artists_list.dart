@@ -23,7 +23,7 @@ class _ImportArtistsListScreenState extends State<ImportArtistsListScreen> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context).settings.arguments as ImportArtistsArguments;
-    final List<String> artists = args.artists;
+    final List<String> artists = args.artists.toList();
     artists.sort();
 
     _initBoxSelectionsIfNull(artists);
