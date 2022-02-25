@@ -19,6 +19,7 @@ class _ImportArtistsListScreenState extends State<ImportArtistsListScreen> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   List<bool> _isBoxSelected;
+  int _selectedBoxesCount;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,9 @@ class _ImportArtistsListScreenState extends State<ImportArtistsListScreen> {
     final List<String> artists = args.artists.toList();
     artists.sort();
 
-    _initBoxSelectionsIfNull(artists);
+    if (_isBoxSelected == null) {
+      _setBoxSelections(artists.length, true);
+    }
 
     return Scaffold(
       appBar: MtAppBar(context),
@@ -38,18 +41,34 @@ class _ImportArtistsListScreenState extends State<ImportArtistsListScreen> {
           return _buildArtistRow(context, artists[i], i);
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _onImportButtonPressed(context, artists),
-        child: const Text('Import'),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+      floatingActionButton: Container(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(left: 32),
+              child: _buildFloatingSelectButton(context, artists.length),
+            ),
+            FloatingActionButton.extended(
+              onPressed: () => _onImportButtonPressed(context, artists),
+              label: const Text('Import'),
+              icon: const Icon(Icons.add_circle_outline),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              heroTag: 'import_button',
+            ),
+          //add right Widget here with padding right
+          ],
+        ),
       ),
     );
   }
   
-  void _initBoxSelectionsIfNull(List<String> artists) {
-    if (_isBoxSelected == null) {
-      _isBoxSelected = List.filled(artists.length, true);
-    }
+  void _setBoxSelections(int artistsCount, bool value) {
+    setState(() {
+      _isBoxSelected = List.filled(artistsCount, value);
+      _selectedBoxesCount = value == true ? artistsCount : 0;
+    });
   }
 
   Widget _buildArtistRow(BuildContext context, String artistName, int index) {
@@ -63,6 +82,11 @@ class _ImportArtistsListScreenState extends State<ImportArtistsListScreen> {
       onChanged: (bool newValue) {
         setState(() {
           _isBoxSelected[index] = newValue;
+          if (newValue == true) {
+            _selectedBoxesCount++;
+          } else {
+            _selectedBoxesCount--;
+          }
         });
       }
     );
@@ -97,6 +121,26 @@ class _ImportArtistsListScreenState extends State<ImportArtistsListScreen> {
       );
 
       Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
+    }
+  }
+
+  Widget _buildFloatingSelectButton(BuildContext context, int artistsCount) {
+    if (_selectedBoxesCount == artistsCount) {
+      return FloatingActionButton.extended(
+        onPressed: () => _setBoxSelections(artistsCount, false),
+        label: const Text('Select none'),
+        icon: const Icon(Icons.remove_circle_outline),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        heroTag: 'select_button',
+      );
+    } else {
+      return FloatingActionButton.extended(
+        onPressed: () => _setBoxSelections(artistsCount, true),
+        label: const Text('Select all'),
+        icon: const Icon(Icons.select_all_outlined),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        heroTag: 'select_button',
+      );
     }
   }
 
