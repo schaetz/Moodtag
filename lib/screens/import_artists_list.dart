@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/structs/import_artists_arguments.dart';
+import 'package:moodtag/structs/imported_artists_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 import 'package:provider/provider.dart';
 
@@ -23,8 +23,9 @@ class _ImportArtistsListScreenState extends State<ImportArtistsListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context).settings.arguments as ImportArtistsArguments;
-    final List<String> artists = args.artists.toList();
+    final args = ModalRoute.of(context).settings.arguments as ImportedArtistsSet;
+    print(args);
+    final List<String> artists = List.from(args.artists.map((artist) => artist.name));
     artists.sort();
 
     if (_isBoxSelected == null) {

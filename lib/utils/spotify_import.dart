@@ -3,6 +3,8 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:moodtag/exceptions/spotify_import_exception.dart';
+import 'package:moodtag/structs/imported_artists_set.dart';
+import 'package:moodtag/structs/imported_artist.dart';
 
 import 'helpers.dart';
 import 'random_helper.dart';
@@ -64,28 +66,7 @@ Future<dynamic> getAccessToken(String authorizationCode) async {
   }
 }
 
-Future<Set<String>> getTopArtists(String accessToken, int limit) async {
-  if (limit <= topItemsLimit) {
-    return _getTopArtists(accessToken, limit, 0);
-  }
-
-  // Not sure if the Spotify API can actually return more than 50 top artists, so this might be obsolete
-  final requestsCount = (limit / topItemsLimit).ceil();
-  Set<String> topArtists = {};
-
-  for (var i=0; i < requestsCount; i++) {
-    var partLimit = topItemsLimit;
-    if (i == requestsCount - 1) {
-      partLimit = limit % topItemsLimit;
-    }
-    final offset = topItemsLimit * i;
-    topArtists.addAll(await _getTopArtists(accessToken, partLimit, offset));
-  }
-
-  return topArtists;
-}
-
-Future<Set<String>> getFollowedArtists(String accessToken) async {
+Future<ImportedArtistsSet> getFollowedArtists(String accessToken) async {
   final queryParameters = {
     'type': 'artist',
     'limit': '50',
@@ -99,17 +80,25 @@ Future<Set<String>> getFollowedArtists(String accessToken) async {
   }
 
   final responseBodyStructure = json.decode(response.body);
-  final followedArtists = Set<String>.from(
-      responseBodyStructure['artists']['items']?.map((item) => item['name'])
-  );
+  Set<ImportedArtist> followedArtists;
+  try {
+    followedArtists = Set<ImportedArtist>.from(
+      responseBodyStructure['artists']['items']?.map(
+        (item) => ImportedArtist(item['name'], Set.from(item['genres']))
+      )
+    );
+  } catch (error) {
+    throw SpotifyImportException('The Spotify data has an unknown structure.');
+  }
+
   if (followedArtists == null) {
     throw SpotifyImportException('The Spotify data could not be processed.');
   }
 
-  return followedArtists;
+  return ImportedArtistsSet.from(followedArtists);
 }
 
-Future<Set<String>> _getTopArtists(String accessToken, int limit, int offset) async {
+Future<ImportedArtistsSet> getTopArtists(String accessToken, int limit, int offset) async {
   final queryParameters = {
     'limit': limit.toString(),
     'offset': offset.toString(),
@@ -124,14 +113,22 @@ Future<Set<String>> _getTopArtists(String accessToken, int limit, int offset) as
   }
 
   final responseBodyMap = json.decode(response.body);
-  final topArtists = Set<String>.from(
-      responseBodyMap['items']?.map((item) => item['name'])
-  );
+  Set<ImportedArtist> topArtists;
+  try {
+    topArtists = Set<ImportedArtist>.from(
+      responseBodyMap['items']?.map(
+        (item) => ImportedArtist(item['name'], Set.from(item['genres']))
+      )
+    );
+  } catch (error) {
+    throw SpotifyImportException('The Spotify data has an unknown structure.');
+  }
+
   if (topArtists == null) {
     throw SpotifyImportException('The Spotify data could not be processed.');
   }
 
-  return topArtists;
+  return ImportedArtistsSet.from(topArtists);
 }
 
 String _getRequestErrorMessage(Response response) {
