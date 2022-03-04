@@ -17,7 +17,7 @@ class ImportedArtistsSet {
 
   bool get isEmpty => _importArtistsByName.isEmpty;
 
-  Set<ImportedArtist> get artists => _importArtistsByName.values;
+  Set<ImportedArtist> get artists => Set.from(_importArtistsByName.values);
 
   void addArtist(ImportedArtist newArtist) {
     _importArtistsByName.putIfAbsent(newArtist.name, () => newArtist);
