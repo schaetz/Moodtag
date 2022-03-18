@@ -5,7 +5,7 @@ import 'package:moodtag/exceptions/spotify_import_exception.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
-import 'package:moodtag/utils/spotify_import.dart';
+import 'package:moodtag/utils/spotify_import_helper.dart';
 
 class SpotifyImportScreen extends StatefulWidget {
 

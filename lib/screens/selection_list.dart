@@ -4,23 +4,23 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 import '../components/mt_app_bar.dart';
 
-class SelectionListScreen<T extends NamedEntity> extends StatefulWidget {
+class SelectionList<T extends NamedEntity> extends StatefulWidget {
 
   final String mainButtonLabel;
   final Function(BuildContext, List<String>, List<bool>) onMainButtonPressed;
 
-  SelectionListScreen({
+  SelectionList({
     this.mainButtonLabel,
     this.onMainButtonPressed,
   });
 
   @override
-  State<StatefulWidget> createState() => _SelectionListScreenState<T>();
+  State<StatefulWidget> createState() => _SelectionListState<T>();
 
 }
 
 
-class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionListScreen> {
+class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
 
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 

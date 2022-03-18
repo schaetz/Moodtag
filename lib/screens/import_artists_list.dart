@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/screens/selection_list_screen.dart';
+import 'package:moodtag/screens/selection_list.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
@@ -9,7 +9,7 @@ class ImportArtistsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SelectionListScreen(
+    return SelectionList(
       mainButtonLabel: "Import",
       onMainButtonPressed: _onImportButtonPressed
     );
