@@ -3,8 +3,8 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:moodtag/exceptions/spotify_import_exception.dart';
-import 'package:moodtag/structs/imported_artists_set.dart';
 import 'package:moodtag/structs/imported_artist.dart';
+import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 import 'helpers.dart';
 import 'random_helper.dart';
@@ -66,7 +66,7 @@ Future<dynamic> getAccessToken(String authorizationCode) async {
   }
 }
 
-Future<ImportedArtistsSet> getFollowedArtists(String accessToken) async {
+Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessToken) async {
   final queryParameters = {
     'type': 'artist',
     'limit': '50',
@@ -95,10 +95,10 @@ Future<ImportedArtistsSet> getFollowedArtists(String accessToken) async {
     throw SpotifyImportException('The Spotify data could not be processed.');
   }
 
-  return ImportedArtistsSet.from(followedArtists);
+  return UniqueNamedEntitySet<ImportedArtist>.from(followedArtists);
 }
 
-Future<ImportedArtistsSet> getTopArtists(String accessToken, int limit, int offset) async {
+Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, int limit, int offset) async {
   final queryParameters = {
     'limit': limit.toString(),
     'offset': offset.toString(),
@@ -128,7 +128,7 @@ Future<ImportedArtistsSet> getTopArtists(String accessToken, int limit, int offs
     throw SpotifyImportException('The Spotify data could not be processed.');
   }
 
-  return ImportedArtistsSet.from(topArtists);
+  return UniqueNamedEntitySet<ImportedArtist>.from(topArtists);
 }
 
 String _getRequestErrorMessage(Response response) {

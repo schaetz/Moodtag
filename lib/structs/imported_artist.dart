@@ -1,4 +1,6 @@
-class ImportedArtist {
+import 'package:moodtag/structs/named_entity.dart';
+
+class ImportedArtist extends NamedEntity {
   final String _name;
   final Set<String> _genres;
 

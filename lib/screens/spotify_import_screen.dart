@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/exceptions/spotify_import_exception.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/structs/imported_artists_set.dart';
+import 'package:moodtag/structs/imported_artist.dart';
+import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/spotify_import.dart';
 
 class SpotifyImportScreen extends StatefulWidget {
@@ -77,7 +78,7 @@ void _conductSpotifyImport(BuildContext context, bool useTopArtists, bool useFol
         final accessToken = accessTokenResponseBodyJSON['access_token'];
         print('Obtained access token from Spotify: $accessToken');
 
-        ImportedArtistsSet importedArtists = ImportedArtistsSet();
+        final importedArtists = UniqueNamedEntitySet<ImportedArtist>();
 
         if (useTopArtists) {
           importedArtists.addAll(await getTopArtists(accessToken, 50, 0));
