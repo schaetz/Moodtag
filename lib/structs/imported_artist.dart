@@ -6,12 +6,7 @@ class ImportedArtist extends NamedEntity {
 
   ImportedArtist(this._name, this._genres);
 
-  String get name {
-    return _name;
-  }
-
-  Set<String> get genres {
-    return _genres;
-  }
+  String get name => _name;
+  Set<String> get genres => _genres;
 
 }

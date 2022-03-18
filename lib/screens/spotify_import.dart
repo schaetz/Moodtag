@@ -5,7 +5,7 @@ import 'package:moodtag/exceptions/spotify_import_exception.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
-import 'package:moodtag/utils/spotify_import_helper.dart';
+import 'package:moodtag/utils/spotify_connector.dart';
 
 class SpotifyImportScreen extends StatefulWidget {
 
@@ -18,6 +18,7 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
 
   bool _useTopArtists = true;
   bool _useFollowedArtists = true;
+  bool _useArtistGenres = true;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +52,17 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
                 });
               },
             ),
+            CheckboxListTile(
+              title: Text('Artist genres'),
+              value: _useArtistGenres,
+              onChanged: (newValue) {
+                setState(() {
+                  _useArtistGenres = newValue;
+                });
+              },
+            ),
             TextButton(
-              onPressed: _buttonEnabled ? () => _conductSpotifyImport(context, _useTopArtists, _useFollowedArtists) : null,
+              onPressed: _buttonEnabled ? () => _conductSpotifyImport(context, _useTopArtists, _useFollowedArtists, _useArtistGenres) : null,
               child: const Text('Start Spotify Import'),
             ),
           ],
@@ -65,7 +75,8 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
 
 }
 
-void _conductSpotifyImport(BuildContext context, bool useTopArtists, bool useFollowedArtists) {
+void _conductSpotifyImport(BuildContext context, bool useTopArtists, bool useFollowedArtists, bool useArtistGenres) {
+  // TODO Pass on useArtistGenres value
   final authCodeFuture = Navigator.of(context).pushNamed(Routes.webView);
   authCodeFuture.then((authorizationCode) async {
     if (authorizationCode == null) {

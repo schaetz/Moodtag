@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/models/artist.dart';
+import 'package:moodtag/models/tag.dart';
 
 import 'package:moodtag/screens/artist_details.dart';
 import 'package:moodtag/screens/artists_list.dart';
-import 'package:moodtag/screens/import_artists_list.dart';
+import 'package:moodtag/screens/import_selection_list.dart';
 import 'package:moodtag/screens/spotify_import.dart';
 import 'package:moodtag/screens/spotify_login_webview.dart';
 import 'package:moodtag/screens/tag_details.dart';
 import 'package:moodtag/screens/tags_list.dart';
+import 'package:moodtag/structs/imported_artist.dart';
+import 'package:moodtag/structs/imported_genre.dart';
 
 class Routes {
 
@@ -15,7 +19,8 @@ class Routes {
   static const tagsList = '/tags';
   static const tagsDetails = '/tags/details';
   static const spotifyImport = '/spotifyImport';
-  static const importArtistsList = '/import';
+  static const importArtistsList = '/importArtists';
+  static const importGenresList = '/importGenres';
   static const webView = '/webView';
 
   static const initialRoute = artistsList;
@@ -36,7 +41,14 @@ class Routes {
       artistsDetails: (context) => ArtistDetailsScreen(context),
       tagsDetails: (context) => TagDetailsScreen(context),
       spotifyImport: (context) => SpotifyImportScreen(),
-      importArtistsList: (context) => ImportArtistsListScreen(),
+      importArtistsList: (context) => ImportSelectionListScreen<ImportedArtist,Artist>(
+        entityDenotationSingular: Artist.denotationSingular,
+        entityDenotationPlural: Artist.denotationPlural
+      ),
+      importGenresList: (context) => ImportSelectionListScreen<ImportedGenre,Tag>(
+          entityDenotationSingular: "genre tag",
+          entityDenotationPlural: "genre tags",
+      ),
       webView: (context) => SpotifyLoginWebview(),
     };
   }
