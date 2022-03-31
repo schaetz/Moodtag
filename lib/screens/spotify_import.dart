@@ -1,7 +1,9 @@
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/exceptions/spotify_import_exception.dart';
+import 'package:moodtag/flows/import_flow_state.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
@@ -76,8 +78,7 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
 }
 
 void _conductSpotifyImport(BuildContext context, bool useTopArtists, bool useFollowedArtists, bool useArtistGenres) {
-  // TODO Pass on useArtistGenres value
-  final authCodeFuture = Navigator.of(context).pushNamed(Routes.webView);
+  final authCodeFuture = Navigator.of(context).pushNamed(Routes.webView); // TODO Replace navigation by import flow
   authCodeFuture.then((authorizationCode) async {
     if (authorizationCode == null) {
       throw SpotifyImportException('Authorization in Spotify failed.');
@@ -103,7 +104,7 @@ void _conductSpotifyImport(BuildContext context, bool useTopArtists, bool useFol
               SnackBar(content: Text("No artists to import."))
           );
         } else {
-          Navigator.of(context).pushNamed(Routes.importArtistsList, arguments: importedArtists);
+          context.flow<ImportFlowState>().update((state) => state.copyWith(importedArtistsSet: importedArtists, doImportGenres: useArtistGenres));
         }
       } catch (e) {
         print("Spotify import failed: $e");

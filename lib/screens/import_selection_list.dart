@@ -1,11 +1,12 @@
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/flows/import_flow_state.dart';
 import 'package:moodtag/models/abstract_entity.dart';
 import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/screens/selection_list.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/structs/named_entity.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 import 'package:provider/provider.dart';
@@ -33,8 +34,19 @@ class ImportSelectionListScreen<N extends NamedEntity, M extends AbstractEntity>
     } else {
       _showSuccessMessage(context, requestSuccessCounter);
 
-      // TODO Route from artists import screen to genres import screen
-      Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
+      final flowController = context.flow<ImportFlowState>();
+      if (M == Artist) {
+        flowController.update((state) => state.copyWith(isArtistsImportFinished: true));
+      } else if (M == Tag) {
+        flowController.update((state) => state.copyWith(isGenresImportFinished: true));
+      } else {
+        throw new UnimplementedError("The functionality for importing an entity of type $M is not implemented yet.");
+      }
+
+      if (flowController.state.isArtistsImportFinished &&
+          (!flowController.state.doImportGenres || flowController.state.isGenresImportFinished)) {
+        flowController.complete();
+      }
     }
   }
 
