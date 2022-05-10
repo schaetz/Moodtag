@@ -1,7 +1,9 @@
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/flows/import_flow_state.dart';
 import 'package:moodtag/utils/spotify_connector.dart';
 
 // Webview that displays the Spotify login page in a WebviewScaffold
@@ -35,7 +37,7 @@ class SpotifyLoginWebview extends StatelessWidget {
     print('uri: ' + uri.toString());
     if (isRedirectUri(uri)) {
       final authorizationCode = uri.queryParameters.containsKey('code') ? uri.queryParameters['code'] : null;
-      Navigator.of(context).pop(authorizationCode);
+      context.flow<ImportFlowState>().update((state) => state.copyWith(spotifyAuthCode: authorizationCode));
     }
   }
 

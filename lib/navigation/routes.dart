@@ -3,7 +3,6 @@ import 'package:moodtag/flows/import_flow.dart';
 
 import 'package:moodtag/screens/artist_details.dart';
 import 'package:moodtag/screens/artists_list.dart';
-import 'package:moodtag/screens/spotify_login_webview.dart';
 import 'package:moodtag/screens/tag_details.dart';
 import 'package:moodtag/screens/tags_list.dart';
 
@@ -36,7 +35,6 @@ class Routes {
       artistsDetails: (context) => ArtistDetailsScreen(context),
       tagsDetails: (context) => TagDetailsScreen(context),
       spotifyImport: (context) => ImportFlow(),
-      webView: (context) => SpotifyLoginWebview(),
     };
   }
 

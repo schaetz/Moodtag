@@ -6,10 +6,12 @@ import '../components/mt_app_bar.dart';
 
 class SelectionList<T extends NamedEntity> extends StatefulWidget {
 
+  final UniqueNamedEntitySet<T> namedEntitySet;
   final String mainButtonLabel;
-  final Function(BuildContext, List<String>, List<bool>) onMainButtonPressed;
+  final Function(BuildContext, List<T>, List<bool>) onMainButtonPressed;
 
   SelectionList({
+    this.namedEntitySet,
     this.mainButtonLabel,
     this.onMainButtonPressed,
   });
@@ -29,13 +31,10 @@ class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context).settings.arguments as UniqueNamedEntitySet<T>;
-    print(args);
-    final List<String> listValues = List.from(args.values.map((entity) => entity.name));
-    listValues.sort();
+    final List<T> sortedEntities = widget.namedEntitySet.toSortedList();
 
     if (_isBoxSelected == null) {
-      _setBoxSelections(listValues.length, true);
+      _setBoxSelections(sortedEntities.length, true);
     }
 
     return Scaffold(
@@ -43,9 +42,9 @@ class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
       body: ListView.separated(
         separatorBuilder: (context, _) => Divider(),
         padding: EdgeInsets.all(16.0),
-        itemCount: listValues.length,
+        itemCount: sortedEntities.length,
         itemBuilder: (context, i) {
-          return _buildRow(context, listValues[i], i);
+          return _buildRow(context, sortedEntities[i].name, i);
         },
       ),
       floatingActionButton: Container(
@@ -55,10 +54,10 @@ class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(left: 32),
-              child: _buildFloatingSelectButton(context, listValues.length),
+              child: _buildFloatingSelectButton(context, sortedEntities.length),
             ),
             FloatingActionButton.extended(
-              onPressed: () => widget.onMainButtonPressed(context, listValues, _isBoxSelected),
+              onPressed: () => widget.onMainButtonPressed(context, sortedEntities, _isBoxSelected),
               label: Text(widget.mainButtonLabel),
               icon: const Icon(Icons.add_circle_outline),
               backgroundColor: Theme.of(context).colorScheme.secondary,

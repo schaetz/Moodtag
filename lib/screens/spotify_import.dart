@@ -2,9 +2,7 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/exceptions/spotify_import_exception.dart';
 import 'package:moodtag/flows/import_flow_state.dart';
-import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/spotify_connector.dart';
@@ -77,42 +75,40 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
 
 }
 
-void _conductSpotifyImport(BuildContext context, bool useTopArtists, bool useFollowedArtists, bool useArtistGenres) {
-  final authCodeFuture = Navigator.of(context).pushNamed(Routes.webView); // TODO Replace navigation by import flow
-  authCodeFuture.then((authorizationCode) async {
-    if (authorizationCode == null) {
-      throw SpotifyImportException('Authorization in Spotify failed.');
-    } else {
-      try {
-        print('Obtained authorization code from Spotify: $authorizationCode');
-        final accessTokenResponseBodyJSON = await getAccessToken(authorizationCode);
+void _conductSpotifyImport(BuildContext context, bool useTopArtists, bool useFollowedArtists, bool useArtistGenres) async {
+  try {
+    final authorizationCode = context.flow<ImportFlowState>().state.spotifyAuthCode;
 
-        final accessToken = accessTokenResponseBodyJSON['access_token'];
-        print('Obtained access token from Spotify: $accessToken');
+    print('Obtained authorization code from Spotify: $authorizationCode');
+    final accessTokenResponseBodyJSON = await getAccessToken(authorizationCode);
 
-        final importedArtists = UniqueNamedEntitySet<ImportedArtist>();
+    final accessToken = accessTokenResponseBodyJSON['access_token'];
+    print('Obtained access token from Spotify: $accessToken');
 
-        if (useTopArtists) {
-          importedArtists.addAll(await getTopArtists(accessToken, 50, 0));
-        }
-        if (useFollowedArtists) {
-          importedArtists.addAll(await getFollowedArtists(accessToken));
-        }
+    final availableSpotifyArtists = UniqueNamedEntitySet<ImportedArtist>();
 
-        if (importedArtists.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("No artists to import."))
-          );
-        } else {
-          context.flow<ImportFlowState>().update((state) => state.copyWith(importedArtistsSet: importedArtists, doImportGenres: useArtistGenres));
-        }
-      } catch (e) {
-        print("Spotify import failed: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Spotify import failed."))
-        );
-      }
+    if (useTopArtists) {
+      availableSpotifyArtists.addAll(await getTopArtists(accessToken, 50, 0));
     }
-  });
+    if (useFollowedArtists) {
+      availableSpotifyArtists.addAll(await getFollowedArtists(accessToken));
+    }
+
+    if (availableSpotifyArtists.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No artists to import."))
+      );
+    } else {
+      context.flow<ImportFlowState>().update((state) => state.copyWith(
+        availableSpotifyArtists: availableSpotifyArtists,
+        doImportGenres: useArtistGenres
+      ));
+    }
+  } catch (e) {
+    print("Spotify import failed: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Spotify import failed."))
+    );
+  }
 }
 

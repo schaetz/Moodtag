@@ -7,27 +7,32 @@ import 'package:moodtag/models/artist.dart';
 import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/screens/selection_list.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/structs/imported_artist.dart';
+import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';
+import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 import 'package:provider/provider.dart';
 
 class ImportSelectionListScreen<N extends NamedEntity, M extends AbstractEntity> extends StatelessWidget {
 
+  final UniqueNamedEntitySet<N> namedEntitySet;
   final String entityDenotationSingular;
   final String entityDenotationPlural;
 
-  const ImportSelectionListScreen({Key key, this.entityDenotationSingular, this.entityDenotationPlural}) : super(key: key);
+  const ImportSelectionListScreen({Key key, this.namedEntitySet, this.entityDenotationSingular, this.entityDenotationPlural}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SelectionList<N>(
+      namedEntitySet: namedEntitySet,
       mainButtonLabel: "Import",
       onMainButtonPressed: _onImportButtonPressed
     );
   }
 
-  void _onImportButtonPressed(BuildContext context, List<String> entityNames, List<bool> isBoxSelected) async {
-    final requestSuccessCounter = await _createEntities(context, entityNames, isBoxSelected);
+  void _onImportButtonPressed(BuildContext context, List<N> sortedEntities, List<bool> isBoxSelected) async {
+    final requestSuccessCounter = await _createEntities(context, sortedEntities, isBoxSelected);
 
     if (requestSuccessCounter.totalCount == 0) {
       _showNoSelectionError(context);
@@ -35,10 +40,10 @@ class ImportSelectionListScreen<N extends NamedEntity, M extends AbstractEntity>
       _showSuccessMessage(context, requestSuccessCounter);
 
       final flowController = context.flow<ImportFlowState>();
-      if (M == Artist) {
-        flowController.update((state) => state.copyWith(isArtistsImportFinished: true));
-      } else if (M == Tag) {
-        flowController.update((state) => state.copyWith(isGenresImportFinished: true));
+      if (M == Artist && N == ImportedArtist) {
+        _finishArtistsImportAndPrepareGenreImport(sortedEntities as List<ImportedArtist>, flowController);
+      } else if (M == Tag && N == ImportedGenre) {
+        _finishGenresImport(flowController);
       } else {
         throw new UnimplementedError("The functionality for importing an entity of type $M is not implemented yet.");
       }
@@ -50,13 +55,30 @@ class ImportSelectionListScreen<N extends NamedEntity, M extends AbstractEntity>
     }
   }
 
-  Future<DbRequestSuccessCounter> _createEntities(BuildContext context, List<String> entityNames, List<bool> isBoxSelected) async {
+  void _finishArtistsImportAndPrepareGenreImport(List<ImportedArtist> sortedEntities, FlowController<ImportFlowState> flowController) {
+    final UniqueNamedEntitySet<ImportedGenre> importedArtistsGenres = UniqueNamedEntitySet();
+    sortedEntities.forEach((importedArtist) {
+      List<ImportedGenre> genresList = importedArtist.genres.map((genreName) => ImportedGenre(genreName)).toList();
+      genresList.forEach((genreEntity) => importedArtistsGenres.add(genreEntity));
+    });
+    
+    flowController.update((state) => state.copyWith(
+      isArtistsImportFinished: true,
+      importedArtistsGenres: importedArtistsGenres,
+    ));
+  }
+
+  void _finishGenresImport(FlowController<ImportFlowState> flowController) {
+    flowController.update((state) => state.copyWith(isGenresImportFinished: true));
+  }
+
+  Future<DbRequestSuccessCounter> _createEntities(BuildContext context, List<N> sortedEntities, List<bool> isBoxSelected) async {
     final bloc = Provider.of<MoodtagBloc>(context, listen: false);
     final requestSuccessCounter = new DbRequestSuccessCounter();
 
-    for (int i=0 ; i < entityNames.length; i++){
+    for (int i=0 ; i < sortedEntities.length; i++){
       if (isBoxSelected[i]) {
-        String newEntityName = entityNames[i];
+        String newEntityName = sortedEntities[i].name;
         DbRequestResponse creationResponse;
         if (M == Artist) {
           creationResponse = await bloc.createArtist(newEntityName);

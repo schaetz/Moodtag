@@ -33,4 +33,10 @@ class UniqueNamedEntitySet<T extends NamedEntity> {
     }
   }
 
+  List<T> toSortedList() {
+    final List<T> sortedEntities = List.from(_entitiesByName.values);
+    sortedEntities.sort((a,b) => a.name.compareTo(b.name));
+    return sortedEntities;
+  }
+
 }
