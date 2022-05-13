@@ -23,7 +23,7 @@ class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MtAppBar(context),
+      appBar: MtAppBar(context, forceBackButton: true),
       body: Center(
         child: Column(
           children: [

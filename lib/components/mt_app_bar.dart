@@ -1,28 +1,43 @@
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
+import 'package:moodtag/flows/import_flow_state.dart';
 
 import 'package:moodtag/main.dart';
 import 'package:moodtag/navigation/routes.dart';
 
-class MtAppBar extends AppBar {
+class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   static const titleLabelStyle = TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold);
 
   static const menuItemSpotifyImport = 'Spotify Import';
   static const menuItemResetLibrary = 'Reset library';
   static const popupMenuItems = [menuItemSpotifyImport, menuItemResetLibrary];
+  static const double height = 60;
 
-  MtAppBar(BuildContext context) : super(
-    title: _buildTitle(context),
-    actions: <Widget>[
-      PopupMenuButton<String>(
-        itemBuilder: (BuildContext itemBuilderContext) {
-          return popupMenuItems.map((choice) => _buildPopupMenuItem(context, choice)).toList();
-        },
-        onSelected: (value) => _handlePopupMenuItemTap(context, value),
-      ),
-    ],
-  );
+  final BuildContext context;
+  final bool forceBackButton;
+
+  MtAppBar(this.context, {this.forceBackButton = false}) : super();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: _buildTitle(context),
+      actions: <Widget>[
+        PopupMenuButton<String>(
+          itemBuilder: (BuildContext itemBuilderContext) {
+            return popupMenuItems.map((choice) => _buildPopupMenuItem(context, choice)).toList();
+          },
+          onSelected: (value) => _handlePopupMenuItemTap(context, value),
+        ),
+      ],
+      leading: forceBackButton ? BackButton(onPressed: () => context.flow<ImportFlowState>().complete()) : null,
+    );
+  }
+  
+  @override
+  Size get preferredSize => Size.fromHeight(height);
 
   static GestureDetector _buildTitle(BuildContext context) {
     return GestureDetector(

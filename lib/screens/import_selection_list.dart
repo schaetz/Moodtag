@@ -65,21 +65,21 @@ class ImportSelectionListScreen<N extends NamedEntity, M extends AbstractEntity>
     final flowController = context.flow<ImportFlowState>();
     if (M == Artist && N == ImportedArtist) {
       flowController.update((state) => state.copyWith(
-        isArtistsImportFinished: true,
+        isArtistsSelectionFinished: true,
         selectedArtists: selectedEntities as List<ImportedArtist>,
         availableArtistsGenres: _getImportedArtistsGenres(selectedEntities as List<ImportedArtist>),
       ));
     } else if (M == Tag && N == ImportedGenre) {
       flowController.update((state) => state.copyWith(
-        isGenresImportFinished: true,
+        isGenresSelectionFinished: true,
         selectedGenres: selectedEntities as List<ImportedGenre>,
       ));
     } else {
       throw new UnimplementedError("The functionality for importing an entity of type $M is not implemented yet.");
     }
 
-    if (flowController.state.isArtistsImportFinished &&
-        (!flowController.state.doImportGenres || flowController.state.isGenresImportFinished)) {
+    if (flowController.state.isArtistsSelectionFinished &&
+        (!flowController.state.doImportGenres || flowController.state.isGenresSelectionFinished)) {
       flowController.complete();
     }
   }

@@ -20,7 +20,7 @@ class ImportFlow extends StatelessWidget {
     return FlowBuilder<ImportFlowState>(
       state: ImportFlowState.initial(),
       onGeneratePages: _onGenerateImportFlowPages,
-      onComplete: (importFlowState) => _conductImport(context, importFlowState),
+      onComplete: (importFlowState) => _completeFlow(context, importFlowState),
     );
   }
 
@@ -43,7 +43,7 @@ class ImportFlow extends StatelessWidget {
           entityDenotationPlural: Artist.denotationPlural
         )
       ),
-      if (importFlowState.doImportGenres && importFlowState.isArtistsImportFinished) MaterialPage<void>(
+      if (importFlowState.doImportGenres && importFlowState.isArtistsSelectionFinished) MaterialPage<void>(
         child: ImportSelectionListScreen<ImportedGenre,Tag>(
           namedEntitySet: importFlowState.availableArtistsGenres,
           confirmationButtonLabel: "Import",
@@ -54,13 +54,16 @@ class ImportFlow extends StatelessWidget {
     ];
   }
 
-  void _conductImport(BuildContext context, ImportFlowState importFlowState) async {
-    List<NamedEntity> entitiesToCreate = [];
-    entitiesToCreate.addAll(importFlowState.selectedArtists);
-    entitiesToCreate.addAll(importFlowState.selectedGenres);
+  void _completeFlow(BuildContext context, ImportFlowState importFlowState) async {
+    if (importFlowState.isArtistsSelectionFinished && (!importFlowState.doImportGenres || importFlowState.isGenresSelectionFinished)) {
+      List<NamedEntity> entitiesToCreate = [];
+      entitiesToCreate.addAll(importFlowState.selectedArtists);
+      entitiesToCreate.addAll(importFlowState.selectedGenres);
 
-    final Map<Type,DbRequestSuccessCounter> creationSuccessCountersByType = await createEntities(context, entitiesToCreate);
-    _showResultMessage(context, creationSuccessCountersByType);
+      final Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType = await createEntities(
+          context, entitiesToCreate);
+      _showResultMessage(context, creationSuccessCountersByType);
+    }
 
     Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
   }

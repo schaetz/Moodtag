@@ -17,7 +17,7 @@ class SpotifyLoginWebview extends StatelessWidget {
 
     return WebviewScaffold(
       url: getSpotifyAuthUri().toString(),
-      appBar: MtAppBar(context),
+      appBar: MtAppBar(context, forceBackButton: true),
       withZoom: true,
       withLocalStorage: true,
       hidden: true,
