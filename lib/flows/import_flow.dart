@@ -73,7 +73,7 @@ class ImportFlow extends StatelessWidget {
 
     if (creationSuccessCountersByType[ImportedArtist].successCount > 0) {
       if (creationSuccessCountersByType[ImportedGenre].successCount > 0) {
-        message = """"
+        message = """
         Successfully added ${creationSuccessCountersByType[ImportedArtist].successCount} artists and
         ${creationSuccessCountersByType[ImportedGenre].successCount} tags.
         """;
