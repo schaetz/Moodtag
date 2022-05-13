@@ -9,6 +9,9 @@ import 'package:moodtag/screens/spotify_import.dart';
 import 'package:moodtag/screens/spotify_login_webview.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
+import 'package:moodtag/structs/named_entity.dart';
+import 'package:moodtag/utils/db_request_success_counter.dart';
+import 'package:moodtag/utils/entity_creator.dart';
 
 class ImportFlow extends StatelessWidget {
 
@@ -17,6 +20,7 @@ class ImportFlow extends StatelessWidget {
     return FlowBuilder<ImportFlowState>(
       state: ImportFlowState.initial(),
       onGeneratePages: _onGenerateImportFlowPages,
+      onComplete: (importFlowState) => _conductImport(context, importFlowState),
     );
   }
 
@@ -34,18 +38,54 @@ class ImportFlow extends StatelessWidget {
       if (importFlowState.availableSpotifyArtists != null) MaterialPage<void>(
         child: ImportSelectionListScreen<ImportedArtist,Artist>(
           namedEntitySet: importFlowState.availableSpotifyArtists,
+          confirmationButtonLabel: importFlowState.doImportGenres ? "OK" : "Import",
           entityDenotationSingular: Artist.denotationSingular,
           entityDenotationPlural: Artist.denotationPlural
         )
       ),
       if (importFlowState.doImportGenres && importFlowState.isArtistsImportFinished) MaterialPage<void>(
         child: ImportSelectionListScreen<ImportedGenre,Tag>(
-          namedEntitySet: importFlowState.importedArtistsGenres,
+          namedEntitySet: importFlowState.availableArtistsGenres,
+          confirmationButtonLabel: "Import",
           entityDenotationSingular: "genre tag",
           entityDenotationPlural: "genre tags",
         )
       ),
     ];
+  }
+
+  void _conductImport(BuildContext context, ImportFlowState importFlowState) async {
+    List<NamedEntity> entitiesToCreate = [];
+    entitiesToCreate.addAll(importFlowState.selectedArtists);
+    entitiesToCreate.addAll(importFlowState.selectedGenres);
+
+    final Map<Type,DbRequestSuccessCounter> creationSuccessCountersByType = await createEntities(context, entitiesToCreate);
+    _showResultMessage(context, creationSuccessCountersByType);
+
+    Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
+  }
+
+  void _showResultMessage(BuildContext context, Map<Type,DbRequestSuccessCounter> creationSuccessCountersByType) {
+    String message;
+
+    if (creationSuccessCountersByType[ImportedArtist].successCount > 0) {
+      if (creationSuccessCountersByType[ImportedGenre].successCount > 0) {
+        message = """"
+        Successfully added ${creationSuccessCountersByType[ImportedArtist].successCount} artists and
+        ${creationSuccessCountersByType[ImportedGenre].successCount} tags.
+        """;
+      } else {
+        message = "Successfully added ${creationSuccessCountersByType[ImportedArtist].successCount} artists.";
+      }
+    } else if (creationSuccessCountersByType[ImportedGenre].successCount > 0) {
+      message = "Successfully added ${creationSuccessCountersByType[ImportedGenre].successCount} genres.";
+    } else {
+      message = "No entities were added.";
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message))
+    );
   }
 
 }

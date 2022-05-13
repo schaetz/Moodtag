@@ -5,23 +5,29 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 class ImportFlowState {
 
   final UniqueNamedEntitySet<ImportedArtist> availableSpotifyArtists;
-  final UniqueNamedEntitySet<ImportedGenre> importedArtistsGenres;
+  final UniqueNamedEntitySet<ImportedGenre> availableArtistsGenres;
+  final List<ImportedArtist> selectedArtists;
+  final List<ImportedGenre> selectedGenres;
   final bool doImportGenres;
   final String spotifyAuthCode;
   final bool isArtistsImportFinished;
   final bool isGenresImportFinished;
 
-  const ImportFlowState({this.availableSpotifyArtists, this.importedArtistsGenres,
+  const ImportFlowState({this.availableSpotifyArtists, this.availableArtistsGenres,
+    this.selectedArtists, this.selectedGenres,
     this.doImportGenres, this.spotifyAuthCode, this.isArtistsImportFinished, this.isGenresImportFinished
   });
 
-  const ImportFlowState.initial({this.availableSpotifyArtists, this.importedArtistsGenres,
+  const ImportFlowState.initial({this.availableSpotifyArtists, this.availableArtistsGenres,
+    this.selectedArtists, this.selectedGenres,
     this.doImportGenres: false, this.spotifyAuthCode: '', this.isArtistsImportFinished: false, this.isGenresImportFinished: false
   });
 
   ImportFlowState copyWith({
     UniqueNamedEntitySet<ImportedArtist> availableSpotifyArtists,
-    UniqueNamedEntitySet<ImportedGenre> importedArtistsGenres,
+    UniqueNamedEntitySet<ImportedGenre> availableArtistsGenres,
+    List<ImportedArtist> selectedArtists,
+    List<ImportedGenre> selectedGenres,
     bool doImportGenres,
     String spotifyAuthCode,
     bool isArtistsImportFinished,
@@ -29,7 +35,9 @@ class ImportFlowState {
   }) {
     return ImportFlowState(
       availableSpotifyArtists: availableSpotifyArtists ?? this.availableSpotifyArtists,
-      importedArtistsGenres: importedArtistsGenres ?? this.importedArtistsGenres,
+      availableArtistsGenres: availableArtistsGenres ?? this.availableArtistsGenres,
+      selectedArtists: selectedArtists ?? this.selectedArtists,
+      selectedGenres: selectedGenres ?? this.selectedGenres,
       doImportGenres: doImportGenres ?? this.doImportGenres,
       spotifyAuthCode: spotifyAuthCode ?? this.spotifyAuthCode,
       isArtistsImportFinished: isArtistsImportFinished ?? this.isArtistsImportFinished,

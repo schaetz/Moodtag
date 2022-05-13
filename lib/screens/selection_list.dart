@@ -8,7 +8,7 @@ class SelectionList<T extends NamedEntity> extends StatefulWidget {
 
   final UniqueNamedEntitySet<T> namedEntitySet;
   final String mainButtonLabel;
-  final Function(BuildContext, List<T>, List<bool>) onMainButtonPressed;
+  final Function(BuildContext, List<T>, List<bool>, int) onMainButtonPressed;
 
   SelectionList({
     this.namedEntitySet,
@@ -57,7 +57,7 @@ class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
               child: _buildFloatingSelectButton(context, sortedEntities.length),
             ),
             FloatingActionButton.extended(
-              onPressed: () => widget.onMainButtonPressed(context, sortedEntities, _isBoxSelected),
+              onPressed: () => widget.onMainButtonPressed(context, sortedEntities, _isBoxSelected, _selectedBoxesCount),
               label: Text(widget.mainButtonLabel),
               icon: const Icon(Icons.add_circle_outline),
               backgroundColor: Theme.of(context).colorScheme.secondary,

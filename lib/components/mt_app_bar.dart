@@ -21,7 +21,7 @@ class MtAppBar extends AppBar {
         },
         onSelected: (value) => _handlePopupMenuItemTap(context, value),
       ),
-    ]
+    ],
   );
 
   static GestureDetector _buildTitle(BuildContext context) {
