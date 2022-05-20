@@ -54,32 +54,31 @@ class TagsListScreen extends StatelessWidget {
   }
 
   Widget _buildTagRow(BuildContext context, MoodtagBloc bloc, Tag tag) {
-    // TODO Return type of the artistsWithTag() call is a Stream, not a list of artists; needs to be fixed
-    //final artistsWithTag = bloc.artistsWithTag(tag);
-    return ListTile(
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              tag.name,
-              style: listEntryStyle,
+    return StreamBuilder<List<Artist>>(
+      stream: bloc.artistsWithTag(tag),
+      builder: (context, artistsWithTagSnapshot) => ListTile(
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                tag.name,
+                style: listEntryStyle,
+              ),
             ),
-          ),
-          Text(
-            // TODO Insert number of artists with tag
-            // artistsWithTag.length,
-            '0',
-            style: listEntryStylePale,
-          )
-        ],
-      ),
-      leading: Icon(
-        Icons.label
-      ),
-      onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
-      onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag)
+            Text(
+              artistsWithTagSnapshot.hasData ? artistsWithTagSnapshot.data.length.toString() : "0",
+              style: listEntryStylePale,
+            )
+          ],
+        ),
+        leading: Icon(
+          Icons.label
+        ),
+        onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
+        onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag)
+      )
     );
   }
 
