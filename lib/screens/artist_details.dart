@@ -33,8 +33,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
       appBar: MtAppBar(context),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
           children: [
             Padding(
               padding: EdgeInsets.only(bottom: 12.0),
