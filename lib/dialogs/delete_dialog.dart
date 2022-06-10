@@ -5,7 +5,7 @@ import 'abstract_dialog.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/database/moodtag_db.dart';
 
-class DeleteDialog<T> extends AbstractDialog {
+class DeleteDialog<T> extends AbstractDialog<bool> {
 
   static void openNew<T>(BuildContext context, {T entityToDelete, bool resetLibrary = false}) {
     print(entityToDelete);
@@ -47,7 +47,7 @@ class DeleteDialog<T> extends AbstractDialog {
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: SimpleDialogOption(
-                  onPressed: () => closeDialog(context),
+                  onPressed: () => closeDialog(context, result: false),
                   child: const Text('No'),
                 ),
               ),
@@ -94,9 +94,10 @@ class DeleteDialog<T> extends AbstractDialog {
       await bloc.deleteTag(entityToDelete as Tag);
     } else {
       print('Error: Invalid entity');
+      closeDialog(context, result: false);
     }
 
-    closeDialog(context);
+    closeDialog(context, result: true);
   }
 
 }

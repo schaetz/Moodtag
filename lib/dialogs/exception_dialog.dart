@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'abstract_dialog.dart';
 
-class ExceptionDialog extends AbstractDialog {
+class ExceptionDialog extends AbstractDialog<String> {
 
   static void openNew(BuildContext context, String exceptionHeadline, String exceptionMessage) {
     new ExceptionDialog(context, exceptionHeadline, exceptionMessage).show();
@@ -20,7 +20,7 @@ class ExceptionDialog extends AbstractDialog {
       content: Text(exceptionMessage),
       actions: <Widget>[
         TextButton(
-          onPressed: () => closeDialog(context),
+          onPressed: () => closeDialog(context, result: exceptionMessage),
           child: const Text('OK'),
         ),
       ],

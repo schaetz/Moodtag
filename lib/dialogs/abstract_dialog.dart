@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
-abstract class AbstractDialog {
+abstract class AbstractDialog<T> {
 
   BuildContext context;
 
   AbstractDialog(this.context);
 
-  void show() async {
-    await showDialog<String>(
+  Future<T> show() async {
+    return await showDialog<T>(
         context: context,
         builder: (BuildContext context) => buildDialog(context)
     );
@@ -18,8 +17,8 @@ abstract class AbstractDialog {
   // to be able to use @protected collides with "flutter_test"
   StatelessWidget buildDialog(BuildContext context);
 
-  void closeDialog(BuildContext context) {
-    Navigator.pop(context);
+  void closeDialog(BuildContext context, {T result}) {
+    Navigator.pop(context, result);
   }
 
 }
