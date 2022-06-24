@@ -43,7 +43,6 @@ class _AppState extends State<MoodtagApp> {
             theme: ThemeData(
                 primarySwatch: Colors.red,
                 primaryColor: Colors.red,
-                accentColor: Colors.redAccent, // TODO replace accentColor property
                 unselectedWidgetColor: Colors.grey,
                 dividerColor: Colors.black54),
             initialRoute: Routes.initialRoute,
