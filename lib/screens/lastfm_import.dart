@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
+import 'package:moodtag/utils/user_properties_index.dart';
+import 'package:provider/provider.dart';
 
 class LastfmImportScreen extends StatefulWidget {
 
@@ -12,23 +15,30 @@ class LastfmImportScreen extends StatefulWidget {
 
 class _LastfmImportScreenState extends State<LastfmImportScreen> {
 
-  String _accountName = null;
+  MoodtagBloc bloc;
 
   @override
   Widget build(BuildContext context) {
+    bloc = Provider.of<MoodtagBloc>(context, listen: false);
+
     return Scaffold(
         appBar: MtAppBar(context),
         body: Center(
           child: Column(
             children: [
-              _accountNameContainer(),
+              FutureBuilder<String>(
+                future: bloc.getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME),
+                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  return _accountNameContainer(snapshot.data);
+                }
+              )
             ],
           ),
         )
     );
   }
 
-  Widget _accountNameContainer() {
+  Widget _accountNameContainer(String accountName) {
     return Container(
       alignment: Alignment.center,
       color: Theme.of(context).colorScheme.background,
@@ -36,17 +46,17 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
       margin: const EdgeInsets.all(32.0),
       child: Column(
         children: [
-          _accountName == null ? Text('No associated account', style: TextStyle(fontStyle: FontStyle.italic))
-                               : Text(_accountName),
+          accountName == null ? Text('No associated account', style: TextStyle(fontStyle: FontStyle.italic))
+                              : Text(accountName),
           SizedBox(height: 16),
-          _accountChangeButton(),
+          _accountChangeButton(accountName != null),
         ]
       ),
     );
   }
 
-  Widget _accountChangeButton() {
-    if (_accountName == null) {
+  Widget _accountChangeButton(bool hasAccountName) {
+    if (!hasAccountName) {
       return ElevatedButton(
         onPressed: () => _openSetAccountNameDialog(),
         child: const Text('Add Last.fm account'),
@@ -68,8 +78,11 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
   }
 
   void _setAccountName(String newAccountName) {
-    _accountName = newAccountName;
-    print(_accountName);
+    if (bloc == null) {
+      throw new Exception('Last.fm account name could not be set - BLoC object is not available');
+    }
+
+    bloc.createOrUpdateUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME, newAccountName);
   }
 
 }

@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'moodtag_db.dart';
@@ -107,6 +108,19 @@ class MoodtagBloc {
     return db.tagsForArtist(artist.id).get().then(
             (tagsList) => tagsList.contains(tag)
     );
+  }
+
+
+  //
+  // User properties
+  //
+  Future<String> getUserProperty(String propertyKey) {
+    return db.getUserProperty(propertyKey)
+             .then((userProperty) => userProperty.propValue);
+  }
+
+  Future createOrUpdateUserProperty(String propertyKey, String propertyValue) {
+    return db.createOrUpdateUserProperty(UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue)));
   }
 
 

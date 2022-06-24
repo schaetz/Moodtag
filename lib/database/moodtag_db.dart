@@ -9,7 +9,7 @@ part 'moodtag_db.g.dart';
 
 
 @DriftDatabase(
-  tables: [Artists, Tags, AssignedTags],
+  tables: [Artists, Tags, AssignedTags, UserProperty],
   include: {'queries.drift'}
 )
 class MoodtagDB extends _$MoodtagDB {
@@ -43,6 +43,10 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(tags)..where((t) => t.name.equals(tagName))).getSingleOrNull();
   }
 
+  Future<UserProperty> getUserProperty(String propertyKey) {
+    return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).getSingleOrNull();
+  }
+
 
   //
   // CREATE
@@ -57,6 +61,10 @@ class MoodtagDB extends _$MoodtagDB {
 
   Future<int> assignTagToArtist(AssignedTagsCompanion artistTagPair) {
     return into(assignedTags).insert(artistTagPair);
+  }
+
+  Future<int> createOrUpdateUserProperty(UserPropertiesCompanion userPropertyPair) {
+    return into(userProperties).insertOnConflictUpdate(userPropertyPair);
   }
 
 

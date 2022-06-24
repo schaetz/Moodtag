@@ -14,6 +14,11 @@ CREATE TABLE assigned_tags (
     PRIMARY KEY (artist, tag)
 );
 
+CREATE TABLE user_properties (
+    prop_key VARCHAR(255) NOT NULL PRIMARY KEY,
+    prop_value VARCHAR(512)
+) AS UserProperty;
+
 artistsWithTag:
     SELECT * FROM artists WHERE artists.id IN (
         SELECT artist FROM assigned_tags WHERE tag = :tagId
