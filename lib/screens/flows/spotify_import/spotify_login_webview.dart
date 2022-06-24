@@ -2,8 +2,9 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/flows/import_flow_state.dart';
 import 'package:moodtag/utils/spotify_connector.dart';
+
+import 'import_flow_state.dart';
 
 // Webview that displays the Spotify login page in a WebviewScaffold
 // and returns the obtained access token to the import screen on successful login

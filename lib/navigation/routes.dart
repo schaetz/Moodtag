@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/flows/import_flow.dart';
-import 'package:moodtag/screens/artist_details.dart';
-import 'package:moodtag/screens/artists_list.dart';
-import 'package:moodtag/screens/lastfm_import.dart';
-import 'package:moodtag/screens/tag_details.dart';
-import 'package:moodtag/screens/tags_list.dart';
+import 'package:moodtag/screens/artist_details_screen.dart';
+import 'package:moodtag/screens/artists_list_screen.dart';
+import 'package:moodtag/screens/flows/spotify_import/import_flow.dart';
+import 'package:moodtag/screens/lastfm_import_screen.dart';
+import 'package:moodtag/screens/tag_details_screen.dart';
+import 'package:moodtag/screens/tags_list_screen.dart';
 
 class Routes {
   static const artistsList = '/artists';

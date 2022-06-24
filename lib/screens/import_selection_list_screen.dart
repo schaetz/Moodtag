@@ -1,7 +1,7 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:moodtag/flows/import_flow_state.dart';
-import 'package:moodtag/screens/selection_list.dart';
+import 'package:moodtag/screens/flows/spotify_import/import_flow_state.dart';
+import 'package:moodtag/screens/selection_list_screen.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';
@@ -23,7 +23,7 @@ class ImportSelectionListScreen<N extends NamedEntity> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SelectionList<N>(
+    return SelectionListScreen<N>(
         namedEntitySet: namedEntitySet,
         mainButtonLabel: confirmationButtonLabel,
         onMainButtonPressed: _onImportButtonPressed);
