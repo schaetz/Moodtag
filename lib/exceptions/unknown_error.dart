@@ -1,7 +1,6 @@
 import 'user_readable_exception.dart';
 
 class UnknownError implements UserReadableException {
-
   final String _message;
   final ExceptionSeverity _severity = ExceptionSeverity.HIGH;
 
@@ -11,5 +10,4 @@ class UnknownError implements UserReadableException {
   ExceptionSeverity get severity => _severity;
 
   String toString() => "UnknownError: $message";
-
 }

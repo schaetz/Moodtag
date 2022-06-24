@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
@@ -9,9 +7,9 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:provider/provider.dart';
 
 class ArtistsListScreen extends StatelessWidget {
-
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   @override
@@ -53,13 +51,11 @@ class ArtistsListScreen extends StatelessWidget {
 
   Widget _buildArtistRow(BuildContext context, Artist artist) {
     return ListTile(
-      title: Text(
-        artist.name,
-        style: listEntryStyle,
-      ),
-      onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist),
-      onLongPress: () => DeleteDialog.openNew<Artist>(context, entityToDelete: artist)
-    );
+        title: Text(
+          artist.name,
+          style: listEntryStyle,
+        ),
+        onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist),
+        onLongPress: () => DeleteDialog.openNew<Artist>(context, entityToDelete: artist));
   }
-
 }

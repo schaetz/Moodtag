@@ -10,13 +10,13 @@ import 'package:provider/provider.dart';
 
 import 'db_request_success_counter.dart';
 
-Future<Map<Type, DbRequestSuccessCounter>>createEntities(BuildContext context, List<NamedEntity> entities) async {
+Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, List<NamedEntity> entities) async {
   final bloc = Provider.of<MoodtagBloc>(context, listen: false);
   final creationSuccessCountersByType = Map<Type, DbRequestSuccessCounter>();
-  final Map<ImportedArtist,Artist> createdArtistsByEntity = {};
-  final Map<String,Tag> createdTagsByGenreName = {};
+  final Map<ImportedArtist, Artist> createdArtistsByEntity = {};
+  final Map<String, Tag> createdTagsByGenreName = {};
 
-  for (int i=0 ; i < entities.length; i++){
+  for (int i = 0; i < entities.length; i++) {
     NamedEntity entity = entities[i];
     Type entityType = entity.runtimeType;
 
@@ -30,7 +30,8 @@ Future<Map<Type, DbRequestSuccessCounter>>createEntities(BuildContext context, L
       final tag = await bloc.getTagByName(entity.name);
       createdTagsByGenreName[entity.name] = tag;
     } else {
-      throw new UnimplementedError("The functionality for importing an entity of type $entityType is not implemented yet.");
+      throw new UnimplementedError(
+          "The functionality for importing an entity of type $entityType is not implemented yet.");
     }
 
     creationSuccessCountersByType.putIfAbsent(entityType, () => DbRequestSuccessCounter());
@@ -42,7 +43,8 @@ Future<Map<Type, DbRequestSuccessCounter>>createEntities(BuildContext context, L
   return creationSuccessCountersByType;
 }
 
-void _assignGenreTagsToArtists(MoodtagBloc bloc, Map<ImportedArtist,Artist> createdArtistsByEntity, Map<String,Tag> createdTagsByGenreName) {
+void _assignGenreTagsToArtists(
+    MoodtagBloc bloc, Map<ImportedArtist, Artist> createdArtistsByEntity, Map<String, Tag> createdTagsByGenreName) {
   createdArtistsByEntity.forEach((importedArtistEntity, artist) {
     importedArtistEntity.genres.forEach((genreName) {
       if (createdTagsByGenreName.containsKey(genreName)) {

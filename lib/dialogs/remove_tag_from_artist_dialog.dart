@@ -1,12 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
-
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
+import 'package:provider/provider.dart';
 
 class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
-
   static void openNew(BuildContext context, Tag tag, Artist artist) {
     new RemoveTagFromArtistDialog(context, tag, artist).show();
   }
@@ -19,9 +17,8 @@ class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
 
   @override
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) {
-    return new Future<String>(() =>
-      'Do you want to remove the tag "${tagToRemove.name}" from the artist "${artistToRemoveFrom.name}"?'
-    );
+    return new Future<String>(
+        () => 'Do you want to remove the tag "${tagToRemove.name}" from the artist "${artistToRemoveFrom.name}"?');
   }
 
   @override
@@ -31,5 +28,4 @@ class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
 
     closeDialog(context);
   }
-
 }

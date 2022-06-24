@@ -15,48 +15,38 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(MoodtagApp());
 }
 
-
 class MoodtagApp extends StatefulWidget {
-
   static const appTitle = 'Moodtag';
 
   MoodtagApp({Key key}) : super(key: key);
 
   @override
   _AppState createState() => _AppState();
-
 }
 
-
 class _AppState extends State<MoodtagApp> {
-
   @override
   Widget build(BuildContext context) {
     return Provider<MoodtagBloc>(
-      create: (_) => MoodtagBloc(),
-      dispose: (_, bloc) => bloc.close(),
-      child: MaterialApp(
-        title: MoodtagApp.appTitle,
-        theme: ThemeData(
-          primarySwatch: Colors.red,
-          primaryColor: Colors.red,
-          accentColor: Colors.redAccent, // TODO replace accentColor property
-          unselectedWidgetColor: Colors.grey,
-          dividerColor: Colors.black54
-        ),
-        initialRoute: Routes.initialRoute,
-        routes: Routes.instance().getRoutes()
-      )
-    );
+        create: (_) => MoodtagBloc(),
+        dispose: (_, bloc) => bloc.close(),
+        child: MaterialApp(
+            title: MoodtagApp.appTitle,
+            theme: ThemeData(
+                primarySwatch: Colors.red,
+                primaryColor: Colors.red,
+                accentColor: Colors.redAccent, // TODO replace accentColor property
+                unselectedWidgetColor: Colors.grey,
+                dividerColor: Colors.black54),
+            initialRoute: Routes.initialRoute,
+            routes: Routes.instance().getRoutes()));
   }
-
 }

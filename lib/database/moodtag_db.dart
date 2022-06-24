@@ -2,18 +2,13 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 part 'moodtag_db.g.dart';
 
-
-@DriftDatabase(
-  tables: [Artists, Tags, AssignedTags, UserProperty],
-  include: {'queries.drift'}
-)
+@DriftDatabase(tables: [Artists, Tags, AssignedTags, UserProperty], include: {'queries.drift'})
 class MoodtagDB extends _$MoodtagDB {
-
   MoodtagDB() : super(_openConnection());
 
   @override
@@ -22,7 +17,6 @@ class MoodtagDB extends _$MoodtagDB {
   Stream<List<Artist>> get allArtists => (select(artists)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
   Stream<List<Tag>> get allTags => (select(tags)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
   Stream<List<AssignedTag>> get allArtistTagPairs => select(assignedTags).watch();
-
 
   //
   // GET
@@ -47,7 +41,6 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).getSingleOrNull();
   }
 
-
   //
   // CREATE
   //
@@ -67,7 +60,6 @@ class MoodtagDB extends _$MoodtagDB {
     return into(userProperties).insertOnConflictUpdate(userPropertyPair);
   }
 
-
   //
   // DELETE
   //
@@ -86,10 +78,7 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   Future removeTagFromArtist(int artistId, int tagId) {
-    return (delete(assignedTags)..where((row) =>
-        row.artist.equals(artistId)
-        & row.tag.equals(tagId)
-    )).go();
+    return (delete(assignedTags)..where((row) => row.artist.equals(artistId) & row.tag.equals(tagId))).go();
   }
 
   Future deleteAllArtists() {
@@ -99,13 +88,12 @@ class MoodtagDB extends _$MoodtagDB {
   Future deleteAllTags() {
     return delete(tags).go();
   }
-
 }
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-      final dbFolder = await getApplicationDocumentsDirectory();
-      final file = File(path.join(dbFolder.path, 'db.sqlite'));
-      return NativeDatabase(file);
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final file = File(path.join(dbFolder.path, 'db.sqlite'));
+    return NativeDatabase(file);
   });
 }

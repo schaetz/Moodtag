@@ -2,12 +2,10 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/flows/import_flow_state.dart';
-
 import 'package:moodtag/main.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
-
   static const titleLabelStyle = TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold);
 
   static const menuItemSpotifyImport = 'Spotify Import';
@@ -36,7 +34,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: forceBackButton ? BackButton(onPressed: () => context.flow<ImportFlowState>().complete()) : null,
     );
   }
-  
+
   @override
   Size get preferredSize => Size.fromHeight(height);
 
@@ -47,9 +45,8 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
         style: titleLabelStyle,
       ),
       onTap: () => {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList))
-        }
+        if (Navigator.of(context).canPop())
+          {Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList))}
       },
     );
   }
@@ -74,5 +71,4 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
         break;
     }
   }
-
 }

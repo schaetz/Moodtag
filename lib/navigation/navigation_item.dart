@@ -1,3 +1,1 @@
-enum NavigationItem {
-  artists, tags
-}
+enum NavigationItem { artists, tags }

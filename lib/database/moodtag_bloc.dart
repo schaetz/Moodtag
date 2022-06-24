@@ -1,12 +1,11 @@
 import 'package:drift/drift.dart';
+import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'moodtag_db.dart';
-import 'package:moodtag/exceptions/db_request_response.dart';
-import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 
 class MoodtagBloc {
-
   final MoodtagDB db;
 
   final BehaviorSubject<List<Artist>> _allArtists = BehaviorSubject();
@@ -31,7 +30,6 @@ class MoodtagBloc {
     _allTags.close();
     _allArtistTagPairs.close();
   }
-
 
   //
   // Artists
@@ -61,7 +59,6 @@ class MoodtagBloc {
     return db.deleteAllArtists();
   }
 
-
   //
   // Tags
   //
@@ -90,14 +87,11 @@ class MoodtagBloc {
     return db.deleteAllTags();
   }
 
-
   //
   // Assigned tags
   //
   Future assignTagToArtist(Artist artist, Tag tag) {
-    return db.assignTagToArtist(
-        AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id)
-    );
+    return db.assignTagToArtist(AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id));
   }
 
   Future removeTagFromArtist(Artist artist, Tag tag) {
@@ -105,24 +99,20 @@ class MoodtagBloc {
   }
 
   Future<bool> artistHasTag(Artist artist, Tag tag) {
-    return db.tagsForArtist(artist.id).get().then(
-            (tagsList) => tagsList.contains(tag)
-    );
+    return db.tagsForArtist(artist.id).get().then((tagsList) => tagsList.contains(tag));
   }
-
 
   //
   // User properties
   //
   Future<String> getUserProperty(String propertyKey) {
-    return db.getUserProperty(propertyKey)
-             .then((userProperty) => userProperty.propValue);
+    return db.getUserProperty(propertyKey).then((userProperty) => userProperty.propValue);
   }
 
   Future createOrUpdateUserProperty(String propertyKey, String propertyValue) {
-    return db.createOrUpdateUserProperty(UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue)));
+    return db.createOrUpdateUserProperty(
+        UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue)));
   }
-
 
   //
   // Helper methods
@@ -132,9 +122,7 @@ class MoodtagBloc {
     E newEntity = await createEntityFuture.catchError((e) {
       exception = e;
       return null;
-    }).then(
-      (newEntityId) async => await _getEntityById<E>(newEntityId)
-    );
+    }).then((newEntityId) async => await _getEntityById<E>(newEntityId));
 
     if (newEntity == null) {
       return new DbRequestResponse<E>.fail(exception, [name]);
@@ -149,9 +137,7 @@ class MoodtagBloc {
       return db.getTagById(id);
     } else {
       return Future.error(
-          new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString())
-      );
+          new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString()));
     }
   }
-
 }

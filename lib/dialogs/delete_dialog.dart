@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/database/moodtag_db.dart';
 import 'package:provider/provider.dart';
 
 import 'abstract_dialog.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/database/moodtag_db.dart';
 
 class DeleteDialog<T> extends AbstractDialog<bool> {
-
   static void openNew<T>(BuildContext context, {T entityToDelete, bool resetLibrary = false}) {
     print(entityToDelete);
     new DeleteDialog<T>(context, entityToDelete: entityToDelete, resetLibrary: resetLibrary).show();
@@ -21,15 +20,14 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
   StatelessWidget buildDialog(BuildContext context) {
     return SimpleDialog(
       title: FutureBuilder<String>(
-        future: determineDialogTextForDeleteEntity(context),
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData) {
-            return Text(snapshot.data);
-          } else {
-            return Text('');
-          }
-        }
-      ),
+          future: determineDialogTextForDeleteEntity(context),
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            if (snapshot.hasData) {
+              return Text(snapshot.data);
+            } else {
+              return Text('');
+            }
+          }),
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(20.0),
@@ -99,5 +97,4 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
 
     closeDialog(context, result: true);
   }
-
 }

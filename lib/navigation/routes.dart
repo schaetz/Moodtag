@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/flows/import_flow.dart';
-
 import 'package:moodtag/screens/artist_details.dart';
 import 'package:moodtag/screens/artists_list.dart';
 import 'package:moodtag/screens/lastfm_import.dart';
@@ -8,7 +7,6 @@ import 'package:moodtag/screens/tag_details.dart';
 import 'package:moodtag/screens/tags_list.dart';
 
 class Routes {
-
   static const artistsList = '/artists';
   static const artistsDetails = '/artists/details';
   static const tagsList = '/tags';
@@ -40,17 +38,14 @@ class Routes {
       spotifyImport: (context) => ImportFlow(),
     };
   }
-
 }
 
 extension ModalRouteExt on ModalRoute {
-
   static RoutePredicate withNames(String name1, String name2) {
     return (Route<dynamic> route) {
-      return !route.willHandlePopInternally
-          && route is ModalRoute
-          && (route.settings.name == name1 || route.settings.name == name2);
+      return !route.willHandlePopInternally &&
+          route is ModalRoute &&
+          (route.settings.name == name1 || route.settings.name == name2);
     };
   }
-
 }

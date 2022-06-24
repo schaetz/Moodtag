@@ -5,7 +5,6 @@ import 'package:moodtag/components/simple_text_input_dialog.dart';
 import 'abstract_dialog.dart';
 
 class AddLastFmAccountDialog<T> extends AbstractDialog<String> {
-
   AddLastFmAccountDialog(BuildContext context) : super(context);
 
   @override
@@ -18,5 +17,4 @@ class AddLastFmAccountDialog<T> extends AbstractDialog<String> {
       },
     );
   }
-
 }

@@ -5,7 +5,6 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 import '../components/mt_app_bar.dart';
 
 class SelectionList<T extends NamedEntity> extends StatefulWidget {
-
   final UniqueNamedEntitySet<T> namedEntitySet;
   final String mainButtonLabel;
   final Function(BuildContext, List<T>, List<bool>, int) onMainButtonPressed;
@@ -18,12 +17,9 @@ class SelectionList<T extends NamedEntity> extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _SelectionListState<T>();
-
 }
 
-
 class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
-
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   List<bool> _isBoxSelected;
@@ -94,8 +90,7 @@ class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
               _selectedBoxesCount--;
             }
           });
-        }
-    );
+        });
   }
 
   Widget _buildFloatingSelectButton(BuildContext context, int entityCount) {
@@ -117,5 +112,4 @@ class _SelectionListState<T extends NamedEntity> extends State<SelectionList> {
       );
     }
   }
-
 }

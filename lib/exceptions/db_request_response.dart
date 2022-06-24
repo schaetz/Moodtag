@@ -1,12 +1,10 @@
 import 'package:drift/native.dart';
-
 import 'package:moodtag/exceptions/database_error.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 
 class DbRequestResponse<E> {
-
   E changedEntity;
   List<Object> parameters;
   Exception exception;
@@ -54,12 +52,11 @@ class DbRequestResponse<E> {
   }
 
   String _getStringParameter(int index) {
-    if (parameters != null && parameters.length >= index+1 && parameters[index] is String) {
+    if (parameters != null && parameters.length >= index + 1 && parameters[index] is String) {
       return parameters[index] as String;
     }
     return null;
   }
-
 }
 
 UserReadableException getHighestSeverityExceptionForMultipleResponses(List<DbRequestResponse> exceptionResponses) {

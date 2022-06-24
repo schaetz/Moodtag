@@ -1,7 +1,6 @@
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 
 class DatabaseError implements UserReadableException {
-
   final String _message;
   final ExceptionSeverity _severity = ExceptionSeverity.MEDIUM;
 
@@ -11,5 +10,4 @@ class DatabaseError implements UserReadableException {
   ExceptionSeverity get severity => _severity;
 
   String toString() => "DatabaseError: $message";
-
 }

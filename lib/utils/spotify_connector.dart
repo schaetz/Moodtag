@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -82,11 +83,8 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
   final responseBodyStructure = json.decode(response.body);
   Set<ImportedArtist> followedArtists;
   try {
-    followedArtists = Set<ImportedArtist>.from(
-      responseBodyStructure['artists']['items']?.map(
-        (item) => ImportedArtist(item['name'], Set.from(item['genres']))
-      )
-    );
+    followedArtists = Set<ImportedArtist>.from(responseBodyStructure['artists']['items']
+        ?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']))));
   } catch (error) {
     throw SpotifyImportException('The Spotify data has an unknown structure.');
   }
@@ -116,10 +114,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
   Set<ImportedArtist> topArtists;
   try {
     topArtists = Set<ImportedArtist>.from(
-      responseBodyMap['items']?.map(
-        (item) => ImportedArtist(item['name'], Set.from(item['genres']))
-      )
-    );
+        responseBodyMap['items']?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']))));
   } catch (error) {
     throw SpotifyImportException('The Spotify data has an unknown structure.');
   }
@@ -149,10 +144,7 @@ String _generateCodeChallenge() {
   codeVerifier = getRandomStringOfRandomLength(43, 128, useSpecialChars: true);
   final bytes = utf8.encode(codeVerifier);
   final hashed = sha256.convert(bytes);
-  final base64UrlEncoded = base64Url.encode(hashed.bytes)
-      .replaceAll("=", "")
-      .replaceAll("+", "-")
-      .replaceAll("/", "_");
+  final base64UrlEncoded = base64Url.encode(hashed.bytes).replaceAll("=", "").replaceAll("+", "-").replaceAll("/", "_");
   return base64UrlEncoded;
 }
 

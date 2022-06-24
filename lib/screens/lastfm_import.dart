@@ -7,14 +7,11 @@ import 'package:moodtag/utils/user_properties_index.dart';
 import 'package:provider/provider.dart';
 
 class LastfmImportScreen extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() => _LastfmImportScreenState();
-
 }
 
 class _LastfmImportScreenState extends State<LastfmImportScreen> {
-
   MoodtagBloc bloc;
 
   @override
@@ -27,15 +24,13 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
           child: Column(
             children: [
               FutureBuilder<String>(
-                future: bloc.getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME),
-                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                  return _accountNameContainer(snapshot.data);
-                }
-              )
+                  future: bloc.getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME),
+                  builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    return _accountNameContainer(snapshot.data);
+                  })
             ],
           ),
-        )
-    );
+        ));
   }
 
   Widget _accountNameContainer(String accountName) {
@@ -44,14 +39,13 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
       color: Theme.of(context).colorScheme.background,
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.all(32.0),
-      child: Column(
-        children: [
-          accountName == null ? Text('No associated account', style: TextStyle(fontStyle: FontStyle.italic))
-                              : Text(accountName),
-          SizedBox(height: 16),
-          _accountChangeButton(accountName != null),
-        ]
-      ),
+      child: Column(children: [
+        accountName == null
+            ? Text('No associated account', style: TextStyle(fontStyle: FontStyle.italic))
+            : Text(accountName),
+        SizedBox(height: 16),
+        _accountChangeButton(accountName != null),
+      ]),
     );
   }
 
@@ -84,5 +78,4 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
 
     bloc.createOrUpdateUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME, newAccountName);
   }
-
 }

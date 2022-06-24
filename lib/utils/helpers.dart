@@ -9,8 +9,7 @@ String dropThe(String artistName) {
 
 List<String> processMultilineInput(String input) {
   List<String> elementsWithDuplicates = input.split("\n");
-  elementsWithDuplicates = elementsWithDuplicates
-      .map((element) => element.trim()).toList();
+  elementsWithDuplicates = elementsWithDuplicates.map((element) => element.trim()).toList();
   elementsWithDuplicates.retainWhere((element) => element.isNotEmpty);
   Set<String> uniqueElements = elementsWithDuplicates.toSet();
   return uniqueElements.toList();

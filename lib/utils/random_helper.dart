@@ -7,8 +7,7 @@ Random _random = Random.secure();
 String getRandomString(int length, {bool useSpecialChars = false}) {
   final usedChars = useSpecialChars ? _alphaNumPlusSpecialChars : _alphaNumChars;
   return String.fromCharCodes(
-      Iterable.generate(length, (_) => usedChars.codeUnitAt(_random.nextInt(usedChars.length)))
-  );
+      Iterable.generate(length, (_) => usedChars.codeUnitAt(_random.nextInt(usedChars.length))));
 }
 
 String getRandomStringOfRandomLength(int minLength, int maxLength, {bool useSpecialChars = false}) {

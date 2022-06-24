@@ -8,5 +8,4 @@ class ImportedArtist extends NamedEntity {
 
   String get name => _name;
   Set<String> get genres => _genres;
-
 }

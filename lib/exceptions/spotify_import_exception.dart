@@ -1,7 +1,6 @@
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 
 class SpotifyImportException implements UserReadableException {
-
   final String _message;
   final ExceptionSeverity _severity = ExceptionSeverity.LOW;
 
@@ -11,5 +10,4 @@ class SpotifyImportException implements UserReadableException {
   ExceptionSeverity get severity => _severity;
 
   String toString() => "SpotifyImportException: $message";
-
 }

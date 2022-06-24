@@ -13,7 +13,6 @@ import 'package:moodtag/utils/entity_creator.dart';
 import 'package:moodtag/utils/i10n.dart';
 
 class ImportFlow extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return FlowBuilder<ImportFlowState>(
@@ -34,40 +33,41 @@ class ImportFlow extends StatelessWidget {
 
     return [
       MaterialPage<void>(child: SpotifyImportScreen(), name: Routes.spotifyImport),
-      if (importFlowState.availableSpotifyArtists != null) MaterialPage<void>(
-        child: ImportSelectionListScreen<ImportedArtist>(
+      if (importFlowState.availableSpotifyArtists != null)
+        MaterialPage<void>(
+            child: ImportSelectionListScreen<ImportedArtist>(
           namedEntitySet: importFlowState.availableSpotifyArtists,
           confirmationButtonLabel: importFlowState.doImportGenres ? "OK" : "Import",
           entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
           entityDenotationPlural: I10n.ARTIST_DENOTATION_PLURAL,
-        )
-      ),
-      if (importFlowState.doImportGenres && importFlowState.isArtistsSelectionFinished) MaterialPage<void>(
-        child: ImportSelectionListScreen<ImportedGenre>(
+        )),
+      if (importFlowState.doImportGenres && importFlowState.isArtistsSelectionFinished)
+        MaterialPage<void>(
+            child: ImportSelectionListScreen<ImportedGenre>(
           namedEntitySet: importFlowState.availableArtistsGenres,
           confirmationButtonLabel: "Import",
           entityDenotationSingular: "genre tag",
           entityDenotationPlural: "genre tags",
-        )
-      ),
+        )),
     ];
   }
 
   void _completeFlow(BuildContext context, ImportFlowState importFlowState) async {
-    if (importFlowState.isArtistsSelectionFinished && (!importFlowState.doImportGenres || importFlowState.isGenresSelectionFinished)) {
+    if (importFlowState.isArtistsSelectionFinished &&
+        (!importFlowState.doImportGenres || importFlowState.isGenresSelectionFinished)) {
       List<NamedEntity> entitiesToCreate = [];
       entitiesToCreate.addAll(importFlowState.selectedArtists);
       entitiesToCreate.addAll(importFlowState.selectedGenres);
 
-      final Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType = await createEntities(
-          context, entitiesToCreate);
+      final Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType =
+          await createEntities(context, entitiesToCreate);
       _showResultMessage(context, creationSuccessCountersByType);
     }
 
     Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
   }
 
-  void _showResultMessage(BuildContext context, Map<Type,DbRequestSuccessCounter> creationSuccessCountersByType) {
+  void _showResultMessage(BuildContext context, Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType) {
     String message;
 
     if (creationSuccessCountersByType[ImportedArtist].successCount > 0) {
@@ -85,9 +85,6 @@ class ImportFlow extends StatelessWidget {
       message = "No entities were added.";
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message))
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
-
 }
