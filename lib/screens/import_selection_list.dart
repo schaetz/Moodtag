@@ -1,16 +1,13 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/flows/import_flow_state.dart';
-import 'package:moodtag/models/abstract_entity.dart';
-import 'package:moodtag/models/artist.dart';
-import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/screens/selection_list.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
-class ImportSelectionListScreen<N extends NamedEntity, M extends AbstractEntity> extends StatelessWidget {
+class ImportSelectionListScreen<N extends NamedEntity> extends StatelessWidget {
 
   final UniqueNamedEntitySet<N> namedEntitySet;
   final String confirmationButtonLabel;
@@ -63,19 +60,19 @@ class ImportSelectionListScreen<N extends NamedEntity, M extends AbstractEntity>
 
   void _advanceImportFlowState(BuildContext context, List<N> selectedEntities) {
     final flowController = context.flow<ImportFlowState>();
-    if (M == Artist && N == ImportedArtist) {
+    if (N == ImportedArtist) {
       flowController.update((state) => state.copyWith(
         isArtistsSelectionFinished: true,
         selectedArtists: selectedEntities as List<ImportedArtist>,
         availableArtistsGenres: _getImportedArtistsGenres(selectedEntities as List<ImportedArtist>),
       ));
-    } else if (M == Tag && N == ImportedGenre) {
+    } else if (N == ImportedGenre) {
       flowController.update((state) => state.copyWith(
         isGenresSelectionFinished: true,
         selectedGenres: selectedEntities as List<ImportedGenre>,
       ));
     } else {
-      throw new UnimplementedError("The functionality for importing an entity of type $M is not implemented yet.");
+      throw new UnimplementedError("The functionality for importing an entity of type $N is not implemented yet.");
     }
 
     if (flowController.state.isArtistsSelectionFinished &&

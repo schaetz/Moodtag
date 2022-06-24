@@ -18,8 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/models/artist.dart';
-import 'package:moodtag/models/tag.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 void main() {
@@ -40,31 +38,6 @@ class MoodtagApp extends StatefulWidget {
 
 
 class _AppState extends State<MoodtagApp> {
-
-  static const _sampleArtistNames = <String>[
-    'AC/DC',
-    'The Beatles',
-    'Deep Purple',
-    'The Rolling Stones'
-  ];
-  static const _sampleTagNames = <String>[
-    '80s',
-    'Rock',
-    'Mellow',
-    'Cheerful'
-  ];
-
-  final sampleTags;
-  final sampleArtists;
-
-  _AppState._(this.sampleTags, this.sampleArtists);
-
-  factory _AppState() {
-      var sampleTags = _sampleTagNames.map((name) => Tag(name)).toList();
-      var sampleArtists = _sampleArtistNames.map((name) => Artist.withTags(name, sampleTags)).toList();
-
-      return new _AppState._(sampleTags, sampleArtists);
-  }
 
   @override
   Widget build(BuildContext context) {
