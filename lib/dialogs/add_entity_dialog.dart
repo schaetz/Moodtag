@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/components/simple_text_input_dialog_base.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
@@ -40,51 +41,13 @@ class AddEntityDialog<E, O> extends AbstractDialog {
 
   @override
   StatelessWidget buildDialog(BuildContext context) {
-    var newInput;
-    return SimpleDialog(
-      title: Text('Enter the name of the ${_getEntityDenotation()}:'),
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextField(maxLines: null, maxLength: 255, onChanged: (value) => newInput = value.trim()),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: SimpleDialogOption(
-                  onPressed: () async {
-                    if (newInput == null || newInput.isEmpty) {
-                      return;
-                    }
-                    _addEntity(context, newInput, preselectedOtherEntity);
-                  },
-                  child: const Text('OK'),
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
+    return SimpleTextInputDialogBase(
+      message: 'Enter the name of the ${I10n.getEntityDenotation(type: E, plural: false)}:',
+      confirmationButtonLabel: 'OK',
+      onSendInput: (String newInput) {
+        _addEntity(context, newInput, preselectedOtherEntity);
+      },
     );
-  }
-
-  String _getEntityDenotation({bool plural = false}) {
-    String denotationSingular = 'entity';
-    String denotationPlural = 'entities';
-
-    if (E == Artist) {
-      denotationSingular = I10n.ARTIST_DENOTATION_SINGULAR;
-      denotationPlural = I10n.ARTIST_DENOTATION_PLURAL;
-    } else if (E == Tag) {
-      denotationSingular = I10n.TAG_DENOTATION_SINGULAR;
-      denotationPlural = I10n.TAG_DENOTATION_PLURAL;
-    }
-
-    return plural ? denotationPlural : denotationSingular;
   }
 
   void _addEntity(BuildContext context, String newInput, O preselectedOther) async {
@@ -154,10 +117,11 @@ class AddEntityDialog<E, O> extends AbstractDialog {
       // Do not show an error message if the already existing entity
       // is assigned to a preselected other entity
     } else {
+      final entityDenotationPlural = I10n.getEntityDenotation(type: E, plural: true);
       final errorReason = userFeedbackException is NameAlreadyTakenException
-          ? 'One or several ${_getEntityDenotation(plural: true)} already exist'
+          ? 'One or several $entityDenotationPlural already exist'
           : userFeedbackException.message;
-      final errorMessage = 'Error while adding ${_getEntityDenotation(plural: true)}: $errorReason';
+      final errorMessage = 'Error while adding $entityDenotationPlural: $errorReason';
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
     }

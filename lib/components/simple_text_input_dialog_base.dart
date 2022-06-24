@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class SimpleTextInputDialog extends StatelessWidget {
+class SimpleTextInputDialogBase extends StatelessWidget {
   final String message;
   final String confirmationButtonLabel;
   final Function(String) onSendInput;
 
-  const SimpleTextInputDialog({Key key, this.message, this.confirmationButtonLabel, this.onSendInput})
+  const SimpleTextInputDialogBase({Key key, this.message, this.confirmationButtonLabel, this.onSendInput})
       : super(key: key);
 
   @override
