@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 part 'moodtag_db.g.dart';
 
-@DriftDatabase(tables: [Artists, Tags, AssignedTags, UserProperty], include: {'queries.drift'})
+@DriftDatabase(include: {'queries.drift'})
 class MoodtagDB extends _$MoodtagDB {
   MoodtagDB() : super(_openConnection());
 
