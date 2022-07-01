@@ -1,6 +1,8 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:moodtag/components/import_config_form.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/screens/flows/spotify_import/import_options.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/spotify_connector.dart';
@@ -13,66 +15,26 @@ class SpotifyImportScreen extends StatefulWidget {
 }
 
 class _SpotifyImportScreenState extends State<SpotifyImportScreen> {
-  bool _useTopArtists = true;
-  bool _useFollowedArtists = true;
-  bool _useArtistGenres = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: MtAppBar(context, forceBackButton: true),
-        body: Center(
-          child: Column(
-            children: [
-              Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 16.0, 0, 0),
-                    child: Text('Select what should be imported:'),
-                  )),
-              CheckboxListTile(
-                title: Text('Top artists'),
-                value: _useTopArtists,
-                onChanged: (newValue) {
-                  setState(() {
-                    _useTopArtists = newValue;
-                  });
-                },
-              ),
-              CheckboxListTile(
-                title: Text('Followed artists'),
-                value: _useFollowedArtists,
-                onChanged: (newValue) {
-                  setState(() {
-                    _useFollowedArtists = newValue;
-                  });
-                },
-              ),
-              CheckboxListTile(
-                title: Text('Artist genres'),
-                value: _useArtistGenres,
-                onChanged: (newValue) {
-                  setState(() {
-                    _useArtistGenres = newValue;
-                  });
-                },
-              ),
-              TextButton(
-                onPressed: _buttonEnabled
-                    ? () => _conductSpotifyImport(context, _useTopArtists, _useFollowedArtists, _useArtistGenres)
-                    : null,
-                child: const Text('Start Spotify Import'),
-              ),
-            ],
-          ),
-        ));
+      appBar: MtAppBar(context, forceBackButton: true),
+      body: Center(
+          child: ImportConfigForm(
+        headlineCaption: 'Select what should be imported:',
+        sendButtonCaption: 'Start Spotify Import',
+        configItemsWithCaption: {
+          IMPORT_OPTION_TOP_ARTISTS: 'Top artists',
+          IMPORT_OPTION_FOLLOWED_ARTISTS: 'Followed artists',
+          IMPORT_OPTION_ARTIST_GENRES: 'Artist genres'
+        },
+        onSend: _conductSpotifyImport,
+      )),
+    );
   }
-
-  bool get _buttonEnabled => _useTopArtists || _useFollowedArtists;
 }
 
-void _conductSpotifyImport(
-    BuildContext context, bool useTopArtists, bool useFollowedArtists, bool useArtistGenres) async {
+void _conductSpotifyImport(BuildContext context, Map<String, bool> selections) async {
   try {
     final authorizationCode = context.flow<ImportFlowState>().state.spotifyAuthCode;
 
@@ -84,18 +46,18 @@ void _conductSpotifyImport(
 
     final availableSpotifyArtists = UniqueNamedEntitySet<ImportedArtist>();
 
-    if (useTopArtists) {
+    if (selections[IMPORT_OPTION_TOP_ARTISTS]) {
       availableSpotifyArtists.addAll(await getTopArtists(accessToken, 50, 0));
     }
-    if (useFollowedArtists) {
+    if (selections[IMPORT_OPTION_FOLLOWED_ARTISTS]) {
       availableSpotifyArtists.addAll(await getFollowedArtists(accessToken));
     }
 
     if (availableSpotifyArtists.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No artists to import.")));
     } else {
-      context.flow<ImportFlowState>().update(
-          (state) => state.copyWith(availableSpotifyArtists: availableSpotifyArtists, doImportGenres: useArtistGenres));
+      context.flow<ImportFlowState>().update((state) => state.copyWith(
+          availableSpotifyArtists: availableSpotifyArtists, doImportGenres: selections[IMPORT_OPTION_ARTIST_GENRES]));
     }
   } catch (e) {
     print("Spotify import failed: $e");
