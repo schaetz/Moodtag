@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/components/import_config_form.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/screens/flows/spotify_import/import_options.dart';
+import 'package:moodtag/screens/flows/spotify_import/spotify_connector.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
-import 'package:moodtag/utils/spotify_connector.dart';
 
 import 'import_flow_state.dart';
 

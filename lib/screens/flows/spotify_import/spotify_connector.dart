@@ -6,9 +6,8 @@ import 'package:http/http.dart';
 import 'package:moodtag/exceptions/spotify_import_exception.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
-
-import 'helpers.dart';
-import 'random_helper.dart';
+import 'package:moodtag/utils/helpers.dart';
+import 'package:moodtag/utils/random_helper.dart';
 
 // TODO Store these constants in a config file
 const spotifyAccountsBaseUrl = 'accounts.spotify.com';
