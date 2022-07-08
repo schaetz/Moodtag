@@ -1,9 +1,9 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/flows/spotify_import/spotify_import_screen.dart';
-import 'package:moodtag/screens/flows/spotify_import/spotify_login_webview.dart';
 import 'package:moodtag/screens/import_selection_list_screen.dart';
+import 'package:moodtag/screens/spotify_import/spotify_import_screen.dart';
+import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';

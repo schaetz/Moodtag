@@ -2,8 +2,8 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/components/import_config_form.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/screens/flows/spotify_import/import_options.dart';
-import 'package:moodtag/screens/flows/spotify_import/spotify_connector.dart';
+import 'package:moodtag/screens/spotify_import/import_options.dart';
+import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 

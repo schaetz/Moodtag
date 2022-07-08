@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/flows/spotify_import/import_flow_state.dart';
+import 'package:moodtag/screens/spotify_import/import_flow_state.dart';
 
 class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const titleLabelStyle = TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold);
