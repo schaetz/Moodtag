@@ -17,13 +17,10 @@ class ImportConfigForm extends StatefulWidget {
 class _ImportConfigFormState extends State<ImportConfigForm> {
   Map<String, bool> _selectionsState;
 
-  _ImportConfigFormState() {
-    _selectionsState = {};
-    this
-        .widget
-        .configItemsWithCaption
-        .entries
-        .forEach((keyAndCaption) => {_selectionsState[keyAndCaption.key] = false});
+  @override
+  void initState() {
+    super.initState();
+    _initializeSelectionsState();
   }
 
   @override
@@ -54,4 +51,13 @@ class _ImportConfigFormState extends State<ImportConfigForm> {
   }
 
   bool _isButtonEnabled() => _selectionsState.values.contains(true);
+
+  void _initializeSelectionsState() {
+    this._selectionsState = {};
+    this
+        .widget
+        .configItemsWithCaption
+        .entries
+        .forEach((keyAndCaption) => {this._selectionsState[keyAndCaption.key] = false});
+  }
 }
