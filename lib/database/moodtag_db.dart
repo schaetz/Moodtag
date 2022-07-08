@@ -60,6 +60,10 @@ class MoodtagDB extends _$MoodtagDB {
     return into(userProperties).insertOnConflictUpdate(userPropertyPair);
   }
 
+  Future deleteUserProperty(String key) {
+    return (delete(userProperties)..where((t) => t.propKey.equals(key))).go();
+  }
+
   //
   // DELETE
   //

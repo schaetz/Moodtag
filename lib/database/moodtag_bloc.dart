@@ -106,12 +106,16 @@ class MoodtagBloc {
   // User properties
   //
   Future<String> getUserProperty(String propertyKey) {
-    return db.getUserProperty(propertyKey).then((userProperty) => userProperty.propValue);
+    return db.getUserProperty(propertyKey).then((userProperty) => userProperty != null ? userProperty.propValue : null);
   }
 
   Future createOrUpdateUserProperty(String propertyKey, String propertyValue) {
     return db.createOrUpdateUserProperty(
         UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue)));
+  }
+
+  Future deleteUserProperty(String propertyKey) {
+    return db.deleteUserProperty(propertyKey);
   }
 
   //

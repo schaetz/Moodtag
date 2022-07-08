@@ -53,14 +53,33 @@ class _ExternalAccountSelectorState extends State<ExternalAccountSelector> {
   Widget _accountChangeButton(bool hasAccountName) {
     if (!hasAccountName) {
       return ElevatedButton(
-        onPressed: () => widget.onAddAccountClick(),
+        onPressed: () => _addAccount(),
         child: Text('Add ${widget.serviceName} account'),
       );
     } else {
       return ElevatedButton(
-        onPressed: () => widget.onRemoveAccountClick(),
+        onPressed: () => _removeAccount(),
         child: Text('Remove ${widget.serviceName} account'),
       );
+    }
+  }
+
+  void _addAccount() {
+    try {
+      widget.onAddAccountClick();
+    } catch (error) {
+      // TODO More specific error message
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Something went wrong trying to set the ${widget.serviceName} account.')));
+    }
+  }
+
+  void _removeAccount() {
+    try {
+      widget.onRemoveAccountClick();
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Something went wrong trying to remove the associated ${widget.serviceName} account.')));
     }
   }
 }

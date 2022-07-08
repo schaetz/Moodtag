@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:moodtag/exceptions/spotify_import_exception.dart';
+import 'package:moodtag/exceptions/external_service_query_exception.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/helpers.dart';
@@ -62,7 +62,7 @@ Future<dynamic> getAccessToken(String authorizationCode) async {
   if (isHttpRequestSuccessful(response)) {
     return responseBodyJSON;
   } else {
-    throw SpotifyImportException('Could not acquire an access token for the Spotify Web API.');
+    throw ExternalServiceQueryException('Could not acquire an access token for the Spotify Web API.');
   }
 }
 
@@ -76,7 +76,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
   final response = await http.get(uri, headers: _getHeader(accessToken));
 
   if (!isHttpRequestSuccessful(response)) {
-    throw SpotifyImportException(_getRequestErrorMessage(response));
+    throw ExternalServiceQueryException(_getRequestErrorMessage(response));
   }
 
   final responseBodyStructure = json.decode(response.body);
@@ -85,11 +85,11 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
     followedArtists = Set<ImportedArtist>.from(responseBodyStructure['artists']['items']
         ?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']))));
   } catch (error) {
-    throw SpotifyImportException('The Spotify data has an unknown structure.');
+    throw ExternalServiceQueryException('The Spotify data has an unknown structure.');
   }
 
   if (followedArtists == null) {
-    throw SpotifyImportException('The Spotify data could not be processed.');
+    throw ExternalServiceQueryException('The Spotify data could not be processed.');
   }
 
   return UniqueNamedEntitySet<ImportedArtist>.from(followedArtists);
@@ -106,7 +106,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
   final response = await http.get(uri, headers: _getHeader(accessToken));
 
   if (!isHttpRequestSuccessful(response)) {
-    throw SpotifyImportException(_getRequestErrorMessage(response));
+    throw ExternalServiceQueryException(_getRequestErrorMessage(response));
   }
 
   final responseBodyMap = json.decode(response.body);
@@ -115,11 +115,11 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
     topArtists = Set<ImportedArtist>.from(
         responseBodyMap['items']?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']))));
   } catch (error) {
-    throw SpotifyImportException('The Spotify data has an unknown structure.');
+    throw ExternalServiceQueryException('The Spotify data has an unknown structure.');
   }
 
   if (topArtists == null) {
-    throw SpotifyImportException('The Spotify data could not be processed.');
+    throw ExternalServiceQueryException('The Spotify data could not be processed.');
   }
 
   return UniqueNamedEntitySet<ImportedArtist>.from(topArtists);

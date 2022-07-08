@@ -5,6 +5,7 @@ import 'package:moodtag/components/external_account_selector.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/database/moodtag_bloc.dart';
 import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
+import 'package:moodtag/screens/lastfm_import/lastfm_connector.dart';
 import 'package:moodtag/utils/user_properties_index.dart';
 import 'package:provider/provider.dart';
 
@@ -36,34 +37,38 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
               ExternalAccountSelector(
                 serviceName: widget.serviceName,
                 accountNameStreamController: accountNameStreamController,
-                onAddAccountClick: () => _openSetAccountNameDialog(),
-                onRemoveAccountClick: () => _setAccountName(null),
+                onAddAccountClick: () => _openSetAccountNameDialog(context),
+                onRemoveAccountClick: () => _removeAccountName(),
               )
             ],
           ),
         ));
   }
 
-  void _updateAccountNameFromDatabase() {
-    bloc
-        .getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME)
-        .then((value) => accountNameStreamController.add(value));
-  }
+  void _updateAccountNameFromDatabase() => bloc
+      .getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME)
+      .then((value) => accountNameStreamController.add(value));
 
-  void _openSetAccountNameDialog() async {
+  void _openSetAccountNameDialog(BuildContext context) async {
     String newAccountName = await AddExternalAccountDialog(context, widget.serviceName).show();
     if (newAccountName != null) {
       _setAccountName(newAccountName);
     }
   }
 
-  void _setAccountName(String newAccountName) {
-    if (bloc == null) {
-      throw new Exception('${widget.serviceName} account name could not be set - BLoC object is not available');
-    }
+  // TODO Error handling
+  void _setAccountName(String newAccountName) async {
+    final userInfo = await getUserInfo(newAccountName).onError((error, stackTrace) => throw error);
+    print(userInfo); // TODO Can be removed
 
     bloc
         .createOrUpdateUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME, newAccountName)
-        .whenComplete(() => _updateAccountNameFromDatabase());
+        .then((_) => _updateAccountNameFromDatabase());
+  }
+
+  void _removeAccountName() {
+    bloc
+        .deleteUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME)
+        .then((_) => _updateAccountNameFromDatabase());
   }
 }
