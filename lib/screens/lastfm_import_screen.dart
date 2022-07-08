@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
@@ -13,24 +15,36 @@ class LastfmImportScreen extends StatefulWidget {
 
 class _LastfmImportScreenState extends State<LastfmImportScreen> {
   MoodtagBloc bloc;
+  StreamController<String> accountNameStreamController = StreamController<String>();
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = Provider.of<MoodtagBloc>(context, listen: false);
+    updateAccountNameFromDatabase();
+  }
 
   @override
   Widget build(BuildContext context) {
-    bloc = Provider.of<MoodtagBloc>(context, listen: false);
-
     return Scaffold(
         appBar: MtAppBar(context),
         body: Center(
           child: Column(
             children: [
-              FutureBuilder<String>(
-                  future: bloc.getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME),
+              StreamBuilder<String>(
+                  stream: accountNameStreamController.stream,
                   builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                     return _accountNameContainer(snapshot.data);
-                  })
+                  }),
             ],
           ),
         ));
+  }
+
+  void updateAccountNameFromDatabase() {
+    bloc
+        .getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME)
+        .then((value) => accountNameStreamController.add(value));
   }
 
   Widget _accountNameContainer(String accountName) {
@@ -76,6 +90,8 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
       throw new Exception('Last.fm account name could not be set - BLoC object is not available');
     }
 
-    bloc.createOrUpdateUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME, newAccountName);
+    bloc
+        .createOrUpdateUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME, newAccountName)
+        .whenComplete(() => updateAccountNameFromDatabase());
   }
 }
