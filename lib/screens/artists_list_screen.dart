@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
+import 'package:moodtag/model/bloc/artists/artists_bloc.dart';
+import 'package:moodtag/model/bloc/artists/artists_state.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:provider/provider.dart';
 
 class ArtistsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
-
     return Scaffold(
       appBar: MtAppBar(context),
-      body: StreamBuilder<List<Artist>>(
-        stream: bloc.artists,
-        builder: (context, snapshot) {
-          print(snapshot);
-
-          if (!snapshot.hasData) {
+      body: BlocBuilder<ArtistsBloc, ArtistsState>(
+        buildWhen: (previous, current) => current.status.isSuccess,
+        builder: (context, state) {
+          if (state.artists.isEmpty) {
             return const Align(
               alignment: Alignment.center,
               child: Text('No artists yet', style: listEntryStyle),
@@ -33,9 +30,9 @@ class ArtistsListScreen extends StatelessWidget {
           return ListView.separated(
             separatorBuilder: (context, _) => Divider(),
             padding: EdgeInsets.all(16.0),
-            itemCount: snapshot.hasData ? snapshot.data.length : 0,
+            itemCount: state.artists.isNotEmpty ? state.artists.length : 0,
             itemBuilder: (context, i) {
-              return _buildArtistRow(context, snapshot.data[i]);
+              return _buildArtistRow(context, state.artists[i]);
             },
           );
         },

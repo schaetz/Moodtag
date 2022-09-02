@@ -1,39 +1,25 @@
 import 'package:drift/drift.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/invalid_argument_exception.dart';
-import 'package:rxdart/rxdart.dart';
 
-import 'moodtag_db.dart';
+import 'database/moodtag_db.dart';
 
-class MoodtagBloc {
+class Repository {
   final MoodtagDB db;
 
-  final BehaviorSubject<List<Artist>> _allArtists = BehaviorSubject();
-  Stream<List<Artist>> get artists => _allArtists;
-
-  final BehaviorSubject<List<Tag>> _allTags = BehaviorSubject();
-  Stream<List<Tag>> get tags => _allTags;
-
-  // Solely for testing purposes
-  final BehaviorSubject<List<AssignedTag>> _allArtistTagPairs = BehaviorSubject();
-  Stream<List<AssignedTag>> get artistTagPairs => _allArtistTagPairs;
-
-  MoodtagBloc() : db = MoodtagDB() {
-    db.allArtists.listen(_allArtists.add);
-    db.allTags.listen(_allTags.add);
-    db.allArtistTagPairs.listen(_allArtistTagPairs.add);
-  }
+  Repository() : db = MoodtagDB();
 
   void close() {
     db.close();
-    _allArtists.close();
-    _allTags.close();
-    _allArtistTagPairs.close();
   }
 
   //
   // Artists
   //
+  Future getArtists() {
+    return db.getArtists();
+  }
+
   Future getArtistById(int id) {
     return db.getArtistById(id);
   }
@@ -62,6 +48,10 @@ class MoodtagBloc {
   //
   // Tags
   //
+  Future getTags() {
+    return db.getTags();
+  }
+
   Future getTagById(int id) {
     return db.getTagById(id);
   }

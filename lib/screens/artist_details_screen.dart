@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
-import 'package:multiple_stream_builder/multiple_stream_builder.dart';
+import 'package:moodtag/model/bloc/artists/artists_bloc.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository.dart';
 import 'package:provider/provider.dart';
+
+import '../model/bloc/artists/artists_state.dart';
 
 class ArtistDetailsScreen extends StatefulWidget {
   final Artist artist;
@@ -22,8 +25,6 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
-
     return Scaffold(
         appBar: MtAppBar(context),
         body: Padding(
@@ -33,19 +34,10 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
               padding: EdgeInsets.only(bottom: 12.0),
               child: Text(widget.artist.name, style: ArtistDetailsScreen.artistNameStyle),
             ),
-            StreamBuilder2<List<Tag>, List<Tag>>(
-              streams: Tuple2(bloc.tags, bloc.tagsForArtist(widget.artist)),
-              builder: (context, snapshots) {
-                print(snapshots);
-
-                List<Tag> allTags = snapshots.item1.hasData ? snapshots.item1.data : [];
-                List<Tag> tagsForArtist = snapshots.item2.hasData ? snapshots.item2.data : [];
-
-                return Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: _buildTagChipsRow(context, widget.artist, allTags, tagsForArtist),
-                );
+            BlocBuilder<ArtistsBloc, ArtistsState>(
+              buildWhen: (previous, current) => current.status.isSuccess,
+              builder: (context, state) {
+                return _buildTagChipsRow(context, widget.artist, state.tagsWithSelectedArtist);
               },
             ),
             Padding(
@@ -62,15 +54,20 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     });
   }
 
-  List<Widget> _buildTagChipsRow(BuildContext context, Artist artist, List<Tag> allTags, List<Tag> tagsForArtist) {
-    List<Tag> tagsToDisplay = _tagEditMode ? allTags : tagsForArtist;
+  Widget _buildTagChipsRow(BuildContext context, Artist artist, List<Tag> tagsForArtist) {
+    List<Tag> tagsToDisplay = tagsForArtist; // TODO Display all tags in tag edit mode
 
     List<Widget> chipsList =
         tagsToDisplay.map((tag) => _buildTagChip(context, artist, tag, tagsForArtist, (value) {})).toList();
     if (_tagEditMode) {
       chipsList.add(_buildAddTagChip(context, artist));
     }
-    return chipsList;
+
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: 8.0,
+      children: chipsList,
+    );
   }
 
   Widget _buildTagChip(
@@ -83,7 +80,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
 
   void _onTagChipPressed(Artist artist, Tag tag, List<Tag> tagsForArtist, ValueChanged<Tag> onTapped) async {
     if (_tagEditMode) {
-      final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+      final bloc = Provider.of<Repository>(context, listen: false);
 
       if (tagsForArtist.contains(tag)) {
         await bloc.removeTagFromArtist(artist, tag);

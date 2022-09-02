@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
+import 'package:moodtag/model/bloc/tags/tags_bloc.dart';
+import 'package:moodtag/model/bloc/tags/tags_state.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:provider/provider.dart';
 
 class TagsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
@@ -16,16 +17,12 @@ class TagsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
-
     return Scaffold(
       appBar: MtAppBar(context),
-      body: StreamBuilder<List<Tag>>(
-          stream: bloc.tags,
-          builder: (context, snapshot) {
-            print(snapshot);
-
-            if (!snapshot.hasData) {
+      body: BlocBuilder<TagsBloc, TagsState>(
+          buildWhen: (previous, current) => current.status.isSuccess,
+          builder: (context, state) {
+            if (state.tags.isEmpty) {
               return const Align(
                 alignment: Alignment.center,
                 child: Text('No tags yet', style: listEntryStyle),
@@ -35,9 +32,9 @@ class TagsListScreen extends StatelessWidget {
             return ListView.separated(
               separatorBuilder: (context, _) => Divider(),
               padding: EdgeInsets.all(16.0),
-              itemCount: snapshot.hasData ? snapshot.data.length : 0,
+              itemCount: state.tags.isNotEmpty ? state.tags.length : 0,
               itemBuilder: (context, i) {
-                return _buildTagRow(context, bloc, snapshot.data[i]);
+                return _buildTagRow(context, state.tags[i]);
               },
             );
           }),
@@ -50,28 +47,26 @@ class TagsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTagRow(BuildContext context, MoodtagBloc bloc, Tag tag) {
-    return StreamBuilder<List<Artist>>(
-        stream: bloc.artistsWithTag(tag),
-        builder: (context, artistsWithTagSnapshot) => ListTile(
-            title: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    tag.name,
-                    style: listEntryStyle,
-                  ),
-                ),
-                Text(
-                  artistsWithTagSnapshot.hasData ? artistsWithTagSnapshot.data.length.toString() : "0",
-                  style: listEntryStylePale,
-                )
-              ],
+  Widget _buildTagRow(BuildContext context, Tag tag) {
+    return ListTile(
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                tag.name,
+                style: listEntryStyle,
+              ),
             ),
-            leading: Icon(Icons.label),
-            onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
-            onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag)));
+            Text(
+              "0", // TODO Display correct number of artists with tag
+              style: listEntryStylePale,
+            )
+          ],
+        ),
+        leading: Icon(Icons.label),
+        onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
+        onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag));
   }
 }

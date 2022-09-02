@@ -5,7 +5,7 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
-part 'moodtag_db.g.dart';
+part './moodtag_db.g.dart';
 
 @DriftDatabase(include: {'queries.drift'})
 class MoodtagDB extends _$MoodtagDB {
@@ -21,12 +21,20 @@ class MoodtagDB extends _$MoodtagDB {
   //
   // GET
   //
+  Future<List<Artist>> getArtists() {
+    return (select(artists).get());
+  }
+
   Future<Artist> getArtistById(int artistId) {
     return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull();
   }
 
   Future<Artist> getArtistByName(String artistName) {
     return (select(artists)..where((t) => t.name.equals(artistName))).getSingleOrNull();
+  }
+
+  Future<List<Tag>> getTags() {
+    return (select(tags).get());
   }
 
   Future<Tag> getTagById(int tagId) {

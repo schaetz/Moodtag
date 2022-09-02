@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';
@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'db_request_success_counter.dart';
 
 Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, List<NamedEntity> entities) async {
-  final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+  final bloc = Provider.of<Repository>(context, listen: false);
   final creationSuccessCountersByType = Map<Type, DbRequestSuccessCounter>();
   final Map<ImportedArtist, Artist> createdArtistsByEntity = {};
   final Map<String, Tag> createdTagsByGenreName = {};
@@ -44,7 +44,7 @@ Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, 
 }
 
 void _assignGenreTagsToArtists(
-    MoodtagBloc bloc, Map<ImportedArtist, Artist> createdArtistsByEntity, Map<String, Tag> createdTagsByGenreName) {
+    Repository bloc, Map<ImportedArtist, Artist> createdArtistsByEntity, Map<String, Tag> createdTagsByGenreName) {
   createdArtistsByEntity.forEach((importedArtistEntity, artist) {
     importedArtistEntity.genres.forEach((genreName) {
       if (createdTagsByGenreName.containsKey(genreName)) {

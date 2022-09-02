@@ -1,4 +1,4 @@
-import 'package:moodtag/database/moodtag_db.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 
 class I10n {
   static const UNKNOWN_ENTITY_DENOTATION_SINGULAR = 'entity';

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:moodtag/components/external_account_selector.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/model/repository.dart';
 import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_connector.dart';
 import 'package:moodtag/utils/user_properties_index.dart';
@@ -17,13 +17,13 @@ class LastfmImportScreen extends StatefulWidget {
 }
 
 class _LastfmImportScreenState extends State<LastfmImportScreen> {
-  MoodtagBloc bloc;
+  Repository bloc;
   StreamController<String> accountNameStreamController = StreamController<String>();
 
   @override
   void initState() {
     super.initState();
-    bloc = Provider.of<MoodtagBloc>(context, listen: false);
+    bloc = Provider.of<Repository>(context, listen: false);
     _updateAccountNameFromDatabase();
   }
 

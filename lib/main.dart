@@ -15,9 +15,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/bloc/artists/artist_events.dart';
+import 'package:moodtag/model/bloc/artists/artists_bloc.dart';
+import 'package:moodtag/model/bloc/tags/tag_events.dart';
+import 'package:moodtag/model/bloc/tags/tags_bloc.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   runApp(MoodtagApp());
@@ -35,9 +38,11 @@ class MoodtagApp extends StatefulWidget {
 class _AppState extends State<MoodtagApp> {
   @override
   Widget build(BuildContext context) {
-    return Provider<MoodtagBloc>(
-        create: (_) => MoodtagBloc(),
-        dispose: (_, bloc) => bloc.close(),
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => ArtistsBloc()..add(GetArtists())),
+          BlocProvider(create: (context) => TagsBloc()..add(GetTags())),
+        ],
         child: MaterialApp(
             title: MoodtagApp.appTitle,
             theme: ThemeData(

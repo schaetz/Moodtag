@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
+import 'package:moodtag/model/repository.dart';
 
 class ExternalAccountSelector extends StatefulWidget {
   final String serviceName;
@@ -18,7 +18,7 @@ class ExternalAccountSelector extends StatefulWidget {
 }
 
 class _ExternalAccountSelectorState extends State<ExternalAccountSelector> {
-  MoodtagBloc bloc;
+  Repository bloc;
 
   @override
   void initState() {

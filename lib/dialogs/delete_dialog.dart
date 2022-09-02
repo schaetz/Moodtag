@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/database/moodtag_db.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository.dart';
 import 'package:provider/provider.dart';
 
 import 'abstract_dialog.dart';
@@ -57,7 +57,7 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
   }
 
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) async {
-    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+    final bloc = Provider.of<Repository>(context, listen: false);
 
     print(resetLibrary);
     if (resetLibrary) {
@@ -81,7 +81,7 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
   }
 
   void deleteEntity(BuildContext context) async {
-    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+    final bloc = Provider.of<Repository>(context, listen: false);
 
     if (resetLibrary) {
       await bloc.deleteAllArtists();

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/components/simple_text_input_dialog_base.dart';
-import 'package:moodtag/database/moodtag_bloc.dart';
-import 'package:moodtag/database/moodtag_db.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository.dart';
 import 'package:moodtag/utils/helpers.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +53,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
   void _addEntity(BuildContext context, String newInput, O preselectedOther) async {
     List<String> inputElements = processMultilineInput(newInput);
     List<DbRequestResponse> exceptionResponses = [];
-    final bloc = Provider.of<MoodtagBloc>(context, listen: false);
+    final bloc = Provider.of<Repository>(context, listen: false);
 
     for (String newEntityName in inputElements) {
       DbRequestResponse response;
@@ -77,7 +77,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
   }
 
   Future<DbRequestResponse<Artist>> _createArtistOrEditExistingArtist(
-      MoodtagBloc bloc, String newArtistName, Tag preselectedTag) async {
+      Repository bloc, String newArtistName, Tag preselectedTag) async {
     final createArtistResponse = await bloc.createArtist(newArtistName);
 
     if (preselectedTag != null) {
@@ -94,7 +94,7 @@ class AddEntityDialog<E, O> extends AbstractDialog {
   }
 
   Future<DbRequestResponse<Tag>> _createTagOrEditExistingTag(
-      MoodtagBloc bloc, String newTagName, Artist preselectedArtist) async {
+      Repository bloc, String newTagName, Artist preselectedArtist) async {
     final createTagResponse = await bloc.createTag(newTagName);
 
     if (preselectedArtist != null) {
