@@ -10,15 +10,6 @@ class GetArtists extends ArtistEvent {
   List<Object> get props => [];
 }
 
-class SelectArtist extends ArtistEvent {
-  final Artist artist;
-
-  SelectArtist(this.artist);
-
-  @override
-  List<Object> get props => [artist];
-}
-
 class CreateArtist extends ArtistEvent {
   final String name;
 

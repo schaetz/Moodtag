@@ -4,8 +4,9 @@ import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
-import 'package:moodtag/model/bloc/artists/artists_bloc.dart';
-import 'package:moodtag/model/bloc/artists/artists_state.dart';
+import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
+import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
+import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
@@ -17,8 +18,8 @@ class ArtistsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MtAppBar(context),
-      body: BlocBuilder<ArtistsBloc, ArtistsState>(
-        buildWhen: (previous, current) => current.status.isSuccess,
+      body: BlocBuilder<ArtistsListBloc, ArtistsListState>(
+        buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {
           if (state.artists.isEmpty) {
             return const Align(

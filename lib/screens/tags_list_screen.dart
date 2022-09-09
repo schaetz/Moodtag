@@ -4,8 +4,9 @@ import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
-import 'package:moodtag/model/bloc/tags/tags_bloc.dart';
-import 'package:moodtag/model/bloc/tags/tags_state.dart';
+import 'package:moodtag/model/blocs/loading_status.dart';
+import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
+import 'package:moodtag/model/blocs/tags_list/tags_list_state.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
@@ -19,8 +20,8 @@ class TagsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MtAppBar(context),
-      body: BlocBuilder<TagsBloc, TagsState>(
-          buildWhen: (previous, current) => current.status.isSuccess,
+      body: BlocBuilder<TagsListBloc, TagsListState>(
+          buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
           builder: (context, state) {
             if (state.tags.isEmpty) {
               return const Align(
@@ -66,7 +67,7 @@ class TagsListScreen extends StatelessWidget {
           ],
         ),
         leading: Icon(Icons.label),
-        onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag),
+        onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag.id),
         onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag));
   }
 }

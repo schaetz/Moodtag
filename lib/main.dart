@@ -16,11 +16,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/bloc/artists/artist_events.dart';
-import 'package:moodtag/model/bloc/artists/artists_bloc.dart';
-import 'package:moodtag/model/bloc/tags/tag_events.dart';
-import 'package:moodtag/model/bloc/tags/tags_bloc.dart';
+import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
+import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/navigation/routes.dart';
+
+import 'model/blocs/artists_list/artists_list_bloc.dart';
 
 void main() {
   runApp(MoodtagApp());
@@ -40,8 +41,8 @@ class _AppState extends State<MoodtagApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => ArtistsBloc()..add(GetArtists())),
-          BlocProvider(create: (context) => TagsBloc()..add(GetTags())),
+          BlocProvider(create: (context) => ArtistsListBloc()..add(GetArtists())),
+          BlocProvider(create: (context) => TagsListBloc()..add(GetTags())),
         ],
         child: MaterialApp(
             title: MoodtagApp.appTitle,

@@ -2,26 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
-import 'package:moodtag/model/bloc/artists/artists_bloc.dart';
+import 'package:moodtag/model/blocs/artist_details/artist_details_cubit.dart';
+import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
+import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository.dart';
 import 'package:provider/provider.dart';
 
-import '../model/bloc/artists/artists_state.dart';
-
-class ArtistDetailsScreen extends StatefulWidget {
-  final Artist artist;
-
+class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
+  static const infoLabelStyle = TextStyle(fontSize: 18.0);
 
-  ArtistDetailsScreen(BuildContext context) : artist = ModalRoute.of(context).settings.arguments as Artist;
-
-  @override
-  State<StatefulWidget> createState() => _ArtistDetailsScreenState();
-}
-
-class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
-  bool _tagEditMode = false;
+  const ArtistDetailsScreen();
 
   @override
   Widget build(BuildContext context) {
@@ -29,38 +21,58 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
         appBar: MtAppBar(context),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: ListView(children: [
-            Padding(
-              padding: EdgeInsets.only(bottom: 12.0),
-              child: Text(widget.artist.name, style: ArtistDetailsScreen.artistNameStyle),
-            ),
-            BlocBuilder<ArtistsBloc, ArtistsState>(
-              buildWhen: (previous, current) => current.status.isSuccess,
-              builder: (context, state) {
-                return _buildTagChipsRow(context, widget.artist, state.tagsWithSelectedArtist);
-              },
-            ),
-            Padding(
-                padding: EdgeInsets.only(top: 12.0),
-                child: ElevatedButton(
-                    child: Text(_tagEditMode ? 'Finish editing' : 'Edit tags'), onPressed: () => _toggleEditMode()))
-          ]),
+          child: BlocBuilder<ArtistDetailsCubit, ArtistDetailsState>(
+            // TODO Show loading or error symbols
+            buildWhen: (previous, current) =>
+                current.artistLoadingStatus.isSuccess &&
+                current.tagsListLoadingStatus.isSuccess, // TODO Show artist even when tags list is not available
+            builder: (context, state) {
+              return ListView(children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 12.0),
+                  child: Text(state.artist.name, style: ArtistDetailsScreen.artistNameStyle),
+                ),
+                _buildTagChipsRow(context, state),
+                Padding(
+                    padding: EdgeInsets.only(top: 12.0),
+                    child: ElevatedButton(
+                        child: Text(state.tagEditMode ? 'Finish editing' : 'Edit tags'),
+                        onPressed: () => _toggleEditMode(context)))
+              ]);
+            },
+          ),
         ));
   }
 
-  void _toggleEditMode() {
-    setState(() {
-      _tagEditMode = !_tagEditMode;
-    });
+  void _toggleEditMode(BuildContext context) {
+    context.read<ArtistDetailsCubit>().toggleTagEditMode();
   }
 
-  Widget _buildTagChipsRow(BuildContext context, Artist artist, List<Tag> tagsForArtist) {
-    List<Tag> tagsToDisplay = tagsForArtist; // TODO Display all tags in tag edit mode
+  Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state) {
+    if (state.tagEditMode) {
+      // TODO When in tag edit mode, only build the widget if the complete list of tags was loaded
+    } else {
+      // TODO Improve loading / error labels
+      if (state.tagsListLoadingStatus.isInitialOrLoading) {
+        return const Align(
+          alignment: Alignment.center,
+          child: Text('Loading tags...', style: infoLabelStyle),
+        );
+      }
+      if (state.artistLoadingStatus.isError || state.tagsForArtist == null) {
+        return const Align(
+          alignment: Alignment.center,
+          child: Text('Error loading the tags for the artist', style: infoLabelStyle),
+        );
+      }
+    }
 
-    List<Widget> chipsList =
-        tagsToDisplay.map((tag) => _buildTagChip(context, artist, tag, tagsForArtist, (value) {})).toList();
-    if (_tagEditMode) {
-      chipsList.add(_buildAddTagChip(context, artist));
+    List<Tag> tagsToDisplay =
+        state.tagEditMode ? state.tagsForArtist : state.tagsForArtist; // TODO Show all tags in tag edit mode
+
+    List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (value) {})).toList();
+    if (state.tagEditMode) {
+      chipsList.add(_buildAddTagChip(context, state.artist));
     }
 
     return Wrap(
@@ -70,22 +82,21 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     );
   }
 
-  Widget _buildTagChip(
-      BuildContext context, Artist artist, Tag tag, List<Tag> tagsForArtist, ValueChanged<Tag> onTapped) {
+  Widget _buildTagChip(BuildContext context, ArtistDetailsState state, Tag tag, ValueChanged<Tag> onTapped) {
     return InputChip(
         label: Text(tag.name),
-        selected: _tagEditMode && tagsForArtist.contains(tag),
-        onPressed: () => _onTagChipPressed(artist, tag, tagsForArtist, onTapped));
+        selected: state.tagEditMode && state.tagsForArtist.contains(tag),
+        onPressed: () => _onTagChipPressed(context, state, tag, onTapped));
   }
 
-  void _onTagChipPressed(Artist artist, Tag tag, List<Tag> tagsForArtist, ValueChanged<Tag> onTapped) async {
-    if (_tagEditMode) {
+  void _onTagChipPressed(BuildContext context, ArtistDetailsState state, Tag tag, ValueChanged<Tag> onTapped) async {
+    if (state.tagEditMode) {
       final bloc = Provider.of<Repository>(context, listen: false);
 
-      if (tagsForArtist.contains(tag)) {
-        await bloc.removeTagFromArtist(artist, tag);
+      if (state.tagsForArtist.contains(tag)) {
+        await bloc.removeTagFromArtist(state.artist, tag);
       } else {
-        await bloc.assignTagToArtist(artist, tag);
+        await bloc.assignTagToArtist(state.artist, tag);
       }
     } else {
       onTapped(tag);

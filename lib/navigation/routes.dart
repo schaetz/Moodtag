@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/blocs/artist_details/artist_details_cubit.dart';
+import 'package:moodtag/model/blocs/tag_details/tag_details_cubit.dart';
 import 'package:moodtag/screens/artist_details_screen.dart';
 import 'package:moodtag/screens/artists_list_screen.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_import_screen.dart';
@@ -32,8 +35,12 @@ class Routes {
     return {
       artistsList: (context) => ArtistsListScreen(),
       tagsList: (context) => TagsListScreen(),
-      artistsDetails: (context) => ArtistDetailsScreen(context),
-      tagsDetails: (context) => TagDetailsScreen(context),
+      artistsDetails: (context) => BlocProvider(
+          create: (_) => ArtistDetailsCubit(artistId: ModalRoute.of(context).settings.arguments as int)..initialize(),
+          child: const ArtistDetailsScreen()),
+      tagsDetails: (context) => BlocProvider(
+          create: (_) => TagDetailsCubit(tagId: ModalRoute.of(context).settings.arguments as int)..initialize(),
+          child: const TagDetailsScreen()),
       lastFmImport: (context) => LastfmImportScreen(),
       spotifyImport: (context) => ImportFlow(),
     };
