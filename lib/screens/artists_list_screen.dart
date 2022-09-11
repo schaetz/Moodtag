@@ -8,6 +8,7 @@ import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -18,7 +19,12 @@ class ArtistsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MtAppBar(context),
-      body: BlocBuilder<ArtistsListBloc, ArtistsListState>(
+      body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
+        listenWhen: (context, state) => state.showCreateArtistDialog,
+        listener: (context, state) {
+          AddEntityDialog.openAddArtistDialog(context)
+              .then((_) => context.read<ArtistsListBloc>().add(new CloseCreateArtistDialog()));
+        },
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {
           if (state.artists.isEmpty) {
@@ -39,7 +45,7 @@ class ArtistsListScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddEntityDialog.openAddArtistDialog(context),
+        onPressed: () => context.read<ArtistsListBloc>().add(OpenCreateArtistDialog()),
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),

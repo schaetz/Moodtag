@@ -6,7 +6,7 @@ import 'package:moodtag/model/blocs/artist_details/artist_details_cubit.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/repository.dart';
+import 'package:moodtag/model/repository/repository.dart';
 import 'package:provider/provider.dart';
 
 class ArtistDetailsScreen extends StatelessWidget {

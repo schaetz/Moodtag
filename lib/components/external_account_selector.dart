@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/repository.dart';
+import 'package:moodtag/model/repository/repository.dart';
 
 class ExternalAccountSelector extends StatefulWidget {
   final String serviceName;

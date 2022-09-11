@@ -10,6 +10,16 @@ class GetArtists extends ArtistEvent {
   List<Object> get props => [];
 }
 
+class OpenCreateArtistDialog extends ArtistEvent {
+  @override
+  List<Object> get props => [];
+}
+
+class CloseCreateArtistDialog extends ArtistEvent {
+  @override
+  List<Object> get props => [];
+}
+
 class CreateArtist extends ArtistEvent {
   final String name;
 

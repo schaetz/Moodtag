@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
-import 'package:moodtag/model/repository.dart';
+import 'package:moodtag/model/repository/repository.dart';
 
 import 'tag_details_state.dart';
 

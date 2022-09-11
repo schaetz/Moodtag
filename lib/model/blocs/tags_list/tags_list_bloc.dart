@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/repository.dart';
+import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/tag_events.dart';
 import '../loading_status.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/repository.dart';
+import 'package:moodtag/model/repository/repository.dart';
 import 'package:provider/provider.dart';
 
 import 'abstract_dialog.dart';

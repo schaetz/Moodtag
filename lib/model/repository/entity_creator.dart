@@ -2,15 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/repository.dart';
+import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';
 import 'package:provider/provider.dart';
 
-import 'db_request_success_counter.dart';
+import '../../utils/db_request_success_counter.dart';
+
+Future<DbRequestResponse<Artist>> createArtistOrEditExistingArtist(
+    Repository repository, String newArtistName, Tag preselectedTag) async {
+  final createArtistResponse = await repository.createArtist(newArtistName);
+
+  if (preselectedTag != null) {
+    if (createArtistResponse.didSucceed()) {
+      await repository.assignTagToArtist(createArtistResponse.changedEntity, preselectedTag);
+    } else {
+      await repository
+          .getArtistByName(newArtistName)
+          .then((existingArtist) async => await repository.assignTagToArtist(existingArtist, preselectedTag));
+    }
+  }
+
+  return createArtistResponse;
+}
+
+Future<DbRequestResponse<Tag>> createTagOrEditExistingTag(
+    Repository repository, String newTagName, Artist preselectedArtist) async {
+  final createTagResponse = await repository.createTag(newTagName);
+
+  if (preselectedArtist != null) {
+    if (createTagResponse.didSucceed()) {
+      await repository.assignTagToArtist(preselectedArtist, createTagResponse.changedEntity);
+    } else {
+      await repository
+          .getTagByName(newTagName)
+          .then((existingTag) async => await repository.assignTagToArtist(preselectedArtist, existingTag));
+    }
+  }
+
+  return createTagResponse;
+}
 
 Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, List<NamedEntity> entities) async {
+  // TODO Pass repository as parameter rather than getting it here
   final bloc = Provider.of<Repository>(context, listen: false);
   final creationSuccessCountersByType = Map<Type, DbRequestSuccessCounter>();
   final Map<ImportedArtist, Artist> createdArtistsByEntity = {};

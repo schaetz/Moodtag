@@ -1,5 +1,6 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:moodtag/model/repository/entity_creator.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/import_selection_list_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_screen.dart';
@@ -8,7 +9,6 @@ import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
-import 'package:moodtag/utils/entity_creator.dart';
 import 'package:moodtag/utils/i10n.dart';
 
 import 'import_flow_state.dart';
