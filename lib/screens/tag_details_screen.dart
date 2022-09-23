@@ -4,7 +4,7 @@ import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/remove_tag_from_artist_dialog.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
-import 'package:moodtag/model/blocs/tag_details/tag_details_cubit.dart';
+import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_state.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/navigation/routes.dart';
@@ -19,7 +19,7 @@ class TagDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MtAppBar(context),
-      body: BlocBuilder<TagDetailsCubit, TagDetailsState>(
+      body: BlocBuilder<TagDetailsBloc, TagDetailsState>(
         buildWhen: (previous, current) =>
             // TODO Show loading or error symbols
             current.tagLoadingStatus.isSuccess &&
@@ -54,8 +54,8 @@ class TagDetailsScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            AddEntityDialog.openAddArtistDialog(context), // TODO Add preselected tag: "preselectedTag: state.tag"
+        onPressed: () => AddEntityDialog.openAddArtistDialog<TagDetailsBloc>(
+            context), // TODO Add preselected tag: "preselectedTag: state.tag"
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),

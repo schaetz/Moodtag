@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
-import 'package:moodtag/model/blocs/artist_details/artist_details_cubit.dart';
+import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,7 @@ class ArtistDetailsScreen extends StatelessWidget {
         appBar: MtAppBar(context),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: BlocBuilder<ArtistDetailsCubit, ArtistDetailsState>(
+          child: BlocBuilder<ArtistDetailsBloc, ArtistDetailsState>(
             // TODO Show loading or error symbols
             buildWhen: (previous, current) =>
                 current.artistLoadingStatus.isSuccess &&
@@ -45,7 +46,7 @@ class ArtistDetailsScreen extends StatelessWidget {
   }
 
   void _toggleEditMode(BuildContext context) {
-    context.read<ArtistDetailsCubit>().toggleTagEditMode();
+    context.read<ArtistDetailsBloc>().add(ToggleTagEditMode());
   }
 
   Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state) {
@@ -107,6 +108,6 @@ class ArtistDetailsScreen extends StatelessWidget {
     return InputChip(
         label: Text('+'),
         backgroundColor: Theme.of(context).colorScheme.secondary,
-        onPressed: () => AddEntityDialog.openAddTagDialog(context, preselectedArtist: artist));
+        onPressed: () => AddEntityDialog.openAddTagDialog<ArtistDetailsBloc>(context, preselectedArtist: artist));
   }
 }

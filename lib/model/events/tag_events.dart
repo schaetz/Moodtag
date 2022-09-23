@@ -5,6 +5,15 @@ abstract class TagEvent extends Equatable {
   const TagEvent();
 }
 
+class GetSelectedTag extends TagEvent {
+  final int id;
+
+  GetSelectedTag(this.id);
+
+  @override
+  List<Object> get props => [];
+}
+
 class GetTags extends TagEvent {
   @override
   List<Object> get props => [];
@@ -13,7 +22,7 @@ class GetTags extends TagEvent {
 class SelectTag extends TagEvent {
   final Tag tag;
 
-  SelectTag(this.tag);
+  const SelectTag(this.tag);
 
   @override
   List<Object> get props => [tag];
@@ -22,7 +31,7 @@ class SelectTag extends TagEvent {
 class CreateTag extends TagEvent {
   final String name;
 
-  CreateTag(this.name);
+  const CreateTag(this.name);
 
   @override
   List<Object> get props => [name];
@@ -31,7 +40,7 @@ class CreateTag extends TagEvent {
 class DeleteTag extends TagEvent {
   final Tag tag;
 
-  DeleteTag(this.tag);
+  const DeleteTag(this.tag);
 
   @override
   List<Object> get props => [tag];

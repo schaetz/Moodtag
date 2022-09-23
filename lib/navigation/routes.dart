@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/blocs/artist_details/artist_details_cubit.dart';
-import 'package:moodtag/model/blocs/tag_details/tag_details_cubit.dart';
+import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
+import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
+import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/screens/artist_details_screen.dart';
 import 'package:moodtag/screens/artists_list_screen.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_import_screen.dart';
@@ -36,10 +38,10 @@ class Routes {
       artistsList: (context) => ArtistsListScreen(),
       tagsList: (context) => TagsListScreen(),
       artistsDetails: (context) => BlocProvider(
-          create: (_) => ArtistDetailsCubit(artistId: ModalRoute.of(context).settings.arguments as int)..initialize(),
+          create: (_) => ArtistDetailsBloc()..add(GetSelectedArtist(ModalRoute.of(context).settings.arguments as int)),
           child: const ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
-          create: (_) => TagDetailsCubit(tagId: ModalRoute.of(context).settings.arguments as int)..initialize(),
+          create: (_) => TagDetailsBloc()..add(GetSelectedTag(ModalRoute.of(context).settings.arguments as int)),
           child: const TagDetailsScreen()),
       lastFmImport: (context) => LastfmImportScreen(),
       spotifyImport: (context) => ImportFlow(),

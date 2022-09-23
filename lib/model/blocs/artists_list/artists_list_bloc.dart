@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/bloc_helpers/create_artist_bloc_helper.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/artist_events.dart';
@@ -7,23 +8,24 @@ import 'artists_list_state.dart';
 
 class ArtistsListBloc extends Bloc<ArtistEvent, ArtistsListState> {
   final Repository repository;
+  final CreateArtistBlocHelper createArtistBlocHelper = CreateArtistBlocHelper();
 
   ArtistsListBloc({this.repository}) : super(const ArtistsListState()) {
     on<OpenCreateArtistDialog>(_mapOpenCreateArtistDialogEventToState);
     on<CloseCreateArtistDialog>(_mapCloseCreateArtistDialogEventToState);
     on<GetArtists>(_mapGetArtistsEventToState);
-    on<CreateArtist>(_mapCreateArtistEventToState);
+    on<CreateArtists>(_mapCreateArtistsEventToState);
     on<DeleteArtist>(_mapDeleteArtistEventToState);
   }
 
-  void _mapOpenCreateArtistDialogEventToState(OpenCreateArtistDialog event, Emitter<ArtistsListState> emit) async {
+  void _mapOpenCreateArtistDialogEventToState(OpenCreateArtistDialog event, Emitter<ArtistsListState> emit) {
     print('Open');
-    if (!state.showCreateArtistDialog) emit(state.copyWith(showCreateArtistDialog: true));
+    if (!state.showCreateArtistDialog) _openCreateArtistDialog();
   }
 
-  void _mapCloseCreateArtistDialogEventToState(CloseCreateArtistDialog event, Emitter<ArtistsListState> emit) async {
+  void _mapCloseCreateArtistDialogEventToState(CloseCreateArtistDialog event, Emitter<ArtistsListState> emit) {
     print('Close');
-    if (state.showCreateArtistDialog) emit(state.copyWith(showCreateArtistDialog: false));
+    if (state.showCreateArtistDialog) _closeCreateArtistDialog();
   }
 
   void _mapGetArtistsEventToState(GetArtists event, Emitter<ArtistsListState> emit) async {
@@ -42,11 +44,20 @@ class ArtistsListBloc extends Bloc<ArtistEvent, ArtistsListState> {
     }
   }
 
-  void _mapCreateArtistEventToState(CreateArtist event, Emitter<ArtistsListState> emit) {
-    // TODO
+  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) async {
+    await createArtistBlocHelper.handleCreateArtistEvent(event, repository);
+    _closeCreateArtistDialog();
   }
 
   void _mapDeleteArtistEventToState(DeleteArtist event, Emitter<ArtistsListState> emit) {
     // TODO
+  }
+
+  void _openCreateArtistDialog() {
+    emit(state.copyWith(showCreateArtistDialog: true));
+  }
+
+  void _closeCreateArtistDialog() {
+    emit(state.copyWith(showCreateArtistDialog: false));
   }
 }

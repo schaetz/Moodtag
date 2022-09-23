@@ -40,7 +40,7 @@ class TagsListScreen extends StatelessWidget {
             );
           }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddEntityDialog.openAddTagDialog(context),
+        onPressed: () => AddEntityDialog.openAddTagDialog<TagsListBloc>(context),
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),

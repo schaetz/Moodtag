@@ -22,8 +22,8 @@ class ArtistsListScreen extends StatelessWidget {
       body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
         listenWhen: (context, state) => state.showCreateArtistDialog,
         listener: (context, state) {
-          AddEntityDialog.openAddArtistDialog(context)
-              .then((_) => context.read<ArtistsListBloc>().add(new CloseCreateArtistDialog()));
+          AddEntityDialog.openAddArtistDialog<ArtistsListBloc>(context)
+              .then((_) => context.read<ArtistsListBloc>().add(CloseCreateArtistDialog()));
         },
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {

@@ -68,8 +68,7 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
     } else if (entityToDelete is Tag) {
       Tag tag = entityToDelete as Tag;
       final mainMessage = 'Are you sure that you want to delete the tag "${tag.name}"?';
-      // TODO Return type of the artistsWithTag() call is a Stream, not a list of artists; needs to be fixed
-      final artistsWithTag = bloc.artistsWithTag(tag);
+      final artistsWithTag = await bloc.getArtistsWithTag(tag.id);
       if (await artistsWithTag.isEmpty) {
         return mainMessage + ' It is currently not assigned to any artist.';
       } else {

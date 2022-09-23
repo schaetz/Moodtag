@@ -12,9 +12,9 @@ class TagDetailsState extends Equatable {
 
   const TagDetailsState(
       {this.tagId,
-      this.tagLoadingStatus,
+      this.tagLoadingStatus = LoadingStatus.initial,
       this.tag,
-      this.artistsListLoadingStatus,
+      this.artistsListLoadingStatus = LoadingStatus.initial,
       this.artistsWithTag,
       this.tagEditMode});
 

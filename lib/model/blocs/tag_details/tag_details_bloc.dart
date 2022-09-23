@@ -1,15 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
+import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import 'tag_details_state.dart';
 
-class TagDetailsCubit extends Cubit<TagDetailsState> {
+class TagDetailsBloc extends Bloc<TagEvent, TagDetailsState> {
   final Repository repository;
 
-  TagDetailsCubit({this.repository, int tagId}) : super(TagDetailsState(tagId: tagId));
+  TagDetailsBloc({this.repository}) : super(TagDetailsState()) {
+    on<GetSelectedTag>(_mapGetSelectedTagEventToState);
+  }
 
-  void initialize() async {
+  void _mapGetSelectedTagEventToState(GetSelectedTag event, Emitter<TagDetailsState> emit) async {
     emit(state.copyWith(tagLoadingStatus: LoadingStatus.loading));
     try {
       final tag = await repository.getTagById(state.tagId);
@@ -21,8 +24,6 @@ class TagDetailsCubit extends Cubit<TagDetailsState> {
       print(stacktrace);
       emit(state.copyWith(tagLoadingStatus: LoadingStatus.error));
     }
-
-    emit(state.copyWith(artistsListLoadingStatus: LoadingStatus.loading));
   }
 
   void _loadArtistsWithTag() async {
@@ -30,17 +31,13 @@ class TagDetailsCubit extends Cubit<TagDetailsState> {
       state.copyWith(artistsListLoadingStatus: LoadingStatus.loading),
     );
     try {
-      final tagsForTag = await repository.getTags();
+      final artistsWithTag = await repository.getArtistsWithTag(state.tagId);
       emit(
-        state.copyWith(artistsListLoadingStatus: LoadingStatus.success, artistsWithTag: tagsForTag),
+        state.copyWith(artistsListLoadingStatus: LoadingStatus.success, artistsWithTag: artistsWithTag),
       );
     } catch (error, stacktrace) {
       print(stacktrace);
       emit(state.copyWith(artistsListLoadingStatus: LoadingStatus.error));
     }
-  }
-
-  void toggleTagEditMode() {
-    emit(state.copyWith(tagEditMode: !state.tagEditMode));
   }
 }

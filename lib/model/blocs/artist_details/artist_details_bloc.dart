@@ -1,15 +1,22 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/bloc_helpers/create_artist_bloc_helper.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
+import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import 'artist_details_state.dart';
 
-class ArtistDetailsCubit extends Cubit<ArtistDetailsState> {
+class ArtistDetailsBloc extends Bloc<ArtistEvent, ArtistDetailsState> {
   final Repository repository;
+  final CreateArtistBlocHelper createArtistBlocHelper = CreateArtistBlocHelper();
 
-  ArtistDetailsCubit({this.repository, int artistId}) : super(ArtistDetailsState(artistId: artistId));
+  ArtistDetailsBloc({this.repository}) : super(ArtistDetailsState()) {
+    on<GetSelectedArtist>(_mapGetSelectedArtistEventToState);
+    on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
+    on<CreateArtists>(_mapCreateArtistsEventToState);
+  }
 
-  void initialize() async {
+  void _mapGetSelectedArtistEventToState(GetSelectedArtist event, Emitter<ArtistDetailsState> emit) async {
     emit(state.copyWith(artistLoadingStatus: LoadingStatus.loading));
     try {
       final artist = await repository.getArtistById(state.artistId);
@@ -21,8 +28,6 @@ class ArtistDetailsCubit extends Cubit<ArtistDetailsState> {
       print(stacktrace);
       emit(state.copyWith(artistLoadingStatus: LoadingStatus.error));
     }
-
-    emit(state.copyWith(tagsListLoadingStatus: LoadingStatus.loading));
   }
 
   void _loadTagsForArtist() async {
@@ -40,7 +45,11 @@ class ArtistDetailsCubit extends Cubit<ArtistDetailsState> {
     }
   }
 
-  void toggleTagEditMode() {
+  void _mapToggleTagEditModeEventToState(ToggleTagEditMode event, Emitter<ArtistDetailsState> emit) {
     emit(state.copyWith(tagEditMode: !state.tagEditMode));
+  }
+
+  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistDetailsState> emit) async {
+    await createArtistBlocHelper.handleCreateArtistEvent(event, repository);
   }
 }

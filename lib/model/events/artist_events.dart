@@ -5,6 +5,15 @@ abstract class ArtistEvent extends Equatable {
   const ArtistEvent();
 }
 
+class GetSelectedArtist extends ArtistEvent {
+  final int id;
+
+  const GetSelectedArtist(this.id);
+
+  @override
+  List<Object> get props => [];
+}
+
 class GetArtists extends ArtistEvent {
   @override
   List<Object> get props => [];
@@ -20,20 +29,25 @@ class CloseCreateArtistDialog extends ArtistEvent {
   List<Object> get props => [];
 }
 
-class CreateArtist extends ArtistEvent {
-  final String name;
+class CreateArtists extends ArtistEvent {
+  final String input;
 
-  CreateArtist(this.name);
+  const CreateArtists(this.input);
 
   @override
-  List<Object> get props => [name];
+  List<Object> get props => [input];
 }
 
 class DeleteArtist extends ArtistEvent {
   final Artist artist;
 
-  DeleteArtist(this.artist);
+  const DeleteArtist(this.artist);
 
   @override
   List<Object> get props => [artist];
+}
+
+class ToggleTagEditMode extends ArtistEvent {
+  @override
+  List<Object> get props => [];
 }
