@@ -69,8 +69,8 @@ class Repository {
     return db.deleteTagById(tag.id);
   }
 
-  Stream<List<Tag>> tagsForArtist(Artist artist) {
-    return db.tagsForArtist(artist.id).watch();
+  Future getTagsForArtist(int artistId) {
+    return db.tagsForArtist(artistId).get();
   }
 
   Future deleteAllTags() {

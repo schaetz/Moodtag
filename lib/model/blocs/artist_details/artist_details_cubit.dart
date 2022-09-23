@@ -30,7 +30,7 @@ class ArtistDetailsCubit extends Cubit<ArtistDetailsState> {
       state.copyWith(tagsListLoadingStatus: LoadingStatus.loading),
     );
     try {
-      final tagsForArtist = await repository.getArtists();
+      final tagsForArtist = await repository.getTagsForArtist(state.artistId);
       emit(
         state.copyWith(tagsListLoadingStatus: LoadingStatus.success, tagsForArtist: tagsForArtist),
       );
