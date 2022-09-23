@@ -20,12 +20,12 @@ class ArtistsListBloc extends Bloc<ArtistEvent, ArtistsListState> {
 
   void _mapOpenCreateArtistDialogEventToState(OpenCreateArtistDialog event, Emitter<ArtistsListState> emit) {
     print('Open');
-    if (!state.showCreateArtistDialog) _openCreateArtistDialog();
+    if (!state.showCreateArtistDialog) _openCreateArtistDialog(emit);
   }
 
   void _mapCloseCreateArtistDialogEventToState(CloseCreateArtistDialog event, Emitter<ArtistsListState> emit) {
     print('Close');
-    if (state.showCreateArtistDialog) _closeCreateArtistDialog();
+    if (state.showCreateArtistDialog) _closeCreateArtistDialog(emit);
   }
 
   void _mapGetArtistsEventToState(GetArtists event, Emitter<ArtistsListState> emit) async {
@@ -46,18 +46,18 @@ class ArtistsListBloc extends Bloc<ArtistEvent, ArtistsListState> {
 
   void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) async {
     await createArtistBlocHelper.handleCreateArtistEvent(event, repository);
-    _closeCreateArtistDialog();
+    _closeCreateArtistDialog(emit);
   }
 
   void _mapDeleteArtistEventToState(DeleteArtist event, Emitter<ArtistsListState> emit) {
     // TODO
   }
 
-  void _openCreateArtistDialog() {
+  void _openCreateArtistDialog(Emitter<ArtistsListState> emit) {
     emit(state.copyWith(showCreateArtistDialog: true));
   }
 
-  void _closeCreateArtistDialog() {
+  void _closeCreateArtistDialog(Emitter<ArtistsListState> emit) {
     emit(state.copyWith(showCreateArtistDialog: false));
   }
 }
