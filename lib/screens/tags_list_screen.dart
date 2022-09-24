@@ -16,6 +16,8 @@ class TagsListScreen extends StatelessWidget {
   // TODO Define pale color in theme
   static const listEntryStylePale = TextStyle(fontSize: 18.0, color: Colors.grey);
 
+  const TagsListScreen();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

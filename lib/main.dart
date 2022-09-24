@@ -16,15 +16,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
-import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
-import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
-import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/navigation/routes.dart';
-
-import 'model/blocs/artists_list/artists_list_bloc.dart';
 
 void main() {
   runApp(MoodtagApp());
@@ -44,22 +37,14 @@ class _AppState extends State<MoodtagApp> {
   Widget build(BuildContext context) {
     return RepositoryProvider(
         create: (context) => Repository(),
-        child: MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                  create: (context) => ArtistsListBloc(repository: context.read<Repository>())..add(GetArtists())),
-              BlocProvider(create: (context) => ArtistDetailsBloc(repository: context.read<Repository>())),
-              BlocProvider(create: (context) => TagsListBloc(repository: context.read<Repository>())..add(GetTags())),
-              BlocProvider(create: (context) => TagDetailsBloc(repository: context.read<Repository>())),
-            ],
-            child: MaterialApp(
-                title: MoodtagApp.appTitle,
-                theme: ThemeData(
-                    primarySwatch: Colors.red,
-                    primaryColor: Colors.red,
-                    unselectedWidgetColor: Colors.grey,
-                    dividerColor: Colors.black54),
-                initialRoute: Routes.initialRoute,
-                routes: Routes.instance().getRoutes())));
+        child: MaterialApp(
+            title: MoodtagApp.appTitle,
+            theme: ThemeData(
+                primarySwatch: Colors.red,
+                primaryColor: Colors.red,
+                unselectedWidgetColor: Colors.grey,
+                dividerColor: Colors.black54),
+            initialRoute: Routes.initialRoute,
+            routes: Routes.instance().getRoutes()));
   }
 }

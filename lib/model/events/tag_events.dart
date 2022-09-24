@@ -1,31 +1,27 @@
-import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 
-abstract class TagEvent extends Equatable {
+import 'LibraryEvent.dart';
+
+abstract class TagEvent extends LibraryEvent {
   const TagEvent();
 }
 
-class GetSelectedTag extends TagEvent {
-  final int id;
-
-  GetSelectedTag(this.id);
-
-  @override
-  List<Object> get props => [];
-}
-
-class GetTags extends TagEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class SelectTag extends TagEvent {
+class TagUpdated extends TagEvent {
   final Tag tag;
 
-  const SelectTag(this.tag);
+  TagUpdated(this.tag);
 
   @override
   List<Object> get props => [tag];
+}
+
+class TagsListUpdated extends TagEvent {
+  final List<Tag> tags;
+
+  TagsListUpdated(this.tags);
+
+  @override
+  List<Object> get props => [tags];
 }
 
 class CreateTag extends TagEvent {

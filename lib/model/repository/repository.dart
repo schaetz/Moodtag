@@ -16,11 +16,11 @@ class Repository {
   //
   // Artists
   //
-  Future getArtists() {
+  Stream getArtists() {
     return db.getArtists();
   }
 
-  Future getArtistById(int id) {
+  Stream getArtistById(int id) {
     return db.getArtistById(id);
   }
 
@@ -37,8 +37,8 @@ class Repository {
     return db.deleteArtistById(artist.id);
   }
 
-  Future getArtistsWithTag(int tagId) {
-    return db.tagsForArtist(tagId).get();
+  Stream getArtistsWithTag(int tagId) {
+    return db.tagsForArtist(tagId).watch();
   }
 
   Future deleteAllArtists() {
@@ -48,11 +48,11 @@ class Repository {
   //
   // Tags
   //
-  Future getTags() {
+  Stream getTags() {
     return db.getTags();
   }
 
-  Future getTagById(int id) {
+  Stream getTagById(int id) {
     return db.getTagById(id);
   }
 
@@ -69,8 +69,8 @@ class Repository {
     return db.deleteTagById(tag.id);
   }
 
-  Future getTagsForArtist(int artistId) {
-    return db.tagsForArtist(artistId).get();
+  Stream getTagsForArtist(int artistId) {
+    return db.tagsForArtist(artistId).watch();
   }
 
   Future deleteAllTags() {
@@ -126,9 +126,9 @@ class Repository {
 
   Future _getEntityById<E>(int id) {
     if (E == Artist) {
-      return db.getArtistById(id);
+      return db.getArtistById(id).last;
     } else if (E == Tag) {
-      return db.getTagById(id);
+      return db.getTagById(id).last;
     } else {
       return Future.error(
           new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString()));

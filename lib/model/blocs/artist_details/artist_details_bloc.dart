@@ -1,46 +1,51 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/bloc_helpers/create_artist_bloc_helper.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
+import 'package:moodtag/model/events/LibraryEvent.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import 'artist_details_state.dart';
 
-class ArtistDetailsBloc extends Bloc<ArtistEvent, ArtistDetailsState> {
-  final Repository repository;
+class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
+  final Repository _repository;
+  StreamSubscription _artistStreamSubscription;
+  StreamSubscription _tagsForArtistStreamSubscription;
   final CreateArtistBlocHelper createArtistBlocHelper = CreateArtistBlocHelper();
 
-  ArtistDetailsBloc({this.repository}) : super(ArtistDetailsState()) {
-    on<GetSelectedArtist>(_mapGetSelectedArtistEventToState);
+  ArtistDetailsBloc(this._repository, int artistId) : super(ArtistDetailsState(artistId: artistId)) {
+    on<ArtistUpdated>(_mapArtistUpdatedEventToState);
+    on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
     on<CreateArtists>(_mapCreateArtistsEventToState);
+
+    _artistStreamSubscription =
+        _repository.getArtistById(artistId).listen((artistFromStream) => add(ArtistUpdated(artistFromStream)));
+    _tagsForArtistStreamSubscription =
+        _repository.getTagsForArtist(artistId).listen((tagsListFromStream) => add(TagsListUpdated(tagsListFromStream)));
   }
 
-  void _mapGetSelectedArtistEventToState(GetSelectedArtist event, Emitter<ArtistDetailsState> emit) async {
-    emit(state.copyWith(artistLoadingStatus: LoadingStatus.loading));
-    try {
-      final artist = await repository.getArtistById(state.artistId);
-      emit(
-        state.copyWith(artistLoadingStatus: LoadingStatus.success, artist: artist),
-      );
-      await _loadTagsForArtist();
-    } catch (error, stacktrace) {
-      print(stacktrace);
+  Future<void> close() async {
+    _artistStreamSubscription.cancel();
+    _tagsForArtistStreamSubscription.cancel();
+    super.close();
+  }
+
+  void _mapArtistUpdatedEventToState(ArtistUpdated event, Emitter<ArtistDetailsState> emit) {
+    if (event.artist != null) {
+      emit(state.copyWith(artist: event.artist, artistLoadingStatus: LoadingStatus.success));
+    } else {
       emit(state.copyWith(artistLoadingStatus: LoadingStatus.error));
     }
   }
 
-  void _loadTagsForArtist() async {
-    emit(
-      state.copyWith(tagsListLoadingStatus: LoadingStatus.loading),
-    );
-    try {
-      final tagsForArtist = await repository.getTagsForArtist(state.artistId);
-      emit(
-        state.copyWith(tagsListLoadingStatus: LoadingStatus.success, tagsForArtist: tagsForArtist),
-      );
-    } catch (error, stacktrace) {
-      print(stacktrace);
+  void _mapTagsListUpdatedEventToState(TagsListUpdated event, Emitter<ArtistDetailsState> emit) {
+    if (event.tags != null) {
+      emit(state.copyWith(tagsForArtist: event.tags, tagsListLoadingStatus: LoadingStatus.success));
+    } else {
       emit(state.copyWith(tagsListLoadingStatus: LoadingStatus.error));
     }
   }
@@ -50,6 +55,6 @@ class ArtistDetailsBloc extends Bloc<ArtistEvent, ArtistDetailsState> {
   }
 
   void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistDetailsState> emit) async {
-    await createArtistBlocHelper.handleCreateArtistEvent(event, repository);
+    await createArtistBlocHelper.handleCreateArtistEvent(event, _repository);
   }
 }

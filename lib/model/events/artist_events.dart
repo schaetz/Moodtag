@@ -1,22 +1,27 @@
-import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 
-abstract class ArtistEvent extends Equatable {
+import 'LibraryEvent.dart';
+
+abstract class ArtistEvent extends LibraryEvent {
   const ArtistEvent();
 }
 
-class GetSelectedArtist extends ArtistEvent {
-  final int id;
+class ArtistUpdated extends ArtistEvent {
+  final Artist artist;
 
-  const GetSelectedArtist(this.id);
+  ArtistUpdated(this.artist);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [artist];
 }
 
-class GetArtists extends ArtistEvent {
+class ArtistsListUpdated extends ArtistEvent {
+  final List<Artist> artists;
+
+  ArtistsListUpdated(this.artists);
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [artists];
 }
 
 class OpenCreateArtistDialog extends ArtistEvent {

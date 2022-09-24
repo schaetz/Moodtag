@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
+import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
-import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
+import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/artist_details_screen.dart';
 import 'package:moodtag/screens/artists_list_screen.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_import_screen.dart';
@@ -35,13 +36,16 @@ class Routes {
 
   Map<String, Widget Function(BuildContext)> getRoutes() {
     return {
-      artistsList: (context) => ArtistsListScreen(),
-      tagsList: (context) => TagsListScreen(),
+      artistsList: (context) =>
+          BlocProvider(create: (_) => ArtistsListBloc(context.read<Repository>()), child: const ArtistsListScreen()),
+      tagsList: (context) =>
+          BlocProvider(create: (_) => TagsListBloc(context.read<Repository>()), child: const TagsListScreen()),
       artistsDetails: (context) => BlocProvider(
-          create: (_) => ArtistDetailsBloc()..add(GetSelectedArtist(ModalRoute.of(context).settings.arguments as int)),
+          create: (_) =>
+              ArtistDetailsBloc(context.read<Repository>(), ModalRoute.of(context).settings.arguments as int),
           child: const ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
-          create: (_) => TagDetailsBloc()..add(GetSelectedTag(ModalRoute.of(context).settings.arguments as int)),
+          create: (_) => TagDetailsBloc(context.read<Repository>(), ModalRoute.of(context).settings.arguments as int),
           child: const TagDetailsScreen()),
       lastFmImport: (context) => LastfmImportScreen(),
       spotifyImport: (context) => ImportFlow(),

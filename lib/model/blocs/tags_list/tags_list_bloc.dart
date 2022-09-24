@@ -1,29 +1,33 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/events/LibraryEvent.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/tag_events.dart';
 import '../loading_status.dart';
 import 'tags_list_state.dart';
 
-class TagsListBloc extends Bloc<TagEvent, TagsListState> {
-  final Repository repository;
+class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
+  final Repository _repository;
+  StreamSubscription _tagsStreamSubscription;
 
-  TagsListBloc({this.repository}) : super(const TagsListState()) {
-    on<GetTags>(_mapGetTagsEventToState);
+  TagsListBloc(this._repository) : super(const TagsListState()) {
+    on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
+
+    _tagsStreamSubscription =
+        _repository.getTags().listen((tagsListFromStream) => add(TagsListUpdated(tagsListFromStream)));
   }
 
-  void _mapGetTagsEventToState(GetTags event, Emitter<TagsListState> emit) async {
-    emit(state.copyWith(loadingStatus: LoadingStatus.loading));
-    try {
-      final tags = await repository.getTags();
-      emit(
-        state.copyWith(
-          loadingStatus: LoadingStatus.success,
-          tags: tags,
-        ),
-      );
-    } catch (error, stacktrace) {
-      print(stacktrace);
+  Future<void> close() async {
+    _tagsStreamSubscription.cancel();
+    super.close();
+  }
+
+  void _mapTagsListUpdatedEventToState(TagsListUpdated event, Emitter<TagsListState> emit) {
+    if (event.tags != null) {
+      emit(state.copyWith(tags: event.tags, loadingStatus: LoadingStatus.success));
+    } else {
       emit(state.copyWith(loadingStatus: LoadingStatus.error));
     }
   }

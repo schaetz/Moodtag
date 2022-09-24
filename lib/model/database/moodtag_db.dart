@@ -21,24 +21,24 @@ class MoodtagDB extends _$MoodtagDB {
   //
   // GET
   //
-  Future<List<Artist>> getArtists() {
-    return (select(artists).get());
+  Stream<List<Artist>> getArtists() {
+    return (select(artists).watch());
   }
 
-  Future<Artist> getArtistById(int artistId) {
-    return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull();
+  Stream<Artist> getArtistById(int artistId) {
+    return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull().asStream();
   }
 
   Future<Artist> getArtistByName(String artistName) {
     return (select(artists)..where((t) => t.name.equals(artistName))).getSingleOrNull();
   }
 
-  Future<List<Tag>> getTags() {
-    return (select(tags).get());
+  Stream<List<Tag>> getTags() {
+    return (select(tags).watch());
   }
 
-  Future<Tag> getTagById(int tagId) {
-    return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
+  Stream<Tag> getTagById(int tagId) {
+    return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull().asStream();
   }
 
   Future<Tag> getTagByName(String tagName) {
