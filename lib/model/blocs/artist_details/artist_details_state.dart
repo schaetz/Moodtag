@@ -34,6 +34,6 @@ class ArtistDetailsState extends Equatable {
         artist: artist ?? this.artist,
         tagsListLoadingStatus: tagsListLoadingStatus ?? this.tagsListLoadingStatus,
         tagsForArtist: tagsForArtist ?? this.tagsForArtist,
-        tagEditMode: tagEditMode);
+        tagEditMode: tagEditMode ?? this.tagEditMode);
   }
 }

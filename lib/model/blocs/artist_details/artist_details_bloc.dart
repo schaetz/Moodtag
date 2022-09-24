@@ -16,7 +16,8 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
   StreamSubscription _tagsForArtistStreamSubscription;
   final CreateArtistBlocHelper createArtistBlocHelper = CreateArtistBlocHelper();
 
-  ArtistDetailsBloc(this._repository, int artistId) : super(ArtistDetailsState(artistId: artistId)) {
+  ArtistDetailsBloc(this._repository, int artistId)
+      : super(ArtistDetailsState(artistId: artistId, tagEditMode: false)) {
     on<ArtistUpdated>(_mapArtistUpdatedEventToState);
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);

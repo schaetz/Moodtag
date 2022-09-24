@@ -28,6 +28,10 @@ class ArtistDetailsScreen extends StatelessWidget {
                 current.artistLoadingStatus.isSuccess &&
                 current.tagsListLoadingStatus.isSuccess, // TODO Show artist even when tags list is not available
             builder: (context, state) {
+              if (!state.artistLoadingStatus.isSuccess) {
+                return null;
+              }
+
               return ListView(children: [
                 Padding(
                   padding: EdgeInsets.only(bottom: 12.0),
