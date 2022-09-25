@@ -6,7 +6,8 @@ class SimpleTextInputDialogBase extends StatelessWidget {
   final String confirmationButtonLabel;
   final Function(String) onSendInput;
 
-  const SimpleTextInputDialogBase({Key key, this.message, this.confirmationButtonLabel, this.onSendInput})
+  const SimpleTextInputDialogBase(
+      {Key? key, required this.message, required this.confirmationButtonLabel, required this.onSendInput})
       : super(key: key);
 
   @override

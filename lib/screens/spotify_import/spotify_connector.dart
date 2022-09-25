@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:moodtag/exceptions/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/helpers.dart';
@@ -23,7 +24,7 @@ const redirectUri = 'http://localhost:8888/callback';
 
 const topItemsLimit = 50;
 
-String codeVerifier;
+String? codeVerifier;
 
 Uri getSpotifyAuthUri() {
   var state = getRandomString(16);
@@ -73,7 +74,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
   };
 
   final uri = Uri.https(spotifyApiBaseUrl, followedArtistsSubroute, queryParameters);
-  final response = await http.get(uri, headers: _getHeader(accessToken));
+  final response = await http.get(uri, headers: _getHeader(accessToken) as Map<String, String>);
 
   if (!isHttpRequestSuccessful(response)) {
     throw ExternalServiceQueryException(_getRequestErrorMessage(response));
@@ -103,7 +104,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
   };
 
   final uri = Uri.https(spotifyApiBaseUrl, topArtistsSubroute, queryParameters);
-  final response = await http.get(uri, headers: _getHeader(accessToken));
+  final response = await http.get(uri, headers: _getHeader(accessToken) as Map<String, String>);
 
   if (!isHttpRequestSuccessful(response)) {
     throw ExternalServiceQueryException(_getRequestErrorMessage(response));
@@ -141,7 +142,8 @@ String _getRequestErrorMessage(Response response) {
 
 String _generateCodeChallenge() {
   codeVerifier = getRandomStringOfRandomLength(43, 128, useSpecialChars: true);
-  final bytes = utf8.encode(codeVerifier);
+  if (codeVerifier == null) throw UnknownError('An error occurred trying to connect to the Spotify API.');
+  final bytes = utf8.encode(codeVerifier!);
   final hashed = sha256.convert(bytes);
   final base64UrlEncoded = base64Url.encode(hashed.bytes).replaceAll("=", "").replaceAll("+", "-").replaceAll("/", "_");
   return base64UrlEncoded;

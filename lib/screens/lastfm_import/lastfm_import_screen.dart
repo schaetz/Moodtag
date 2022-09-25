@@ -17,7 +17,7 @@ class LastfmImportScreen extends StatefulWidget {
 }
 
 class _LastfmImportScreenState extends State<LastfmImportScreen> {
-  Repository bloc;
+  late final Repository bloc;
   StreamController<String> accountNameStreamController = StreamController<String>();
 
   @override
@@ -47,10 +47,10 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
 
   void _updateAccountNameFromDatabase() => bloc
       .getUserProperty(UserPropertiesIndex.USER_PROPERTY_LASTFM_ACCOUNT_NAME)
-      .then((value) => accountNameStreamController.add(value));
+      .then((value) => value != null ? accountNameStreamController.add(value) : {});
 
   void _openSetAccountNameDialog(BuildContext context) async {
-    String newAccountName = await AddExternalAccountDialog(context, widget.serviceName).show();
+    String? newAccountName = await AddExternalAccountDialog(context, widget.serviceName).show();
     if (newAccountName != null) {
       _setAccountName(newAccountName);
     }
@@ -58,7 +58,7 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
 
   // TODO Error handling
   void _setAccountName(String newAccountName) async {
-    final userInfo = await getUserInfo(newAccountName).onError((error, stackTrace) => throw error);
+    final userInfo = await getUserInfo(newAccountName).onError((error, stackTrace) => error != null ? throw error : {});
     print(userInfo); // TODO Can be removed
 
     bloc

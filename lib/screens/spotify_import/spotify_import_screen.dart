@@ -46,10 +46,10 @@ void _conductSpotifyImport(BuildContext context, Map<String, bool> selections) a
 
     final availableSpotifyArtists = UniqueNamedEntitySet<ImportedArtist>();
 
-    if (selections[IMPORT_OPTION_TOP_ARTISTS]) {
+    if (selections[IMPORT_OPTION_TOP_ARTISTS] == true) {
       availableSpotifyArtists.addAll(await getTopArtists(accessToken, 50, 0));
     }
-    if (selections[IMPORT_OPTION_FOLLOWED_ARTISTS]) {
+    if (selections[IMPORT_OPTION_FOLLOWED_ARTISTS] == true) {
       availableSpotifyArtists.addAll(await getFollowedArtists(accessToken));
     }
 
@@ -57,7 +57,8 @@ void _conductSpotifyImport(BuildContext context, Map<String, bool> selections) a
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No artists to import.")));
     } else {
       context.flow<ImportFlowState>().update((state) => state.copyWith(
-          availableSpotifyArtists: availableSpotifyArtists, doImportGenres: selections[IMPORT_OPTION_ARTIST_GENRES]));
+          availableSpotifyArtists: availableSpotifyArtists,
+          doImportGenres: selections[IMPORT_OPTION_ARTIST_GENRES] ?? false));
     }
   } catch (e) {
     print("Spotify import failed: $e");

@@ -25,13 +25,13 @@ class Routes {
 
   static const initialRoute = artistsList;
 
-  static Routes _instance;
+  static Routes? _instance;
 
   static Routes instance() {
     if (_instance == null) {
       _instance = new Routes();
     }
-    return _instance;
+    return _instance!;
   }
 
   Map<String, Widget Function(BuildContext)> getRoutes() {
@@ -42,10 +42,10 @@ class Routes {
           BlocProvider(create: (_) => TagsListBloc(context.read<Repository>()), child: const TagsListScreen()),
       artistsDetails: (context) => BlocProvider(
           create: (_) =>
-              ArtistDetailsBloc(context.read<Repository>(), ModalRoute.of(context).settings.arguments as int),
+              ArtistDetailsBloc(context.read<Repository>(), ModalRoute.of(context)?.settings.arguments as int),
           child: const ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
-          create: (_) => TagDetailsBloc(context.read<Repository>(), ModalRoute.of(context).settings.arguments as int),
+          create: (_) => TagDetailsBloc(context.read<Repository>(), ModalRoute.of(context)?.settings.arguments as int),
           child: const TagDetailsScreen()),
       lastFmImport: (context) => LastfmImportScreen(),
       spotifyImport: (context) => ImportFlow(),

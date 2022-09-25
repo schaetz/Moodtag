@@ -19,21 +19,21 @@ import 'abstract_dialog.dart';
 /// O: Type of the other entity that might be affected
 /// (E=artist => O=tag and vice versa)
 class AddEntityDialog<B extends Bloc, E, O> extends AbstractDialog {
-  static Future openAddArtistDialog<B extends Bloc>(BuildContext context, {Tag preselectedTag}) async {
+  static Future openAddArtistDialog<B extends Bloc>(BuildContext context, {Tag? preselectedTag}) async {
     final dialog = preselectedTag != null
         ? new AddEntityDialog<B, Artist, Tag>.withPreselectedOtherEntity(context, preselectedTag)
         : new AddEntityDialog<B, Artist, Tag>(context);
     return await dialog.show();
   }
 
-  static Future openAddTagDialog<B extends Bloc>(BuildContext context, {Artist preselectedArtist}) async {
+  static Future openAddTagDialog<B extends Bloc>(BuildContext context, {Artist? preselectedArtist}) async {
     final dialog = preselectedArtist != null
         ? new AddEntityDialog<B, Tag, Artist>.withPreselectedOtherEntity(context, preselectedArtist)
         : new AddEntityDialog<B, Tag, Artist>(context);
     return await dialog.show();
   }
 
-  O preselectedOtherEntity;
+  O? preselectedOtherEntity;
 
   AddEntityDialog(BuildContext context) : super(context);
   AddEntityDialog.withPreselectedOtherEntity(BuildContext context, this.preselectedOtherEntity) : super(context);
@@ -85,9 +85,11 @@ class AddEntityDialog<B extends Bloc, E, O> extends AbstractDialog {
   // }
 
   void showErrorInSnackbar(List<DbRequestResponse> exceptionResponses, bool preselectedOther) {
-    UserReadableException userFeedbackException = getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
+    UserReadableException? userFeedbackException = getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
 
-    if (userFeedbackException is NameAlreadyTakenException && preselectedOther) {
+    if (userFeedbackException == null) {
+      // Ignore if there was no actual error (this should never happen)
+    } else if (userFeedbackException is NameAlreadyTakenException && preselectedOther) {
       // Do not show an error message if the already existing entity
       // is assigned to a preselected other entity
     } else {

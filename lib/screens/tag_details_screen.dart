@@ -30,10 +30,14 @@ class TagDetailsScreen extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Padding(
                 padding: EdgeInsets.only(bottom: 12.0),
-                child: Text(state.tag.name + ' (' + state.artistsWithTag.length.toString() + ')', style: tagNameStyle),
+                child: state.tag != null && state.artistsWithTag != null
+                    ? Text(state.tag!.name + ' (' + state.artistsWithTag!.length.toString() + ')', style: tagNameStyle)
+                    : Text(''),
               ),
               Expanded(child: Builder(builder: (BuildContext context) {
-                if (state.artistsWithTag.isEmpty) {
+                if (state.artistsWithTag == null || state.tag == null) {
+                  return Container(); // TODO Show loading symbol or somethink alike
+                } else if (state.artistsWithTag!.isEmpty) {
                   return const Align(
                     alignment: Alignment.center,
                     child: Text('No artists with this tag', style: listEntryStyle),
@@ -43,9 +47,9 @@ class TagDetailsScreen extends StatelessWidget {
                 return ListView.separated(
                   separatorBuilder: (context, _) => Divider(),
                   padding: EdgeInsets.all(16.0),
-                  itemCount: state.artistsWithTag.length,
+                  itemCount: state.artistsWithTag!.length,
                   itemBuilder: (context, i) {
-                    return _buildArtistRow(context, state, state.artistsWithTag[i]);
+                    return _buildArtistRow(context, state, state.artistsWithTag![i]);
                   },
                 );
               })),
@@ -62,6 +66,7 @@ class TagDetailsScreen extends StatelessWidget {
     );
   }
 
+  // TODO Replace state parameter by non-nullable parameters for individual properties
   Widget _buildArtistRow(BuildContext context, TagDetailsState state, Artist artist) {
     return ListTile(
         title: Text(
@@ -69,6 +74,6 @@ class TagDetailsScreen extends StatelessWidget {
           style: listEntryStyle,
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
-        onLongPress: () => RemoveTagFromArtistDialog.openNew(context, state.tag, artist));
+        onLongPress: () => RemoveTagFromArtistDialog.openNew(context, state.tag!, artist));
   }
 }

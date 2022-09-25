@@ -5,9 +5,9 @@ import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 
 class DbRequestResponse<E> {
-  E changedEntity;
-  List<Object> parameters;
-  Exception exception;
+  late final E changedEntity;
+  late final List<Object> parameters;
+  late final Exception exception;
 
   DbRequestResponse.success(this.changedEntity, parameters);
   DbRequestResponse.fail(this.exception, parameters);
@@ -29,7 +29,7 @@ class DbRequestResponse<E> {
     return exception != null && exception is SqliteException;
   }
 
-  SqliteException getSqliteException() {
+  SqliteException? getSqliteException() {
     if (isSqliteException()) {
       return exception as SqliteException;
     }
@@ -38,8 +38,9 @@ class DbRequestResponse<E> {
 
   UserReadableException getUserFeedbackException() {
     if (isSqliteException()) {
-      if (getSqliteException().extendedResultCode == 2067) {
-        String alreadyExistingName = _getStringParameter(0);
+      final sqliteException = getSqliteException();
+      if (sqliteException?.extendedResultCode == 2067) {
+        String? alreadyExistingName = _getStringParameter(0);
         final message = alreadyExistingName != null
             ? 'There is already an entity with the name $alreadyExistingName.'
             : 'There is already an entity with the same name.';
@@ -51,7 +52,7 @@ class DbRequestResponse<E> {
     }
   }
 
-  String _getStringParameter(int index) {
+  String? _getStringParameter(int index) {
     if (parameters != null && parameters.length >= index + 1 && parameters[index] is String) {
       return parameters[index] as String;
     }
@@ -59,9 +60,9 @@ class DbRequestResponse<E> {
   }
 }
 
-UserReadableException getHighestSeverityExceptionForMultipleResponses(List<DbRequestResponse> exceptionResponses) {
+UserReadableException? getHighestSeverityExceptionForMultipleResponses(List<DbRequestResponse> exceptionResponses) {
   ExceptionSeverity highestSeverity = ExceptionSeverity.LOW;
-  UserReadableException highestSeverityException;
+  UserReadableException? highestSeverityException;
 
   for (DbRequestResponse response in exceptionResponses) {
     UserReadableException userFeedbackException = response.getUserFeedbackException();

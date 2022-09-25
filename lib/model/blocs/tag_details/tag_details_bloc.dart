@@ -11,10 +11,10 @@ import 'tag_details_state.dart';
 
 class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> {
   final Repository _repository;
-  StreamSubscription _tagStreamSubscription;
-  StreamSubscription _artistsWithTagStreamSubscription;
+  late final StreamSubscription _tagStreamSubscription;
+  late final StreamSubscription _artistsWithTagStreamSubscription;
 
-  TagDetailsBloc(this._repository, int tagId) : super(TagDetailsState(tagId: tagId)) {
+  TagDetailsBloc(this._repository, int tagId) : super(TagDetailsState(tagId: tagId, tagEditMode: false)) {
     on<TagUpdated>(_mapTagUpdatedEventToState);
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
 

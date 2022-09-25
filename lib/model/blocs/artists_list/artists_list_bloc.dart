@@ -11,10 +11,10 @@ import 'artists_list_state.dart';
 
 class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
   final Repository _repository;
-  StreamSubscription _artistsStreamSubscription;
+  late final StreamSubscription _artistsStreamSubscription;
   final CreateArtistBlocHelper createArtistBlocHelper = CreateArtistBlocHelper();
 
-  ArtistsListBloc(this._repository) : super(const ArtistsListState()) {
+  ArtistsListBloc(this._repository) : super(ArtistsListState()) {
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
     on<OpenCreateArtistDialog>(_mapOpenCreateArtistDialogEventToState);
     on<CloseCreateArtistDialog>(_mapCloseCreateArtistDialogEventToState);
@@ -48,8 +48,8 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
     if (state.showCreateArtistDialog) _closeCreateArtistDialog(emit);
   }
 
-  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) async {
-    await createArtistBlocHelper.handleCreateArtistEvent(event, _repository);
+  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) {
+    createArtistBlocHelper.handleCreateArtistEvent(event, _repository);
     _closeCreateArtistDialog(emit);
   }
 

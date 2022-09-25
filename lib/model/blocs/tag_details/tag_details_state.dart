@@ -5,35 +5,35 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 class TagDetailsState extends Equatable {
   final int tagId;
   final LoadingStatus tagLoadingStatus;
-  final Tag tag;
+  final Tag? tag;
   final LoadingStatus artistsListLoadingStatus;
-  final List<Artist> artistsWithTag;
+  final List<Artist>? artistsWithTag;
   final bool tagEditMode;
 
   const TagDetailsState(
-      {this.tagId,
+      {required this.tagId,
       this.tagLoadingStatus = LoadingStatus.initial,
       this.tag,
       this.artistsListLoadingStatus = LoadingStatus.initial,
       this.artistsWithTag,
-      this.tagEditMode});
+      required this.tagEditMode});
 
   @override
-  List<Object> get props => [tagId, tagLoadingStatus, tag, artistsListLoadingStatus, artistsWithTag, tagEditMode];
+  List<Object?> get props => [tagId, tagLoadingStatus, tag, artistsListLoadingStatus, artistsWithTag, tagEditMode];
 
   TagDetailsState copyWith(
-      {int tagId,
-      LoadingStatus tagLoadingStatus,
-      Tag tag,
-      LoadingStatus artistsListLoadingStatus,
-      List<Artist> artistsWithTag,
-      bool tagEditMode}) {
+      {int? tagId,
+      LoadingStatus? tagLoadingStatus,
+      Tag? tag,
+      LoadingStatus? artistsListLoadingStatus,
+      List<Artist>? artistsWithTag,
+      bool? tagEditMode}) {
     return TagDetailsState(
         tagId: tagId ?? this.tagId,
         tagLoadingStatus: tagLoadingStatus ?? this.tagLoadingStatus,
         tag: tag ?? this.tag,
         artistsListLoadingStatus: artistsListLoadingStatus ?? this.artistsListLoadingStatus,
         artistsWithTag: artistsWithTag ?? this.artistsWithTag,
-        tagEditMode: tagEditMode);
+        tagEditMode: tagEditMode ?? this.tagEditMode);
   }
 }

@@ -10,7 +10,7 @@ class I10n {
   static const TAG_DENOTATION_SINGULAR = 'tag';
   static const TAG_DENOTATION_PLURAL = 'tags';
 
-  static String getEntityDenotation({Type type, bool plural = false}) {
+  static String getEntityDenotation({required Type type, bool plural = false}) {
     if (type == Artist) {
       return plural ? I10n.ARTIST_DENOTATION_PLURAL : I10n.ARTIST_DENOTATION_SINGULAR;
     } else if (type == Tag) {

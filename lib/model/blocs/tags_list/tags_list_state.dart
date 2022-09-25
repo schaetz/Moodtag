@@ -6,14 +6,15 @@ class TagsListState extends Equatable {
   final LoadingStatus loadingStatus;
   final List<Tag> tags;
 
-  const TagsListState(
-      {this.loadingStatus = LoadingStatus.initial, List<Tag> tags, Tag selectedTag, List<Artist> artistsWithTag})
-      : tags = tags ?? const [];
+  const TagsListState({
+    this.loadingStatus = LoadingStatus.initial,
+    List<Tag>? tags,
+  }) : tags = tags ?? const [];
 
   @override
   List<Object> get props => [loadingStatus, tags];
 
-  TagsListState copyWith({LoadingStatus loadingStatus, List<Tag> tags}) {
+  TagsListState copyWith({LoadingStatus? loadingStatus, List<Tag>? tags}) {
     return TagsListState(loadingStatus: loadingStatus ?? this.loadingStatus, tags: tags ?? this.tags);
   }
 }

@@ -10,9 +10,9 @@ class SelectionListScreen<T extends NamedEntity> extends StatefulWidget {
   final Function(BuildContext, List<T>, List<bool>, int) onMainButtonPressed;
 
   SelectionListScreen({
-    this.namedEntitySet,
-    this.mainButtonLabel,
-    this.onMainButtonPressed,
+    required this.namedEntitySet,
+    required this.mainButtonLabel,
+    required this.onMainButtonPressed,
   });
 
   @override
@@ -22,25 +22,25 @@ class SelectionListScreen<T extends NamedEntity> extends StatefulWidget {
 class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionListScreen> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  List<bool> _isBoxSelected;
-  int _selectedBoxesCount;
+  late final List<T> _sortedEntities;
+  late final List<bool> _isBoxSelected;
+  late final int _selectedBoxesCount;
+
+  _SelectionListScreenState() {
+    _sortedEntities = widget.namedEntitySet.toSortedList() as List<T>;
+    _setBoxSelections(_sortedEntities.length, true);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<T> sortedEntities = widget.namedEntitySet.toSortedList();
-
-    if (_isBoxSelected == null) {
-      _setBoxSelections(sortedEntities.length, true);
-    }
-
     return Scaffold(
       appBar: MtAppBar(context),
       body: ListView.separated(
         separatorBuilder: (context, _) => Divider(),
         padding: EdgeInsets.all(16.0),
-        itemCount: sortedEntities.length,
+        itemCount: _sortedEntities.length,
         itemBuilder: (context, i) {
-          return _buildRow(context, sortedEntities[i].name, i);
+          return _buildRow(context, _sortedEntities[i].name, i);
         },
       ),
       floatingActionButton: Container(
@@ -50,10 +50,11 @@ class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionLi
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(left: 32),
-              child: _buildFloatingSelectButton(context, sortedEntities.length),
+              child: _buildFloatingSelectButton(context, _sortedEntities.length),
             ),
             FloatingActionButton.extended(
-              onPressed: () => widget.onMainButtonPressed(context, sortedEntities, _isBoxSelected, _selectedBoxesCount),
+              onPressed: () =>
+                  widget.onMainButtonPressed(context, _sortedEntities, _isBoxSelected, _selectedBoxesCount),
               label: Text(widget.mainButtonLabel),
               icon: const Icon(Icons.add_circle_outline),
               backgroundColor: Theme.of(context).colorScheme.secondary,
@@ -81,13 +82,15 @@ class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionLi
         ),
         value: _isBoxSelected[index],
         controlAffinity: ListTileControlAffinity.leading,
-        onChanged: (bool newValue) {
+        onChanged: (bool? newValue) {
           setState(() {
-            _isBoxSelected[index] = newValue;
-            if (newValue == true) {
-              _selectedBoxesCount++;
-            } else {
-              _selectedBoxesCount--;
+            if (newValue != null) {
+              _isBoxSelected[index] = newValue;
+              if (newValue == true) {
+                _selectedBoxesCount++;
+              } else {
+                _selectedBoxesCount--;
+              }
             }
           });
         });

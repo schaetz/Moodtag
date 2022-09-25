@@ -10,9 +10,9 @@ import 'tags_list_state.dart';
 
 class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
   final Repository _repository;
-  StreamSubscription _tagsStreamSubscription;
+  late final StreamSubscription _tagsStreamSubscription;
 
-  TagsListBloc(this._repository) : super(const TagsListState()) {
+  TagsListBloc(this._repository) : super(TagsListState()) {
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
 
     _tagsStreamSubscription =

@@ -189,14 +189,14 @@ packages:
       name: drift
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.7.1"
+    version: "2.1.0"
   drift_dev:
     dependency: "direct dev"
     description:
       name: drift_dev
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.7.1"
+    version: "2.1.0"
   equatable:
     dependency: "direct main"
     description:
@@ -259,12 +259,10 @@ packages:
   flutter_webview_plugin:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: f85db45aedefeab4c1df75cfc4c35f62d3c1c629
-      url: "https://github.com/nuc134r/flutter_webview_plugin.git"
-    source: git
-    version: "0.3.11"
+      name: flutter_webview_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -369,7 +367,7 @@ packages:
       name: multiple_stream_builder
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "3.0.2"
   nested:
     dependency: transitive
     description:
@@ -489,13 +487,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
-  quiver:
-    dependency: transitive
-    description:
-      name: quiver
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.1.0"
   recase:
     dependency: transitive
     description:
@@ -563,7 +554,7 @@ packages:
       name: sqlparser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.22.0"
+    version: "0.23.2"
   stack_trace:
     dependency: transitive
     description:
@@ -613,13 +604,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  tuple:
-    dependency: transitive
-    description:
-      name: tuple
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   typed_data:
     dependency: transitive
     description:

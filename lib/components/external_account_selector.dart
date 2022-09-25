@@ -10,7 +10,11 @@ class ExternalAccountSelector extends StatefulWidget {
   final Function onRemoveAccountClick;
 
   const ExternalAccountSelector(
-      {Key key, this.serviceName, this.accountNameStreamController, this.onAddAccountClick, this.onRemoveAccountClick})
+      {Key? key,
+      required this.serviceName,
+      required this.accountNameStreamController,
+      required this.onAddAccountClick,
+      required this.onRemoveAccountClick})
       : super(key: key);
 
   @override
@@ -18,7 +22,7 @@ class ExternalAccountSelector extends StatefulWidget {
 }
 
 class _ExternalAccountSelectorState extends State<ExternalAccountSelector> {
-  Repository bloc;
+  late final Repository bloc;
 
   @override
   void initState() {
@@ -28,13 +32,13 @@ class _ExternalAccountSelectorState extends State<ExternalAccountSelector> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<String>(
-        stream: widget.accountNameStreamController.stream,
+        stream: widget.accountNameStreamController.stream as Stream<String>,
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
           return _accountNameContainer(snapshot.data);
         });
   }
 
-  Widget _accountNameContainer(String accountName) {
+  Widget _accountNameContainer(String? accountName) {
     return Container(
       alignment: Alignment.center,
       color: Theme.of(context).colorScheme.background,

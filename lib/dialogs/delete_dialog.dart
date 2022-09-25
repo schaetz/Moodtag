@@ -6,15 +6,15 @@ import 'package:provider/provider.dart';
 import 'abstract_dialog.dart';
 
 class DeleteDialog<T> extends AbstractDialog<bool> {
-  static void openNew<T>(BuildContext context, {T entityToDelete, bool resetLibrary = false}) {
+  static void openNew<T>(BuildContext context, {T? entityToDelete, bool resetLibrary = false}) {
     print(entityToDelete);
     new DeleteDialog<T>(context, entityToDelete: entityToDelete, resetLibrary: resetLibrary).show();
   }
 
   bool resetLibrary = false;
-  T entityToDelete;
+  T? entityToDelete;
 
-  DeleteDialog(BuildContext context, {this.entityToDelete, this.resetLibrary = false}) : super(context);
+  DeleteDialog(BuildContext context, {required this.entityToDelete, this.resetLibrary = false}) : super(context);
 
   @override
   StatelessWidget buildDialog(BuildContext context) {
@@ -22,8 +22,8 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
       title: FutureBuilder<String>(
           future: determineDialogTextForDeleteEntity(context),
           builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-            if (snapshot.hasData) {
-              return Text(snapshot.data);
+            if (snapshot.hasData && snapshot.data != null) {
+              return Text(snapshot.data!);
             } else {
               return Text('');
             }

@@ -26,7 +26,7 @@ void main() {
 class MoodtagApp extends StatefulWidget {
   static const appTitle = 'Moodtag';
 
-  MoodtagApp({Key key}) : super(key: key);
+  MoodtagApp({Key? key}) : super(key: key);
 
   @override
   _AppState createState() => _AppState();

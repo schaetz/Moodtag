@@ -5,7 +5,7 @@ abstract class AbstractDialog<T> {
 
   AbstractDialog(this.context);
 
-  Future<T> show() async {
+  Future<T?> show() async {
     return await showDialog<T>(context: context, builder: (_) => buildDialog(this.context));
   }
 
@@ -13,7 +13,7 @@ abstract class AbstractDialog<T> {
   // to be able to use @protected collides with "flutter_test"
   StatelessWidget buildDialog(BuildContext context);
 
-  void closeDialog(BuildContext context, {T result}) {
+  void closeDialog(BuildContext context, {T? result}) {
     Navigator.pop(context, result);
   }
 }

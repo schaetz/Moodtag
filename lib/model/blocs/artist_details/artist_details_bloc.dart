@@ -12,8 +12,8 @@ import 'artist_details_state.dart';
 
 class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
   final Repository _repository;
-  StreamSubscription _artistStreamSubscription;
-  StreamSubscription _tagsForArtistStreamSubscription;
+  late final StreamSubscription _artistStreamSubscription;
+  late final StreamSubscription _tagsForArtistStreamSubscription;
   final CreateArtistBlocHelper createArtistBlocHelper = CreateArtistBlocHelper();
 
   ArtistDetailsBloc(this._repository, int artistId)
@@ -55,7 +55,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
     emit(state.copyWith(tagEditMode: !state.tagEditMode));
   }
 
-  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistDetailsState> emit) async {
-    await createArtistBlocHelper.handleCreateArtistEvent(event, _repository);
+  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistDetailsState> emit) {
+    createArtistBlocHelper.handleCreateArtistEvent(event, _repository);
   }
 }

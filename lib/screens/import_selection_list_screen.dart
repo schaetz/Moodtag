@@ -14,11 +14,11 @@ class ImportSelectionListScreen<N extends NamedEntity> extends StatelessWidget {
   final String entityDenotationPlural;
 
   const ImportSelectionListScreen(
-      {Key key,
-      this.namedEntitySet,
+      {Key? key,
+      required this.namedEntitySet,
       this.confirmationButtonLabel = "Import",
-      this.entityDenotationSingular,
-      this.entityDenotationPlural})
+      required this.entityDenotationSingular,
+      required this.entityDenotationPlural})
       : super(key: key);
 
   @override

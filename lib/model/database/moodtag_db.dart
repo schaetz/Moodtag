@@ -5,7 +5,7 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
-part './moodtag_db.g.dart';
+part 'moodtag_db.g.dart';
 
 @DriftDatabase(include: {'queries.drift'})
 class MoodtagDB extends _$MoodtagDB {
@@ -25,11 +25,11 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(artists).watch());
   }
 
-  Stream<Artist> getArtistById(int artistId) {
+  Stream<Artist?> getArtistById(int artistId) {
     return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull().asStream();
   }
 
-  Future<Artist> getArtistByName(String artistName) {
+  Future<Artist?> getArtistByName(String artistName) {
     return (select(artists)..where((t) => t.name.equals(artistName))).getSingleOrNull();
   }
 
@@ -37,15 +37,15 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(tags).watch());
   }
 
-  Stream<Tag> getTagById(int tagId) {
+  Stream<Tag?> getTagById(int tagId) {
     return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull().asStream();
   }
 
-  Future<Tag> getTagByName(String tagName) {
+  Future<Tag?> getTagByName(String tagName) {
     return (select(tags)..where((t) => t.name.equals(tagName))).getSingleOrNull();
   }
 
-  Future<UserProperty> getUserProperty(String propertyKey) {
+  Future<UserProperty?> getUserProperty(String propertyKey) {
     return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).getSingleOrNull();
   }
 

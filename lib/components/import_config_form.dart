@@ -7,7 +7,11 @@ class ImportConfigForm extends StatefulWidget {
   final Function(BuildContext, Map<String, bool>) onSend;
 
   const ImportConfigForm(
-      {Key key, this.headlineCaption, this.sendButtonCaption, this.configItemsWithCaption, this.onSend})
+      {Key? key,
+      required this.headlineCaption,
+      required this.sendButtonCaption,
+      required this.configItemsWithCaption,
+      required this.onSend})
       : super(key: key);
 
   @override
@@ -15,7 +19,7 @@ class ImportConfigForm extends StatefulWidget {
 }
 
 class _ImportConfigFormState extends State<ImportConfigForm> {
-  Map<String, bool> _selectionsState;
+  late final Map<String, bool> _selectionsState;
 
   @override
   void initState() {
@@ -37,9 +41,11 @@ class _ImportConfigFormState extends State<ImportConfigForm> {
               title: Text(keyAndCaption.value),
               value: _selectionsState[keyAndCaption.key],
               onChanged: (newValue) {
-                setState(() {
-                  _selectionsState[keyAndCaption.key] = newValue;
-                });
+                if (newValue != null) {
+                  setState(() {
+                    _selectionsState[keyAndCaption.key] = newValue;
+                  });
+                }
               },
             )),
         TextButton(

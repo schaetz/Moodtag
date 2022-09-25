@@ -8,16 +8,16 @@ class ArtistsListState extends Equatable {
   final bool showCreateArtistDialog;
 
   const ArtistsListState(
-      {this.loadingStatus = LoadingStatus.initial, List<Artist> artists, this.showCreateArtistDialog = false})
+      {this.loadingStatus = LoadingStatus.initial, List<Artist>? artists, this.showCreateArtistDialog = false})
       : artists = artists ?? const [];
 
   @override
   List<Object> get props => [loadingStatus, artists, showCreateArtistDialog];
 
   ArtistsListState copyWith({
-    LoadingStatus loadingStatus,
-    List<Artist> artists,
-    bool showCreateArtistDialog,
+    LoadingStatus? loadingStatus,
+    List<Artist>? artists,
+    bool? showCreateArtistDialog,
   }) {
     return ArtistsListState(
       loadingStatus: loadingStatus ?? this.loadingStatus,

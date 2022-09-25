@@ -5,7 +5,7 @@
 import 'package:moodtag/structs/named_entity.dart';
 
 class UniqueNamedEntitySet<T extends NamedEntity> {
-  Map<String, T> _entitiesByName;
+  late final Map<String, T> _entitiesByName;
 
   UniqueNamedEntitySet() : _entitiesByName = {};
 

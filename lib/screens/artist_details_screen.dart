@@ -28,14 +28,14 @@ class ArtistDetailsScreen extends StatelessWidget {
                 current.artistLoadingStatus.isSuccess &&
                 current.tagsListLoadingStatus.isSuccess, // TODO Show artist even when tags list is not available
             builder: (context, state) {
-              if (!state.artistLoadingStatus.isSuccess) {
-                return null;
+              if (!state.artistLoadingStatus.isSuccess || state.artist == null || state.tagsForArtist == null) {
+                return Container(); // TODO Show loading symbol or somethink alike
               }
 
               return ListView(children: [
                 Padding(
                   padding: EdgeInsets.only(bottom: 12.0),
-                  child: Text(state.artist.name, style: ArtistDetailsScreen.artistNameStyle),
+                  child: Text(state.artist!.name, style: ArtistDetailsScreen.artistNameStyle),
                 ),
                 _buildTagChipsRow(context, state),
                 Padding(
@@ -73,11 +73,11 @@ class ArtistDetailsScreen extends StatelessWidget {
     }
 
     List<Tag> tagsToDisplay =
-        state.tagEditMode ? state.tagsForArtist : state.tagsForArtist; // TODO Show all tags in tag edit mode
+        state.tagEditMode ? state.tagsForArtist! : state.tagsForArtist!; // TODO Show all tags in tag edit mode
 
     List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (value) {})).toList();
     if (state.tagEditMode) {
-      chipsList.add(_buildAddTagChip(context, state.artist));
+      chipsList.add(_buildAddTagChip(context, state.artist!));
     }
 
     return Wrap(
@@ -90,18 +90,19 @@ class ArtistDetailsScreen extends StatelessWidget {
   Widget _buildTagChip(BuildContext context, ArtistDetailsState state, Tag tag, ValueChanged<Tag> onTapped) {
     return InputChip(
         label: Text(tag.name),
-        selected: state.tagEditMode && state.tagsForArtist.contains(tag),
+        selected: state.tagEditMode && state.tagsForArtist!.contains(tag),
         onPressed: () => _onTagChipPressed(context, state, tag, onTapped));
   }
 
+  // TODO Replace state parameter by non-nullable parameters for individual properties
   void _onTagChipPressed(BuildContext context, ArtistDetailsState state, Tag tag, ValueChanged<Tag> onTapped) async {
     if (state.tagEditMode) {
       final bloc = Provider.of<Repository>(context, listen: false);
 
-      if (state.tagsForArtist.contains(tag)) {
-        await bloc.removeTagFromArtist(state.artist, tag);
+      if (state.tagsForArtist!.contains(tag)) {
+        await bloc.removeTagFromArtist(state.artist!, tag);
       } else {
-        await bloc.assignTagToArtist(state.artist, tag);
+        await bloc.assignTagToArtist(state.artist!, tag);
       }
     } else {
       onTapped(tag);

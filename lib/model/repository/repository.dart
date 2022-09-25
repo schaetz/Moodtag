@@ -95,7 +95,7 @@ class Repository {
   //
   // User properties
   //
-  Future<String> getUserProperty(String propertyKey) {
+  Future<String?> getUserProperty(String propertyKey) {
     return db.getUserProperty(propertyKey).then((userProperty) => userProperty != null ? userProperty.propValue : null);
   }
 
@@ -112,7 +112,7 @@ class Repository {
   // Helper methods
   //
   Future<DbRequestResponse<E>> _getCreatedEntityFromId<E>(Future<int> createEntityFuture, String name) async {
-    Exception exception;
+    Exception exception = Exception();
     E newEntity = await createEntityFuture.catchError((e) {
       exception = e;
       return null;

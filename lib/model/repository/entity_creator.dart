@@ -59,7 +59,7 @@ Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, 
     if (entityType == ImportedArtist) {
       creationResponse = await bloc.createArtist(entity.name);
       final artist = await bloc.getArtistByName(entity.name);
-      createdArtistsByEntity[entity] = artist;
+      createdArtistsByEntity[entity as ImportedArtist] = artist;
     } else if (entityType == ImportedGenre) {
       creationResponse = await bloc.createTag(entity.name);
       final tag = await bloc.getTagByName(entity.name);
@@ -70,7 +70,7 @@ Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, 
     }
 
     creationSuccessCountersByType.putIfAbsent(entityType, () => DbRequestSuccessCounter());
-    creationSuccessCountersByType[entityType].registerResponse(creationResponse);
+    creationSuccessCountersByType[entityType]?.registerResponse(creationResponse);
   }
 
   _assignGenreTagsToArtists(bloc, createdArtistsByEntity, createdTagsByGenreName);
@@ -82,8 +82,8 @@ void _assignGenreTagsToArtists(
     Repository bloc, Map<ImportedArtist, Artist> createdArtistsByEntity, Map<String, Tag> createdTagsByGenreName) {
   createdArtistsByEntity.forEach((importedArtistEntity, artist) {
     importedArtistEntity.genres.forEach((genreName) {
-      if (createdTagsByGenreName.containsKey(genreName)) {
-        bloc.assignTagToArtist(artist, createdTagsByGenreName[genreName]);
+      if (createdTagsByGenreName.containsKey(genreName) && createdTagsByGenreName[genreName] != null) {
+        bloc.assignTagToArtist(artist, createdTagsByGenreName[genreName]!);
       }
     });
   });

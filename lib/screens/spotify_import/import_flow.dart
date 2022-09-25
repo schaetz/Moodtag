@@ -37,15 +37,17 @@ class ImportFlow extends StatelessWidget {
       if (importFlowState.availableSpotifyArtists != null)
         MaterialPage<void>(
             child: ImportSelectionListScreen<ImportedArtist>(
-          namedEntitySet: importFlowState.availableSpotifyArtists,
+          namedEntitySet: importFlowState.availableSpotifyArtists!,
           confirmationButtonLabel: importFlowState.doImportGenres ? "OK" : "Import",
           entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
           entityDenotationPlural: I10n.ARTIST_DENOTATION_PLURAL,
         )),
-      if (importFlowState.doImportGenres && importFlowState.isArtistsSelectionFinished)
+      if (importFlowState.doImportGenres &&
+          importFlowState.isArtistsSelectionFinished &&
+          importFlowState.availableSpotifyArtists != null)
         MaterialPage<void>(
             child: ImportSelectionListScreen<ImportedGenre>(
-          namedEntitySet: importFlowState.availableArtistsGenres,
+          namedEntitySet: importFlowState.availableArtistsGenres!,
           confirmationButtonLabel: "Import",
           entityDenotationSingular: "genre tag",
           entityDenotationPlural: "genre tags",
@@ -57,8 +59,12 @@ class ImportFlow extends StatelessWidget {
     if (importFlowState.isArtistsSelectionFinished &&
         (!importFlowState.doImportGenres || importFlowState.isGenresSelectionFinished)) {
       List<NamedEntity> entitiesToCreate = [];
-      entitiesToCreate.addAll(importFlowState.selectedArtists);
-      entitiesToCreate.addAll(importFlowState.selectedGenres);
+      if (importFlowState.selectedArtists != null) {
+        entitiesToCreate.addAll(importFlowState.selectedArtists as Iterable<NamedEntity>);
+      }
+      if (importFlowState.selectedGenres != null) {
+        entitiesToCreate.addAll(importFlowState.selectedGenres as Iterable<NamedEntity>);
+      }
 
       final Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType =
           await createEntities(context, entitiesToCreate);
@@ -71,19 +77,22 @@ class ImportFlow extends StatelessWidget {
   void _showResultMessage(BuildContext context, Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType) {
     String message;
 
-    if (creationSuccessCountersByType[ImportedArtist].successCount > 0) {
-      if (creationSuccessCountersByType[ImportedGenre].successCount > 0) {
-        message = """
-        Successfully added ${creationSuccessCountersByType[ImportedArtist].successCount} artists and
-        ${creationSuccessCountersByType[ImportedGenre].successCount} tags.
-        """;
-      } else {
-        message = "Successfully added ${creationSuccessCountersByType[ImportedArtist].successCount} artists.";
-      }
-    } else if (creationSuccessCountersByType[ImportedGenre].successCount > 0) {
-      message = "Successfully added ${creationSuccessCountersByType[ImportedGenre].successCount} genres.";
-    } else {
+    if (creationSuccessCountersByType[ImportedArtist] == null) {
       message = "No entities were added.";
+    } else {
+      final successfulArtists = creationSuccessCountersByType[ImportedArtist]?.successCount ?? 0;
+      final successfulGenres = creationSuccessCountersByType[ImportedGenre]?.successCount ?? 0;
+      if (successfulArtists > 0) {
+        if (successfulGenres > 0) {
+          message = "Successfully added ${successfulArtists} artists and ${successfulGenres} tags.";
+        } else {
+          message = "Successfully added ${successfulArtists} artists.";
+        }
+      } else if (successfulGenres > 0) {
+        message = "Successfully added ${successfulGenres} genres.";
+      } else {
+        message = "No entities were added.";
+      }
     }
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
