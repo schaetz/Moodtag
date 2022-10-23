@@ -22,8 +22,14 @@ class MoodtagDB extends _$MoodtagDB {
   // GET
   //
   Stream<List<Artist>> getArtists() {
-    return (select(artists).watch());
+    return (select(artists)..orderBy([orderByArtistName()])).watch();
   }
+
+  OrderingTerm Function(Artists) orderByArtistName() => (a) {
+        final columnName = a.actualTableName + '.' + a.name.escapedName;
+        return OrderingTerm(
+            expression: CustomExpression<String>("replace(lower($columnName), 'the ', '')"), mode: OrderingMode.asc);
+      };
 
   Stream<Artist?> getArtistById(int artistId) {
     return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull().asStream();
