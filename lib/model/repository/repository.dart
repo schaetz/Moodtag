@@ -1,3 +1,4 @@
+import 'package:diacritic/diacritic.dart';
 import 'package:drift/drift.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/invalid_argument_exception.dart';
@@ -29,7 +30,8 @@ class Repository {
   }
 
   Future<DbRequestResponse<Artist>> createArtist(String name) async {
-    Future<int> createArtistFuture = db.createArtist(ArtistsCompanion.insert(name: name));
+    Future<int> createArtistFuture =
+        db.createArtist(ArtistsCompanion.insert(name: name, orderingName: _getOrderingNameForArtist(name)));
     return _getCreatedEntityFromId<Artist>(createArtistFuture, name);
   }
 
@@ -133,5 +135,13 @@ class Repository {
       return Future.error(
           new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString()));
     }
+  }
+
+  String _getOrderingNameForArtist(String artistName) {
+    final lowerCased = artistName.toLowerCase();
+    final diacriticsReplaced = removeDiacritics(lowerCased);
+    final leadingTheRemoved = diacriticsReplaced.replaceFirst(RegExp('^the\\s'), '');
+    print("$artistName => $leadingTheRemoved");
+    return leadingTheRemoved;
   }
 }
