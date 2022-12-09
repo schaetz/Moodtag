@@ -7,9 +7,9 @@ import 'package:moodtag/exceptions/user_readable_exception.dart';
 class DbRequestResponse<E> {
   late final E changedEntity;
   late final List<Object> parameters;
-  late final Exception exception;
+  late final Exception? exception;
 
-  DbRequestResponse.success(this.changedEntity, parameters);
+  DbRequestResponse.success(this.changedEntity, parameters, {this.exception = null});
   DbRequestResponse.fail(this.exception, parameters);
   DbRequestResponse(this.changedEntity, this.exception);
 
