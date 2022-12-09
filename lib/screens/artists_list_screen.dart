@@ -15,17 +15,23 @@ import 'package:moodtag/navigation/routes.dart';
 class ArtistsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  const ArtistsListScreen();
+  ArtistsListScreen();
+
+  AddEntityDialog<ArtistsListBloc, Artist, Tag>? _createArtistDialog;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MtAppBar(context),
       body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
-        listenWhen: (context, state) => state.showCreateArtistDialog,
         listener: (context, state) {
-          AddEntityDialog.openAddArtistDialog<ArtistsListBloc>(context)
-              .then((_) => context.read<ArtistsListBloc>().add(CloseCreateArtistDialog()));
+          if (state.showCreateArtistDialog) {
+            _createArtistDialog = AddEntityDialog.openAddArtistDialog<ArtistsListBloc>(context,
+                onTerminate: (_) => context.read<ArtistsListBloc>().add(CloseCreateArtistDialog()));
+          } else if (_createArtistDialog != null) {
+            _createArtistDialog!.closeDialog(context);
+            _createArtistDialog = null;
+          }
         },
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {

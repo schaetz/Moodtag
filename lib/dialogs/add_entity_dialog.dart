@@ -18,25 +18,19 @@ import 'abstract_dialog.dart';
 /// E: Type of the entity to add
 /// O: Type of the other entity that might be affected
 /// (E=artist => O=tag and vice versa)
-class AddEntityDialog<B extends Bloc, E, O> extends AbstractDialog {
-  static Future openAddArtistDialog<B extends Bloc>(BuildContext context, {Tag? preselectedTag}) async {
-    final dialog = preselectedTag != null
-        ? new AddEntityDialog<B, Artist, Tag>.withPreselectedOtherEntity(context, preselectedTag)
-        : new AddEntityDialog<B, Artist, Tag>(context);
-    return await dialog.show();
-  }
+class AddEntityDialog<B extends Bloc, E, O> extends AbstractDialog<E> {
+  static AddEntityDialog<B, Artist, Tag> openAddArtistDialog<B extends Bloc>(BuildContext context,
+          {Tag? preselectedTag, Function(dynamic)? onTerminate}) =>
+      new AddEntityDialog<B, Artist, Tag>(context, preselectedOtherEntity: preselectedTag, onTerminate: onTerminate);
 
-  static Future openAddTagDialog<B extends Bloc>(BuildContext context, {Artist? preselectedArtist}) async {
-    final dialog = preselectedArtist != null
-        ? new AddEntityDialog<B, Tag, Artist>.withPreselectedOtherEntity(context, preselectedArtist)
-        : new AddEntityDialog<B, Tag, Artist>(context);
-    return await dialog.show();
-  }
+  static AddEntityDialog<B, Tag, Artist> openAddTagDialog<B extends Bloc>(BuildContext context,
+          {Artist? preselectedArtist, Function(dynamic)? onTerminate}) =>
+      new AddEntityDialog<B, Tag, Artist>(context, preselectedOtherEntity: preselectedArtist, onTerminate: onTerminate);
 
   O? preselectedOtherEntity;
 
-  AddEntityDialog(BuildContext context) : super(context);
-  AddEntityDialog.withPreselectedOtherEntity(BuildContext context, this.preselectedOtherEntity) : super(context);
+  AddEntityDialog(BuildContext context, {O? this.preselectedOtherEntity, Function(E?)? onTerminate})
+      : super(context, onTerminate: onTerminate);
 
   @override
   StatelessWidget buildDialog(BuildContext context) {

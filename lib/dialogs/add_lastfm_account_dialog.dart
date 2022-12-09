@@ -7,7 +7,8 @@ import 'abstract_dialog.dart';
 class AddExternalAccountDialog<T> extends AbstractDialog<String> {
   final String serviceName;
 
-  AddExternalAccountDialog(BuildContext context, this.serviceName) : super(context);
+  AddExternalAccountDialog(BuildContext context, this.serviceName, {Function(String?)? onTerminate})
+      : super(context, onTerminate: onTerminate);
 
   @override
   StatelessWidget buildDialog(BuildContext context) {

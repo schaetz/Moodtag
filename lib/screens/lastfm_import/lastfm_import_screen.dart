@@ -50,10 +50,11 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
       .then((value) => value != null ? accountNameStreamController.add(value) : {});
 
   void _openSetAccountNameDialog(BuildContext context) async {
-    String? newAccountName = await AddExternalAccountDialog(context, widget.serviceName).show();
-    if (newAccountName != null) {
-      _setAccountName(newAccountName);
-    }
+    AddExternalAccountDialog(context, widget.serviceName, onTerminate: (newAccountName) {
+      if (newAccountName != null) {
+        _setAccountName(newAccountName);
+      }
+    });
   }
 
   // TODO Error handling

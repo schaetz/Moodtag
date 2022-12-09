@@ -39,12 +39,10 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
   }
 
   void _mapOpenCreateArtistDialogEventToState(OpenCreateArtistDialog event, Emitter<ArtistsListState> emit) {
-    print('Open');
     if (!state.showCreateArtistDialog) _openCreateArtistDialog(emit);
   }
 
   void _mapCloseCreateArtistDialogEventToState(CloseCreateArtistDialog event, Emitter<ArtistsListState> emit) {
-    print('Close');
     if (state.showCreateArtistDialog) _closeCreateArtistDialog(emit);
   }
 

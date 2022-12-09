@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 abstract class AbstractDialog<T> {
   BuildContext context;
 
-  AbstractDialog(this.context);
+  AbstractDialog(this.context, {Function(T?)? onTerminate}) {
+    this._onTerminate = onTerminate;
+    show();
+  }
 
-  Future<T?> show() async {
-    return await showDialog<T>(context: context, builder: (_) => buildDialog(this.context));
+  Future<T?>? _futureResult;
+  Function(T?)? _onTerminate;
+  bool _isClosed = false;
+
+  void show() async {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _futureResult = showDialog<T>(context: context, builder: (_) => buildDialog(this.context));
+      if (_onTerminate != null) {
+        _futureResult!.then(_onTerminate!).whenComplete(() => _isClosed = true);
+      }
+    });
   }
 
   // Should be protected, but upgrading the meta package to ^1.7.0
@@ -14,6 +27,11 @@ abstract class AbstractDialog<T> {
   StatelessWidget buildDialog(BuildContext context);
 
   void closeDialog(BuildContext context, {T? result}) {
-    Navigator.pop(context, result);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!_isClosed) {
+        Navigator.pop(context, result);
+        _isClosed = true;
+      }
+    });
   }
 }

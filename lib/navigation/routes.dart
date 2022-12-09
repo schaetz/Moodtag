@@ -37,7 +37,7 @@ class Routes {
   Map<String, Widget Function(BuildContext)> getRoutes() {
     return {
       artistsList: (context) =>
-          BlocProvider(create: (_) => ArtistsListBloc(context.read<Repository>()), child: const ArtistsListScreen()),
+          BlocProvider(create: (_) => ArtistsListBloc(context.read<Repository>()), child: ArtistsListScreen()),
       tagsList: (context) =>
           BlocProvider(create: (_) => TagsListBloc(context.read<Repository>()), child: const TagsListScreen()),
       artistsDetails: (context) => BlocProvider(
