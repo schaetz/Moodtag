@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/remove_tag_from_artist_dialog.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
@@ -58,8 +57,10 @@ class TagDetailsScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddEntityDialog.openAddArtistDialog<TagDetailsBloc>(
-            context), // TODO Add preselected tag: "preselectedTag: state.tag"
+        onPressed: () => {},
+        // TODO Open dialog from Bloc listener method
+        // onPressed: () => AddEntityDialog.openAddArtistDialog<TagDetailsBloc>(
+        //     context), // TODO Add preselected tag: "preselectedTag: state.tag"
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),

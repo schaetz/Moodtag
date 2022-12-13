@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
@@ -111,8 +110,9 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   Widget _buildAddTagChip(BuildContext context, Artist artist) {
     return InputChip(
-        label: Text('+'),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        onPressed: () => AddEntityDialog.openAddTagDialog<ArtistDetailsBloc>(context, preselectedArtist: artist));
+      label: Text('+'),
+      backgroundColor: Theme.of(context).colorScheme.secondary,
+      // onPressed: () => AddEntityDialog.openAddTagDialog<ArtistDetailsBloc>(context, preselectedArtist: artist)// TODO Open dialog from Bloc listener method
+    );
   }
 }
