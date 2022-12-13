@@ -15,9 +15,10 @@ abstract class AbstractDialog<T> {
 
   void show() async {
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      _futureResult = showDialog<T>(context: context, builder: (_) => buildDialog(this.context));
+      _futureResult = showDialog<T>(context: context, builder: (_) => buildDialog(context));
+      _futureResult!.whenComplete(() => _isClosed = true);
       if (_onTerminate != null) {
-        _futureResult!.then(_onTerminate!).whenComplete(() => _isClosed = true);
+        _futureResult!.then(_onTerminate!);
       }
     });
   }

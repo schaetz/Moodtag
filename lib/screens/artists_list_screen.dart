@@ -17,8 +17,6 @@ class ArtistsListScreen extends StatelessWidget {
 
   ArtistsListScreen();
 
-  AddEntityDialog<Artist, Tag>? _createArtistDialog;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,12 +24,9 @@ class ArtistsListScreen extends StatelessWidget {
       body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
         listener: (context, state) {
           if (state.showCreateArtistDialog) {
-            _createArtistDialog = AddEntityDialog.openAddArtistDialog(context,
+            AddEntityDialog.openAddArtistDialog(context,
                 onSendInput: (input) => context.read<ArtistsListBloc>().add(CreateArtists(input)),
                 onTerminate: (_) => context.read<ArtistsListBloc>().add(CloseCreateArtistDialog()));
-          } else if (_createArtistDialog != null) {
-            _createArtistDialog!.closeDialog(context);
-            _createArtistDialog = null;
           }
         },
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols

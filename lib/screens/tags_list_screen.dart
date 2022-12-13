@@ -19,8 +19,6 @@ class TagsListScreen extends StatelessWidget {
 
   TagsListScreen();
 
-  AddEntityDialog<Tag, Artist>? _createTagDialog;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,12 +26,9 @@ class TagsListScreen extends StatelessWidget {
       body: BlocConsumer<TagsListBloc, TagsListState>(
           listener: (context, state) {
             if (state.showCreateTagDialog) {
-              _createTagDialog = AddEntityDialog.openAddTagDialog(context,
+              AddEntityDialog.openAddTagDialog(context,
                   onSendInput: (input) => context.read<TagsListBloc>().add(CreateTags(input)),
                   onTerminate: (_) => context.read<TagsListBloc>().add(CloseCreateTagDialog()));
-            } else if (_createTagDialog != null) {
-              _createTagDialog!.closeDialog(context);
-              _createTagDialog = null;
             }
           },
           buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
