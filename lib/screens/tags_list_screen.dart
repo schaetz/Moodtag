@@ -8,6 +8,7 @@ import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_state.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -16,13 +17,24 @@ class TagsListScreen extends StatelessWidget {
   // TODO Define pale color in theme
   static const listEntryStylePale = TextStyle(fontSize: 18.0, color: Colors.grey);
 
-  const TagsListScreen();
+  TagsListScreen();
+
+  AddEntityDialog<TagsListBloc, Tag, Artist>? _createTagDialog;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MtAppBar(context),
-      body: BlocBuilder<TagsListBloc, TagsListState>(
+      body: BlocConsumer<TagsListBloc, TagsListState>(
+          listener: (context, state) {
+            if (state.showCreateTagDialog) {
+              _createTagDialog = AddEntityDialog.openAddTagDialog<TagsListBloc>(context,
+                  onTerminate: (_) => context.read<TagsListBloc>().add(CloseCreateTagDialog()));
+            } else if (_createTagDialog != null) {
+              _createTagDialog!.closeDialog(context);
+              _createTagDialog = null;
+            }
+          },
           buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
           builder: (context, state) {
             if (state.tags.isEmpty) {
@@ -42,7 +54,7 @@ class TagsListScreen extends StatelessWidget {
             );
           }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddEntityDialog.openAddTagDialog<TagsListBloc>(context),
+        onPressed: () => context.read<TagsListBloc>().add(OpenCreateTagDialog()),
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),

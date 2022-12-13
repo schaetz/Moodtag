@@ -41,7 +41,7 @@ class AddEntityDialog<B extends Bloc, E, O> extends AbstractDialog<E> {
           final createEntityEvent = (E == Artist)
               ? CreateArtists(newInput)
               : (E == Tag)
-                  ? CreateTag(newInput)
+                  ? CreateTags(newInput)
                   : null;
           if (createEntityEvent == null) {
             // TODO Error handling

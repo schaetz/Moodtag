@@ -39,7 +39,7 @@ class Routes {
       artistsList: (context) =>
           BlocProvider(create: (_) => ArtistsListBloc(context.read<Repository>()), child: ArtistsListScreen()),
       tagsList: (context) =>
-          BlocProvider(create: (_) => TagsListBloc(context.read<Repository>()), child: const TagsListScreen()),
+          BlocProvider(create: (_) => TagsListBloc(context.read<Repository>()), child: TagsListScreen()),
       artistsDetails: (context) => BlocProvider(
           create: (_) =>
               ArtistDetailsBloc(context.read<Repository>(), ModalRoute.of(context)?.settings.arguments as int),

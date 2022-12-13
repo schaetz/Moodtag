@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/bloc_helpers/create_artist_bloc_helper.dart';
+import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/LibraryEvent.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -12,7 +12,7 @@ import 'artists_list_state.dart';
 class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
   final Repository _repository;
   late final StreamSubscription _artistsStreamSubscription;
-  final CreateArtistBlocHelper createArtistBlocHelper = CreateArtistBlocHelper();
+  final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
 
   ArtistsListBloc(this._repository) : super(ArtistsListState()) {
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
@@ -47,7 +47,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
   }
 
   void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) {
-    createArtistBlocHelper.handleCreateArtistEvent(event, _repository);
+    createEntityBlocHelper.handleCreateArtistEvent(event, _repository);
     _closeCreateArtistDialog(emit);
   }
 
