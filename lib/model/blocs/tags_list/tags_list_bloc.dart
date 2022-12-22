@@ -47,7 +47,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
   }
 
   void _mapCreateTagsEventToState(CreateTags event, Emitter<TagsListState> emit) {
-    createEntityBlocHelper.handleCreateTagEvent(event, _repository);
+    createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     _closeCreateTagDialog(emit);
   }
 

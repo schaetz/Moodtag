@@ -14,7 +14,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
   final Repository _repository;
   late final StreamSubscription _artistStreamSubscription;
   late final StreamSubscription _tagsForArtistStreamSubscription;
-  final CreateEntityBlocHelper createArtistBlocHelper = CreateEntityBlocHelper();
+  final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
 
   ArtistDetailsBloc(this._repository, int artistId)
       : super(ArtistDetailsState(artistId: artistId, tagEditMode: false)) {
@@ -22,6 +22,10 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
     on<CreateArtists>(_mapCreateArtistsEventToState);
+    on<OpenCreateTagDialog>(_mapOpenCreateTagDialogEventToState);
+    on<CloseCreateTagDialog>(_mapCloseCreateTagDialogEventToState);
+    on<CreateTags>(_mapCreateTagsEventToState);
+    on<AssignTagToArtist>(_mapAssignTagToArtistEventToState);
 
     _artistStreamSubscription =
         _repository.getArtistById(artistId).listen((artistFromStream) => add(ArtistUpdated(artistFromStream)));
@@ -56,6 +60,22 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
   }
 
   void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistDetailsState> emit) {
-    createArtistBlocHelper.handleCreateArtistEvent(event, _repository);
+    createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
+  }
+
+  void _mapOpenCreateTagDialogEventToState(OpenCreateTagDialog event, Emitter<ArtistDetailsState> emit) {
+    emit(state.copyWith(showCreateTagDialog: true));
+  }
+
+  void _mapCloseCreateTagDialogEventToState(CloseCreateTagDialog event, Emitter<ArtistDetailsState> emit) {
+    emit(state.copyWith(showCreateTagDialog: false));
+  }
+
+  void _mapCreateTagsEventToState(CreateTags event, Emitter<ArtistDetailsState> emit) {
+    createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+  }
+
+  void _mapAssignTagToArtistEventToState(AssignTagToArtist event, Emitter<ArtistDetailsState> emit) {
+    createEntityBlocHelper.handleAssignTagToArtistEvent(event, _repository);
   }
 }

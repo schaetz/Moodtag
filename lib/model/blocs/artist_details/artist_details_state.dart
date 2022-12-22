@@ -9,6 +9,7 @@ class ArtistDetailsState extends Equatable {
   final LoadingStatus tagsListLoadingStatus;
   final List<Tag>? tagsForArtist;
   final bool tagEditMode;
+  final bool showCreateTagDialog;
 
   const ArtistDetailsState(
       {required this.artistId,
@@ -16,6 +17,7 @@ class ArtistDetailsState extends Equatable {
       this.artist,
       this.tagsListLoadingStatus = LoadingStatus.initial,
       this.tagsForArtist,
+      this.showCreateTagDialog = false,
       required this.tagEditMode});
 
   @override
@@ -27,6 +29,7 @@ class ArtistDetailsState extends Equatable {
       Artist? artist,
       LoadingStatus? tagsListLoadingStatus,
       List<Tag>? tagsForArtist,
+      bool? showCreateTagDialog,
       bool? tagEditMode}) {
     return ArtistDetailsState(
         artistId: artistId ?? this.artistId,
@@ -34,6 +37,7 @@ class ArtistDetailsState extends Equatable {
         artist: artist ?? this.artist,
         tagsListLoadingStatus: tagsListLoadingStatus ?? this.tagsListLoadingStatus,
         tagsForArtist: tagsForArtist ?? this.tagsForArtist,
+        showCreateTagDialog: showCreateTagDialog ?? this.showCreateTagDialog,
         tagEditMode: tagEditMode ?? this.tagEditMode);
   }
 }

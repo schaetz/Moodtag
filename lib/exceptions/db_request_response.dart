@@ -5,12 +5,12 @@ import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 
 class DbRequestResponse<E> {
-  late final E changedEntity;
-  late final List<Object> parameters;
+  late final E? changedEntity;
+  late final List<Object>? parameters;
   late final Exception? exception;
 
-  DbRequestResponse.success(this.changedEntity, parameters, {this.exception = null});
-  DbRequestResponse.fail(this.exception, parameters);
+  DbRequestResponse.success({this.changedEntity, this.parameters, this.exception = null});
+  DbRequestResponse.fail(this.exception, {this.parameters});
   DbRequestResponse(this.changedEntity, this.exception);
 
   DbRequestResponse.exceptionFrom(DbRequestResponse otherRequestResponse) {
@@ -53,8 +53,8 @@ class DbRequestResponse<E> {
   }
 
   String? _getStringParameter(int index) {
-    if (parameters != null && parameters.length >= index + 1 && parameters[index] is String) {
-      return parameters[index] as String;
+    if (parameters != null && parameters!.length >= index + 1 && parameters![index] is String) {
+      return parameters![index] as String;
     }
     return null;
   }

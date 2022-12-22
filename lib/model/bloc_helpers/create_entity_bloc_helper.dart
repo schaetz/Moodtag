@@ -5,7 +5,7 @@ import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/utils/helpers.dart';
 
 class CreateEntityBlocHelper {
-  void handleCreateArtistEvent(CreateArtists event, Repository repository) async {
+  void handleCreateArtistsEvent(CreateArtists event, Repository repository) async {
     List<String> inputElements = processMultilineInput(event.input);
     List<DbRequestResponse> exceptionResponses = [];
 
@@ -17,15 +17,31 @@ class CreateEntityBlocHelper {
     //TODO handle exceptions
   }
 
-  void handleCreateTagEvent(CreateTags event, Repository repository) async {
+  void handleCreateTagsEvent(CreateTags event, Repository repository) async {
     List<String> inputElements = processMultilineInput(event.input);
     List<DbRequestResponse> exceptionResponses = [];
 
     for (String newTagName in inputElements) {
       final createTagResponse = await repository.createTag(newTagName);
       if (createTagResponse.didFail()) exceptionResponses.add(createTagResponse);
+
+      if (event.preselectedArtist != null &&
+          createTagResponse.didSucceed() &&
+          createTagResponse.changedEntity != null) {
+        final assignTagToArtistResponse =
+            await repository.assignTagToArtist(event.preselectedArtist!, createTagResponse.changedEntity!);
+        if (assignTagToArtistResponse.didFail()) exceptionResponses.add(assignTagToArtistResponse);
+      }
     }
 
     //TODO handle exceptions
+  }
+
+  void handleAssignTagToArtistEvent(AssignTagToArtist event, Repository repository) async {
+    final assignTagToArtistResponse = await repository.assignTagToArtist(event.artist, event.tag);
+    if (assignTagToArtistResponse.didFail()) {
+      print(assignTagToArtistResponse.exception);
+      // TODO handle exception
+    }
   }
 }

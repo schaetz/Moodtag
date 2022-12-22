@@ -47,7 +47,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
   }
 
   void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) {
-    createEntityBlocHelper.handleCreateArtistEvent(event, _repository);
+    createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
     _closeCreateArtistDialog(emit);
   }
 

@@ -15,8 +15,8 @@ Future<DbRequestResponse<Artist>> createArtistOrEditExistingArtist(
   final createArtistResponse = await repository.createArtist(newArtistName);
 
   if (preselectedTag != null) {
-    if (createArtistResponse.didSucceed()) {
-      await repository.assignTagToArtist(createArtistResponse.changedEntity, preselectedTag);
+    if (createArtistResponse.didSucceed() && createArtistResponse.changedEntity != null) {
+      await repository.assignTagToArtist(createArtistResponse.changedEntity!, preselectedTag);
     } else {
       await repository
           .getArtistByName(newArtistName)
@@ -32,8 +32,8 @@ Future<DbRequestResponse<Tag>> createTagOrEditExistingTag(
   final createTagResponse = await repository.createTag(newTagName);
 
   if (preselectedArtist != null) {
-    if (createTagResponse.didSucceed()) {
-      await repository.assignTagToArtist(preselectedArtist, createTagResponse.changedEntity);
+    if (createTagResponse.didSucceed() && createTagResponse.changedEntity != null) {
+      await repository.assignTagToArtist(preselectedArtist, createTagResponse.changedEntity!);
     } else {
       await repository
           .getTagByName(newTagName)

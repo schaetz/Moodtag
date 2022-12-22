@@ -24,16 +24,6 @@ class ArtistsListUpdated extends ArtistEvent {
   List<Object> get props => [artists];
 }
 
-class OpenCreateArtistDialog extends ArtistEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class CloseCreateArtistDialog extends ArtistEvent {
-  @override
-  List<Object> get props => [];
-}
-
 class CreateArtists extends ArtistEvent {
   final String input;
 
@@ -52,7 +42,27 @@ class DeleteArtist extends ArtistEvent {
   List<Object> get props => [artist];
 }
 
+class AssignTagToArtist extends ArtistEvent {
+  final Artist artist;
+  final Tag tag;
+
+  AssignTagToArtist(this.artist, this.tag);
+
+  @override
+  List<Object> get props => [artist, tag];
+}
+
 class ToggleTagEditMode extends ArtistEvent {
+  @override
+  List<Object> get props => [];
+}
+
+class OpenCreateArtistDialog extends ArtistEvent {
+  @override
+  List<Object> get props => [];
+}
+
+class CloseCreateArtistDialog extends ArtistEvent {
   @override
   List<Object> get props => [];
 }

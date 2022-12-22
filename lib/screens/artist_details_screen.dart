@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:provider/provider.dart';
 
@@ -21,14 +23,23 @@ class ArtistDetailsScreen extends StatelessWidget {
         appBar: MtAppBar(context),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: BlocBuilder<ArtistDetailsBloc, ArtistDetailsState>(
+          child: BlocConsumer<ArtistDetailsBloc, ArtistDetailsState>(
+            listener: (context, state) {
+              if (state.showCreateTagDialog) {
+                AddEntityDialog.openAddTagDialog(context,
+                    preselectedArtist: state.artist,
+                    onSendInput: (input) =>
+                        context.read<ArtistDetailsBloc>().add(CreateTags(input, preselectedArtist: state.artist)),
+                    onTerminate: (_) => context.read<ArtistDetailsBloc>().add(CloseCreateTagDialog()));
+              }
+            },
             // TODO Show loading or error symbols
             buildWhen: (previous, current) =>
                 current.artistLoadingStatus.isSuccess &&
                 current.tagsListLoadingStatus.isSuccess, // TODO Show artist even when tags list is not available
             builder: (context, state) {
               if (!state.artistLoadingStatus.isSuccess || state.artist == null || state.tagsForArtist == null) {
-                return Container(); // TODO Show loading symbol or somethink alike
+                return Container(); // TODO Show loading symbol or something alike
               }
 
               return ListView(children: [
@@ -76,7 +87,7 @@ class ArtistDetailsScreen extends StatelessWidget {
 
     List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (value) {})).toList();
     if (state.tagEditMode) {
-      chipsList.add(_buildAddTagChip(context, state.artist!));
+      chipsList.add(_buildAddTagChip(context));
     }
 
     return Wrap(
@@ -108,11 +119,11 @@ class ArtistDetailsScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildAddTagChip(BuildContext context, Artist artist) {
+  Widget _buildAddTagChip(BuildContext context) {
     return InputChip(
       label: Text('+'),
       backgroundColor: Theme.of(context).colorScheme.secondary,
-      // onPressed: () => AddEntityDialog.openAddTagDialog<ArtistDetailsBloc>(context, preselectedArtist: artist)// TODO Open dialog from Bloc listener method
+      onPressed: () => context.read<ArtistDetailsBloc>().add(OpenCreateTagDialog()),
     );
   }
 }

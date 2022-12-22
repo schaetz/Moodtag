@@ -24,23 +24,14 @@ class TagsListUpdated extends TagEvent {
   List<Object> get props => [tags];
 }
 
-class OpenCreateTagDialog extends TagEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class CloseCreateTagDialog extends TagEvent {
-  @override
-  List<Object> get props => [];
-}
-
 class CreateTags extends TagEvent {
   final String input;
+  final Artist? preselectedArtist;
 
-  const CreateTags(this.input);
+  const CreateTags(this.input, {this.preselectedArtist});
 
   @override
-  List<Object> get props => [input];
+  List<Object> get props => preselectedArtist != null ? [input, preselectedArtist!] : [input];
 }
 
 class DeleteTag extends TagEvent {
@@ -50,4 +41,14 @@ class DeleteTag extends TagEvent {
 
   @override
   List<Object> get props => [tag];
+}
+
+class OpenCreateTagDialog extends TagEvent {
+  @override
+  List<Object> get props => [];
+}
+
+class CloseCreateTagDialog extends TagEvent {
+  @override
+  List<Object> get props => [];
 }
