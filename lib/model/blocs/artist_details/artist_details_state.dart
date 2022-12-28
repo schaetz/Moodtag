@@ -21,7 +21,8 @@ class ArtistDetailsState extends Equatable {
       required this.tagEditMode});
 
   @override
-  List<Object?> get props => [artistId, artistLoadingStatus, artist, tagsListLoadingStatus, tagsForArtist, tagEditMode];
+  List<Object?> get props =>
+      [artistId, artistLoadingStatus, artist, tagsListLoadingStatus, tagsForArtist, showCreateTagDialog, tagEditMode];
 
   ArtistDetailsState copyWith(
       {int? artistId,

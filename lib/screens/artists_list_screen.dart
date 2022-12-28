@@ -15,7 +15,7 @@ import 'package:moodtag/navigation/routes.dart';
 class ArtistsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  ArtistsListScreen();
+  const ArtistsListScreen();
 
   @override
   Widget build(BuildContext context) {
