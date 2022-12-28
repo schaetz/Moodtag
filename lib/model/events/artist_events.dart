@@ -44,19 +44,19 @@ class DeleteArtist extends ArtistEvent {
   List<Object> get props => [artist];
 }
 
-class AssignTagToArtist extends ArtistEvent {
-  final Artist artist;
-  final Tag tag;
-
-  AssignTagToArtist(this.artist, this.tag);
-
-  @override
-  List<Object> get props => [artist, tag];
-}
-
 class ToggleTagEditMode extends ArtistEvent {
   @override
   List<Object> get props => [];
+}
+
+class ToggleTagForArtist extends ArtistEvent {
+  final Artist artist;
+  final Tag tag;
+
+  const ToggleTagForArtist(this.artist, this.tag);
+
+  @override
+  List<Object> get props => [artist, tag];
 }
 
 class OpenCreateArtistDialog extends ArtistEvent {

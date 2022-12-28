@@ -26,6 +26,16 @@ class TagsListUpdated extends TagEvent {
   List<Object?> get props => [tags, error];
 }
 
+class TagsForArtistListUpdated extends TagEvent {
+  final List<Tag>? tags;
+  final Object? error;
+
+  const TagsForArtistListUpdated({this.tags, this.error});
+
+  @override
+  List<Object?> get props => [tags, error];
+}
+
 class CreateTags extends TagEvent {
   final String input;
   final Artist? preselectedArtist;

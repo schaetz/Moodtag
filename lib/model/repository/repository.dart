@@ -88,8 +88,8 @@ class Repository {
     return _wrapExceptionsAndReturnResponse(assignTagFuture);
   }
 
-  Future removeTagFromArtist(Artist artist, Tag tag) {
-    return db.removeTagFromArtist(artist.id, tag.id);
+  Future<DbRequestResponse> removeTagFromArtist(Artist artist, Tag tag) {
+    return _wrapExceptionsAndReturnResponse(db.removeTagFromArtist(artist.id, tag.id));
   }
 
   Future<bool> artistHasTag(Artist artist, Tag tag) {
@@ -115,10 +115,11 @@ class Repository {
   //
   // Helper methods
   //
-  Future<DbRequestResponse> _wrapExceptionsAndReturnResponse(Future<int> changedEntityFuture) async {
+  Future<DbRequestResponse> _wrapExceptionsAndReturnResponse(Future changedEntityFuture) async {
     Exception? exception = null;
-    await changedEntityFuture.catchError((e) {
+    await changedEntityFuture.onError<Exception>((e, stackTrace) {
       exception = e;
+      return null;
     });
 
     if (exception != null) {
@@ -130,7 +131,7 @@ class Repository {
   Future<DbRequestResponse<E>> _wrapExceptionsAndReturnResponseWithEntity<E>(
       Future<int?> createEntityFuture, String name) async {
     Exception? exception = null;
-    E newEntity = await createEntityFuture.catchError((e) {
+    E newEntity = await createEntityFuture.onError<Exception>((e, stackTrace) {
       exception = e;
       return null;
     }).then((newEntityId) async => await _getEntityById<E>(newEntityId));

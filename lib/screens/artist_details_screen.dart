@@ -8,7 +8,6 @@ import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
-import 'package:moodtag/model/repository/repository.dart';
 import 'package:provider/provider.dart';
 
 class ArtistDetailsScreen extends StatelessWidget {
@@ -36,9 +35,13 @@ class ArtistDetailsScreen extends StatelessWidget {
             // TODO Show loading or error symbols
             buildWhen: (previous, current) =>
                 current.artistLoadingStatus.isSuccess &&
-                current.tagsListLoadingStatus.isSuccess, // TODO Show artist even when tags list is not available
+                current.tagsForArtistLoadingStatus.isSuccess &&
+                current.allTagsLoadingStatus.isSuccess, // TODO Show artist even when tags list is not available
             builder: (context, state) {
-              if (!state.artistLoadingStatus.isSuccess || state.artist == null || state.tagsForArtist == null) {
+              if (!state.artistLoadingStatus.isSuccess ||
+                  state.artist == null ||
+                  state.tagsForArtist == null ||
+                  state.allTags == null) {
                 return Container(); // TODO Show loading symbol or something alike
               }
 
@@ -65,16 +68,21 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state) {
     if (state.tagEditMode) {
-      // TODO When in tag edit mode, only build the widget if the complete list of tags was loaded
+      if (state.allTagsLoadingStatus.isError || state.allTags == null) {
+        return const Align(
+          alignment: Alignment.center,
+          child: Text('Error loading the tags', style: infoLabelStyle),
+        );
+      }
     } else {
       // TODO Improve loading / error labels
-      if (state.tagsListLoadingStatus.isInitialOrLoading) {
+      if (state.tagsForArtistLoadingStatus.isInitialOrLoading) {
         return const Align(
           alignment: Alignment.center,
           child: Text('Loading tags...', style: infoLabelStyle),
         );
       }
-      if (state.artistLoadingStatus.isError || state.tagsForArtist == null) {
+      if (state.tagsForArtistLoadingStatus.isError || state.tagsForArtist == null) {
         return const Align(
           alignment: Alignment.center,
           child: Text('Error loading the tags for the artist', style: infoLabelStyle),
@@ -82,10 +90,9 @@ class ArtistDetailsScreen extends StatelessWidget {
       }
     }
 
-    List<Tag> tagsToDisplay =
-        state.tagEditMode ? state.tagsForArtist! : state.tagsForArtist!; // TODO Show all tags in tag edit mode
+    List<Tag> tagsToDisplay = state.tagEditMode ? state.allTags! : state.tagsForArtist!;
 
-    List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (value) {})).toList();
+    List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (_value) {})).toList();
     if (state.tagEditMode) {
       chipsList.add(_buildAddTagChip(context));
     }
@@ -101,19 +108,13 @@ class ArtistDetailsScreen extends StatelessWidget {
     return InputChip(
         label: Text(tag.name),
         selected: state.tagEditMode && state.tagsForArtist!.contains(tag),
-        onPressed: () => _onTagChipPressed(context, state, tag, onTapped));
+        onPressed: () => _onTagChipPressed(context, state.artist!, tag, state.tagEditMode, onTapped));
   }
 
-  // TODO Replace state parameter by non-nullable parameters for individual properties
-  void _onTagChipPressed(BuildContext context, ArtistDetailsState state, Tag tag, ValueChanged<Tag> onTapped) async {
-    if (state.tagEditMode) {
-      final bloc = Provider.of<Repository>(context, listen: false);
-
-      if (state.tagsForArtist!.contains(tag)) {
-        await bloc.removeTagFromArtist(state.artist!, tag);
-      } else {
-        await bloc.assignTagToArtist(state.artist!, tag);
-      }
+  void _onTagChipPressed(
+      BuildContext context, Artist artist, Tag tag, bool tagEditMode, ValueChanged<Tag> onTapped) async {
+    if (tagEditMode) {
+      context.read<ArtistDetailsBloc>().add(ToggleTagForArtist(artist, tag));
     } else {
       onTapped(tag);
     }

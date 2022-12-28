@@ -6,8 +6,10 @@ class ArtistDetailsState extends Equatable {
   final int artistId;
   final LoadingStatus artistLoadingStatus;
   final Artist? artist;
-  final LoadingStatus tagsListLoadingStatus;
+  final LoadingStatus tagsForArtistLoadingStatus;
   final List<Tag>? tagsForArtist;
+  final LoadingStatus allTagsLoadingStatus;
+  final List<Tag>? allTags;
   final bool tagEditMode;
   final bool showCreateTagDialog;
 
@@ -15,29 +17,44 @@ class ArtistDetailsState extends Equatable {
       {required this.artistId,
       this.artistLoadingStatus = LoadingStatus.initial,
       this.artist,
-      this.tagsListLoadingStatus = LoadingStatus.initial,
+      this.tagsForArtistLoadingStatus = LoadingStatus.initial,
       this.tagsForArtist,
+      this.allTagsLoadingStatus = LoadingStatus.initial,
+      this.allTags,
       this.showCreateTagDialog = false,
       required this.tagEditMode});
 
   @override
-  List<Object?> get props =>
-      [artistId, artistLoadingStatus, artist, tagsListLoadingStatus, tagsForArtist, showCreateTagDialog, tagEditMode];
+  List<Object?> get props => [
+        artistId,
+        artistLoadingStatus,
+        artist,
+        tagsForArtistLoadingStatus,
+        tagsForArtist,
+        allTagsLoadingStatus,
+        allTags,
+        showCreateTagDialog,
+        tagEditMode
+      ];
 
   ArtistDetailsState copyWith(
       {int? artistId,
       LoadingStatus? artistLoadingStatus,
       Artist? artist,
-      LoadingStatus? tagsListLoadingStatus,
+      LoadingStatus? tagsForArtistLoadingStatus,
       List<Tag>? tagsForArtist,
+      LoadingStatus? allTagsLoadingStatus,
+      List<Tag>? allTags,
       bool? showCreateTagDialog,
       bool? tagEditMode}) {
     return ArtistDetailsState(
         artistId: artistId ?? this.artistId,
         artistLoadingStatus: artistLoadingStatus ?? this.artistLoadingStatus,
         artist: artist ?? this.artist,
-        tagsListLoadingStatus: tagsListLoadingStatus ?? this.tagsListLoadingStatus,
+        tagsForArtistLoadingStatus: tagsForArtistLoadingStatus ?? this.tagsForArtistLoadingStatus,
         tagsForArtist: tagsForArtist ?? this.tagsForArtist,
+        allTagsLoadingStatus: allTagsLoadingStatus ?? this.allTagsLoadingStatus,
+        allTags: allTags ?? this.allTags,
         showCreateTagDialog: showCreateTagDialog ?? this.showCreateTagDialog,
         tagEditMode: tagEditMode ?? this.tagEditMode);
   }

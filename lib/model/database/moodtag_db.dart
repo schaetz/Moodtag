@@ -89,7 +89,7 @@ class MoodtagDB extends _$MoodtagDB {
     ]);
   }
 
-  Future removeTagFromArtist(int artistId, int tagId) {
+  Future<int> removeTagFromArtist(int artistId, int tagId) {
     return (delete(assignedTags)..where((row) => row.artist.equals(artistId) & row.tag.equals(tagId))).go();
   }
 
