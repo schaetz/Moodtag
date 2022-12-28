@@ -27,10 +27,14 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
     on<CreateTags>(_mapCreateTagsEventToState);
     on<AssignTagToArtist>(_mapAssignTagToArtistEventToState);
 
-    _artistStreamSubscription =
-        _repository.getArtistById(artistId).listen((artistFromStream) => add(ArtistUpdated(artistFromStream)));
-    _tagsForArtistStreamSubscription =
-        _repository.getTagsForArtist(artistId).listen((tagsListFromStream) => add(TagsListUpdated(tagsListFromStream)));
+    _artistStreamSubscription = _repository
+        .getArtistById(artistId)
+        .handleError((error) => add(ArtistUpdated(error: error)))
+        .listen((artistFromStream) => add(ArtistUpdated(artist: artistFromStream)));
+    _tagsForArtistStreamSubscription = _repository
+        .getTagsForArtist(artistId)
+        .handleError((error) => add(TagsListUpdated(error: error)))
+        .listen((tagsListFromStream) => add(TagsListUpdated(tags: tagsListFromStream)));
   }
 
   Future<void> close() async {

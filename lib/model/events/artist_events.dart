@@ -7,21 +7,23 @@ abstract class ArtistEvent extends LibraryEvent {
 }
 
 class ArtistUpdated extends ArtistEvent {
-  final Artist artist;
+  final Artist? artist;
+  final Object? error;
 
-  ArtistUpdated(this.artist);
+  const ArtistUpdated({this.artist, this.error});
 
   @override
-  List<Object> get props => [artist];
+  List<Object?> get props => [artist, error];
 }
 
 class ArtistsListUpdated extends ArtistEvent {
-  final List<Artist> artists;
+  final List<Artist>? artists;
+  final Object? error;
 
-  ArtistsListUpdated(this.artists);
+  const ArtistsListUpdated({this.artists, this.error});
 
   @override
-  List<Object> get props => [artists];
+  List<Object?> get props => [artists, error];
 }
 
 class CreateArtists extends ArtistEvent {

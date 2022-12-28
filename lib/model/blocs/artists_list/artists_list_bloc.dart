@@ -21,8 +21,10 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
     on<CreateArtists>(_mapCreateArtistsEventToState);
     on<DeleteArtist>(_mapDeleteArtistEventToState);
 
-    _artistsStreamSubscription =
-        _repository.getArtists().listen((artistsListFromStream) => add(ArtistsListUpdated(artistsListFromStream)));
+    _artistsStreamSubscription = _repository
+        .getArtists()
+        .handleError((error) => add(ArtistsListUpdated(error: error)))
+        .listen((artistsListFromStream) => add(ArtistsListUpdated(artists: artistsListFromStream)));
   }
 
   Future<void> close() async {

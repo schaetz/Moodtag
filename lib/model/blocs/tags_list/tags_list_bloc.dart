@@ -21,8 +21,10 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
     on<CreateTags>(_mapCreateTagsEventToState);
     on<DeleteTag>(_mapDeleteTagEventToState);
 
-    _tagsStreamSubscription =
-        _repository.getTags().listen((tagsListFromStream) => add(TagsListUpdated(tagsListFromStream)));
+    _tagsStreamSubscription = _repository
+        .getTags()
+        .handleError((error) => add(TagsListUpdated(error: error)))
+        .listen((tagsListFromStream) => add(TagsListUpdated(tags: tagsListFromStream)));
   }
 
   Future<void> close() async {

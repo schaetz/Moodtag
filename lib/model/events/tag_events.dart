@@ -7,21 +7,23 @@ abstract class TagEvent extends LibraryEvent {
 }
 
 class TagUpdated extends TagEvent {
-  final Tag tag;
+  final Tag? tag;
+  final Object? error;
 
-  TagUpdated(this.tag);
+  const TagUpdated({this.tag, this.error});
 
   @override
-  List<Object> get props => [tag];
+  List<Object?> get props => [tag, error];
 }
 
 class TagsListUpdated extends TagEvent {
-  final List<Tag> tags;
+  final List<Tag>? tags;
+  final Object? error;
 
-  TagsListUpdated(this.tags);
+  const TagsListUpdated({this.tags, this.error});
 
   @override
-  List<Object> get props => [tags];
+  List<Object?> get props => [tags, error];
 }
 
 class CreateTags extends TagEvent {
