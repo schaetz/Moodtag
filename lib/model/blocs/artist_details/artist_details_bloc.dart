@@ -21,7 +21,6 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
     on<ArtistUpdated>(_mapArtistUpdatedEventToState);
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
-    on<CreateArtists>(_mapCreateArtistsEventToState);
     on<OpenCreateTagDialog>(_mapOpenCreateTagDialogEventToState);
     on<CloseCreateTagDialog>(_mapCloseCreateTagDialogEventToState);
     on<CreateTags>(_mapCreateTagsEventToState);
@@ -63,23 +62,24 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
     emit(state.copyWith(tagEditMode: !state.tagEditMode));
   }
 
-  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistDetailsState> emit) {
-    createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
-  }
-
   void _mapOpenCreateTagDialogEventToState(OpenCreateTagDialog event, Emitter<ArtistDetailsState> emit) {
     emit(state.copyWith(showCreateTagDialog: true));
   }
 
   void _mapCloseCreateTagDialogEventToState(CloseCreateTagDialog event, Emitter<ArtistDetailsState> emit) {
-    emit(state.copyWith(showCreateTagDialog: false));
+    _closeCreateTagDialog(emit);
   }
 
   void _mapCreateTagsEventToState(CreateTags event, Emitter<ArtistDetailsState> emit) {
     createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    _closeCreateTagDialog(emit);
   }
 
   void _mapAssignTagToArtistEventToState(AssignTagToArtist event, Emitter<ArtistDetailsState> emit) {
     createEntityBlocHelper.handleAssignTagToArtistEvent(event, _repository);
+  }
+
+  void _closeCreateTagDialog(Emitter<ArtistDetailsState> emit) {
+    emit(state.copyWith(showCreateTagDialog: false));
   }
 }
