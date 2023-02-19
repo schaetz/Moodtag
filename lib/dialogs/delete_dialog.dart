@@ -80,20 +80,23 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
   }
 
   void deleteEntity(BuildContext context) async {
-    final bloc = Provider.of<Repository>(context, listen: false);
+    // TODO Create actual BLoC events
+    // final bloc = Provider.of<Repository>(context, listen: false);
+    //
+    // if (resetLibrary) {
+    //   await bloc.deleteAllArtists();
+    //   await bloc.deleteAllTags();
+    // } else if (entityToDelete is Artist) {
+    //   await bloc.deleteArtist(entityToDelete as Artist);
+    // } else if (entityToDelete is Tag) {
+    //   await bloc.deleteTag(entityToDelete as Tag);
+    // } else {
+    //   print('Error: Invalid entity');
+    //   closeDialog(context, result: false);
+    // }
+    //
+    // closeDialog(context, result: true);
 
-    if (resetLibrary) {
-      await bloc.deleteAllArtists();
-      await bloc.deleteAllTags();
-    } else if (entityToDelete is Artist) {
-      await bloc.deleteArtist(entityToDelete as Artist);
-    } else if (entityToDelete is Tag) {
-      await bloc.deleteTag(entityToDelete as Tag);
-    } else {
-      print('Error: Invalid entity');
-      closeDialog(context, result: false);
-    }
-
-    closeDialog(context, result: true);
+    throw UnimplementedError();
   }
 }

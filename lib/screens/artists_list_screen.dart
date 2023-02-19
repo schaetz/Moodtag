@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
@@ -19,15 +20,22 @@ class ArtistsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<ArtistsListBloc>();
+    bloc.errorStreamController.stream.listen((event) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
+      });
+    });
     return Scaffold(
       appBar: MtAppBar(context),
       body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
         listener: (context, state) {
           if (state.showCreateArtistDialog) {
             AddEntityDialog.openAddArtistDialog(context,
-                onSendInput: (input) => context.read<ArtistsListBloc>().add(CreateArtists(input)),
-                onTerminate: (_) => context.read<ArtistsListBloc>().add(CloseCreateArtistDialog()));
+                onSendInput: (input) => bloc.add(CreateArtists(input)),
+                onTerminate: (_) => bloc.add(CloseCreateArtistDialog()));
           }
+          // if (bloc.errorStreamController.stream.listen((event) { })
         },
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {

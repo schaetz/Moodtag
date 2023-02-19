@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/exceptions/name_already_taken_exception.dart';
+import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/library_event.dart';
@@ -13,6 +15,8 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
   final Repository _repository;
   late final StreamSubscription _artistsStreamSubscription;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
+  // late final Stream<UserReadableException?> errorStream;
+  StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
   ArtistsListBloc(this._repository) : super(ArtistsListState()) {
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
@@ -48,8 +52,12 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
     if (state.showCreateArtistDialog) _closeCreateArtistDialog(emit);
   }
 
-  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) {
-    createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
+  void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) async {
+    final exception = await createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
+    if (exception is NameAlreadyTakenException) {
+      errorStreamController.add(exception);
+    }
+
     _closeCreateArtistDialog(emit);
   }
 

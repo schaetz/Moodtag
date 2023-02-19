@@ -1,11 +1,12 @@
 import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/utils/helpers.dart';
 
 class CreateEntityBlocHelper {
-  void handleCreateArtistsEvent(CreateArtists event, Repository repository) async {
+  Future<UserReadableException?> handleCreateArtistsEvent(CreateArtists event, Repository repository) async {
     List<String> inputElements = processMultilineInput(event.input);
     List<DbRequestResponse> exceptionResponses = [];
 
@@ -14,7 +15,7 @@ class CreateEntityBlocHelper {
       if (createArtistResponse.didFail()) exceptionResponses.add(createArtistResponse);
     }
 
-    //TODO handle exceptions
+    return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
   }
 
   void handleCreateTagsEvent(CreateTags event, Repository repository) async {
@@ -53,4 +54,22 @@ class CreateEntityBlocHelper {
       }
     }
   }
+
+  // void showErrorInSnackbar(List<DbRequestResponse> exceptionResponses, bool preselectedOther) {
+  //   UserReadableException? userFeedbackException = getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
+  //
+  //   if (userFeedbackException == null) {
+  //     // Ignore if there was no actual error (this should never happen)
+  //     return;
+  //   } else if (userFeedbackException is NameAlreadyTakenException && preselectedOther) {
+  //     // Do not show an error message if the already existing entity
+  //     // is assigned to a preselected other entity
+  //     return;
+  //   } else {
+  //     final errorReason = userFeedbackException is NameAlreadyTakenException
+  //         ? 'One or several $entityDenotationPlural already exist'
+  //         : userFeedbackException.message;
+  //     final errorMessage = 'Error while adding $entityDenotationPlural: $errorReason';
+  //   }
+  // }
 }
