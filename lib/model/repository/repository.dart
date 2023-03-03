@@ -119,7 +119,6 @@ class Repository {
     Exception? exception = null;
     await changedEntityFuture.onError<Exception>((e, stackTrace) {
       exception = e;
-      return null;
     });
 
     if (exception != null) {
@@ -130,11 +129,14 @@ class Repository {
 
   Future<DbRequestResponse<E>> _wrapExceptionsAndReturnResponseWithEntity<E>(
       Future<int?> createEntityFuture, String name) async {
-    Exception? exception = null;
-    E newEntity = await createEntityFuture.onError<Exception>((e, stackTrace) {
-      exception = e;
-      return null;
-    }).then((newEntityId) async => await _getEntityById<E>(newEntityId));
+    Exception? exception;
+    E? newEntity;
+
+    try {
+      newEntity = await createEntityFuture.then((newEntityId) async => await _getEntityById<E>(newEntityId));
+    } catch (e) {
+      exception = e as Exception;
+    }
 
     if (newEntity == null) {
       if (exception == null) {
