@@ -18,7 +18,7 @@ class CreateEntityBlocHelper {
     return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
   }
 
-  void handleCreateTagsEvent(CreateTags event, Repository repository) async {
+  Future<UserReadableException?> handleCreateTagsEvent(CreateTags event, Repository repository) async {
     List<String> inputElements = processMultilineInput(event.input);
     List<DbRequestResponse> exceptionResponses = [];
 
@@ -35,7 +35,7 @@ class CreateEntityBlocHelper {
       }
     }
 
-    //TODO handle exceptions
+    return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
   }
 
   void handleToggleTagForArtistEvent(ToggleTagForArtist event, Repository repository) async {

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/exceptions/name_already_taken_exception.dart';
+import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/events/library_event.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -13,6 +15,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
   final Repository _repository;
   late final StreamSubscription _tagsStreamSubscription;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
+  StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
   TagsListBloc(this._repository) : super(TagsListState()) {
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
@@ -48,8 +51,12 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
     if (state.showCreateTagDialog) _closeCreateTagDialog(emit);
   }
 
-  void _mapCreateTagsEventToState(CreateTags event, Emitter<TagsListState> emit) {
-    createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+  void _mapCreateTagsEventToState(CreateTags event, Emitter<TagsListState> emit) async {
+    final exception = await createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    if (exception is NameAlreadyTakenException) {
+      errorStreamController.add(exception);
+    }
+
     _closeCreateTagDialog(emit);
   }
 

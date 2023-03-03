@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/exceptions/name_already_taken_exception.dart';
+import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/artist_events.dart';
@@ -16,6 +18,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
   late final StreamSubscription _tagsForArtistStreamSubscription;
   late final StreamSubscription _allTagsStreamSubscription;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
+  StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
   ArtistDetailsBloc(this._repository, int artistId)
       : super(ArtistDetailsState(artistId: artistId, tagEditMode: false)) {
@@ -85,8 +88,12 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
     _closeCreateTagDialog(emit);
   }
 
-  void _mapCreateTagsEventToState(CreateTags event, Emitter<ArtistDetailsState> emit) {
-    createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+  void _mapCreateTagsEventToState(CreateTags event, Emitter<ArtistDetailsState> emit) async {
+    final exception = await createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    if (exception is NameAlreadyTakenException) {
+      errorStreamController.add(exception);
+    }
+
     _closeCreateTagDialog(emit);
   }
 

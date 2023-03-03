@@ -35,7 +35,6 @@ class ArtistsListScreen extends StatelessWidget {
                 onSendInput: (input) => bloc.add(CreateArtists(input)),
                 onTerminate: (_) => bloc.add(CloseCreateArtistDialog()));
           }
-          // if (bloc.errorStreamController.stream.listen((event) { })
         },
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {

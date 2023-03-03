@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
@@ -18,6 +19,12 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<ArtistDetailsBloc>();
+    bloc.errorStreamController.stream.listen((event) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
+      });
+    });
     return Scaffold(
         appBar: MtAppBar(context),
         body: Padding(
@@ -27,9 +34,8 @@ class ArtistDetailsScreen extends StatelessWidget {
               if (state.showCreateTagDialog) {
                 AddEntityDialog.openAddTagDialog(context,
                     preselectedArtist: state.artist,
-                    onSendInput: (input) =>
-                        context.read<ArtistDetailsBloc>().add(CreateTags(input, preselectedArtist: state.artist)),
-                    onTerminate: (_) => context.read<ArtistDetailsBloc>().add(CloseCreateTagDialog()));
+                    onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: state.artist)),
+                    onTerminate: (_) => bloc.add(CloseCreateTagDialog()));
               }
             },
             // TODO Show loading or error symbols

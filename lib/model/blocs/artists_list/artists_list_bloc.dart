@@ -15,7 +15,6 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
   final Repository _repository;
   late final StreamSubscription _artistsStreamSubscription;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
-  // late final Stream<UserReadableException?> errorStream;
   StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
   ArtistsListBloc(this._repository) : super(ArtistsListState()) {
