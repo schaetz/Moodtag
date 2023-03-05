@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
@@ -12,8 +11,9 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/utils/user_error_notifier.dart';
 
-class ArtistsListScreen extends StatelessWidget {
+class ArtistsListScreen extends StatelessWidget with UserErrorNotifier {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   const ArtistsListScreen();
@@ -21,11 +21,6 @@ class ArtistsListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
-    bloc.errorStreamController.stream.listen((event) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
-      });
-    });
     return Scaffold(
       appBar: MtAppBar(context),
       body: BlocConsumer<ArtistsListBloc, ArtistsListState>(

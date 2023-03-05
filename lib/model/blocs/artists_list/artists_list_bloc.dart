@@ -9,13 +9,17 @@ import 'package:moodtag/model/events/library_event.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/artist_events.dart';
+import '../error_stream_bloc.dart';
 import 'artists_list_state.dart';
 
-class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> {
+class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> implements ErrorStreamBloc {
   final Repository _repository;
   late final StreamSubscription _artistsStreamSubscription;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
-  StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
+  final StreamController<UserReadableException> _errorStreamController = StreamController<UserReadableException>();
+
+  @override
+  StreamController<UserReadableException> get errorStreamController => _errorStreamController;
 
   ArtistsListBloc(this._repository) : super(ArtistsListState()) {
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
