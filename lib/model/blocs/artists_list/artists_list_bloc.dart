@@ -1,27 +1,23 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
-import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/library_event.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/artist_events.dart';
-import '../error_stream_bloc.dart';
+import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
-class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> implements ErrorStreamBloc {
-  final Repository _repository;
+class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStreamHandling {
+  late final Repository _repository;
   late final StreamSubscription _artistsStreamSubscription;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
-  final StreamController<UserReadableException> _errorStreamController = StreamController<UserReadableException>();
 
-  @override
-  StreamController<UserReadableException> get errorStreamController => _errorStreamController;
-
-  ArtistsListBloc(this._repository) : super(ArtistsListState()) {
+  ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
     on<OpenCreateArtistDialog>(_mapOpenCreateArtistDialogEventToState);
     on<CloseCreateArtistDialog>(_mapCloseCreateArtistDialogEventToState);
@@ -32,6 +28,8 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> implements Er
         .getArtists()
         .handleError((error) => add(ArtistsListUpdated(error: error)))
         .listen((artistsListFromStream) => add(ArtistsListUpdated(artists: artistsListFromStream)));
+
+    setupErrorHandler(mainContext);
   }
 
   Future<void> close() async {

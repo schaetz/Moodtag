@@ -11,9 +11,8 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/utils/user_error_notifier.dart';
 
-class ArtistsListScreen extends StatelessWidget with UserErrorNotifier {
+class ArtistsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   const ArtistsListScreen();

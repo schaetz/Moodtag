@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
+import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_event.dart';
@@ -12,7 +14,7 @@ import 'package:moodtag/model/repository/repository.dart';
 
 import 'artist_details_state.dart';
 
-class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
+class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _artistStreamSubscription;
   late final StreamSubscription _tagsForArtistStreamSubscription;
@@ -20,7 +22,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
   StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
-  ArtistDetailsBloc(this._repository, int artistId)
+  ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId)
       : super(ArtistDetailsState(artistId: artistId, tagEditMode: false)) {
     on<ArtistUpdated>(_mapArtistUpdatedEventToState);
     on<TagsForArtistListUpdated>(_mapTagsForArtistListUpdatedEventToState);
@@ -43,6 +45,8 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> {
         .getTags()
         .handleError((error) => add(TagsListUpdated(error: error)))
         .listen((tagsListFromStream) => add(TagsListUpdated(tags: tagsListFromStream)));
+
+    setupErrorHandler(mainContext);
   }
 
   Future<void> close() async {

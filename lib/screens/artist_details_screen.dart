@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
@@ -20,11 +19,6 @@ class ArtistDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistDetailsBloc>();
-    bloc.errorStreamController.stream.listen((event) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
-      });
-    });
     return Scaffold(
         appBar: MtAppBar(context),
         body: Padding(

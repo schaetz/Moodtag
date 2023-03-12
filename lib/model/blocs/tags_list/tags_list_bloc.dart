@@ -1,23 +1,23 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
-import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/events/library_event.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/tag_events.dart';
+import '../error_stream_handling.dart';
 import '../loading_status.dart';
 import 'tags_list_state.dart';
 
-class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
+class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _tagsStreamSubscription;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
-  StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
-  TagsListBloc(this._repository) : super(TagsListState()) {
+  TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
     on<OpenCreateTagDialog>(_mapOpenCreateTagDialogEventToState);
     on<CloseCreateTagDialog>(_mapCloseCreateTagDialogEventToState);
@@ -28,6 +28,8 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> {
         .getTags()
         .handleError((error) => add(TagsListUpdated(error: error)))
         .listen((tagsListFromStream) => add(TagsListUpdated(tags: tagsListFromStream)));
+
+    setupErrorHandler(mainContext);
   }
 
   Future<void> close() async {
