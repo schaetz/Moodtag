@@ -1,6 +1,5 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/spotify_import/import_flow_state.dart';
@@ -67,7 +66,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
         Navigator.of(context).pushNamed(Routes.lastFmImport);
         break;
       case menuItemResetLibrary:
-        DeleteDialog.openNew(context, resetLibrary: true);
+        //DeleteDialog.openNew(context, resetLibrary: true); // TODO
         break;
     }
   }

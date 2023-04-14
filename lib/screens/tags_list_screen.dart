@@ -46,7 +46,7 @@ class TagsListScreen extends StatelessWidget {
               padding: EdgeInsets.all(16.0),
               itemCount: state.tags.isNotEmpty ? state.tags.length : 0,
               itemBuilder: (context, i) {
-                return _buildTagRow(context, state.tags[i]);
+                return _buildTagRow(context, state.tags[i], bloc);
               },
             );
           }),
@@ -59,7 +59,10 @@ class TagsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTagRow(BuildContext context, Tag tag) {
+  Widget _buildTagRow(BuildContext context, Tag tag, TagsListBloc bloc) {
+    final handleDeleteTag = (Tag tag) {
+      bloc.add(DeleteTag(tag));
+    };
     return ListTile(
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -79,6 +82,6 @@ class TagsListScreen extends StatelessWidget {
         ),
         leading: Icon(Icons.label),
         onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag.id),
-        onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag));
+        onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag, deleteHandler: handleDeleteTag));
   }
 }

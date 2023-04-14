@@ -44,6 +44,16 @@ class DeleteArtist extends ArtistEvent {
   List<Object> get props => [artist];
 }
 
+class RemoveTagFromArtist extends ArtistEvent {
+  final Artist artist;
+  final Tag tag;
+
+  const RemoveTagFromArtist(this.artist, this.tag);
+
+  @override
+  List<Object> get props => [artist, tag];
+}
+
 class ToggleTagEditMode extends ArtistEvent {
   @override
   List<Object> get props => [];

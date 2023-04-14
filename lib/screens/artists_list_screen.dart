@@ -44,7 +44,7 @@ class ArtistsListScreen extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             itemCount: state.artists.isNotEmpty ? state.artists.length : 0,
             itemBuilder: (context, i) {
-              return _buildArtistRow(context, state.artists[i]);
+              return _buildArtistRow(context, state.artists[i], bloc);
             },
           );
         },
@@ -58,13 +58,17 @@ class ArtistsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildArtistRow(BuildContext context, Artist artist) {
+  Widget _buildArtistRow(BuildContext context, Artist artist, ArtistsListBloc bloc) {
+    final handleDeleteArtist = (Artist artist) {
+      bloc.add(DeleteArtist(artist));
+    };
     return ListTile(
         title: Text(
           artist.name,
           style: listEntryStyle,
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
-        onLongPress: () => DeleteDialog.openNew<Artist>(context, entityToDelete: artist));
+        onLongPress: () =>
+            DeleteDialog.openNew<Artist>(context, entityToDelete: artist, deleteHandler: handleDeleteArtist));
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/exceptions/internal_exception.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:provider/provider.dart';
@@ -6,15 +7,21 @@ import 'package:provider/provider.dart';
 import 'abstract_dialog.dart';
 
 class DeleteDialog<T> extends AbstractDialog<bool> {
-  static void openNew<T>(BuildContext context, {T? entityToDelete, bool resetLibrary = false}) {
+  static void openNew<T>(BuildContext context,
+      {required T entityToDelete, required Function(T) deleteHandler, bool resetLibrary = false}) {
     print(entityToDelete);
-    new DeleteDialog<T>(context, entityToDelete: entityToDelete, resetLibrary: resetLibrary).show();
+    new DeleteDialog<T>(context,
+            entityToDelete: entityToDelete, deleteHandler: deleteHandler, resetLibrary: resetLibrary)
+        .show();
   }
 
-  bool resetLibrary = false;
+  Function(T) deleteHandler;
   T? entityToDelete;
+  bool resetLibrary = false;
 
-  DeleteDialog(BuildContext context, {required this.entityToDelete, this.resetLibrary = false}) : super(context);
+  DeleteDialog(BuildContext context,
+      {required this.entityToDelete, required this.deleteHandler, this.resetLibrary = false})
+      : super(context);
 
   @override
   StatelessWidget buildDialog(BuildContext context) {
@@ -80,23 +87,11 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
   }
 
   void deleteEntity(BuildContext context) async {
-    // TODO Create actual BLoC events
-    // final bloc = Provider.of<Repository>(context, listen: false);
-    //
-    // if (resetLibrary) {
-    //   await bloc.deleteAllArtists();
-    //   await bloc.deleteAllTags();
-    // } else if (entityToDelete is Artist) {
-    //   await bloc.deleteArtist(entityToDelete as Artist);
-    // } else if (entityToDelete is Tag) {
-    //   await bloc.deleteTag(entityToDelete as Tag);
-    // } else {
-    //   print('Error: Invalid entity');
-    //   closeDialog(context, result: false);
-    // }
-    //
-    // closeDialog(context, result: true);
+    if (entityToDelete == null && !resetLibrary) {
+      throw new InternalException("The delete dialog was called with invalid arguments.");
+    }
 
-    throw UnimplementedError();
+    await deleteHandler(entityToDelete!);
+    closeDialog(context);
   }
 }

@@ -6,6 +6,7 @@ import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_state.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class TagDetailsScreen extends StatelessWidget {
@@ -16,6 +17,7 @@ class TagDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<TagDetailsBloc>();
     return Scaffold(
       appBar: MtAppBar(context),
       body: BlocBuilder<TagDetailsBloc, TagDetailsState>(
@@ -48,7 +50,7 @@ class TagDetailsScreen extends StatelessWidget {
                   padding: EdgeInsets.all(16.0),
                   itemCount: state.artistsWithTag!.length,
                   itemBuilder: (context, i) {
-                    return _buildArtistRow(context, state, state.artistsWithTag![i]);
+                    return _buildArtistRow(context, state, state.artistsWithTag![i], bloc);
                   },
                 );
               })),
@@ -68,13 +70,16 @@ class TagDetailsScreen extends StatelessWidget {
   }
 
   // TODO Replace state parameter by non-nullable parameters for individual properties
-  Widget _buildArtistRow(BuildContext context, TagDetailsState state, Artist artist) {
+  Widget _buildArtistRow(BuildContext context, TagDetailsState state, Artist artist, TagDetailsBloc bloc) {
+    final handleRemoveTagFromArtist = (Tag tag, Artist artist) {
+      bloc.add(RemoveTagFromArtist(artist, tag));
+    };
     return ListTile(
         title: Text(
           artist.name,
           style: listEntryStyle,
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
-        onLongPress: () => RemoveTagFromArtistDialog.openNew(context, state.tag!, artist));
+        onLongPress: () => RemoveTagFromArtistDialog.openNew(context, state.tag!, artist, handleRemoveTagFromArtist));
   }
 }

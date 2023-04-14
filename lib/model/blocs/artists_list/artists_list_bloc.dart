@@ -62,8 +62,11 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
     _closeCreateArtistDialog(emit);
   }
 
-  void _mapDeleteArtistEventToState(DeleteArtist event, Emitter<ArtistsListState> emit) {
-    // TODO
+  void _mapDeleteArtistEventToState(DeleteArtist event, Emitter<ArtistsListState> emit) async {
+    final deleteArtistResponse = await _repository.deleteArtist(event.artist);
+    if (deleteArtistResponse.didFail()) {
+      errorStreamController.add(deleteArtistResponse.getUserFeedbackException());
+    }
   }
 
   void _openCreateArtistDialog(Emitter<ArtistsListState> emit) {

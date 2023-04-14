@@ -3,28 +3,21 @@ import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 
 class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
-  static void openNew(BuildContext context, Tag tag, Artist artist) {
-    new RemoveTagFromArtistDialog(context, tag, artist).show();
+  static void openNew(BuildContext context, Tag tag, Artist artist, Function(Tag, Artist) removeTagHandler) {
+    new RemoveTagFromArtistDialog(context, tag, artist, (Tag curriedTag) => removeTagHandler(curriedTag, artist))
+        .show();
   }
 
+  Function(Tag) removeTagHandler;
   Tag tagToRemove;
   Artist artistToRemoveFrom;
 
-  RemoveTagFromArtistDialog(BuildContext context, this.tagToRemove, this.artistToRemoveFrom)
-      : super(context, entityToDelete: tagToRemove);
+  RemoveTagFromArtistDialog(BuildContext context, this.tagToRemove, this.artistToRemoveFrom, this.removeTagHandler)
+      : super(context, entityToDelete: tagToRemove, deleteHandler: removeTagHandler);
 
   @override
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) {
     return new Future<String>(
         () => 'Do you want to remove the tag "${tagToRemove.name}" from the artist "${artistToRemoveFrom.name}"?');
-  }
-
-  @override
-  void deleteEntity(BuildContext context) {
-    // TODO Replace by firing bloc event
-    // final bloc = Provider.of<Repository>(context, listen: false);
-    // bloc.removeTagFromArtist(artistToRemoveFrom, tagToRemove);
-
-    closeDialog(context);
   }
 }

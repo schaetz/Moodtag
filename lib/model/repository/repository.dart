@@ -36,8 +36,9 @@ class Repository {
     return _wrapExceptionsAndReturnResponseWithEntity<Artist>(createArtistFuture, name);
   }
 
-  Future deleteArtist(Artist artist) {
-    return db.deleteArtistById(artist.id);
+  Future<DbRequestResponse> deleteArtist(Artist artist) async {
+    Future deleteArtistFuture = db.deleteArtistById(artist.id);
+    return _wrapExceptionsAndReturnResponse(deleteArtistFuture);
   }
 
   Stream getArtistsWithTag(int tagId) {
