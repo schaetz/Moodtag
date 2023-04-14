@@ -11,8 +11,7 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
       {required T entityToDelete, required Function(T) deleteHandler, bool resetLibrary = false}) {
     print(entityToDelete);
     new DeleteDialog<T>(context,
-            entityToDelete: entityToDelete, deleteHandler: deleteHandler, resetLibrary: resetLibrary)
-        .show();
+        entityToDelete: entityToDelete, deleteHandler: deleteHandler, resetLibrary: resetLibrary);
   }
 
   Function(T) deleteHandler;
