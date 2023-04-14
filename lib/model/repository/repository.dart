@@ -41,8 +41,8 @@ class Repository {
     return _wrapExceptionsAndReturnResponse(deleteArtistFuture);
   }
 
-  Stream getArtistsWithTag(int tagId) {
-    return db.tagsForArtist(tagId).watch();
+  Stream<List<Artist>> getArtistsWithTag(int tagId) {
+    return db.artistsWithTag(tagId).watch();
   }
 
   Future deleteAllArtists() {
@@ -69,11 +69,12 @@ class Repository {
     return _wrapExceptionsAndReturnResponseWithEntity<Tag>(createTagFuture, name);
   }
 
-  Future deleteTag(Tag tag) {
-    return db.deleteTagById(tag.id);
+  Future<DbRequestResponse> deleteTag(Tag tag) {
+    Future deleteArtistFuture = db.deleteTagById(tag.id);
+    return _wrapExceptionsAndReturnResponse(deleteArtistFuture);
   }
 
-  Stream getTagsForArtist(int artistId) {
+  Stream<List<Tag>> getTagsForArtist(int artistId) {
     return db.tagsForArtist(artistId).watch();
   }
 

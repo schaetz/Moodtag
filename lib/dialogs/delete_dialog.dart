@@ -63,7 +63,7 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
   }
 
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) async {
-    final bloc = Provider.of<Repository>(context, listen: false);
+    final repository = context.read<Repository>();
 
     print(resetLibrary);
     if (resetLibrary) {
@@ -74,12 +74,22 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
     } else if (entityToDelete is Tag) {
       Tag tag = entityToDelete as Tag;
       final mainMessage = 'Are you sure that you want to delete the tag "${tag.name}"?';
-      final artistsWithTag = await bloc.getArtistsWithTag(tag.id);
-      if (await artistsWithTag.isEmpty) {
-        return mainMessage + ' It is currently not assigned to any artist.';
+      String appendix = '';
+      final artistsWithTagStream = await repository.getArtistsWithTag(tag.id);
+      if (await artistsWithTagStream.isEmpty) {
+        appendix = ' It is currently not assigned to any artist.';
       } else {
-        return mainMessage + ' There are currently ${artistsWithTag.length} artists which use this tag.';
+        await artistsWithTagStream.first.then((artistsWithTag) {
+          if (artistsWithTag.length == 0) {
+            appendix = ' It is currently not assigned to any artist.';
+          } else if (artistsWithTag.length == 1) {
+            appendix = ' There is currently 1 artist which uses this tag.';
+          } else {
+            appendix = ' There are currently ${artistsWithTag.length} artists which use this tag.';
+          }
+        });
       }
+      return mainMessage + appendix;
     } else {
       return 'Error: Invalid entity';
     }

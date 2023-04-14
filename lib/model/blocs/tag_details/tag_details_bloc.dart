@@ -26,7 +26,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
         .handleError((error) => add(TagUpdated(error: error)))
         .listen((tagFromStream) => add(TagUpdated(tag: tagFromStream)));
     _artistsWithTagStreamSubscription = _repository
-        .getTagsForArtist(tagId)
+        .getArtistsWithTag(tagId)
         .handleError((error) => add(ArtistsListUpdated(error: error)))
         .listen((artistsListFromStream) => add(ArtistsListUpdated(artists: artistsListFromStream)));
 

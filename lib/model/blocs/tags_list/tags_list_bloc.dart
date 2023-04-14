@@ -62,8 +62,11 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
     _closeCreateTagDialog(emit);
   }
 
-  void _mapDeleteTagEventToState(DeleteTag event, Emitter<TagsListState> emit) {
-    // TODO
+  void _mapDeleteTagEventToState(DeleteTag event, Emitter<TagsListState> emit) async {
+    final deleteTagResponse = await _repository.deleteTag(event.tag);
+    if (deleteTagResponse.didFail()) {
+      errorStreamController.add(deleteTagResponse.getUserFeedbackException());
+    }
   }
 
   void _openCreateTagDialog(Emitter<TagsListState> emit) {

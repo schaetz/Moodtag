@@ -23,7 +23,7 @@ class _LastfmImportScreenState extends State<LastfmImportScreen> {
   @override
   void initState() {
     super.initState();
-    bloc = Provider.of<Repository>(context, listen: false);
+    bloc = Provider.of<Repository>(context, listen: false); // TODO Replace by actual bloc event
     _updateAccountNameFromDatabase();
   }
 
