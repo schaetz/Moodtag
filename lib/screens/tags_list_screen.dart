@@ -24,14 +24,7 @@ class TagsListScreen extends StatelessWidget {
     final bloc = context.read<TagsListBloc>();
     return Scaffold(
       appBar: MtAppBar(context),
-      body: BlocConsumer<TagsListBloc, TagsListState>(
-          listener: (context, state) {
-            if (state.showCreateTagDialog) {
-              AddEntityDialog.openAddTagDialog(context,
-                  onSendInput: (input) => bloc.add(CreateTags(input)),
-                  onTerminate: (_) => bloc.add(CloseCreateTagDialog()));
-            }
-          },
+      body: BlocBuilder<TagsListBloc, TagsListState>(
           buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
           builder: (context, state) {
             if (state.tags.isEmpty) {
@@ -51,7 +44,7 @@ class TagsListScreen extends StatelessWidget {
             );
           }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => bloc.add(OpenCreateTagDialog()),
+        onPressed: () => AddEntityDialog.openAddTagDialog(context, onSendInput: (input) => bloc.add(CreateTags(input))),
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),

@@ -22,14 +22,7 @@ class ArtistsListScreen extends StatelessWidget {
     final bloc = context.read<ArtistsListBloc>();
     return Scaffold(
       appBar: MtAppBar(context),
-      body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
-        listener: (context, state) {
-          if (state.showCreateArtistDialog) {
-            AddEntityDialog.openAddArtistDialog(context,
-                onSendInput: (input) => bloc.add(CreateArtists(input)),
-                onTerminate: (_) => bloc.add(CloseCreateArtistDialog()));
-          }
-        },
+      body: BlocBuilder<ArtistsListBloc, ArtistsListState>(
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {
           if (state.artists.isEmpty) {
@@ -50,7 +43,8 @@ class ArtistsListScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.read<ArtistsListBloc>().add(OpenCreateArtistDialog()),
+        onPressed: () =>
+            AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => bloc.add(CreateArtists(input))),
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),

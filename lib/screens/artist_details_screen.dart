@@ -18,20 +18,11 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<ArtistDetailsBloc>();
     return Scaffold(
         appBar: MtAppBar(context),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: BlocConsumer<ArtistDetailsBloc, ArtistDetailsState>(
-            listener: (context, state) {
-              if (state.showCreateTagDialog) {
-                AddEntityDialog.openAddTagDialog(context,
-                    preselectedArtist: state.artist,
-                    onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: state.artist)),
-                    onTerminate: (_) => bloc.add(CloseCreateTagDialog()));
-              }
-            },
+          child: BlocBuilder<ArtistDetailsBloc, ArtistDetailsState>(
             // TODO Show loading or error symbols
             buildWhen: (previous, current) =>
                 current.artistLoadingStatus.isSuccess &&
@@ -94,7 +85,7 @@ class ArtistDetailsScreen extends StatelessWidget {
 
     List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (_value) {})).toList();
     if (state.tagEditMode) {
-      chipsList.add(_buildAddTagChip(context));
+      chipsList.add(_buildAddTagChip(context, state));
     }
 
     return Wrap(
@@ -120,11 +111,16 @@ class ArtistDetailsScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildAddTagChip(BuildContext context) {
+  Widget _buildAddTagChip(BuildContext context, ArtistDetailsState state) {
+    final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),
       backgroundColor: Theme.of(context).colorScheme.secondary,
-      onPressed: () => context.read<ArtistDetailsBloc>().add(OpenCreateTagDialog()),
+      onPressed: () => AddEntityDialog.openAddTagDialog(
+        context,
+        preselectedArtist: state.artist,
+        onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: state.artist)),
+      ),
     );
   }
 }

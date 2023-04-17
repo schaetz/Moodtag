@@ -68,13 +68,3 @@ class ToggleTagForArtist extends ArtistEvent {
   @override
   List<Object> get props => [artist, tag];
 }
-
-class OpenCreateArtistDialog extends ArtistEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class CloseCreateArtistDialog extends ArtistEvent {
-  @override
-  List<Object> get props => [];
-}

@@ -19,8 +19,6 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
 
   TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
-    on<OpenCreateTagDialog>(_mapOpenCreateTagDialogEventToState);
-    on<CloseCreateTagDialog>(_mapCloseCreateTagDialogEventToState);
     on<CreateTags>(_mapCreateTagsEventToState);
     on<DeleteTag>(_mapDeleteTagEventToState);
 
@@ -45,21 +43,11 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
     }
   }
 
-  void _mapOpenCreateTagDialogEventToState(OpenCreateTagDialog event, Emitter<TagsListState> emit) {
-    if (!state.showCreateTagDialog) _openCreateTagDialog(emit);
-  }
-
-  void _mapCloseCreateTagDialogEventToState(CloseCreateTagDialog event, Emitter<TagsListState> emit) {
-    if (state.showCreateTagDialog) _closeCreateTagDialog(emit);
-  }
-
   void _mapCreateTagsEventToState(CreateTags event, Emitter<TagsListState> emit) async {
     final exception = await createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }
-
-    _closeCreateTagDialog(emit);
   }
 
   void _mapDeleteTagEventToState(DeleteTag event, Emitter<TagsListState> emit) async {
@@ -67,13 +55,5 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
     if (deleteTagResponse.didFail()) {
       errorStreamController.add(deleteTagResponse.getUserFeedbackException());
     }
-  }
-
-  void _openCreateTagDialog(Emitter<TagsListState> emit) {
-    emit(state.copyWith(showCreateTagDialog: true));
-  }
-
-  void _closeCreateTagDialog(Emitter<TagsListState> emit) {
-    emit(state.copyWith(showCreateTagDialog: false));
   }
 }

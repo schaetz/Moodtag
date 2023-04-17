@@ -19,8 +19,6 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
 
   ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
-    on<OpenCreateArtistDialog>(_mapOpenCreateArtistDialogEventToState);
-    on<CloseCreateArtistDialog>(_mapCloseCreateArtistDialogEventToState);
     on<CreateArtists>(_mapCreateArtistsEventToState);
     on<DeleteArtist>(_mapDeleteArtistEventToState);
 
@@ -45,21 +43,11 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
     }
   }
 
-  void _mapOpenCreateArtistDialogEventToState(OpenCreateArtistDialog event, Emitter<ArtistsListState> emit) {
-    if (!state.showCreateArtistDialog) _openCreateArtistDialog(emit);
-  }
-
-  void _mapCloseCreateArtistDialogEventToState(CloseCreateArtistDialog event, Emitter<ArtistsListState> emit) {
-    if (state.showCreateArtistDialog) _closeCreateArtistDialog(emit);
-  }
-
   void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) async {
     final exception = await createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }
-
-    _closeCreateArtistDialog(emit);
   }
 
   void _mapDeleteArtistEventToState(DeleteArtist event, Emitter<ArtistsListState> emit) async {
@@ -67,13 +55,5 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
     if (deleteArtistResponse.didFail()) {
       errorStreamController.add(deleteArtistResponse.getUserFeedbackException());
     }
-  }
-
-  void _openCreateArtistDialog(Emitter<ArtistsListState> emit) {
-    emit(state.copyWith(showCreateArtistDialog: true));
-  }
-
-  void _closeCreateArtistDialog(Emitter<ArtistsListState> emit) {
-    emit(state.copyWith(showCreateArtistDialog: false));
   }
 }

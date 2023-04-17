@@ -54,13 +54,3 @@ class DeleteTag extends TagEvent {
   @override
   List<Object> get props => [tag];
 }
-
-class OpenCreateTagDialog extends TagEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class CloseCreateTagDialog extends TagEvent {
-  @override
-  List<Object> get props => [];
-}

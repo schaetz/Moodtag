@@ -28,8 +28,6 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
     on<TagsForArtistListUpdated>(_mapTagsForArtistListUpdatedEventToState);
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
-    on<OpenCreateTagDialog>(_mapOpenCreateTagDialogEventToState);
-    on<CloseCreateTagDialog>(_mapCloseCreateTagDialogEventToState);
     on<CreateTags>(_mapCreateTagsEventToState);
     on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
 
@@ -84,28 +82,14 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
     emit(state.copyWith(tagEditMode: !state.tagEditMode));
   }
 
-  void _mapOpenCreateTagDialogEventToState(OpenCreateTagDialog event, Emitter<ArtistDetailsState> emit) {
-    emit(state.copyWith(showCreateTagDialog: true));
-  }
-
-  void _mapCloseCreateTagDialogEventToState(CloseCreateTagDialog event, Emitter<ArtistDetailsState> emit) {
-    _closeCreateTagDialog(emit);
-  }
-
   void _mapCreateTagsEventToState(CreateTags event, Emitter<ArtistDetailsState> emit) async {
     final exception = await createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }
-
-    _closeCreateTagDialog(emit);
   }
 
   void _mapToggleTagForArtistEventToState(ToggleTagForArtist event, Emitter<ArtistDetailsState> emit) {
     createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
-  }
-
-  void _closeCreateTagDialog(Emitter<ArtistDetailsState> emit) {
-    emit(state.copyWith(showCreateTagDialog: false));
   }
 }
