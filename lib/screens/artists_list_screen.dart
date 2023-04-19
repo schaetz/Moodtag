@@ -15,12 +15,15 @@ import 'package:moodtag/navigation/routes.dart';
 class ArtistsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  const ArtistsListScreen();
+  GlobalKey _scaffoldKey = GlobalKey();
+
+  ArtistsListScreen();
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: MtAppBar(context),
       body: BlocBuilder<ArtistsListBloc, ArtistsListState>(
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
@@ -62,7 +65,7 @@ class ArtistsListScreen extends StatelessWidget {
           style: listEntryStyle,
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
-        onLongPress: () =>
-            DeleteDialog.openNew<Artist>(context, entityToDelete: artist, deleteHandler: handleDeleteArtist));
+        onLongPress: () => DeleteDialog.openNew<Artist>(_scaffoldKey.currentContext!,
+            entityToDelete: artist, deleteHandler: handleDeleteArtist));
   }
 }

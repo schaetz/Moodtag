@@ -17,12 +17,15 @@ class TagsListScreen extends StatelessWidget {
   // TODO Define pale color in theme
   static const listEntryStylePale = TextStyle(fontSize: 18.0, color: Colors.grey);
 
+  GlobalKey _scaffoldKey = GlobalKey();
+
   TagsListScreen();
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagsListBloc>();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: MtAppBar(context),
       body: BlocBuilder<TagsListBloc, TagsListState>(
           buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
@@ -75,6 +78,7 @@ class TagsListScreen extends StatelessWidget {
         ),
         leading: Icon(Icons.label),
         onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag.id),
-        onLongPress: () => DeleteDialog.openNew<Tag>(context, entityToDelete: tag, deleteHandler: handleDeleteTag));
+        onLongPress: () => DeleteDialog.openNew<Tag>(_scaffoldKey.currentContext!,
+            entityToDelete: tag, deleteHandler: handleDeleteTag));
   }
 }
