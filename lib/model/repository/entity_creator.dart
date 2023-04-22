@@ -45,7 +45,7 @@ Future<DbRequestResponse<Tag>> createTagOrEditExistingTag(
 }
 
 Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, List<NamedEntity> entities) async {
-  // TODO Pass repository as parameter rather than getting it here
+  // TODO Replace direct repository call by bloc
   final bloc = Provider.of<Repository>(context, listen: false);
   final creationSuccessCountersByType = Map<Type, DbRequestSuccessCounter>();
   final Map<ImportedArtist, Artist> createdArtistsByEntity = {};

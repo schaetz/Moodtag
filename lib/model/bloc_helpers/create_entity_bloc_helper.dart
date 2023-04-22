@@ -38,19 +38,17 @@ class CreateEntityBlocHelper {
     return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
   }
 
-  void handleToggleTagForArtistEvent(ToggleTagForArtist event, Repository repository) async {
+  Future<UserReadableException?> handleToggleTagForArtistEvent(ToggleTagForArtist event, Repository repository) async {
     bool isTagAssignedToArtist = await repository.artistHasTag(event.artist, event.tag);
     if (isTagAssignedToArtist) {
       final removeTagFromArtistResponse = await repository.removeTagFromArtist(event.artist, event.tag);
       if (removeTagFromArtistResponse.didFail()) {
-        print(removeTagFromArtistResponse.exception);
-        // TODO handle exception
+        return removeTagFromArtistResponse.getUserFeedbackException();
       }
     } else {
       final assignTagToArtistResponse = await repository.assignTagToArtist(event.artist, event.tag);
       if (assignTagToArtistResponse.didFail()) {
-        print(assignTagToArtistResponse.exception);
-        // TODO handle exception
+        return assignTagToArtistResponse.getUserFeedbackException();
       }
     }
   }

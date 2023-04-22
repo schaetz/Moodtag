@@ -85,7 +85,7 @@ class Repository {
   //
   // Assigned tags
   //
-  Future<DbRequestResponse> assignTagToArtist(Artist artist, Tag tag) {
+  Future<DbRequestResponse> assignTagToArtist(Artist artist, Tag tag) async {
     Future<int> assignTagFuture = db.assignTagToArtist(AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id));
     return _wrapExceptionsAndReturnResponse(assignTagFuture);
   }

@@ -89,7 +89,10 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
     }
   }
 
-  void _mapToggleTagForArtistEventToState(ToggleTagForArtist event, Emitter<ArtistDetailsState> emit) {
-    createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
+  void _mapToggleTagForArtistEventToState(ToggleTagForArtist event, Emitter<ArtistDetailsState> emit) async {
+    final exception = await createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
+    if (exception != null) {
+      errorStreamController.add(exception);
+    }
   }
 }
