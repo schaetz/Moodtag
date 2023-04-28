@@ -9,7 +9,6 @@ import 'abstract_dialog.dart';
 class DeleteDialog<T> extends AbstractDialog<bool> {
   static void openNew<T>(BuildContext context,
       {required T entityToDelete, required Function() deleteHandler, bool resetLibrary = false}) {
-    print(entityToDelete);
     new DeleteDialog<T>(context,
         entityToDelete: entityToDelete, deleteHandler: deleteHandler, resetLibrary: resetLibrary);
   }

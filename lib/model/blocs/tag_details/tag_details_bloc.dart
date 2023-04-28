@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/artist_events.dart';
@@ -15,14 +16,16 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
   final Repository _repository;
   late final StreamSubscription _tagStreamSubscription;
   late final StreamSubscription _artistsWithTagStreamSubscription;
+  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId)
       : super(TagDetailsState(tagId: tagId, tagEditMode: false)) {
     on<TagUpdated>(_mapTagUpdatedEventToState);
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
+    on<RemoveTagFromArtist>(_mapRemoveTagFromArtistEventToState);
 
     _tagStreamSubscription = _repository
-        .getArtistById(tagId)
+        .getTagById(tagId)
         .handleError((error) => add(TagUpdated(error: error)))
         .listen((tagFromStream) => add(TagUpdated(tag: tagFromStream)));
     _artistsWithTagStreamSubscription = _repository
@@ -52,6 +55,13 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
       emit(state.copyWith(artistsWithTag: event.artists, artistsListLoadingStatus: LoadingStatus.success));
     } else {
       emit(state.copyWith(artistsListLoadingStatus: LoadingStatus.error));
+    }
+  }
+
+  void _mapRemoveTagFromArtistEventToState(RemoveTagFromArtist event, Emitter<TagDetailsState> emit) async {
+    final exception = await _createEntityBlocHelper.handleRemoveTagFromArtistEvent(event, _repository);
+    if (exception != null) {
+      errorStreamController.add(exception);
     }
   }
 }

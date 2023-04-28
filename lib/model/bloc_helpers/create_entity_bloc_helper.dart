@@ -1,5 +1,6 @@
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -41,33 +42,37 @@ class CreateEntityBlocHelper {
   Future<UserReadableException?> handleToggleTagForArtistEvent(ToggleTagForArtist event, Repository repository) async {
     bool isTagAssignedToArtist = await repository.artistHasTag(event.artist, event.tag);
     if (isTagAssignedToArtist) {
-      final removeTagFromArtistResponse = await repository.removeTagFromArtist(event.artist, event.tag);
-      if (removeTagFromArtistResponse.didFail()) {
-        return removeTagFromArtistResponse.getUserFeedbackException();
-      }
+      return await _removeTagFromArtist(event.artist, event.tag, repository);
     } else {
-      final assignTagToArtistResponse = await repository.assignTagToArtist(event.artist, event.tag);
-      if (assignTagToArtistResponse.didFail()) {
-        return assignTagToArtistResponse.getUserFeedbackException();
-      }
+      return await _addTagToArtist(event.artist, event.tag, repository);
     }
   }
 
-  // void showErrorInSnackbar(List<DbRequestResponse> exceptionResponses, bool preselectedOther) {
-  //   UserReadableException? userFeedbackException = getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
-  //
-  //   if (userFeedbackException == null) {
-  //     // Ignore if there was no actual error (this should never happen)
-  //     return;
-  //   } else if (userFeedbackException is NameAlreadyTakenException && preselectedOther) {
-  //     // Do not show an error message if the already existing entity
-  //     // is assigned to a preselected other entity
-  //     return;
-  //   } else {
-  //     final errorReason = userFeedbackException is NameAlreadyTakenException
-  //         ? 'One or several $entityDenotationPlural already exist'
-  //         : userFeedbackException.message;
-  //     final errorMessage = 'Error while adding $entityDenotationPlural: $errorReason';
-  //   }
-  // }
+  Future<UserReadableException?> handleRemoveTagFromArtistEvent(
+      RemoveTagFromArtist event, Repository repository) async {
+    bool isTagAssignedToArtist = await repository.artistHasTag(event.artist, event.tag);
+    if (isTagAssignedToArtist) {
+      return await _removeTagFromArtist(event.artist, event.tag, repository);
+    }
+
+    return Future.value(null);
+  }
+
+  Future<UserReadableException?> _addTagToArtist(Artist artist, Tag tag, Repository repository) async {
+    final assignTagResponse = await repository.assignTagToArtist(artist, tag);
+    if (assignTagResponse.didFail()) {
+      return assignTagResponse.getUserFeedbackException();
+    }
+
+    return Future.value(null);
+  }
+
+  Future<UserReadableException?> _removeTagFromArtist(Artist artist, Tag tag, Repository repository) async {
+    final removeTagResponse = await repository.removeTagFromArtist(artist, tag);
+    if (removeTagResponse.didFail()) {
+      return removeTagResponse.getUserFeedbackException();
+    }
+
+    return Future.value(null);
+  }
 }

@@ -15,7 +15,7 @@ import 'tags_list_state.dart';
 class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _tagsStreamSubscription;
-  final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
+  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
     on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
@@ -44,7 +44,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
   }
 
   void _mapCreateTagsEventToState(CreateTags event, Emitter<TagsListState> emit) async {
-    final exception = await createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }

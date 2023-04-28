@@ -19,7 +19,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
   late final StreamSubscription _artistStreamSubscription;
   late final StreamSubscription _tagsForArtistStreamSubscription;
   late final StreamSubscription _allTagsStreamSubscription;
-  final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
+  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
   StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
   ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId)
@@ -83,14 +83,14 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
   }
 
   void _mapCreateTagsEventToState(CreateTags event, Emitter<ArtistDetailsState> emit) async {
-    final exception = await createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }
   }
 
   void _mapToggleTagForArtistEventToState(ToggleTagForArtist event, Emitter<ArtistDetailsState> emit) async {
-    final exception = await createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
+    final exception = await _createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }

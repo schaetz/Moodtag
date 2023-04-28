@@ -13,12 +13,15 @@ class TagDetailsScreen extends StatelessWidget {
   static const tagNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  const TagDetailsScreen();
+  final GlobalKey _scaffoldKey = GlobalKey();
+
+  TagDetailsScreen();
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagDetailsBloc>();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: MtAppBar(context),
       body: BlocBuilder<TagDetailsBloc, TagDetailsState>(
         buildWhen: (previous, current) =>
@@ -50,7 +53,7 @@ class TagDetailsScreen extends StatelessWidget {
                   padding: EdgeInsets.all(16.0),
                   itemCount: state.artistsWithTag!.length,
                   itemBuilder: (context, i) {
-                    return _buildArtistRow(context, state, state.artistsWithTag![i], bloc);
+                    return _buildArtistRow(context, state.tag!, state.artistsWithTag![i], bloc);
                   },
                 );
               })),
@@ -70,8 +73,8 @@ class TagDetailsScreen extends StatelessWidget {
   }
 
   // TODO Replace state parameter by non-nullable parameters for individual properties
-  Widget _buildArtistRow(BuildContext context, TagDetailsState state, Artist artist, TagDetailsBloc bloc) {
-    final handleRemoveTagFromArtist = (Tag tag, Artist artist) {
+  Widget _buildArtistRow(BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc) {
+    final handleRemoveTagFromArtist = () {
       bloc.add(RemoveTagFromArtist(artist, tag));
     };
     return ListTile(
@@ -80,6 +83,7 @@ class TagDetailsScreen extends StatelessWidget {
           style: listEntryStyle,
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
-        onLongPress: () => RemoveTagFromArtistDialog.openNew(context, state.tag!, artist, handleRemoveTagFromArtist));
+        onLongPress: () =>
+            RemoveTagFromArtistDialog.openNew(_scaffoldKey.currentContext!, tag, artist, handleRemoveTagFromArtist));
   }
 }

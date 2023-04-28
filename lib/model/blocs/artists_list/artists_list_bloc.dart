@@ -15,7 +15,7 @@ import 'artists_list_state.dart';
 class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStreamHandling {
   late final Repository _repository;
   late final StreamSubscription _artistsStreamSubscription;
-  final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
+  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
@@ -44,7 +44,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
   }
 
   void _mapCreateArtistsEventToState(CreateArtists event, Emitter<ArtistsListState> emit) async {
-    final exception = await createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
+    final exception = await _createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }

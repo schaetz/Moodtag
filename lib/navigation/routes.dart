@@ -43,11 +43,11 @@ class Routes {
       artistsDetails: (context) => BlocProvider(
           create: (_) =>
               ArtistDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),
-          child: const ArtistDetailsScreen()),
+          child: ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
           create: (_) =>
               TagDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),
-          child: const TagDetailsScreen()),
+          child: TagDetailsScreen()),
       lastFmImport: (context) => LastfmImportScreen(),
       spotifyImport: (context) => ImportFlow(),
     };

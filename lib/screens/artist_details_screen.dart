@@ -14,11 +14,14 @@ class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
   static const infoLabelStyle = TextStyle(fontSize: 18.0);
 
-  const ArtistDetailsScreen();
+  final GlobalKey _scaffoldKey = GlobalKey();
+
+  ArtistDetailsScreen();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldKey,
         appBar: MtAppBar(context),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
