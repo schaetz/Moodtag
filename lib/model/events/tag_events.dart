@@ -1,6 +1,6 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
 
-import 'library_event.dart';
+import 'library_events.dart';
 
 abstract class TagEvent extends LibraryEvent {
   const TagEvent();

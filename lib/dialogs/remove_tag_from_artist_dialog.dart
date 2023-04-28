@@ -4,11 +4,10 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 
 class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
   static void openNew(BuildContext context, Tag tag, Artist artist, Function(Tag, Artist) removeTagHandler) {
-    new RemoveTagFromArtistDialog(context, tag, artist, (Tag curriedTag) => removeTagHandler(curriedTag, artist))
-        .show();
+    new RemoveTagFromArtistDialog(context, tag, artist, () => removeTagHandler(tag, artist)).show();
   }
 
-  Function(Tag) removeTagHandler;
+  Function() removeTagHandler;
   Tag tagToRemove;
   Artist artistToRemoveFrom;
 

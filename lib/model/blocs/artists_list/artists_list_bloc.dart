@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
-import 'package:moodtag/model/events/library_event.dart';
+import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/artist_events.dart';

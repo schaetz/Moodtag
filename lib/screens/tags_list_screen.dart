@@ -17,7 +17,7 @@ class TagsListScreen extends StatelessWidget {
   // TODO Define pale color in theme
   static const listEntryStylePale = TextStyle(fontSize: 18.0, color: Colors.grey);
 
-  GlobalKey _scaffoldKey = GlobalKey();
+  final GlobalKey _scaffoldKey = GlobalKey();
 
   TagsListScreen();
 
@@ -56,7 +56,7 @@ class TagsListScreen extends StatelessWidget {
   }
 
   Widget _buildTagRow(BuildContext context, Tag tag, TagsListBloc bloc) {
-    final handleDeleteTag = (Tag tag) {
+    final handleDeleteTag = () {
       bloc.add(DeleteTag(tag));
     };
     return ListTile(

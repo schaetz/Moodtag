@@ -1,6 +1,10 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/main.dart';
+import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
+import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/spotify_import/import_flow_state.dart';
 
@@ -20,6 +24,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<AppBarBloc>();
     return AppBar(
       title: _buildTitle(context),
       actions: <Widget>[
@@ -27,7 +32,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
           itemBuilder: (BuildContext itemBuilderContext) {
             return popupMenuItems.map((choice) => _buildPopupMenuItem(context, choice)).toList();
           },
-          onSelected: (value) => _handlePopupMenuItemTap(context, value),
+          onSelected: (value) => _handlePopupMenuItemTap(context, value, bloc),
         ),
       ],
       leading: forceBackButton ? BackButton(onPressed: () => context.flow<ImportFlowState>().complete()) : null,
@@ -57,7 +62,10 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  static void _handlePopupMenuItemTap(BuildContext context, String value) {
+  static void _handlePopupMenuItemTap(BuildContext context, String value, AppBarBloc bloc) {
+    final handleResetLibrary = () {
+      bloc.add(ResetLibrary());
+    };
     switch (value) {
       case menuItemSpotifyImport:
         Navigator.of(context).pushNamed(Routes.spotifyImport);
@@ -66,7 +74,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
         Navigator.of(context).pushNamed(Routes.lastFmImport);
         break;
       case menuItemResetLibrary:
-        //DeleteDialog.openNew(context, resetLibrary: true); // TODO
+        DeleteDialog.openNew(context, deleteHandler: handleResetLibrary, entityToDelete: null, resetLibrary: true);
         break;
     }
   }

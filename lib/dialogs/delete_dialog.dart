@@ -8,13 +8,13 @@ import 'abstract_dialog.dart';
 
 class DeleteDialog<T> extends AbstractDialog<bool> {
   static void openNew<T>(BuildContext context,
-      {required T entityToDelete, required Function(T) deleteHandler, bool resetLibrary = false}) {
+      {required T entityToDelete, required Function() deleteHandler, bool resetLibrary = false}) {
     print(entityToDelete);
     new DeleteDialog<T>(context,
         entityToDelete: entityToDelete, deleteHandler: deleteHandler, resetLibrary: resetLibrary);
   }
 
-  Function(T) deleteHandler;
+  Function() deleteHandler;
   T? entityToDelete;
   bool resetLibrary = false;
 
@@ -100,7 +100,7 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
       throw new InternalException("The delete dialog was called with invalid arguments.");
     }
 
-    await deleteHandler(entityToDelete!);
+    await deleteHandler();
     closeDialog(context);
   }
 }

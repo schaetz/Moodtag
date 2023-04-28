@@ -15,7 +15,7 @@ import 'package:moodtag/navigation/routes.dart';
 class ArtistsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  GlobalKey _scaffoldKey = GlobalKey();
+  final GlobalKey _scaffoldKey = GlobalKey();
 
   ArtistsListScreen();
 
@@ -56,7 +56,7 @@ class ArtistsListScreen extends StatelessWidget {
   }
 
   Widget _buildArtistRow(BuildContext context, Artist artist, ArtistsListBloc bloc) {
-    final handleDeleteArtist = (Artist artist) {
+    final handleDeleteArtist = () {
       bloc.add(DeleteArtist(artist));
     };
     return ListTile(

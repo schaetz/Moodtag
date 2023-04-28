@@ -16,6 +16,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -37,14 +38,16 @@ class _AppState extends State<MoodtagApp> {
   Widget build(BuildContext context) {
     return RepositoryProvider(
         create: (context) => Repository(),
-        child: MaterialApp(
-            title: MoodtagApp.appTitle,
-            theme: ThemeData(
-                primarySwatch: Colors.red,
-                primaryColor: Colors.red,
-                unselectedWidgetColor: Colors.grey,
-                dividerColor: Colors.black54),
-            initialRoute: Routes.initialRoute,
-            routes: Routes.instance().getRoutes()));
+        child: BlocProvider(
+            create: (context) => AppBarBloc(context),
+            child: MaterialApp(
+                title: MoodtagApp.appTitle,
+                theme: ThemeData(
+                    primarySwatch: Colors.red,
+                    primaryColor: Colors.red,
+                    unselectedWidgetColor: Colors.grey,
+                    dividerColor: Colors.black54),
+                initialRoute: Routes.initialRoute,
+                routes: Routes.instance().getRoutes())));
   }
 }
