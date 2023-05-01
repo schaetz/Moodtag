@@ -22,6 +22,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
       : super(TagDetailsState(tagId: tagId, tagEditMode: false)) {
     on<TagUpdated>(_mapTagUpdatedEventToState);
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
+    on<AddArtistsForTag>(_mapAddArtistsForTagEventToState);
     on<RemoveTagFromArtist>(_mapRemoveTagFromArtistEventToState);
 
     _tagStreamSubscription = _repository
@@ -55,6 +56,13 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
       emit(state.copyWith(artistsWithTag: event.artists, artistsListLoadingStatus: LoadingStatus.success));
     } else {
       emit(state.copyWith(artistsListLoadingStatus: LoadingStatus.error));
+    }
+  }
+
+  void _mapAddArtistsForTagEventToState(AddArtistsForTag event, Emitter<TagDetailsState> emit) async {
+    final exception = await _createEntityBlocHelper.handleAddArtistsForTagEvent(event, _repository);
+    if (exception != null) {
+      errorStreamController.add(exception);
     }
   }
 

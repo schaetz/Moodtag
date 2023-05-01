@@ -65,3 +65,13 @@ class DeleteTag extends TagEvent {
   @override
   List<Object> get props => [tag];
 }
+
+class AddArtistsForTag extends TagEvent {
+  final String input;
+  final Tag tag;
+
+  const AddArtistsForTag(this.input, this.tag);
+
+  @override
+  List<Object> get props => [input, tag];
+}

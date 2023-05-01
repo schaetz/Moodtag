@@ -15,15 +15,20 @@ class MoodtagDB extends _$MoodtagDB {
   @override
   int get schemaVersion => 1;
 
-  Stream<List<Artist>> get allArtists => (select(artists)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
-  Stream<List<Tag>> get allTags => (select(tags)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
-  Stream<List<AssignedTag>> get allArtistTagPairs => select(assignedTags).watch();
+  // Currently not used
+  // Stream<List<Artist>> get allArtists => (select(artists)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
+  // Stream<List<Tag>> get allTags => (select(tags)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
+  // Stream<List<AssignedTag>> get allArtistTagPairs => select(assignedTags).watch();
 
   //
   // GET
   //
   Stream<List<Artist>> getArtists() {
     return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).watch();
+  }
+
+  Future<List<Artist>> getArtistsOnce() {
+    return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
   }
 
   Stream<Artist?> getArtistById(int artistId) {

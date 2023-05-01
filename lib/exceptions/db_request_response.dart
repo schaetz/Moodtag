@@ -61,15 +61,18 @@ class DbRequestResponse<E> {
 }
 
 UserReadableException? getHighestSeverityExceptionForMultipleResponses(List<DbRequestResponse> exceptionResponses) {
+  final userReadableExceptions = exceptionResponses.map((response) => response.getUserFeedbackException()).toList();
+  return getHighestSeverityException(userReadableExceptions);
+}
+
+UserReadableException? getHighestSeverityException(List<UserReadableException> userReadableExceptions) {
   ExceptionSeverity highestSeverity = ExceptionSeverity.LOW;
   UserReadableException? highestSeverityException;
 
-  for (DbRequestResponse response in exceptionResponses) {
-    UserReadableException userFeedbackException = response.getUserFeedbackException();
-
-    if (highestSeverityException == null || userFeedbackException.severity.index > highestSeverity.index) {
-      highestSeverityException = userFeedbackException;
-      highestSeverity = userFeedbackException.severity;
+  for (UserReadableException exception in userReadableExceptions) {
+    if (highestSeverityException == null || exception.severity.index > highestSeverity.index) {
+      highestSeverityException = exception;
+      highestSeverity = exception.severity;
     }
   }
 

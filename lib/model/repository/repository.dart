@@ -18,8 +18,12 @@ class Repository {
   //
   // Artists
   //
-  Stream getArtists() {
+  Stream<List<Artist>> getArtists() {
     return db.getArtists();
+  }
+
+  Future<List<Artist>> getArtistsOnce() {
+    return db.getArtistsOnce();
   }
 
   Stream getArtistById(int id) {
@@ -52,7 +56,7 @@ class Repository {
   //
   // Tags
   //
-  Stream getTags() {
+  Stream<List<Tag>> getTags() {
     return db.getTags();
   }
 

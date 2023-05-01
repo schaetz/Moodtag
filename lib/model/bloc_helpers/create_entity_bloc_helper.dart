@@ -1,8 +1,10 @@
 import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/entity_processing_helper.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/utils/helpers.dart';
 
@@ -37,6 +39,33 @@ class CreateEntityBlocHelper {
     }
 
     return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
+  }
+
+  Future<UserReadableException?> handleAddArtistsForTagEvent(AddArtistsForTag event, Repository repository) async {
+    List<String> inputElements = processMultilineInput(event.input);
+    List<UserReadableException> exceptions = [];
+
+    final artistNameToObjectMap = await getMapFromArtistNameToObject(repository);
+
+    for (String artistName in inputElements) {
+      if (!artistNameToObjectMap.containsKey(artistName)) {
+        final DbRequestResponse<Artist> createArtistResponse = await repository.createArtist(artistName);
+        if (createArtistResponse.didSucceed()) {
+          artistNameToObjectMap[artistName] = createArtistResponse.changedEntity!;
+        }
+        if (createArtistResponse.didFail()) exceptions.add(createArtistResponse.getUserFeedbackException());
+      }
+
+      if (artistNameToObjectMap.containsKey(artistName)) {
+        final assignTagToArtistResponse =
+            await repository.assignTagToArtist(artistNameToObjectMap[artistName]!, event.tag);
+        if (assignTagToArtistResponse.didFail()) exceptions.add(assignTagToArtistResponse.getUserFeedbackException());
+      } else {
+        exceptions.add(UnknownError("The tag could not be assigned to the artist ${artistName}."));
+      }
+    }
+
+    return getHighestSeverityException(exceptions);
   }
 
   Future<UserReadableException?> handleToggleTagForArtistEvent(ToggleTagForArtist event, Repository repository) async {
