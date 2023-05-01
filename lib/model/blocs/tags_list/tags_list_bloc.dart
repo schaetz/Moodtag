@@ -18,14 +18,14 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
-    on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
+    on<TagsListPlusUpdated>(_mapTagsListUpdatedEventToState);
     on<CreateTags>(_mapCreateTagsEventToState);
     on<DeleteTag>(_mapDeleteTagEventToState);
 
     _tagsStreamSubscription = _repository
-        .getTags()
-        .handleError((error) => add(TagsListUpdated(error: error)))
-        .listen((tagsListFromStream) => add(TagsListUpdated(tags: tagsListFromStream)));
+        .getTagsWithArtistFreq()
+        .handleError((error) => add(TagsListPlusUpdated(error: error)))
+        .listen((tagsListFromStream) => add(TagsListPlusUpdated(tagsWithArtistFreq: tagsListFromStream)));
 
     setupErrorHandler(mainContext);
   }
@@ -35,9 +35,9 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
     super.close();
   }
 
-  void _mapTagsListUpdatedEventToState(TagsListUpdated event, Emitter<TagsListState> emit) {
-    if (event.tags != null) {
-      emit(state.copyWith(tags: event.tags, loadingStatus: LoadingStatus.success));
+  void _mapTagsListUpdatedEventToState(TagsListPlusUpdated event, Emitter<TagsListState> emit) {
+    if (event.tagsWithArtistFreq != null) {
+      emit(state.copyWith(tagsWithArtistFreq: event.tagsWithArtistFreq, loadingStatus: LoadingStatus.success));
     } else {
       emit(state.copyWith(loadingStatus: LoadingStatus.error));
     }

@@ -7,6 +7,7 @@ import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_state.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
@@ -42,7 +43,7 @@ class TagsListScreen extends StatelessWidget {
               padding: EdgeInsets.all(16.0),
               itemCount: state.tags.isNotEmpty ? state.tags.length : 0,
               itemBuilder: (context, i) {
-                return _buildTagRow(context, state.tags[i], bloc);
+                return _buildTagRow(context, state.tags[i], state.artistFrequencies[i], bloc);
               },
             );
           }),
@@ -55,7 +56,7 @@ class TagsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTagRow(BuildContext context, Tag tag, TagsListBloc bloc) {
+  Widget _buildTagRow(BuildContext context, Tag tag, TagWithArtistFreq artistFreq, TagsListBloc bloc) {
     final handleDeleteTag = () {
       bloc.add(DeleteTag(tag));
     };
@@ -71,7 +72,7 @@ class TagsListScreen extends StatelessWidget {
               ),
             ),
             Text(
-              "0", // TODO Display correct number of artists with tag
+              artistFreq.freq.toString() ?? "",
               style: listEntryStylePale,
             )
           ],

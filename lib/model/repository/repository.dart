@@ -56,6 +56,10 @@ class Repository {
     return db.getTags();
   }
 
+  Stream getTagsWithArtistFreq() {
+    return db.getTagsWithArtistFreq();
+  }
+
   Stream getTagById(int id) {
     return db.getTagById(id);
   }
