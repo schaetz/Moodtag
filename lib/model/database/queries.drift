@@ -23,9 +23,11 @@ CREATE TABLE user_properties (
 artistsWithTag:
     SELECT * FROM artists WHERE artists.id IN (
         SELECT artist FROM assigned_tags WHERE tag = :tagId
-    );
+    )
+    ORDER BY ordering_name ASC;
 
 tagsForArtist:
     SELECT * FROM tags WHERE tags.id IN (
         SELECT tag FROM assigned_tags WHERE artist = :artistId
-    );
+    )
+    ORDER BY name ASC;
