@@ -27,15 +27,15 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   Stream<Artist?> getArtistById(int artistId) {
-    return (select(artists)..where((t) => t.id.equals(artistId))).getSingleOrNull().asStream();
+    return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull().asStream();
   }
 
   Future<Artist?> getArtistByName(String artistName) {
-    return (select(artists)..where((t) => t.name.equals(artistName))).getSingleOrNull();
+    return (select(artists)..where((a) => a.name.equals(artistName))).getSingleOrNull();
   }
 
   Stream<List<Tag>> getTags() {
-    return (select(tags)..orderBy([(a) => OrderingTerm.asc(a.name)])).watch();
+    return (select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
   }
 
   Stream<List<TagWithArtistFreq>> getTagsWithArtistFreq() {
@@ -43,7 +43,8 @@ class MoodtagDB extends _$MoodtagDB {
       leftOuterJoin(assignedTags, tags.id.equalsExp(assignedTags.tag)),
     ])
       ..addColumns([assignedTags.artist.count()])
-      ..groupBy([tags.id]);
+      ..groupBy([tags.id])
+      ..orderBy([OrderingTerm.asc(tags.name)]);
     final typedResultStream = query.watch();
     return _mapTagsWithArtistFreqStream(typedResultStream);
   }
