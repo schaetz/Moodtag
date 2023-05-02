@@ -75,3 +75,8 @@ class AddArtistsForTag extends TagEvent {
   @override
   List<Object> get props => [input, tag];
 }
+
+class ToggleArtistsForTagChecklist extends TagEvent {
+  @override
+  List<Object> get props => [];
+}

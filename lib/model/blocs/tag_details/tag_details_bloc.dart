@@ -15,31 +15,33 @@ import 'tag_details_state.dart';
 class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _tagStreamSubscription;
-  late final StreamSubscription _artistsWithTagStreamSubscription;
+  late final StreamSubscription _artistsWithTagFlagStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId)
-      : super(TagDetailsState(tagId: tagId, tagEditMode: false)) {
+      : super(TagDetailsState(tagId: tagId, checklistMode: false)) {
     on<TagUpdated>(_mapTagUpdatedEventToState);
-    on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
+    on<ArtistsListPlusUpdated>(_mapArtistsListPlusUpdatedEventToState);
     on<AddArtistsForTag>(_mapAddArtistsForTagEventToState);
     on<RemoveTagFromArtist>(_mapRemoveTagFromArtistEventToState);
+    on<ToggleArtistsForTagChecklist>(_mapToggleArtistsForTagChecklistEventToState);
+    on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
 
     _tagStreamSubscription = _repository
         .getTagById(tagId)
         .handleError((error) => add(TagUpdated(error: error)))
         .listen((tagFromStream) => add(TagUpdated(tag: tagFromStream)));
-    _artistsWithTagStreamSubscription = _repository
-        .getArtistsWithTag(tagId)
-        .handleError((error) => add(ArtistsListUpdated(error: error)))
-        .listen((artistsListFromStream) => add(ArtistsListUpdated(artists: artistsListFromStream)));
+    _artistsWithTagFlagStreamSubscription = _repository
+        .getArtistsWithTagFlag(tagId)
+        .handleError((error) => add(ArtistsListPlusUpdated(error: error)))
+        .listen((artistsListFromStream) => add(ArtistsListPlusUpdated(artistWithTagFlag: artistsListFromStream)));
 
     setupErrorHandler(mainContext);
   }
 
   Future<void> close() async {
     _tagStreamSubscription.cancel();
-    _artistsWithTagStreamSubscription.cancel();
+    _artistsWithTagFlagStreamSubscription.cancel();
     super.close();
   }
 
@@ -51,9 +53,10 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
     }
   }
 
-  void _mapArtistsListUpdatedEventToState(ArtistsListUpdated event, Emitter<TagDetailsState> emit) {
-    if (event.artists != null) {
-      emit(state.copyWith(artistsWithTag: event.artists, artistsListLoadingStatus: LoadingStatus.success));
+  void _mapArtistsListPlusUpdatedEventToState(ArtistsListPlusUpdated event, Emitter<TagDetailsState> emit) {
+    if (event.artistWithTagFlag != null) {
+      emit(
+          state.copyWith(artistsWithTagFlag: event.artistWithTagFlag, artistsListLoadingStatus: LoadingStatus.success));
     } else {
       emit(state.copyWith(artistsListLoadingStatus: LoadingStatus.error));
     }
@@ -68,6 +71,18 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
 
   void _mapRemoveTagFromArtistEventToState(RemoveTagFromArtist event, Emitter<TagDetailsState> emit) async {
     final exception = await _createEntityBlocHelper.handleRemoveTagFromArtistEvent(event, _repository);
+    if (exception != null) {
+      errorStreamController.add(exception);
+    }
+  }
+
+  void _mapToggleArtistsForTagChecklistEventToState(
+      ToggleArtistsForTagChecklist event, Emitter<TagDetailsState> emit) async {
+    emit(state.copyWith(checklistMode: !state.checklistMode));
+  }
+
+  void _mapToggleTagForArtistEventToState(ToggleTagForArtist event, Emitter<TagDetailsState> emit) async {
+    final exception = await _createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }

@@ -31,6 +31,30 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
   }
 
+  Stream<List<ArtistWithTagFlag>> getArtistsWithTagFlag(int tagId) {
+    final tagFlagForArtistExpr = assignedTags.tag.isNotNull();
+
+    final query = select(artists).join([
+      leftOuterJoin(assignedTags, assignedTags.artist.equalsExp(artists.id) & assignedTags.tag.equals(tagId),
+          useColumns: false),
+    ])
+      ..addColumns([tagFlagForArtistExpr])
+      ..orderBy([OrderingTerm.asc(artists.orderingName)]);
+    final typedResultStream = query.watch();
+    return _mapArtistsWithTagFlagStream(tagFlagForArtistExpr, typedResultStream, tagId);
+  }
+
+  Stream<List<ArtistWithTagFlag>> _mapArtistsWithTagFlagStream(
+      Expression tagFlagForArtistExpr, Stream<List<TypedResult>> typedResultStream, int tagId) {
+    return typedResultStream.map((r) => r.map((row) {
+          return ArtistWithTagFlag(
+            row.readTable(artists),
+            tagId,
+            row.read(tagFlagForArtistExpr) == true,
+          );
+        }).toList());
+  }
+
   Stream<Artist?> getArtistById(int artistId) {
     return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull().asStream();
   }
@@ -55,12 +79,12 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   Stream<List<TagWithArtistFreq>> _mapTagsWithArtistFreqStream(Stream<List<TypedResult>> typedResultStream) {
-    return typedResultStream.map((rows) => rows
-        .map((row) => TagWithArtistFreq(
-              row.readTable(tags),
-              row.read(assignedTags.artist.count()),
-            ))
-        .toList());
+    return typedResultStream.map((r) => r.map((row) {
+          return TagWithArtistFreq(
+            row.readTable(tags),
+            row.read(assignedTags.artist.count()),
+          );
+        }).toList());
   }
 
   Stream<Tag?> getTagById(int tagId) {

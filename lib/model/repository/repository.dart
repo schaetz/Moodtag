@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:moodtag/exceptions/database_error.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/invalid_argument_exception.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 
 import '../database/moodtag_db.dart';
 
@@ -24,6 +25,10 @@ class Repository {
 
   Future<List<Artist>> getArtistsOnce() {
     return db.getArtistsOnce();
+  }
+
+  Stream<List<ArtistWithTagFlag>> getArtistsWithTagFlag(int tagId) {
+    return db.getArtistsWithTagFlag(tagId);
   }
 
   Stream getArtistById(int id) {
