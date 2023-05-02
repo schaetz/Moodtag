@@ -20,7 +20,7 @@ class SpotifyLoginWebview extends StatelessWidget {
         appBar: MtAppBar(context, forceBackButton: true),
         withZoom: true,
         withLocalStorage: true,
-        hidden: true,
+        hidden: false,
         initialChild: Container(
           color: Colors.redAccent,
           child: const Center(

@@ -30,7 +30,9 @@ dependencies:
   drift: ^2.1.0
   equatable: ^2.0.5
   flutter_bloc: ^8.1.1
-  flutter_webview_plugin: ^0.4.0
+  flutter_webview_plugin:
+    git:
+      url: https://github.com/Antwen97/flutter_webview_plugin_V2
   http: ^0.13.4
   meta: ^1.3.0
   multiple_stream_builder: ^3.0.2

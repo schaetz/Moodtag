@@ -266,9 +266,11 @@ packages:
   flutter_webview_plugin:
     dependency: "direct main"
     description:
-      name: flutter_webview_plugin
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: e301b2e1e4d7152d58fc96dbea1c821db766211d
+      url: "https://github.com/Antwen97/flutter_webview_plugin_V2"
+    source: git
     version: "0.4.0"
   frontend_server_client:
     dependency: transitive
