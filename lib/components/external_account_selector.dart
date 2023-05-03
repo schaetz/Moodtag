@@ -1,44 +1,29 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:moodtag/exceptions/internal_exception.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
-class ExternalAccountSelector extends StatefulWidget {
-  final String serviceName;
-  final StreamController accountNameStreamController;
-  final Function onAddAccountClick;
-  final Function onRemoveAccountClick;
-
-  const ExternalAccountSelector(
-      {Key? key,
-      required this.serviceName,
-      required this.accountNameStreamController,
-      required this.onAddAccountClick,
-      required this.onRemoveAccountClick})
-      : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _ExternalAccountSelectorState();
-}
-
-class _ExternalAccountSelectorState extends State<ExternalAccountSelector> {
+class ExternalAccountSelector extends StatelessWidget {
   late final Repository bloc;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  final String serviceName;
+  final String? accountName;
+  final Function onAddAccountClick;
+  final Function onRemoveAccountClick;
+  final Function(Exception) onAddAccountError;
+  final Function(Exception) onRemoveAccountError;
+
+  ExternalAccountSelector({
+    Key? key,
+    required this.serviceName,
+    required this.accountName,
+    required this.onAddAccountClick,
+    required this.onRemoveAccountClick,
+    required this.onAddAccountError,
+    required this.onRemoveAccountError,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<String>(
-        stream: widget.accountNameStreamController.stream as Stream<String>,
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          return _accountNameContainer(snapshot.data);
-        });
-  }
-
-  Widget _accountNameContainer(String? accountName) {
     return Container(
       alignment: Alignment.center,
       color: Theme.of(context).colorScheme.background,
@@ -46,8 +31,8 @@ class _ExternalAccountSelectorState extends State<ExternalAccountSelector> {
       margin: const EdgeInsets.all(32.0),
       child: Column(children: [
         accountName == null
-            ? Text('No associated ${widget.serviceName} account', style: TextStyle(fontStyle: FontStyle.italic))
-            : Text(accountName),
+            ? Text('No associated ${serviceName} account', style: TextStyle(fontStyle: FontStyle.italic))
+            : Text(accountName!),
         SizedBox(height: 16),
         _accountChangeButton(accountName != null),
       ]),
@@ -58,32 +43,30 @@ class _ExternalAccountSelectorState extends State<ExternalAccountSelector> {
     if (!hasAccountName) {
       return ElevatedButton(
         onPressed: () => _addAccount(),
-        child: Text('Add ${widget.serviceName} account'),
+        child: Text('Add ${serviceName} account'),
       );
     } else {
       return ElevatedButton(
         onPressed: () => _removeAccount(),
-        child: Text('Remove ${widget.serviceName} account'),
+        child: Text('Remove ${serviceName} account'),
       );
     }
   }
 
   void _addAccount() {
     try {
-      widget.onAddAccountClick();
+      onAddAccountClick();
     } catch (error) {
-      // TODO More specific error message
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Something went wrong trying to set the ${widget.serviceName} account.')));
+      onAddAccountError(InternalException('Something went wrong trying to set the ${serviceName} account.'));
     }
   }
 
   void _removeAccount() {
     try {
-      widget.onRemoveAccountClick();
+      onRemoveAccountClick();
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Something went wrong trying to remove the associated ${widget.serviceName} account.')));
+      onRemoveAccountError(
+          InternalException('Something went wrong trying to remove the associated ${serviceName} account.'));
     }
   }
 }

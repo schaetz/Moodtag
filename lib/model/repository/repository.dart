@@ -31,12 +31,12 @@ class Repository {
     return db.getArtistsWithTagFlag(tagId);
   }
 
-  Stream getArtistById(int id) {
+  Stream<Artist?> getArtistById(int id) {
     return db.getArtistById(id);
   }
 
-  Future getArtistByName(String name) {
-    return db.getArtistByName(name);
+  Future<Artist?> getArtistByNameOnce(String name) {
+    return db.getArtistByNameOnce(name);
   }
 
   Future<DbRequestResponse<Artist>> createArtist(String name) async {
@@ -65,16 +65,16 @@ class Repository {
     return db.getTags();
   }
 
-  Stream getTagsWithArtistFreq() {
+  Stream<List<TagWithArtistFreq>> getTagsWithArtistFreq() {
     return db.getTagsWithArtistFreq();
   }
 
-  Stream getTagById(int id) {
+  Stream<Tag?> getTagById(int id) {
     return db.getTagById(id);
   }
 
-  Future getTagByName(String name) {
-    return db.getTagByName(name);
+  Future getTagByNameOnce(String name) {
+    return db.getTagByNameOnce(name);
   }
 
   Future<DbRequestResponse<Tag>> createTag(String name) {
@@ -114,17 +114,22 @@ class Repository {
   //
   // User properties
   //
-  Future<String?> getUserProperty(String propertyKey) {
-    return db.getUserProperty(propertyKey).then((userProperty) => userProperty != null ? userProperty.propValue : null);
+  Stream<String?> getUserProperty(String propertyKey) {
+    return db.getUserProperty(propertyKey).map((userProperty) => userProperty?.propValue ?? null);
   }
 
-  Future createOrUpdateUserProperty(String propertyKey, String propertyValue) {
-    return db.createOrUpdateUserProperty(
-        UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue)));
+  Future<String?> getUserPropertyOnce(String propertyKey) {
+    return db.getUserPropertyOnce(propertyKey).then((userProperty) => userProperty?.propValue ?? null);
   }
 
-  Future deleteUserProperty(String propertyKey) {
-    return db.deleteUserProperty(propertyKey);
+  Future<DbRequestResponse> createOrUpdateUserProperty(String propertyKey, String? propertyValue) {
+    return _wrapExceptionsAndReturnResponse(db.createOrUpdateUserProperty(
+        UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue))));
+  }
+
+  Future<DbRequestResponse> deleteUserProperty(String propertyKey) {
+    return _wrapExceptionsAndReturnResponse(
+        db.createOrUpdateUserProperty(UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(null))));
   }
 
   //

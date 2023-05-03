@@ -18,9 +18,11 @@ Future<DbRequestResponse<Artist>> createArtistOrEditExistingArtist(
     if (createArtistResponse.didSucceed() && createArtistResponse.changedEntity != null) {
       await repository.assignTagToArtist(createArtistResponse.changedEntity!, preselectedTag);
     } else {
-      await repository
-          .getArtistByName(newArtistName)
-          .then((existingArtist) async => await repository.assignTagToArtist(existingArtist, preselectedTag));
+      await repository.getArtistByNameOnce(newArtistName).then((existingArtist) async {
+        if (existingArtist != null) {
+          await repository.assignTagToArtist(existingArtist, preselectedTag);
+        }
+      });
     }
   }
 
@@ -36,7 +38,7 @@ Future<DbRequestResponse<Tag>> createTagOrEditExistingTag(
       await repository.assignTagToArtist(preselectedArtist, createTagResponse.changedEntity!);
     } else {
       await repository
-          .getTagByName(newTagName)
+          .getTagByNameOnce(newTagName)
           .then((existingTag) async => await repository.assignTagToArtist(preselectedArtist, existingTag));
     }
   }
@@ -58,11 +60,13 @@ Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, 
     DbRequestResponse creationResponse;
     if (entityType == ImportedArtist) {
       creationResponse = await bloc.createArtist(entity.name);
-      final artist = await bloc.getArtistByName(entity.name);
-      createdArtistsByEntity[entity as ImportedArtist] = artist;
+      final artist = await bloc.getArtistByNameOnce(entity.name);
+      if (artist != null) {
+        createdArtistsByEntity[entity as ImportedArtist] = artist;
+      }
     } else if (entityType == ImportedGenre) {
       creationResponse = await bloc.createTag(entity.name);
-      final tag = await bloc.getTagByName(entity.name);
+      final tag = await bloc.getTagByNameOnce(entity.name);
       createdTagsByGenreName[entity.name] = tag;
     } else {
       throw new UnimplementedError(

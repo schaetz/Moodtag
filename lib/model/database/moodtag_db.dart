@@ -59,7 +59,7 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull().asStream();
   }
 
-  Future<Artist?> getArtistByName(String artistName) {
+  Future<Artist?> getArtistByNameOnce(String artistName) {
     return (select(artists)..where((a) => a.name.equals(artistName))).getSingleOrNull();
   }
 
@@ -88,14 +88,18 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   Stream<Tag?> getTagById(int tagId) {
-    return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull().asStream();
+    return (select(tags)..where((t) => t.id.equals(tagId))).watchSingleOrNull();
   }
 
-  Future<Tag?> getTagByName(String tagName) {
+  Future<Tag?> getTagByNameOnce(String tagName) {
     return (select(tags)..where((t) => t.name.equals(tagName))).getSingleOrNull();
   }
 
-  Future<UserProperty?> getUserProperty(String propertyKey) {
+  Stream<UserProperty?> getUserProperty(String propertyKey) {
+    return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).watchSingleOrNull();
+  }
+
+  Future<UserProperty?> getUserPropertyOnce(String propertyKey) {
     return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).getSingleOrNull();
   }
 
@@ -116,10 +120,6 @@ class MoodtagDB extends _$MoodtagDB {
 
   Future<int> createOrUpdateUserProperty(UserPropertiesCompanion userPropertyPair) {
     return into(userProperties).insertOnConflictUpdate(userPropertyPair);
-  }
-
-  Future deleteUserProperty(String key) {
-    return (delete(userProperties)..where((t) => t.propKey.equals(key))).go();
   }
 
   //

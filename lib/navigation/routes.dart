@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -48,7 +49,8 @@ class Routes {
           create: (_) =>
               TagDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),
           child: TagDetailsScreen()),
-      lastFmImport: (context) => LastfmImportScreen(),
+      lastFmImport: (context) => BlocProvider(
+          create: (_) => LastFmImportBloc(context.read<Repository>(), context), child: LastfmImportScreen()),
       spotifyImport: (context) => ImportFlow(),
     };
   }

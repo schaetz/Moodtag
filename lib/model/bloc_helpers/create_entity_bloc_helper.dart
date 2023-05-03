@@ -87,6 +87,25 @@ class CreateEntityBlocHelper {
     return Future.value(null);
   }
 
+  Future<UserReadableException?> handleCreateOrUpdateUserPropertyEvent(
+      String key, String? value, Repository repository) async {
+    final createOrUpdatePropResponse = await repository.createOrUpdateUserProperty(key, value);
+    if (createOrUpdatePropResponse.didFail()) {
+      return createOrUpdatePropResponse.getUserFeedbackException();
+    }
+
+    return Future.value(null);
+  }
+
+  Future<UserReadableException?> handleRemoveUserPropertyEvent(String key, Repository repository) async {
+    final removePropResponse = await repository.deleteUserProperty(key);
+    if (removePropResponse.didFail()) {
+      return removePropResponse.getUserFeedbackException();
+    }
+
+    return Future.value(null);
+  }
+
   Future<UserReadableException?> _addTagToArtist(Artist artist, Tag tag, Repository repository) async {
     final assignTagResponse = await repository.assignTagToArtist(artist, tag);
     if (assignTagResponse.didFail()) {
