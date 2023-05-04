@@ -39,6 +39,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
     setupErrorHandler(mainContext);
   }
 
+  @override
   Future<void> close() async {
     _tagStreamSubscription.cancel();
     _artistsWithTagFlagStreamSubscription.cancel();

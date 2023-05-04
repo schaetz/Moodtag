@@ -30,6 +30,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
     setupErrorHandler(mainContext);
   }
 
+  @override
   Future<void> close() async {
     _artistsStreamSubscription.cancel();
     super.close();

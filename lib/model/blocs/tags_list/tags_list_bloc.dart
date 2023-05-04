@@ -30,6 +30,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHan
     setupErrorHandler(mainContext);
   }
 
+  @override
   Future<void> close() async {
     _tagsStreamSubscription.cancel();
     super.close();

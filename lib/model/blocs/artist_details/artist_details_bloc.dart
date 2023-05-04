@@ -47,6 +47,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
     setupErrorHandler(mainContext);
   }
 
+  @override
   Future<void> close() async {
     _artistStreamSubscription.cancel();
     _tagsForArtistStreamSubscription.cancel();

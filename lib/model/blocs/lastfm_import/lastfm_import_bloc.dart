@@ -31,6 +31,12 @@ class LastFmImportBloc extends Bloc<LibraryEvent, LastFmImportState> with ErrorS
     setupErrorHandler(mainContext);
   }
 
+  @override
+  Future<void> close() {
+    _accountNameStreamSubscription.cancel();
+    return super.close();
+  }
+
   void _mapLastFmAccountUpdatedEventToState(LastFmAccountUpdated event, Emitter<LastFmImportState> emit) async {
     if (event.error != null) {
       errorStreamController.add(DatabaseError("The Last.fm account name could not be retrieved from the database."));
@@ -47,9 +53,6 @@ class LastFmImportBloc extends Bloc<LibraryEvent, LastFmImportState> with ErrorS
     if (exception != null) {
       errorStreamController.add(exception);
     }
-    // else {
-    //   emit(state.copyWith(accountName: event.accountName));
-    // }
   }
 
   void _mapRemoveLastFmAccountEventToState(RemoveLastFmAccount event, Emitter<LastFmImportState> emit) async {
@@ -58,8 +61,5 @@ class LastFmImportBloc extends Bloc<LibraryEvent, LastFmImportState> with ErrorS
     if (exception != null) {
       errorStreamController.add(exception);
     }
-    // else {
-    //   emit(state.copyWith(accountName: null));
-    // }
   }
 }
