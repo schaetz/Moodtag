@@ -6,12 +6,12 @@ import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/screens/artist_details_screen.dart';
-import 'package:moodtag/screens/artists_list_screen.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_import_screen.dart';
+import 'package:moodtag/screens/library/artist_details_screen.dart';
+import 'package:moodtag/screens/library/artists_list_screen.dart';
+import 'package:moodtag/screens/library/tag_details_screen.dart';
+import 'package:moodtag/screens/library/tags_list_screen.dart';
 import 'package:moodtag/screens/spotify_import/import_flow.dart';
-import 'package:moodtag/screens/tag_details_screen.dart';
-import 'package:moodtag/screens/tags_list_screen.dart';
 
 class Routes {
   static const artistsList = '/artists';
