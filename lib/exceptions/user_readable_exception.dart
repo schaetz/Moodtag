@@ -5,4 +5,4 @@ abstract class UserReadableException implements Exception {
   ExceptionSeverity get severity;
 }
 
-enum ExceptionSeverity { LOW, MEDIUM, HIGH }
+enum ExceptionSeverity { INFO, WARNING, LOW, MEDIUM, HIGH }

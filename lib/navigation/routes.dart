@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
+import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -51,7 +52,8 @@ class Routes {
           child: TagDetailsScreen()),
       lastFmImport: (context) => BlocProvider(
           create: (_) => LastFmImportBloc(context.read<Repository>(), context), child: LastfmImportScreen()),
-      spotifyImport: (context) => ImportFlow(),
+      spotifyImport: (context) =>
+          BlocProvider(create: (_) => SpotifyImportBloc(context.read<Repository>(), context), child: ImportFlow()),
     };
   }
 }

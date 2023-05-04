@@ -1,14 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/named_entity.dart';
-import 'package:provider/provider.dart';
 
 import '../../utils/db_request_success_counter.dart';
+
+// TODO Merge with CreateEntityHelper?
 
 Future<DbRequestResponse<Artist>> createArtistOrEditExistingArtist(
     Repository repository, String newArtistName, Tag preselectedTag) async {
@@ -46,9 +45,7 @@ Future<DbRequestResponse<Tag>> createTagOrEditExistingTag(
   return createTagResponse;
 }
 
-Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, List<NamedEntity> entities) async {
-  // TODO Replace direct repository call by bloc
-  final bloc = Provider.of<Repository>(context, listen: false);
+Future<Map<Type, DbRequestSuccessCounter>> createEntities(Repository repository, List<NamedEntity> entities) async {
   final creationSuccessCountersByType = Map<Type, DbRequestSuccessCounter>();
   final Map<ImportedArtist, Artist> createdArtistsByEntity = {};
   final Map<String, Tag> createdTagsByGenreName = {};
@@ -59,14 +56,14 @@ Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, 
 
     DbRequestResponse creationResponse;
     if (entityType == ImportedArtist) {
-      creationResponse = await bloc.createArtist(entity.name);
-      final artist = await bloc.getArtistByNameOnce(entity.name);
+      creationResponse = await repository.createArtist(entity.name);
+      final artist = await repository.getArtistByNameOnce(entity.name);
       if (artist != null) {
         createdArtistsByEntity[entity as ImportedArtist] = artist;
       }
     } else if (entityType == ImportedGenre) {
-      creationResponse = await bloc.createTag(entity.name);
-      final tag = await bloc.getTagByNameOnce(entity.name);
+      creationResponse = await repository.createTag(entity.name);
+      final tag = await repository.getTagByNameOnce(entity.name);
       createdTagsByGenreName[entity.name] = tag;
     } else {
       throw new UnimplementedError(
@@ -77,17 +74,17 @@ Future<Map<Type, DbRequestSuccessCounter>> createEntities(BuildContext context, 
     creationSuccessCountersByType[entityType]?.registerResponse(creationResponse);
   }
 
-  _assignGenreTagsToArtists(bloc, createdArtistsByEntity, createdTagsByGenreName);
+  _assignGenreTagsToArtists(repository, createdArtistsByEntity, createdTagsByGenreName);
 
   return creationSuccessCountersByType;
 }
 
-void _assignGenreTagsToArtists(
-    Repository bloc, Map<ImportedArtist, Artist> createdArtistsByEntity, Map<String, Tag> createdTagsByGenreName) {
+void _assignGenreTagsToArtists(Repository repository, Map<ImportedArtist, Artist> createdArtistsByEntity,
+    Map<String, Tag> createdTagsByGenreName) {
   createdArtistsByEntity.forEach((importedArtistEntity, artist) {
     importedArtistEntity.genres.forEach((genreName) {
       if (createdTagsByGenreName.containsKey(genreName) && createdTagsByGenreName[genreName] != null) {
-        bloc.assignTagToArtist(artist, createdTagsByGenreName[genreName]!);
+        repository.assignTagToArtist(artist, createdTagsByGenreName[genreName]!);
       }
     });
   });

@@ -1,8 +1,10 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
+import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
+import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 
 import 'import_flow_state.dart';
@@ -12,12 +14,13 @@ import 'import_flow_state.dart';
 class SpotifyLoginWebview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<SpotifyImportBloc>();
     final flutterWebviewPlugin = new FlutterWebviewPlugin();
-    flutterWebviewPlugin.onUrlChanged.listen((url) => _handleUrlChange(url, context));
+    flutterWebviewPlugin.onUrlChanged.listen((url) => bloc.add(LoginWebviewUrlChange(url)));
 
     return WebviewScaffold(
         url: getSpotifyAuthUri().toString(),
-        appBar: MtAppBar(context, forceBackButton: true),
+        appBar: MtAppBar(context, onBackButtonPressed: () => context.flow<ImportFlowState>().complete()),
         withZoom: true,
         withLocalStorage: true,
         hidden: false,
@@ -27,19 +30,5 @@ class SpotifyLoginWebview extends StatelessWidget {
             child: Text('Waiting.....'),
           ),
         ));
-  }
-
-  void _handleUrlChange(String url, BuildContext context) {
-    Uri uri = Uri.parse(url);
-    print(uri.authority);
-    print(uri.queryParameters);
-    print('uri: ' + uri.toString());
-    if (isRedirectUri(uri)) {
-      final authorizationCode = uri.queryParameters.containsKey('code') ? uri.queryParameters['code'] : null;
-      if (authorizationCode == null) {
-        throw UnknownError('An error occurred trying to connect to the Spotify API.');
-      }
-      context.flow<ImportFlowState>().update((state) => state.copyWith(spotifyAuthCode: authorizationCode));
-    }
   }
 }

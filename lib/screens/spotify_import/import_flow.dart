@@ -1,14 +1,16 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/repository/entity_creator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
+import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
+import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/import_selection_list_screen.dart';
-import 'package:moodtag/screens/spotify_import/spotify_import_screen.dart';
+import 'package:moodtag/screens/spotify_import/import_confirmation_screen.dart';
+import 'package:moodtag/screens/spotify_import/import_selection_list_screen.dart';
+import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
-import 'package:moodtag/structs/named_entity.dart';
-import 'package:moodtag/utils/db_request_success_counter.dart';
 import 'package:moodtag/utils/i10n.dart';
 
 import 'import_flow_state.dart';
@@ -16,15 +18,19 @@ import 'import_flow_state.dart';
 class ImportFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder<ImportFlowState>(
-      state: ImportFlowState.initial(),
-      onGeneratePages: _onGenerateImportFlowPages,
-      onComplete: (importFlowState) => _completeFlow(context, importFlowState),
-    );
+    final bloc = context.read<SpotifyImportBloc>();
+    return BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
+      return FlowBuilder<ImportFlowState>(
+        state: ImportFlowState(step: state.step),
+        onGeneratePages: (ImportFlowState importFlowState, List<Page> pages) =>
+            _onGenerateImportFlowPages(importFlowState, pages, bloc),
+        onComplete: (importFlowState) => _returnToLibraryScreens(context),
+      );
+    });
   }
 
-  List<Page> _onGenerateImportFlowPages(ImportFlowState importFlowState, List<Page> pages) {
-    if (importFlowState.spotifyAuthCode.isEmpty) {
+  List<Page> _onGenerateImportFlowPages(ImportFlowState importFlowState, List<Page> pages, SpotifyImportBloc bloc) {
+    if (importFlowState.step.index == SpotifyImportFlowStep.login.index) {
       return [
         MaterialPage<void>(
           child: SpotifyLoginWebview(),
@@ -33,68 +39,49 @@ class ImportFlow extends StatelessWidget {
     }
 
     return [
-      MaterialPage<void>(child: SpotifyImportScreen(), name: Routes.spotifyImport),
-      if (importFlowState.availableSpotifyArtists != null)
-        MaterialPage<void>(
-            child: ImportSelectionListScreen<ImportedArtist>(
-          namedEntitySet: importFlowState.availableSpotifyArtists!,
-          confirmationButtonLabel: importFlowState.doImportGenres ? "OK" : "Import",
-          entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
-          entityDenotationPlural: I10n.ARTIST_DENOTATION_PLURAL,
-        )),
-      if (importFlowState.doImportGenres &&
-          importFlowState.isArtistsSelectionFinished &&
-          importFlowState.availableSpotifyArtists != null)
-        MaterialPage<void>(
-            child: ImportSelectionListScreen<ImportedGenre>(
-          namedEntitySet: importFlowState.availableArtistsGenres!,
-          confirmationButtonLabel: "Import",
-          entityDenotationSingular: "genre tag",
-          entityDenotationPlural: "genre tags",
-        )),
+      MaterialPage<void>(
+          child: SpotifyImportConfigScreen(
+            onConfirmConfig: (Map<SpotifyImportOption, bool> selections) => _onConfirmConfig(selections, bloc),
+          ),
+          name: Routes.spotifyImport),
+      if (importFlowState.step.index >= SpotifyImportFlowStep.artistsSelection.index)
+        MaterialPage<void>(child: _getArtistsSelectionScreen(bloc)),
+      if (importFlowState.step.index >= SpotifyImportFlowStep.genreTagsSelection.index)
+        MaterialPage<void>(child: _getGenreSelectionScreen(bloc)),
+      if (importFlowState.step.index >= SpotifyImportFlowStep.confirmation.index)
+        MaterialPage<void>(child: ImportConfirmationScreen())
     ];
   }
 
-  void _completeFlow(BuildContext context, ImportFlowState importFlowState) async {
-    if (importFlowState.isArtistsSelectionFinished &&
-        (!importFlowState.doImportGenres || importFlowState.isGenresSelectionFinished)) {
-      List<NamedEntity> entitiesToCreate = [];
-      if (importFlowState.selectedArtists != null) {
-        entitiesToCreate.addAll(importFlowState.selectedArtists as Iterable<NamedEntity>);
-      }
-      if (importFlowState.selectedGenres != null) {
-        entitiesToCreate.addAll(importFlowState.selectedGenres as Iterable<NamedEntity>);
-      }
-
-      final Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType =
-          await createEntities(context, entitiesToCreate);
-      _showResultMessage(context, creationSuccessCountersByType);
-    }
-
-    Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
+  void _onConfirmConfig(Map<SpotifyImportOption, bool> selections, SpotifyImportBloc bloc) {
+    bloc.add(ConfirmConfigForSpotifyImport(selections));
   }
 
-  void _showResultMessage(BuildContext context, Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType) {
-    String message;
+  Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {
+    return ImportSelectionListScreen<ImportedArtist>(
+      bloc: bloc,
+      namedEntitySet: bloc.state.availableSpotifyArtists!,
+      confirmationButtonLabel: "OK",
+      entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
+      entityDenotationPlural: I10n.ARTIST_DENOTATION_PLURAL,
+      onSelectionConfirmed: (List<ImportedArtist> selectedArtists) =>
+          bloc.add(ConfirmArtistsForSpotifyImport(selectedArtists)),
+    );
+  }
 
-    if (creationSuccessCountersByType[ImportedArtist] == null) {
-      message = "No entities were added.";
-    } else {
-      final successfulArtists = creationSuccessCountersByType[ImportedArtist]?.successCount ?? 0;
-      final successfulGenres = creationSuccessCountersByType[ImportedGenre]?.successCount ?? 0;
-      if (successfulArtists > 0) {
-        if (successfulGenres > 0) {
-          message = "Successfully added ${successfulArtists} artists and ${successfulGenres} tags.";
-        } else {
-          message = "Successfully added ${successfulArtists} artists.";
-        }
-      } else if (successfulGenres > 0) {
-        message = "Successfully added ${successfulGenres} genres.";
-      } else {
-        message = "No entities were added.";
-      }
-    }
+  Widget _getGenreSelectionScreen(SpotifyImportBloc bloc) {
+    return ImportSelectionListScreen<ImportedGenre>(
+      bloc: bloc,
+      namedEntitySet: bloc.state.availableGenresForSelectedArtists!,
+      confirmationButtonLabel: "OK",
+      entityDenotationSingular: "genre tag",
+      entityDenotationPlural: "genre tags",
+      onSelectionConfirmed: (List<ImportedGenre> selectedGenres) =>
+          bloc.add(ConfirmGenreTagsForSpotifyImport(selectedGenres)),
+    );
+  }
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  void _returnToLibraryScreens(BuildContext context) async {
+    Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
   }
 }

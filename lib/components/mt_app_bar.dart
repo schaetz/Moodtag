@@ -1,4 +1,3 @@
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
@@ -6,7 +5,6 @@ import 'package:moodtag/main.dart';
 import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/spotify_import/import_flow_state.dart';
 
 class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const titleLabelStyle = TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold);
@@ -18,9 +16,9 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double height = 60;
 
   final BuildContext context;
-  final bool forceBackButton;
+  final Function? onBackButtonPressed;
 
-  MtAppBar(this.context, {this.forceBackButton = false}) : super();
+  MtAppBar(this.context, {this.onBackButtonPressed = null}) : super();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +33,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
           onSelected: (value) => _handlePopupMenuItemTap(context, value, bloc),
         ),
       ],
-      leading: forceBackButton ? BackButton(onPressed: () => context.flow<ImportFlowState>().complete()) : null,
+      leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed) : null,
     );
   }
 

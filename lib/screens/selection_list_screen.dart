@@ -23,10 +23,12 @@ class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionLi
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   late final List<T> _sortedEntities;
-  late final List<bool> _isBoxSelected;
-  late final int _selectedBoxesCount;
+  List<bool> _isBoxSelected = [];
+  int _selectedBoxesCount = 0;
 
-  _SelectionListScreenState() {
+  @override
+  void initState() {
+    super.initState();
     _sortedEntities = widget.namedEntitySet.toSortedList() as List<T>;
     _setBoxSelections(_sortedEntities.length, true);
   }
