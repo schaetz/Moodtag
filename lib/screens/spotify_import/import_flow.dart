@@ -1,6 +1,7 @@
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/components/app_bar_context_data.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
@@ -12,6 +13,7 @@ import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/utils/i10n.dart';
+import 'package:provider/provider.dart';
 
 import 'import_flow_state.dart';
 
@@ -19,13 +21,19 @@ class ImportFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
-    return BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
-      return FlowBuilder<ImportFlowState>(
-        state: ImportFlowState(step: state.step, doShowGenreImportScreen: state.doImportGenres),
-        onGeneratePages: (ImportFlowState importFlowState, List<Page> pages) =>
-            _onGenerateImportFlowPages(importFlowState, pages, bloc),
-        onComplete: (importFlowState) => _returnToLibraryScreens(context),
-      );
+    return BlocConsumer<SpotifyImportBloc, SpotifyImportState>(listener: (context, state) {
+      if (state.flowCancelled) {
+        _returnToLibraryScreens(context);
+      }
+    }, builder: (context, state) {
+      return Provider(
+          create: (_) => AppBarContextData(onBackButtonPressed: () => _onBackButtonPressed(bloc)),
+          child: FlowBuilder<ImportFlowState>(
+            state: ImportFlowState(
+                step: state.step, doShowGenreImportScreen: state.doImportGenres, flowCancelled: state.flowCancelled),
+            onGeneratePages: (ImportFlowState importFlowState, List<Page> pages) =>
+                _onGenerateImportFlowPages(importFlowState, pages, bloc),
+          ));
     });
   }
 
@@ -48,6 +56,10 @@ class ImportFlow extends StatelessWidget {
       if (importFlowState.step.index >= SpotifyImportFlowStep.confirmation.index)
         MaterialPage<void>(child: SpotifyImportConfirmationScreen(), name: Routes.spotifyImport)
     ];
+  }
+
+  void _onBackButtonPressed(SpotifyImportBloc bloc) {
+    bloc.add(ReturnToPreviousImportScreen(this));
   }
 
   Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {

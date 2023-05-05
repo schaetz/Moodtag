@@ -1,4 +1,3 @@
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/import_config_form.dart';
@@ -6,8 +5,6 @@ import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
-
-import 'import_flow_state.dart';
 
 enum SpotifyImportOption { topArtists, followedArtists, artistGenres }
 
@@ -18,7 +15,7 @@ class SpotifyImportConfigScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
     return Scaffold(
-        appBar: MtAppBar(context, onBackButtonPressed: () => context.flow<ImportFlowState>().complete()),
+        appBar: MtAppBar(context),
         body: Center(
             child: ImportConfigForm(
           headlineCaption: 'Select what should be imported:',

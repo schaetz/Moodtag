@@ -7,6 +7,7 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 class SpotifyImportState extends Equatable {
   final SpotifyImportFlowStep step;
+  final bool flowCancelled;
   final String? spotifyAuthCode;
   final Map<SpotifyImportOption, bool> configuration;
 
@@ -17,6 +18,7 @@ class SpotifyImportState extends Equatable {
 
   const SpotifyImportState({
     this.step = SpotifyImportFlowStep.login,
+    this.flowCancelled = false,
     this.spotifyAuthCode,
     this.configuration = const {},
     this.availableSpotifyArtists,
@@ -28,6 +30,7 @@ class SpotifyImportState extends Equatable {
   @override
   List<Object?> get props => [
         step,
+        flowCancelled,
         spotifyAuthCode,
         configuration,
         availableSpotifyArtists,
@@ -41,6 +44,7 @@ class SpotifyImportState extends Equatable {
 
   SpotifyImportState copyWith({
     SpotifyImportFlowStep? step,
+    bool? flowCancelled,
     String? spotifyAuthCode,
     Map<SpotifyImportOption, bool>? configuration,
     UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists,
@@ -50,6 +54,7 @@ class SpotifyImportState extends Equatable {
   }) {
     return SpotifyImportState(
       step: step ?? this.step,
+      flowCancelled: flowCancelled ?? this.flowCancelled,
       spotifyAuthCode: spotifyAuthCode ?? this.spotifyAuthCode,
       configuration: configuration ?? this.configuration,
       availableSpotifyArtists: availableSpotifyArtists ?? this.availableSpotifyArtists,

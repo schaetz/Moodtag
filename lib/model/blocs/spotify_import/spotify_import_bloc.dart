@@ -25,6 +25,7 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
 
   SpotifyImportBloc(this._repository, BuildContext mainContext)
       : super(SpotifyImportState(configuration: _getInitialImportConfig())) {
+    on<ReturnToPreviousImportScreen>(_mapReturnToPreviousImportScreenEventToState);
     on<LoginWebviewUrlChange>(_mapLoginWebviewUrlChangeEventToState);
     on<ChangeConfigForSpotifyImport>(_mapChangeConfigForSpotifyImportEventToState);
     on<ConfirmConfigForSpotifyImport>(_mapConfirmConfigForSpotifyImportEventToState);
@@ -41,6 +42,15 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
       initialConfig[option] = true;
     });
     return initialConfig;
+  }
+
+  void _mapReturnToPreviousImportScreenEventToState(
+      ReturnToPreviousImportScreen event, Emitter<SpotifyImportState> emit) {
+    if (state.step.index > SpotifyImportFlowStep.config.index) {
+      emit(state.copyWith(step: SpotifyImportFlowStep.values[state.step.index - 1]));
+    } else {
+      emit(state.copyWith(flowCancelled: true));
+    }
   }
 
   void _mapLoginWebviewUrlChangeEventToState(LoginWebviewUrlChange event, Emitter<SpotifyImportState> emit) {

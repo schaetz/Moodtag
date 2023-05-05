@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/components/app_bar_context_data.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
@@ -16,13 +17,14 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double height = 60;
 
   final BuildContext context;
-  final Function? onBackButtonPressed;
 
-  MtAppBar(this.context, {this.onBackButtonPressed = null}) : super();
+  MtAppBar(this.context) : super();
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<AppBarBloc>();
+    final appBarContextData = context.read<AppBarContextData?>();
+    final onBackButtonPressed = appBarContextData?.onBackButtonPressed ?? null;
     return AppBar(
       title: _buildTitle(context),
       actions: <Widget>[
@@ -34,7 +36,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ],
       automaticallyImplyLeading: onBackButtonPressed == null,
-      leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed!()) : null,
+      leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed()) : null,
     );
   }
 

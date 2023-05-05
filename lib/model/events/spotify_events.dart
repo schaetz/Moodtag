@@ -1,3 +1,4 @@
+import 'package:moodtag/screens/spotify_import/import_flow.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 
@@ -5,6 +6,15 @@ import 'library_events.dart';
 
 abstract class SpotifyEvent extends LibraryEvent {
   const SpotifyEvent();
+}
+
+class ReturnToPreviousImportScreen extends SpotifyEvent {
+  final ImportFlow importFlow;
+
+  const ReturnToPreviousImportScreen(this.importFlow);
+
+  @override
+  List<Object?> get props => [importFlow];
 }
 
 class LoginWebviewUrlChange extends SpotifyEvent {
