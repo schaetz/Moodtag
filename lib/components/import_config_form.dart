@@ -4,21 +4,25 @@ class ImportConfigForm extends StatefulWidget {
   final String headlineCaption;
   final String sendButtonCaption;
   final Map<String, String> configItemsWithCaption;
-  final Function(BuildContext, Map<String, bool>) onSend;
+  final Map<String, bool> initialConfig;
+  final Function(Map<String, bool>) onChangeSelection;
 
-  const ImportConfigForm(
-      {Key? key,
-      required this.headlineCaption,
-      required this.sendButtonCaption,
-      required this.configItemsWithCaption,
-      required this.onSend})
-      : super(key: key);
+  const ImportConfigForm({
+    Key? key,
+    required this.headlineCaption,
+    required this.sendButtonCaption,
+    required this.configItemsWithCaption,
+    required this.initialConfig,
+    required this.onChangeSelection,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ImportConfigFormState();
 }
 
 class _ImportConfigFormState extends State<ImportConfigForm> {
+  static const headlineStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
+
   late final Map<String, bool> _selectionsState;
 
   @override
@@ -35,7 +39,7 @@ class _ImportConfigFormState extends State<ImportConfigForm> {
             alignment: Alignment.topLeft,
             child: Padding(
               padding: EdgeInsets.fromLTRB(16.0, 16.0, 0, 0),
-              child: Text(this.widget.headlineCaption),
+              child: Text(this.widget.headlineCaption, style: headlineStyle),
             )),
         ...this.widget.configItemsWithCaption.entries.map((keyAndCaption) => CheckboxListTile(
               title: Text(keyAndCaption.value),
@@ -45,25 +49,17 @@ class _ImportConfigFormState extends State<ImportConfigForm> {
                   setState(() {
                     _selectionsState[keyAndCaption.key] = newValue;
                   });
+                  widget.onChangeSelection(_selectionsState);
                 }
               },
             )),
-        TextButton(
-          onPressed: _isButtonEnabled() ? () => this.widget.onSend(context, _selectionsState) : null,
-          child: Text(this.widget.sendButtonCaption),
-        ),
       ],
     );
   }
 
-  bool _isButtonEnabled() => _selectionsState.values.contains(true);
-
   void _initializeSelectionsState() {
     this._selectionsState = {};
-    this
-        .widget
-        .configItemsWithCaption
-        .entries
-        .forEach((keyAndCaption) => {this._selectionsState[keyAndCaption.key] = false});
+    widget.configItemsWithCaption.entries.forEach((keyAndCaption) =>
+        {this._selectionsState[keyAndCaption.key] = widget.initialConfig[keyAndCaption.key] ?? false});
   }
 }

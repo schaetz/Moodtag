@@ -5,8 +5,9 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 
-class ImportConfirmationScreen extends StatelessWidget {
+class SpotifyImportConfirmationScreen extends StatelessWidget {
   // TODO Use common property with list screens?
+  static const headlineStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   final GlobalKey _scaffoldKey = GlobalKey();
@@ -17,12 +18,17 @@ class ImportConfirmationScreen extends StatelessWidget {
     return Scaffold(
         key: _scaffoldKey,
         appBar: MtAppBar(context),
-        body: Center(
-          child: Column(
-            children: [
-              BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
-                final entityFrequencies = _getEntityFrequencies(state);
-                return ListView.separated(
+        body: Center(child: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
+          final entityFrequencies = _getEntityFrequencies(state);
+          return Column(children: [
+            Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(16.0, 16.0, 0, 0),
+                  child: Text('Confirm import:', style: headlineStyle),
+                )),
+            Expanded(
+                child: ListView.separated(
                     separatorBuilder: (context, _) => Divider(),
                     padding: EdgeInsets.all(16.0),
                     itemCount: entityFrequencies.length,
@@ -43,14 +49,13 @@ class ImportConfirmationScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ));
-              })
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
+                        )))
+          ]);
+        })),
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: () => bloc.add(CompleteSpotifyImport()),
-          child: const Icon(Icons.library_add),
+          label: Text('Import'),
+          icon: const Icon(Icons.library_add),
           backgroundColor: Theme.of(context).colorScheme.secondary,
         ));
   }

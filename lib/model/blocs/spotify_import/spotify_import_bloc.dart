@@ -23,14 +23,24 @@ enum SpotifyImportFlowStep { login, config, artistsSelection, genreTagsSelection
 class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with ErrorStreamHandling {
   final Repository _repository;
 
-  SpotifyImportBloc(this._repository, BuildContext mainContext) : super(SpotifyImportState()) {
+  SpotifyImportBloc(this._repository, BuildContext mainContext)
+      : super(SpotifyImportState(configuration: _getInitialImportConfig())) {
     on<LoginWebviewUrlChange>(_mapLoginWebviewUrlChangeEventToState);
+    on<ChangeConfigForSpotifyImport>(_mapChangeConfigForSpotifyImportEventToState);
     on<ConfirmConfigForSpotifyImport>(_mapConfirmConfigForSpotifyImportEventToState);
     on<ConfirmArtistsForSpotifyImport>(_mapConfirmArtistsForSpotifyImportEventToState);
     on<ConfirmGenreTagsForSpotifyImport>(_mapConfirmGenreTagsForSpotifyImportEventToState);
     on<CompleteSpotifyImport>(_mapCompleteSpotifyImportEventToState);
 
     setupErrorHandler(mainContext);
+  }
+
+  static Map<SpotifyImportOption, bool> _getInitialImportConfig() {
+    Map<SpotifyImportOption, bool> initialConfig = {};
+    SpotifyImportOption.values.forEach((option) {
+      initialConfig[option] = true;
+    });
+    return initialConfig;
   }
 
   void _mapLoginWebviewUrlChangeEventToState(LoginWebviewUrlChange event, Emitter<SpotifyImportState> emit) {
@@ -43,23 +53,36 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
       if (authorizationCode == null) {
         errorStreamController.add(UnknownError('An error occurred trying to connect to the Spotify API.'));
       } else {
-        emit(state.copyWith(spotifyAuthCode: authorizationCode, step: _getNextFlowStep()));
+        emit(state.copyWith(spotifyAuthCode: authorizationCode, step: _getNextFlowStep(state)));
       }
     }
+  }
+
+  void _mapChangeConfigForSpotifyImportEventToState(
+      ChangeConfigForSpotifyImport event, Emitter<SpotifyImportState> emit) async {
+    final selectedOptions = event.selectedOptions;
+    final Map<SpotifyImportOption, bool> configItemsWithSelection = {
+      SpotifyImportOption.topArtists: selectedOptions[SpotifyImportOption.topArtists.name] ?? false,
+      SpotifyImportOption.followedArtists: selectedOptions[SpotifyImportOption.followedArtists.name] ?? false,
+      SpotifyImportOption.artistGenres: selectedOptions[SpotifyImportOption.artistGenres.name] ?? false,
+    };
+    emit(state.copyWith(configuration: configItemsWithSelection));
   }
 
   void _mapConfirmConfigForSpotifyImportEventToState(
       ConfirmConfigForSpotifyImport event, Emitter<SpotifyImportState> emit) async {
     try {
-      final availableSpotifyArtists = await _getAvailableSpotifyArtists(event.selectedOptions);
+      if (!state.isConfigurationValid) {
+        errorStreamController.add(InvalidUserInputException("Nothing selected for import."));
+        return;
+      }
+
+      final availableSpotifyArtists = await _getAvailableSpotifyArtists(state.configuration);
 
       if (availableSpotifyArtists.isEmpty) {
         errorStreamController.add(InvalidUserInputException("No artists to import."));
       } else {
-        emit(state.copyWith(
-            availableSpotifyArtists: availableSpotifyArtists,
-            doImportGenres: event.selectedOptions[SpotifyImportOption.artistGenres] == true,
-            step: _getNextFlowStep()));
+        emit(state.copyWith(availableSpotifyArtists: availableSpotifyArtists, step: _getNextFlowStep(state)));
       }
     } catch (e) {
       print("Getting available artists from Spotify failed: $e");
@@ -107,7 +130,7 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
           availableGenresForSelectedArtists: availableGenresForSelectedArtists,
-          step: _getNextFlowStep()));
+          step: _getNextFlowStep(state)));
     }
   }
 
@@ -127,7 +150,7 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
     } else if (event.selectedGenres.isEmpty && state.availableGenresForSelectedArtists!.isEmpty == false) {
       errorStreamController.add(InvalidUserInputException("No genres selected for import."));
     } else {
-      emit(state.copyWith(selectedGenres: event.selectedGenres, step: _getNextFlowStep()));
+      emit(state.copyWith(selectedGenres: event.selectedGenres, step: _getNextFlowStep(state)));
     }
   }
 
@@ -148,12 +171,14 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
     emit(state.copyWith(step: SpotifyImportFlowStep.finished));
   }
 
-  SpotifyImportFlowStep _getNextFlowStep() {
-    if (state.step == SpotifyImportFlowStep.artistsSelection && !state.doImportGenres) {
+  SpotifyImportFlowStep _getNextFlowStep(SpotifyImportState currentState) {
+    if (currentState.step == SpotifyImportFlowStep.artistsSelection && !_doImportGenres()) {
       return SpotifyImportFlowStep.confirmation;
     }
-    return SpotifyImportFlowStep.values[state.step.index + 1];
+    return SpotifyImportFlowStep.values[currentState.step.index + 1];
   }
+
+  bool _doImportGenres() => state.configuration![SpotifyImportOption.artistGenres] == true;
 
   void _showResultMessage(Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType) {
     String message;

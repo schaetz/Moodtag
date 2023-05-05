@@ -33,7 +33,8 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
           onSelected: (value) => _handlePopupMenuItemTap(context, value, bloc),
         ),
       ],
-      leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed) : null,
+      automaticallyImplyLeading: onBackButtonPressed == null,
+      leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed!()) : null,
     );
   }
 

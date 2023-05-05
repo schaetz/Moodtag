@@ -5,9 +5,9 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/spotify_import/import_confirmation_screen.dart';
-import 'package:moodtag/screens/spotify_import/import_selection_list_screen.dart';
+import 'package:moodtag/screens/import_selection_list_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
+import 'package:moodtag/screens/spotify_import/spotify_import_confirmation_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
@@ -39,27 +39,18 @@ class ImportFlow extends StatelessWidget {
     }
 
     return [
-      MaterialPage<void>(
-          child: SpotifyImportConfigScreen(
-            onConfirmConfig: (Map<SpotifyImportOption, bool> selections) => _onConfirmConfig(selections, bloc),
-          ),
-          name: Routes.spotifyImport),
+      MaterialPage<void>(child: SpotifyImportConfigScreen(), name: Routes.spotifyImport),
       if (importFlowState.step.index >= SpotifyImportFlowStep.artistsSelection.index)
         MaterialPage<void>(child: _getArtistsSelectionScreen(bloc)),
       if (importFlowState.step.index >= SpotifyImportFlowStep.genreTagsSelection.index)
         MaterialPage<void>(child: _getGenreSelectionScreen(bloc)),
       if (importFlowState.step.index >= SpotifyImportFlowStep.confirmation.index)
-        MaterialPage<void>(child: ImportConfirmationScreen())
+        MaterialPage<void>(child: SpotifyImportConfirmationScreen(), name: Routes.spotifyImport)
     ];
-  }
-
-  void _onConfirmConfig(Map<SpotifyImportOption, bool> selections, SpotifyImportBloc bloc) {
-    bloc.add(ConfirmConfigForSpotifyImport(selections));
   }
 
   Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {
     return ImportSelectionListScreen<ImportedArtist>(
-      bloc: bloc,
       namedEntitySet: bloc.state.availableSpotifyArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
@@ -71,7 +62,6 @@ class ImportFlow extends StatelessWidget {
 
   Widget _getGenreSelectionScreen(SpotifyImportBloc bloc) {
     return ImportSelectionListScreen<ImportedGenre>(
-      bloc: bloc,
       namedEntitySet: bloc.state.availableGenresForSelectedArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: "genre tag",

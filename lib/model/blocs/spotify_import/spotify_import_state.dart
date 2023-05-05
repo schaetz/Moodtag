@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
+import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
@@ -7,7 +8,7 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 class SpotifyImportState extends Equatable {
   final SpotifyImportFlowStep step;
   final String? spotifyAuthCode;
-  final bool doImportGenres;
+  final Map<SpotifyImportOption, bool> configuration;
 
   final UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists;
   final UniqueNamedEntitySet<ImportedGenre>? availableGenresForSelectedArtists;
@@ -17,7 +18,7 @@ class SpotifyImportState extends Equatable {
   const SpotifyImportState({
     this.step = SpotifyImportFlowStep.login,
     this.spotifyAuthCode,
-    this.doImportGenres = false,
+    this.configuration = const {},
     this.availableSpotifyArtists,
     this.availableGenresForSelectedArtists,
     this.selectedArtists,
@@ -28,17 +29,19 @@ class SpotifyImportState extends Equatable {
   List<Object?> get props => [
         step,
         spotifyAuthCode,
-        doImportGenres,
+        configuration,
         availableSpotifyArtists,
         availableGenresForSelectedArtists,
         selectedArtists,
         selectedGenres
       ];
 
+  bool get isConfigurationValid => configuration.values.where((selection) => selection == true).toList().isNotEmpty;
+
   SpotifyImportState copyWith({
     SpotifyImportFlowStep? step,
     String? spotifyAuthCode,
-    bool? doImportGenres,
+    Map<SpotifyImportOption, bool>? configuration,
     UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists,
     UniqueNamedEntitySet<ImportedGenre>? availableGenresForSelectedArtists,
     List<ImportedArtist>? selectedArtists,
@@ -47,7 +50,7 @@ class SpotifyImportState extends Equatable {
     return SpotifyImportState(
       step: step ?? this.step,
       spotifyAuthCode: spotifyAuthCode ?? this.spotifyAuthCode,
-      doImportGenres: doImportGenres ?? this.doImportGenres,
+      configuration: configuration ?? this.configuration,
       availableSpotifyArtists: availableSpotifyArtists ?? this.availableSpotifyArtists,
       availableGenresForSelectedArtists: availableGenresForSelectedArtists ?? this.availableGenresForSelectedArtists,
       selectedArtists: selectedArtists ?? this.selectedArtists,

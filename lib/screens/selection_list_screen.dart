@@ -55,11 +55,14 @@ class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionLi
               child: _buildFloatingSelectButton(context, _sortedEntities.length),
             ),
             FloatingActionButton.extended(
-              onPressed: () =>
-                  widget.onMainButtonPressed(context, _sortedEntities, _isBoxSelected, _selectedBoxesCount),
+              onPressed: () => _isSelectionValid()
+                  ? widget.onMainButtonPressed(context, _sortedEntities, _isBoxSelected, _selectedBoxesCount)
+                  : null,
               label: Text(widget.mainButtonLabel),
               icon: const Icon(Icons.add_circle_outline),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
+              backgroundColor: _isSelectionValid()
+                  ? Theme.of(context).colorScheme.secondary
+                  : Colors.grey, // TODO Define color in theme
               heroTag: 'main_button',
             ),
             //add right Widget here with padding right
@@ -75,6 +78,8 @@ class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionLi
       _selectedBoxesCount = value == true ? entityCount : 0;
     });
   }
+
+  bool _isSelectionValid() => _selectedBoxesCount > 0;
 
   Widget _buildRow(BuildContext context, String entityName, int index) {
     return CheckboxListTile(

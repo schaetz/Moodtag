@@ -1,4 +1,3 @@
-import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 
@@ -17,13 +16,20 @@ class LoginWebviewUrlChange extends SpotifyEvent {
   List<Object?> get props => [url];
 }
 
-class ConfirmConfigForSpotifyImport extends SpotifyEvent {
-  final Map<SpotifyImportOption, bool> selectedOptions;
+class ChangeConfigForSpotifyImport extends SpotifyEvent {
+  final Map<String, bool> selectedOptions;
 
-  const ConfirmConfigForSpotifyImport(this.selectedOptions);
+  const ChangeConfigForSpotifyImport(this.selectedOptions);
 
   @override
   List<Object?> get props => [selectedOptions];
+}
+
+class ConfirmConfigForSpotifyImport extends SpotifyEvent {
+  const ConfirmConfigForSpotifyImport();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class ConfirmArtistsForSpotifyImport extends SpotifyEvent {

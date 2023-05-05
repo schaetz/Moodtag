@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/screens/selection_list_screen.dart';
 import 'package:moodtag/structs/named_entity.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
-// TODO Can be abstracted to use for other imports, not only Spotify
 class ImportSelectionListScreen<N extends NamedEntity> extends StatelessWidget {
-  final SpotifyImportBloc bloc;
   final UniqueNamedEntitySet<N> namedEntitySet;
   final String confirmationButtonLabel;
   final String entityDenotationSingular;
@@ -15,7 +12,6 @@ class ImportSelectionListScreen<N extends NamedEntity> extends StatelessWidget {
 
   const ImportSelectionListScreen(
       {Key? key,
-      required this.bloc,
       required this.namedEntitySet,
       this.confirmationButtonLabel = "Import",
       required this.entityDenotationSingular,
