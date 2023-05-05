@@ -21,16 +21,11 @@ class ImportFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
-    return BlocConsumer<SpotifyImportBloc, SpotifyImportState>(listener: (context, state) {
-      if (state.flowCancelled) {
-        _returnToLibraryScreens(context);
-      }
-    }, builder: (context, state) {
+    return BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
       return Provider(
-          create: (_) => AppBarContextData(onBackButtonPressed: () => _onBackButtonPressed(bloc)),
+          create: (_) => AppBarContextData(onBackButtonPressed: () => _onBackButtonPressed(context, bloc)),
           child: FlowBuilder<ImportFlowState>(
-            state: ImportFlowState(
-                step: state.step, doShowGenreImportScreen: state.doImportGenres, flowCancelled: state.flowCancelled),
+            state: ImportFlowState(step: state.step, doShowGenreImportScreen: state.doImportGenres),
             onGeneratePages: (ImportFlowState importFlowState, List<Page> pages) =>
                 _onGenerateImportFlowPages(importFlowState, pages, bloc),
           ));
@@ -58,8 +53,12 @@ class ImportFlow extends StatelessWidget {
     ];
   }
 
-  void _onBackButtonPressed(SpotifyImportBloc bloc) {
-    bloc.add(ReturnToPreviousImportScreen(this));
+  void _onBackButtonPressed(BuildContext context, SpotifyImportBloc bloc) {
+    if (bloc.state.step.index <= SpotifyImportFlowStep.config.index) {
+      _returnToLibraryScreens(context);
+    } else {
+      bloc.add(ReturnToPreviousImportScreen(this));
+    }
   }
 
   Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {

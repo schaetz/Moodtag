@@ -48,8 +48,6 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
       ReturnToPreviousImportScreen event, Emitter<SpotifyImportState> emit) {
     if (state.step.index > SpotifyImportFlowStep.config.index) {
       emit(state.copyWith(step: SpotifyImportFlowStep.values[state.step.index - 1]));
-    } else {
-      emit(state.copyWith(flowCancelled: true));
     }
   }
 
