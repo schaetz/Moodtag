@@ -21,7 +21,7 @@ class ImportFlow extends StatelessWidget {
     final bloc = context.read<SpotifyImportBloc>();
     return BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
       return FlowBuilder<ImportFlowState>(
-        state: ImportFlowState(step: state.step),
+        state: ImportFlowState(step: state.step, doShowGenreImportScreen: state.doImportGenres),
         onGeneratePages: (ImportFlowState importFlowState, List<Page> pages) =>
             _onGenerateImportFlowPages(importFlowState, pages, bloc),
         onComplete: (importFlowState) => _returnToLibraryScreens(context),
@@ -42,7 +42,8 @@ class ImportFlow extends StatelessWidget {
       MaterialPage<void>(child: SpotifyImportConfigScreen(), name: Routes.spotifyImport),
       if (importFlowState.step.index >= SpotifyImportFlowStep.artistsSelection.index)
         MaterialPage<void>(child: _getArtistsSelectionScreen(bloc)),
-      if (importFlowState.step.index >= SpotifyImportFlowStep.genreTagsSelection.index)
+      if (importFlowState.step.index >= SpotifyImportFlowStep.genreTagsSelection.index &&
+          importFlowState.doShowGenreImportScreen)
         MaterialPage<void>(child: _getGenreSelectionScreen(bloc)),
       if (importFlowState.step.index >= SpotifyImportFlowStep.confirmation.index)
         MaterialPage<void>(child: SpotifyImportConfirmationScreen(), name: Routes.spotifyImport)

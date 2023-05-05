@@ -37,6 +37,7 @@ class SpotifyImportState extends Equatable {
       ];
 
   bool get isConfigurationValid => configuration.values.where((selection) => selection == true).toList().isNotEmpty;
+  bool get doImportGenres => configuration[SpotifyImportOption.artistGenres] == true;
 
   SpotifyImportState copyWith({
     SpotifyImportFlowStep? step,

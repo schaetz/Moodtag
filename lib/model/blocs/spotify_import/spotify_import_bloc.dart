@@ -172,13 +172,11 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
   }
 
   SpotifyImportFlowStep _getNextFlowStep(SpotifyImportState currentState) {
-    if (currentState.step == SpotifyImportFlowStep.artistsSelection && !_doImportGenres()) {
+    if (currentState.step == SpotifyImportFlowStep.artistsSelection && !currentState.doImportGenres) {
       return SpotifyImportFlowStep.confirmation;
     }
     return SpotifyImportFlowStep.values[currentState.step.index + 1];
   }
-
-  bool _doImportGenres() => state.configuration![SpotifyImportOption.artistGenres] == true;
 
   void _showResultMessage(Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType) {
     String message;
