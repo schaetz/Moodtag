@@ -51,7 +51,7 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
     }
   }
 
-  void _mapLoginWebviewUrlChangeEventToState(LoginWebviewUrlChange event, Emitter<SpotifyImportState> emit) {
+  void _mapLoginWebviewUrlChangeEventToState(LoginWebviewUrlChange event, Emitter<SpotifyImportState> emit) async {
     Uri uri = Uri.parse(event.url);
     print(uri.authority);
     print(uri.queryParameters);
@@ -61,7 +61,15 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
       if (authorizationCode == null) {
         errorStreamController.add(UnknownError('An error occurred trying to connect to the Spotify API.'));
       } else {
-        emit(state.copyWith(spotifyAuthCode: authorizationCode, step: _getNextFlowStep(state)));
+        try {
+          String accessToken = await _getAccessToken(authorizationCode: authorizationCode);
+          emit(state.copyWith(
+              spotifyAuthCode: authorizationCode, spotifyAccessToken: accessToken, step: _getNextFlowStep(state)));
+        } catch (e) {
+          errorStreamController
+              .add(ExternalServiceQueryException('Could not retrieve an access token for Spotify API.'));
+          emit(state.copyWith(spotifyAuthCode: authorizationCode, step: _getNextFlowStep(state)));
+        }
       }
     }
   }
@@ -105,16 +113,7 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
 
   Future<UniqueNamedEntitySet<ImportedArtist>> _getAvailableSpotifyArtists(
       Map<SpotifyImportOption, bool> selectedOptions) async {
-    final authorizationCode = state.spotifyAuthCode;
-    if (authorizationCode == null) {
-      throw ExternalServiceQueryException('Could not retrieve artists from the Spotify API: The authorization failed.');
-    }
-
-    print('Obtained authorization code from Spotify: $authorizationCode');
-    final accessTokenResponseBodyJSON = await getAccessToken(authorizationCode);
-
-    final accessToken = accessTokenResponseBodyJSON['access_token'];
-    print('Obtained access token from Spotify: $accessToken');
+    String accessToken = await _getAccessToken();
 
     final availableSpotifyArtists = UniqueNamedEntitySet<ImportedArtist>();
 
@@ -127,6 +126,21 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
     }
 
     return availableSpotifyArtists;
+  }
+
+  Future<String> _getAccessToken({String? authorizationCode}) async {
+    if (state.spotifyAccessToken != null) {
+      print('Existing access token from Spotify: ${state.spotifyAccessToken}');
+      return state.spotifyAccessToken!;
+    }
+
+    final usedAuthCode = authorizationCode == null ? state.spotifyAuthCode : authorizationCode;
+    if (usedAuthCode == null) {
+      throw ExternalServiceQueryException(
+          'Could not retrieve an access token for Spotify API: The authorization failed.');
+    }
+
+    return await getAccessToken(usedAuthCode);
   }
 
   void _mapConfirmArtistsForSpotifyImportEventToState(

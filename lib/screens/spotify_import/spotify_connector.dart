@@ -47,7 +47,7 @@ bool isRedirectUri(Uri uri) {
   return uriWithoutQuery == redirectUri;
 }
 
-Future<dynamic> getAccessToken(String authorizationCode) async {
+Future<String> getAccessToken(String authorizationCode) async {
   final body = {
     'grant_type': 'authorization_code',
     'code': authorizationCode,
@@ -61,7 +61,12 @@ Future<dynamic> getAccessToken(String authorizationCode) async {
   final responseBodyJSON = json.decode(response.body);
 
   if (isHttpRequestSuccessful(response)) {
-    return responseBodyJSON;
+    if (responseBodyJSON != null && responseBodyJSON.containsKey('access_token')) {
+      return responseBodyJSON['access_token'];
+    } else {
+      throw ExternalServiceQueryException(
+          'Could not acquire an access token for the Spotify Web API: Unexpected response');
+    }
   } else {
     throw ExternalServiceQueryException('Could not acquire an access token for the Spotify Web API.');
   }
