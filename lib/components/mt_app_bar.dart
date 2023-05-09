@@ -4,7 +4,9 @@ import 'package:moodtag/components/app_bar_context_data.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/main.dart';
 import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
+import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -69,7 +71,16 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
     };
     switch (value) {
       case menuItemSpotifyImport:
-        Navigator.of(context).pushNamed(Routes.spotifyImport);
+        if (context.read<SpotifyAuthBloc>().state.spotifyAuthCode == null) {
+          Function redirectAfterAuth = () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, Routes.spotifyImport);
+          };
+          context.read<SpotifyAuthBloc>().add(RequestUserAuthorization(redirectAfterAuth: redirectAfterAuth));
+          Navigator.of(context).pushNamed(Routes.spotifyAuth);
+        } else {
+          Navigator.of(context).pushNamed(Routes.spotifyImport);
+        }
         break;
       case menuItemLastFmImport:
         Navigator.of(context).pushNamed(Routes.lastFmImport);

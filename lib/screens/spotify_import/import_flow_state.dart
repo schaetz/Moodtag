@@ -5,7 +5,7 @@ class ImportFlowState extends Equatable {
   final SpotifyImportFlowStep step;
   final bool doShowGenreImportScreen;
 
-  const ImportFlowState({this.step = SpotifyImportFlowStep.login, this.doShowGenreImportScreen = false});
+  const ImportFlowState({this.step = SpotifyImportFlowStep.config, this.doShowGenreImportScreen = false});
 
   @override
   List<Object?> get props => [step, doShowGenreImportScreen];

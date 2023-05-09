@@ -53,6 +53,10 @@ class SpotifyAccessToken {
   String? refreshToken;
 
   SpotifyAccessToken({required this.token, this.expiration, this.refreshToken});
+
+  bool hasExpired() {
+    return expiration == null || DateTime.now().isAfter(expiration!);
+  }
 }
 
 Future<SpotifyAccessToken> getAccessToken(String authorizationCode) async {

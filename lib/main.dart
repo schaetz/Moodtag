@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
+import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -38,8 +39,11 @@ class _AppState extends State<MoodtagApp> {
   Widget build(BuildContext context) {
     return RepositoryProvider(
         create: (context) => Repository(),
-        child: BlocProvider(
-            create: (context) => AppBarBloc(context),
+        child: MultiBlocProvider(
+            providers: [
+              BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),
+              BlocProvider<SpotifyAuthBloc>(create: (context) => SpotifyAuthBloc(context)),
+            ],
             child: MaterialApp(
                 title: MoodtagApp.appTitle,
                 theme: ThemeData(

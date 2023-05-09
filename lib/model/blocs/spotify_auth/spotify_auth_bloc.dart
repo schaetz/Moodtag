@@ -1,0 +1,121 @@
+import 'dart:async';
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/exceptions/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/unknown_error.dart';
+import 'package:moodtag/model/blocs/error_stream_handling.dart';
+import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_state.dart';
+import 'package:moodtag/model/events/spotify_events.dart';
+import 'package:moodtag/screens/spotify_import/spotify_connector.dart' as connector;
+import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
+import 'package:rxdart/rxdart.dart';
+
+class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState> with ErrorStreamHandling {
+  final BuildContext mainContext;
+
+  final _latestAccessToken = BehaviorSubject<connector.SpotifyAccessToken?>();
+
+  SpotifyAuthBloc(this.mainContext) : super(SpotifyAuthState()) {
+    on<RequestUserAuthorization>(_mapRequestUserAuthorizationEventToState);
+    on<LoginWebviewUrlChange>(_mapLoginWebviewUrlChangeEventToState);
+    on<RequestAccessToken>(_mapRequestAccessTokenEventToState);
+
+    setupErrorHandler(mainContext);
+  }
+
+  Future<SpotifyAccessToken?> getCurrentOrNewAccessToken() async {
+    SpotifyAccessToken? accessToken = _latestAccessToken.valueOrNull;
+    if (accessToken == null || accessToken.hasExpired()) {
+      this.add(RequestAccessToken());
+      await _latestAccessToken.timeout(Duration(seconds: 1), onTimeout: (_) {
+        accessToken = null;
+      }).listen((newToken) {
+        if (newToken != accessToken) {
+          accessToken = newToken;
+        }
+        close();
+      });
+    }
+
+    return accessToken;
+  }
+
+  void _mapRequestUserAuthorizationEventToState(RequestUserAuthorization event, Emitter<SpotifyAuthState> emit) {
+    emit(state.copyWith(redirectRoute: event.redirectAfterAuth));
+  }
+
+  void _mapLoginWebviewUrlChangeEventToState(LoginWebviewUrlChange event, Emitter<SpotifyAuthState> emit) async {
+    Uri uri = Uri.parse(event.url);
+    print(uri.authority);
+    print(uri.queryParameters);
+    print('uri: ' + uri.toString());
+    if (isRedirectUri(uri)) {
+      final authorizationCode = uri.queryParameters.containsKey('code') ? uri.queryParameters['code'] : null;
+      if (authorizationCode == null) {
+        errorStreamController.add(UnknownError('An error occurred trying to connect to the Spotify API.'));
+      } else {
+        Function? currentRedirect = state.redirect;
+        SpotifyAccessToken? newAccessToken;
+        try {
+          newAccessToken = await _getAccessTokenWithoutStateUpdate(authorizationCode: authorizationCode);
+        } catch (e) {
+          errorStreamController
+              .add(ExternalServiceQueryException('Could not retrieve an access token for Spotify API.'));
+        }
+
+        if (newAccessToken != null && newAccessToken != state.spotifyAccessToken) {
+          _latestAccessToken.add(newAccessToken);
+          emit(state.copyWith(
+              spotifyAuthCode: authorizationCode, spotifyAccessToken: newAccessToken, redirectRoute: null));
+        } else {
+          emit(state.copyWith(spotifyAuthCode: authorizationCode, redirectRoute: null));
+        }
+        _redirectAfterSuccessfulAuthorization(currentRedirect);
+      }
+    }
+  }
+
+  void _mapRequestAccessTokenEventToState(RequestAccessToken event, Emitter<SpotifyAuthState> emit) async {
+    try {
+      SpotifyAccessToken accessToken = await _getAccessTokenWithoutStateUpdate();
+      if (accessToken != state.spotifyAccessToken) {
+        _latestAccessToken.add(accessToken);
+        emit(state.copyWith(spotifyAccessToken: accessToken));
+      }
+    } catch (e) {
+      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
+    }
+  }
+
+  void _redirectAfterSuccessfulAuthorization(Function? redirect) {
+    if (redirect != null) {
+      redirect();
+    }
+  }
+
+  Future<SpotifyAccessToken> _getAccessTokenWithoutStateUpdate({String? authorizationCode}) async {
+    final usedAuthCode = authorizationCode == null ? state.spotifyAuthCode : authorizationCode;
+    if (usedAuthCode == null) {
+      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
+    }
+
+    try {
+      if (state.spotifyAccessToken == null) {
+        print('Get new Spotify access token');
+        return await connector.getAccessToken(usedAuthCode);
+      } else if (!state.hasAccessTokenExpired()) {
+        print('Use existing access token from Spotify: ${state.spotifyAccessToken!.token}');
+        return state.spotifyAccessToken!;
+      } else if (state.spotifyAccessToken!.refreshToken != null) {
+        print('Spotify access token expired - Refresh access token');
+        return await connector.refreshAccessToken(state.spotifyAccessToken!.refreshToken!);
+      } else {
+        print('Spotify access token expired, no refresh token given - Try to acquire a new access token');
+        return await connector.getAccessToken(usedAuthCode);
+      }
+    } catch (e) {
+      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
+    }
+  }
+}

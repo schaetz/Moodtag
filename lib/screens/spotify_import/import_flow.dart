@@ -9,7 +9,6 @@ import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/import_selection_list_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_confirmation_screen.dart';
-import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/utils/i10n.dart';
@@ -33,14 +32,6 @@ class ImportFlow extends StatelessWidget {
   }
 
   List<Page> _onGenerateImportFlowPages(ImportFlowState importFlowState, List<Page> pages, SpotifyImportBloc bloc) {
-    if (importFlowState.step.index == SpotifyImportFlowStep.login.index) {
-      return [
-        MaterialPage<void>(
-          child: SpotifyLoginWebview(),
-        )
-      ];
-    }
-
     return [
       MaterialPage<void>(child: SpotifyImportConfigScreen(), name: Routes.spotifyImport),
       if (importFlowState.step.index >= SpotifyImportFlowStep.artistsSelection.index)

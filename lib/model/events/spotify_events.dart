@@ -17,6 +17,15 @@ class ReturnToPreviousImportScreen extends SpotifyEvent {
   List<Object?> get props => [importFlow];
 }
 
+class RequestUserAuthorization extends SpotifyEvent {
+  final Function redirectAfterAuth;
+
+  const RequestUserAuthorization({required this.redirectAfterAuth});
+
+  @override
+  List<Object?> get props => [redirectAfterAuth];
+}
+
 class LoginWebviewUrlChange extends SpotifyEvent {
   final String url;
 
@@ -24,6 +33,13 @@ class LoginWebviewUrlChange extends SpotifyEvent {
 
   @override
   List<Object?> get props => [url];
+}
+
+class RequestAccessToken extends SpotifyEvent {
+  const RequestAccessToken();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class ChangeConfigForSpotifyImport extends SpotifyEvent {
