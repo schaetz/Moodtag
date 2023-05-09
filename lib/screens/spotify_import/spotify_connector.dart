@@ -47,7 +47,15 @@ bool isRedirectUri(Uri uri) {
   return uriWithoutQuery == redirectUri;
 }
 
-Future<String> getAccessToken(String authorizationCode) async {
+class SpotifyAccessToken {
+  String token;
+  DateTime? expiration;
+  String? refreshToken;
+
+  SpotifyAccessToken({required this.token, this.expiration, this.refreshToken});
+}
+
+Future<SpotifyAccessToken> getAccessToken(String authorizationCode) async {
   final body = {
     'grant_type': 'authorization_code',
     'code': authorizationCode,
@@ -57,19 +65,57 @@ Future<String> getAccessToken(String authorizationCode) async {
   };
 
   final uri = Uri.https(spotifyAccountsBaseUrl, accessTokenSubroute);
-  final response = await http.post(uri, body: body);
-  final responseBodyJSON = json.decode(response.body);
+  final response = await http.post(uri, body: body, headers: _getHeaderFormUrlEncoded());
 
   if (isHttpRequestSuccessful(response)) {
-    if (responseBodyJSON != null && responseBodyJSON.containsKey('access_token')) {
-      return responseBodyJSON['access_token'];
-    } else {
+    SpotifyAccessToken? accessToken = _extractAccessTokenFromJson(response.body);
+    if (accessToken == null) {
       throw ExternalServiceQueryException(
           'Could not acquire an access token for the Spotify Web API: Unexpected response');
     }
+
+    return accessToken;
   } else {
     throw ExternalServiceQueryException('Could not acquire an access token for the Spotify Web API.');
   }
+}
+
+Future<SpotifyAccessToken> refreshAccessToken(String refreshToken) async {
+  final body = {
+    'grant_type': 'refresh_token',
+    'refresh_token': refreshToken,
+    'client_id': clientId,
+  };
+
+  final uri = Uri.https(spotifyAccountsBaseUrl, accessTokenSubroute);
+  final response = await http.post(uri, body: body, headers: _getHeaderFormUrlEncoded());
+
+  if (isHttpRequestSuccessful(response)) {
+    SpotifyAccessToken? accessToken = _extractAccessTokenFromJson(response.body);
+    if (accessToken == null) {
+      throw ExternalServiceQueryException(
+          'Could not refresh the access token for the Spotify Web API: Unexpected response');
+    }
+
+    return accessToken;
+  } else {
+    throw ExternalServiceQueryException('Could not refresh the access token for the Spotify Web API.');
+  }
+}
+
+SpotifyAccessToken? _extractAccessTokenFromJson(String responseBody) {
+  final responseBodyJSON = json.decode(responseBody);
+  String? token = responseBodyJSON.containsKey('access_token') ? responseBodyJSON['access_token'] : null;
+  if (token == null) {
+    return null;
+  }
+
+  final expiration = responseBodyJSON.containsKey('expires_in')
+      ? DateTime.now().add(Duration(seconds: responseBodyJSON['expires_in']))
+      : null;
+  final refreshToken = responseBodyJSON.containsKey('refresh_token') ? responseBodyJSON['refresh_token'] : null;
+
+  return SpotifyAccessToken(token: token, expiration: expiration, refreshToken: refreshToken);
 }
 
 Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessToken) async {
@@ -79,7 +125,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
   };
 
   final uri = Uri.https(spotifyApiBaseUrl, followedArtistsSubroute, queryParameters);
-  final response = await http.get(uri, headers: _getHeader(accessToken) as Map<String, String>);
+  final response = await http.get(uri, headers: _getHeaderWithAccessToken(accessToken));
 
   if (!isHttpRequestSuccessful(response)) {
     throw ExternalServiceQueryException(_getRequestErrorMessage(response));
@@ -109,7 +155,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
   };
 
   final uri = Uri.https(spotifyApiBaseUrl, topArtistsSubroute, queryParameters);
-  final response = await http.get(uri, headers: _getHeader(accessToken) as Map<String, String>);
+  final response = await http.get(uri, headers: _getHeaderWithAccessToken(accessToken));
 
   if (!isHttpRequestSuccessful(response)) {
     throw ExternalServiceQueryException(_getRequestErrorMessage(response));
@@ -154,7 +200,13 @@ String _generateCodeChallenge() {
   return base64UrlEncoded;
 }
 
-Object _getHeader(String accessToken) {
+Map<String, String> _getHeaderFormUrlEncoded() {
+  return {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+}
+
+Map<String, String> _getHeaderWithAccessToken(String accessToken) {
   return {
     'Authorization': "Bearer $accessToken",
     'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
+import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
@@ -8,7 +9,7 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 class SpotifyImportState extends Equatable {
   final SpotifyImportFlowStep step;
   final String? spotifyAuthCode;
-  final String? spotifyAccessToken;
+  final SpotifyAccessToken? spotifyAccessToken;
   final Map<SpotifyImportOption, bool> configuration;
 
   final UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists;
@@ -45,7 +46,7 @@ class SpotifyImportState extends Equatable {
   SpotifyImportState copyWith({
     SpotifyImportFlowStep? step,
     String? spotifyAuthCode,
-    String? spotifyAccessToken,
+    SpotifyAccessToken? spotifyAccessToken,
     Map<SpotifyImportOption, bool>? configuration,
     UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists,
     UniqueNamedEntitySet<ImportedGenre>? availableGenresForSelectedArtists,

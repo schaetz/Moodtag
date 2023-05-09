@@ -62,7 +62,7 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
         errorStreamController.add(UnknownError('An error occurred trying to connect to the Spotify API.'));
       } else {
         try {
-          String accessToken = await _getAccessToken(authorizationCode: authorizationCode);
+          SpotifyAccessToken accessToken = await _getAccessToken(authorizationCode: authorizationCode);
           emit(state.copyWith(
               spotifyAuthCode: authorizationCode, spotifyAccessToken: accessToken, step: _getNextFlowStep(state)));
         } catch (e) {
@@ -93,12 +93,19 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
         return;
       }
 
-      final availableSpotifyArtists = await _getAvailableSpotifyArtists(state.configuration);
+      SpotifyAccessToken accessToken = await _getAccessToken();
+      final availableSpotifyArtists = await _getAvailableSpotifyArtists(state.configuration, accessToken);
 
       if (availableSpotifyArtists.isEmpty) {
         errorStreamController.add(InvalidUserInputException("No artists to import."));
+        if (accessToken != state.spotifyAccessToken) {
+          emit(state.copyWith(spotifyAccessToken: accessToken));
+        }
       } else {
-        emit(state.copyWith(availableSpotifyArtists: availableSpotifyArtists, step: _getNextFlowStep(state)));
+        emit(state.copyWith(
+            spotifyAccessToken: accessToken,
+            availableSpotifyArtists: availableSpotifyArtists,
+            step: _getNextFlowStep(state)));
       }
     } catch (e) {
       print("Getting available artists from Spotify failed: $e");
@@ -112,35 +119,47 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
   }
 
   Future<UniqueNamedEntitySet<ImportedArtist>> _getAvailableSpotifyArtists(
-      Map<SpotifyImportOption, bool> selectedOptions) async {
-    String accessToken = await _getAccessToken();
-
+      Map<SpotifyImportOption, bool> selectedOptions, SpotifyAccessToken accessToken) async {
     final availableSpotifyArtists = UniqueNamedEntitySet<ImportedArtist>();
 
     if (selectedOptions[SpotifyImportOption.topArtists] == true) {
-      availableSpotifyArtists.addAll(await getTopArtists(accessToken, 50, 0));
+      availableSpotifyArtists.addAll(await getTopArtists(accessToken.token, 50, 0));
     }
 
     if (selectedOptions[SpotifyImportOption.followedArtists] == true) {
-      availableSpotifyArtists.addAll(await getFollowedArtists(accessToken));
+      availableSpotifyArtists.addAll(await getFollowedArtists(accessToken.token));
     }
 
     return availableSpotifyArtists;
   }
 
-  Future<String> _getAccessToken({String? authorizationCode}) async {
-    if (state.spotifyAccessToken != null) {
-      print('Existing access token from Spotify: ${state.spotifyAccessToken}');
-      return state.spotifyAccessToken!;
-    }
-
+  Future<SpotifyAccessToken> _getAccessToken({String? authorizationCode}) async {
     final usedAuthCode = authorizationCode == null ? state.spotifyAuthCode : authorizationCode;
     if (usedAuthCode == null) {
-      throw ExternalServiceQueryException(
-          'Could not retrieve an access token for Spotify API: The authorization failed.');
+      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
     }
 
-    return await getAccessToken(usedAuthCode);
+    try {
+      if (state.spotifyAccessToken == null) {
+        print('Get new Spotify access token');
+        return await getAccessToken(usedAuthCode);
+      } else if (!_isAccessTokenExpired(state.spotifyAccessToken!)) {
+        print('Use existing access token from Spotify: ${state.spotifyAccessToken!.token}');
+        return state.spotifyAccessToken!;
+      } else if (state.spotifyAccessToken!.refreshToken != null) {
+        print('Spotify access token expired - Refresh access token');
+        return await refreshAccessToken(state.spotifyAccessToken!.refreshToken!);
+      } else {
+        print('Spotify access token expired, no refresh token given - Try to acquire a new access token');
+        return await getAccessToken(usedAuthCode);
+      }
+    } catch (e) {
+      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
+    }
+  }
+
+  bool _isAccessTokenExpired(SpotifyAccessToken spotifyAccessToken) {
+    return spotifyAccessToken.expiration == null || DateTime.now().isAfter(spotifyAccessToken.expiration!);
   }
 
   void _mapConfirmArtistsForSpotifyImportEventToState(
