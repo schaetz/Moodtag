@@ -28,14 +28,14 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState> with ErrorStr
     SpotifyAccessToken? accessToken = _latestAccessToken.valueOrNull;
     if (accessToken == null || accessToken.hasExpired()) {
       this.add(RequestAccessToken());
-      await _latestAccessToken.timeout(Duration(seconds: 1), onTimeout: (_) {
-        accessToken = null;
-      }).listen((newToken) {
-        if (newToken != accessToken) {
-          accessToken = newToken;
-        }
-        close();
-      });
+      await _latestAccessToken
+          .timeout(Duration(seconds: 1), onTimeout: (_) {
+            accessToken = null;
+          })
+          .firstWhere((newToken) => newToken != accessToken)
+          .then((newToken) {
+            accessToken = newToken;
+          });
     }
 
     return accessToken;
