@@ -7,7 +7,7 @@ import 'package:moodtag/exceptions/invalid_user_input_exception.dart';
 import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/exceptions/user_info.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
-import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
+import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/repository/entity_creator.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -26,9 +26,9 @@ enum SpotifyImportFlowStep { config, artistsSelection, genreTagsSelection, confi
 class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with ErrorStreamHandling {
   final Repository _repository;
 
-  final SpotifyAuthBloc spotifyAuthBloc;
+  final SpotifyAccessTokenProvider accessTokenProvider;
 
-  SpotifyImportBloc(this._repository, BuildContext mainContext, this.spotifyAuthBloc)
+  SpotifyImportBloc(this._repository, BuildContext mainContext, this.accessTokenProvider)
       : super(SpotifyImportState(configuration: _getInitialImportConfig())) {
     on<ReturnToPreviousImportScreen>(_mapReturnToPreviousImportScreenEventToState);
     on<ChangeConfigForSpotifyImport>(_mapChangeConfigForSpotifyImportEventToState);
@@ -74,7 +74,7 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
         return;
       }
 
-      SpotifyAccessToken? accessToken = await spotifyAuthBloc.getCurrentOrNewAccessToken();
+      SpotifyAccessToken? accessToken = await accessTokenProvider.getAccessToken();
       if (accessToken == null) {
         errorStreamController.add(ExternalServiceQueryException('Authorization to Spotify Web API failed.'));
         return;

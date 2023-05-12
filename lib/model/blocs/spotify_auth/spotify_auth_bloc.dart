@@ -5,16 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/external_service_query_exception.dart';
 import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
+import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart' as connector;
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
-import 'package:rxdart/rxdart.dart';
 
-class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState> with ErrorStreamHandling {
+class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
+    with ErrorStreamHandling
+    implements SpotifyAccessTokenProvider {
   final BuildContext mainContext;
-
-  final _latestAccessToken = BehaviorSubject<connector.SpotifyAccessToken?>();
 
   SpotifyAuthBloc(this.mainContext) : super(SpotifyAuthState()) {
     on<RequestUserAuthorization>(_mapRequestUserAuthorizationEventToState);
@@ -24,17 +24,17 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState> with ErrorStr
     setupErrorHandler(mainContext);
   }
 
-  Future<SpotifyAccessToken?> getCurrentOrNewAccessToken() async {
-    SpotifyAccessToken? accessToken = _latestAccessToken.valueOrNull;
+  Future<SpotifyAccessToken?> getAccessToken() async {
+    SpotifyAccessToken? accessToken = state.spotifyAccessToken;
     if (accessToken == null || accessToken.hasExpired()) {
       this.add(RequestAccessToken());
-      await _latestAccessToken
+      await stream
           .timeout(Duration(seconds: 1), onTimeout: (_) {
             accessToken = null;
           })
-          .firstWhere((newToken) => newToken != accessToken)
-          .then((newToken) {
-            accessToken = newToken;
+          .firstWhere((newState) => newState.spotifyAccessToken != null && newState.spotifyAccessToken != accessToken)
+          .then((newState) {
+            accessToken = newState.spotifyAccessToken;
           });
     }
 
@@ -65,7 +65,6 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState> with ErrorStr
         }
 
         if (newAccessToken != null && newAccessToken != state.spotifyAccessToken) {
-          _latestAccessToken.add(newAccessToken);
           emit(state.copyWith(
               spotifyAuthCode: authorizationCode, spotifyAccessToken: newAccessToken, redirectRoute: null));
         } else {
@@ -80,7 +79,6 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState> with ErrorStr
     try {
       SpotifyAccessToken accessToken = await _getAccessTokenWithoutStateUpdate();
       if (accessToken != state.spotifyAccessToken) {
-        _latestAccessToken.add(accessToken);
         emit(state.copyWith(spotifyAccessToken: accessToken));
       }
     } catch (e) {
