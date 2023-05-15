@@ -42,7 +42,7 @@ class Repository {
   Future<DbRequestResponse<Artist>> createArtist(String name) async {
     Future<int> createArtistFuture =
         db.createArtist(ArtistsCompanion.insert(name: name, orderingName: _getOrderingNameForArtist(name)));
-    return _wrapExceptionsAndReturnResponseWithEntity<Artist>(createArtistFuture, name);
+    return _wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
   }
 
   Future<DbRequestResponse> deleteArtist(Artist artist) async {
@@ -79,7 +79,7 @@ class Repository {
 
   Future<DbRequestResponse<Tag>> createTag(String name) {
     Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name));
-    return _wrapExceptionsAndReturnResponseWithEntity<Tag>(createTagFuture, name);
+    return _wrapExceptionsAndReturnResponseWithCreatedEntity<Tag>(createTagFuture, name);
   }
 
   Future<DbRequestResponse> deleteTag(Tag tag) {
@@ -147,34 +147,30 @@ class Repository {
     return new DbRequestResponse.success();
   }
 
-  Future<DbRequestResponse<E>> _wrapExceptionsAndReturnResponseWithEntity<E>(
+  Future<DbRequestResponse<E>> _wrapExceptionsAndReturnResponseWithCreatedEntity<E>(
       Future<int?> createEntityFuture, String name) async {
-    Exception? exception;
-    E? newEntity;
-
     try {
-      newEntity = await createEntityFuture.then((newEntityId) async => await _getEntityById<E>(newEntityId));
-    } catch (e) {
-      exception = e as Exception;
-    }
+      E? newEntity = await createEntityFuture.then((newEntityId) async => await _getEntityById<E>(newEntityId));
 
-    if (newEntity == null) {
-      if (exception == null) {
-        exception = DatabaseError('The ID of the newly created entity could not be retrieved.');
+      if (newEntity == null) {
+        final exception = DatabaseError('The ID of the newly created entity could not be retrieved.');
+        return new DbRequestResponse<E>.fail(exception, parameters: [name]);
       }
-      return new DbRequestResponse<E>.fail(exception, parameters: [name]);
+      return new DbRequestResponse<E>.success(changedEntity: newEntity, parameters: [name]);
+    } on Exception catch (e) {
+      return new DbRequestResponse<E>.fail(e, parameters: [name]);
     }
-    return new DbRequestResponse<E>.success(changedEntity: newEntity, parameters: [name]);
   }
 
-  Future _getEntityById<E>(int? id) {
+  Future<E?> _getEntityById<E>(int? id) {
     if (id == null) {
       return Future.error(new InvalidArgumentException('getEntityById was called without a valid ID.'));
     }
+
     if (E == Artist) {
-      return db.getArtistById(id).last;
+      return db.getArtistByIdOnce(id) as Future<E?>;
     } else if (E == Tag) {
-      return db.getTagById(id).last;
+      return db.getTagByIdOnce(id) as Future<E?>;
     } else {
       return Future.error(
           new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString()));

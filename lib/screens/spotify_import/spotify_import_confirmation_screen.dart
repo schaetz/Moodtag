@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
@@ -53,7 +54,13 @@ class SpotifyImportConfirmationScreen extends StatelessWidget {
           ]);
         })),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => bloc.add(CompleteSpotifyImport()),
+          onPressed: () {
+            if (bloc.state.selectedArtists != null && bloc.state.selectedGenres != null) {
+              bloc.add(CompleteSpotifyImport(bloc.state.selectedArtists!, bloc.state.selectedGenres!));
+            } else {
+              bloc.errorStreamController.add(UnknownError('Something went wrong.'));
+            }
+          },
           label: Text('Import'),
           icon: const Icon(Icons.library_add),
           backgroundColor: Theme.of(context).colorScheme.secondary,

@@ -77,6 +77,11 @@ class ConfirmGenreTagsForSpotifyImport extends SpotifyEvent {
 }
 
 class CompleteSpotifyImport extends SpotifyEvent {
+  final List<ImportedArtist> selectedArtists;
+  final List<ImportedGenre> selectedGenres;
+
+  CompleteSpotifyImport(this.selectedArtists, this.selectedGenres);
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [selectedArtists, selectedGenres];
 }

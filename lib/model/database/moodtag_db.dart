@@ -56,7 +56,11 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   Stream<Artist?> getArtistById(int artistId) {
-    return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull().asStream();
+    return (select(artists)..where((a) => a.id.equals(artistId))).watchSingleOrNull();
+  }
+
+  Future<Artist?> getArtistByIdOnce(int artistId) {
+    return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull();
   }
 
   Future<Artist?> getArtistByNameOnce(String artistName) {
@@ -89,6 +93,10 @@ class MoodtagDB extends _$MoodtagDB {
 
   Stream<Tag?> getTagById(int tagId) {
     return (select(tags)..where((t) => t.id.equals(tagId))).watchSingleOrNull();
+  }
+
+  Future<Tag?> getTagByIdOnce(int tagId) {
+    return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
   }
 
   Future<Tag?> getTagByNameOnce(String tagName) {

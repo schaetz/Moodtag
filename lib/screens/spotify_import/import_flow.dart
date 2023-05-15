@@ -20,7 +20,11 @@ class ImportFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
-    return BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
+    return BlocConsumer<SpotifyImportBloc, SpotifyImportState>(listener: (context, state) {
+      if (state.step == SpotifyImportFlowStep.finished) {
+        _returnToLibraryScreens(context);
+      }
+    }, builder: (context, state) {
       return Provider(
           create: (_) => AppBarContextData(onBackButtonPressed: () => _onBackButtonPressed(context, bloc)),
           child: FlowBuilder<ImportFlowState>(

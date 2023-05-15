@@ -10,12 +10,8 @@ class DbRequestResponse<E> {
   late final Exception? exception;
 
   DbRequestResponse.success({this.changedEntity, this.parameters, this.exception = null});
-  DbRequestResponse.fail(this.exception, {this.parameters});
+  DbRequestResponse.fail(this.exception, {this.changedEntity = null, this.parameters});
   DbRequestResponse(this.changedEntity, this.exception);
-
-  DbRequestResponse.exceptionFrom(DbRequestResponse otherRequestResponse) {
-    this.exception = otherRequestResponse.exception;
-  }
 
   bool didSucceed() {
     return changedEntity != null && exception == null;
