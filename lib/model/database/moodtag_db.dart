@@ -71,6 +71,10 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
   }
 
+  Future<List<Tag>> getTagsOnce() {
+    return (select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
+  }
+
   Stream<List<TagWithArtistFreq>> getTagsWithArtistFreq() {
     final query = select(tags).join([
       leftOuterJoin(assignedTags, tags.id.equalsExp(assignedTags.tag)),

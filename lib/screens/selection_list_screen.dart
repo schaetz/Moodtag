@@ -4,10 +4,12 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 import '../components/mt_app_bar.dart';
 
-class SelectionListScreen<T extends NamedEntity> extends StatefulWidget {
-  final UniqueNamedEntitySet<T> namedEntitySet;
+// A generic screen that displays a list of named entities with checkboxes
+// and has a FloatingActionButton for carrying out an action on the entities
+class SelectionListScreen<E extends NamedEntity> extends StatefulWidget {
+  final UniqueNamedEntitySet<E> namedEntitySet;
   final String mainButtonLabel;
-  final Function(BuildContext, List<T>, List<bool>, int) onMainButtonPressed;
+  final Function(BuildContext, List<E>, List<bool>, int) onMainButtonPressed;
 
   SelectionListScreen({
     required this.namedEntitySet,
@@ -16,20 +18,20 @@ class SelectionListScreen<T extends NamedEntity> extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _SelectionListScreenState<T>();
+  State<StatefulWidget> createState() => SelectionListScreenState<E>();
 }
 
-class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionListScreen> {
+class SelectionListScreenState<E extends NamedEntity> extends State<SelectionListScreen> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  late final List<T> _sortedEntities;
+  late final List<E> _sortedEntities;
   List<bool> _isBoxSelected = [];
   int _selectedBoxesCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _sortedEntities = widget.namedEntitySet.toSortedList() as List<T>;
+    _sortedEntities = widget.namedEntitySet.toSortedList() as List<E>;
     _setBoxSelections(_sortedEntities.length, true);
   }
 
@@ -42,7 +44,8 @@ class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionLi
         padding: EdgeInsets.all(16.0),
         itemCount: _sortedEntities.length,
         itemBuilder: (context, i) {
-          return _buildRow(context, _sortedEntities[i].name, i);
+          return buildRow(context,
+              entity: _sortedEntities[i], isChecked: _isBoxSelected[i], onChanged: _onListTileChanged(i));
         },
       ),
       floatingActionButton: Container(
@@ -81,26 +84,31 @@ class _SelectionListScreenState<T extends NamedEntity> extends State<SelectionLi
 
   bool _isSelectionValid() => _selectedBoxesCount > 0;
 
-  Widget _buildRow(BuildContext context, String entityName, int index) {
+  Function(bool?) _onListTileChanged(int index) {
+    return (bool? newValue) {
+      setState(() {
+        if (newValue != null) {
+          _isBoxSelected[index] = newValue;
+          if (newValue == true) {
+            _selectedBoxesCount++;
+          } else {
+            _selectedBoxesCount--;
+          }
+        }
+      });
+    };
+  }
+
+  Widget buildRow(BuildContext context,
+      {required E entity, required bool isChecked, required Function(bool?) onChanged}) {
     return CheckboxListTile(
         title: Text(
-          entityName,
+          entity.name,
           style: listEntryStyle,
         ),
-        value: _isBoxSelected[index],
+        value: isChecked,
         controlAffinity: ListTileControlAffinity.leading,
-        onChanged: (bool? newValue) {
-          setState(() {
-            if (newValue != null) {
-              _isBoxSelected[index] = newValue;
-              if (newValue == true) {
-                _selectedBoxesCount++;
-              } else {
-                _selectedBoxesCount--;
-              }
-            }
-          });
-        });
+        onChanged: onChanged);
   }
 
   Widget _buildFloatingSelectButton(BuildContext context, int entityCount) {

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/screens/selection_list_screen.dart';
-import 'package:moodtag/structs/named_entity.dart';
+import 'package:moodtag/screens/spotify_import/spotify_selection_list_screen.dart';
+import 'package:moodtag/structs/import_entity.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
-class ImportSelectionListScreen<N extends NamedEntity> extends StatelessWidget {
-  final UniqueNamedEntitySet<N> namedEntitySet;
+// Wrapper for the SelectionListScreen that allows handling imports of ImportEntity´s
+class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget {
+  final UniqueNamedEntitySet<E> namedEntitySet;
   final String confirmationButtonLabel;
   final String entityDenotationSingular;
   final String entityDenotationPlural;
@@ -21,20 +22,21 @@ class ImportSelectionListScreen<N extends NamedEntity> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SelectionListScreen<N>(
+    // TODO This screen should be independent of Spotify and work for other imports, too
+    return SpotifySelectionListScreen<E>(
         namedEntitySet: namedEntitySet,
         mainButtonLabel: confirmationButtonLabel,
         onMainButtonPressed: _onConfirmButtonPressed);
   }
 
   void _onConfirmButtonPressed(
-      BuildContext context, List<N> sortedEntities, List<bool> isBoxSelected, int selectedBoxesCount) async {
-    List<N> selectedEntities = _filterOutUnselectedEntities(sortedEntities, isBoxSelected);
+      BuildContext context, List<E> sortedEntities, List<bool> isBoxSelected, int selectedBoxesCount) async {
+    List<E> selectedEntities = _filterOutUnselectedEntities(sortedEntities, isBoxSelected);
     onSelectionConfirmed(selectedEntities);
   }
 
-  List<N> _filterOutUnselectedEntities(List<N> sortedEntities, List<bool> isBoxSelected) {
-    List<N> selectedEntities = [];
+  List<E> _filterOutUnselectedEntities(List<E> sortedEntities, List<bool> isBoxSelected) {
+    List<E> selectedEntities = [];
     for (int i = 0; i < sortedEntities.length; i++) {
       if (isBoxSelected[i]) {
         selectedEntities.add(sortedEntities[i]);

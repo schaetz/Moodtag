@@ -13,6 +13,7 @@ import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
+import 'package:moodtag/structs/import_entity.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
@@ -109,15 +110,25 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
       availableSpotifyArtists.addAll(await getFollowedArtists(accessToken));
     }
 
+    if (!availableSpotifyArtists.isEmpty) {
+      final existingArtistNames = await _repository.getSetOfExistingArtistNames();
+      _annotateImportEntitiesWithAlreadyExistsProp(availableSpotifyArtists, existingArtistNames);
+    }
+
     return availableSpotifyArtists;
   }
 
   void _mapConfirmArtistsForSpotifyImportEventToState(
-      ConfirmArtistsForSpotifyImport event, Emitter<SpotifyImportState> emit) {
+      ConfirmArtistsForSpotifyImport event, Emitter<SpotifyImportState> emit) async {
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {
       final availableGenresForSelectedArtists = _getAvailableGenresForSelectedArtists(event.selectedArtists);
+      if (!availableGenresForSelectedArtists.isEmpty) {
+        final existingGenreNames = await _repository.getSetOfExistingTagNames();
+        _annotateImportEntitiesWithAlreadyExistsProp(availableGenresForSelectedArtists, existingGenreNames);
+      }
+
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
           availableGenresForSelectedArtists: availableGenresForSelectedArtists,
@@ -183,5 +194,14 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
     }
 
     return message;
+  }
+
+  void _annotateImportEntitiesWithAlreadyExistsProp(
+      UniqueNamedEntitySet<ImportEntity> entities, Set<String> existingNames) {
+    entities.values.forEach((entity) {
+      if (existingNames.contains(entity.name)) {
+        entity.alreadyExists = true;
+      }
+    });
   }
 }
