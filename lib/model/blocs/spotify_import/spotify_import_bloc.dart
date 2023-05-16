@@ -6,9 +6,9 @@ import 'package:moodtag/exceptions/external_service_query_exception.dart';
 import 'package:moodtag/exceptions/invalid_user_input_exception.dart';
 import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/exceptions/user_info.dart';
-import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
+import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
@@ -24,7 +24,7 @@ enum SpotifyImportFlowStep { config, artistsSelection, genreTagsSelection, confi
 
 class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with ErrorStreamHandling {
   final Repository _repository;
-  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
+  final SpotifyImportProcessor _spotifyImportProcessor = SpotifyImportProcessor();
 
   final SpotifyAccessTokenProvider accessTokenProvider;
 
@@ -146,9 +146,9 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
   }
 
   void _mapCompleteSpotifyImportEventToState(CompleteSpotifyImport event, Emitter<SpotifyImportState> emit) async {
-    final Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType =
-        await _createEntityBlocHelper.handleCompleteSpotifyImportEvent(event, _repository);
-    final resultMessage = _getResultMessage(creationSuccessCountersByType);
+    final Map<ImportSubProcess, DbRequestSuccessCounter> successCounters =
+        await _spotifyImportProcessor.conductImport(event.selectedArtists, event.selectedGenres, _repository);
+    final resultMessage = _getResultMessage(successCounters);
     errorStreamController.add(UserInfo(resultMessage));
 
     emit(state.copyWith(step: SpotifyImportFlowStep.finished));
@@ -161,14 +161,14 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
     return SpotifyImportFlowStep.values[currentState.step.index + 1];
   }
 
-  String _getResultMessage(Map<Type, DbRequestSuccessCounter> creationSuccessCountersByType) {
+  String _getResultMessage(Map<ImportSubProcess, DbRequestSuccessCounter> creationSuccessCountersByType) {
     String message;
 
-    if (creationSuccessCountersByType[ImportedArtist] == null) {
+    if (creationSuccessCountersByType[ImportSubProcess.createArtists] == null) {
       message = "No entities were added.";
     } else {
-      final successfulArtists = creationSuccessCountersByType[ImportedArtist]?.successCount ?? 0;
-      final successfulGenres = creationSuccessCountersByType[ImportedGenre]?.successCount ?? 0;
+      final successfulArtists = creationSuccessCountersByType[ImportSubProcess.createArtists]?.successCount ?? 0;
+      final successfulGenres = creationSuccessCountersByType[ImportSubProcess.createTags]?.successCount ?? 0;
       if (successfulArtists > 0) {
         if (successfulGenres > 0) {
           message = "Successfully added ${successfulArtists} artists and ${successfulGenres} tags.";

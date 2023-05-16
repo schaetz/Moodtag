@@ -3,13 +3,9 @@ import 'package:moodtag/exceptions/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/entity_processing_helper.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_genre.dart';
-import 'package:moodtag/utils/db_request_success_counter.dart';
 import 'package:moodtag/utils/helpers.dart';
 
 class CreateEntityBlocHelper {
@@ -72,16 +68,6 @@ class CreateEntityBlocHelper {
     return getHighestSeverityException(exceptions);
   }
 
-  Future<Map<Type, DbRequestSuccessCounter>> handleCompleteSpotifyImportEvent(
-      CompleteSpotifyImport event, Repository repository) async {
-    final DbRequestSuccessCounter createArtistsSuccessCounter =
-        await createArtistsForImport(event.selectedArtists, repository);
-    final DbRequestSuccessCounter createTagsSuccessCounter =
-        await createGenreTagsForImport(event.selectedGenres, repository);
-
-    return {ImportedArtist: createArtistsSuccessCounter, ImportedGenre: createTagsSuccessCounter};
-  }
-
   Future<UserReadableException?> handleToggleTagForArtistEvent(ToggleTagForArtist event, Repository repository) async {
     bool isTagAssignedToArtist = await repository.artistHasTag(event.artist, event.tag);
     if (isTagAssignedToArtist) {
@@ -136,27 +122,5 @@ class CreateEntityBlocHelper {
     }
 
     return Future.value(null);
-  }
-
-  Future<DbRequestSuccessCounter> createArtistsForImport(List<ImportedArtist> artists, Repository repository) async {
-    final DbRequestSuccessCounter creationSuccessCounter = DbRequestSuccessCounter();
-
-    await Future.forEach(artists, (ImportedArtist importedArtist) async {
-      DbRequestResponse creationResponse = await repository.createArtist(importedArtist.name);
-      creationSuccessCounter.registerResponse(creationResponse);
-    });
-
-    return creationSuccessCounter;
-  }
-
-  Future<DbRequestSuccessCounter> createGenreTagsForImport(List<ImportedGenre> genres, Repository repository) async {
-    final DbRequestSuccessCounter creationSuccessCounter = DbRequestSuccessCounter();
-
-    await Future.forEach(genres, (ImportedGenre importedGenre) async {
-      DbRequestResponse creationResponse = await repository.createTag(importedGenre.name);
-      creationSuccessCounter.registerResponse(creationResponse);
-    });
-
-    return creationSuccessCounter;
   }
 }
