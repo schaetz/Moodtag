@@ -7,6 +7,7 @@ import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
@@ -14,6 +15,7 @@ import 'package:moodtag/navigation/routes.dart';
 
 class ArtistsListScreen extends StatelessWidget {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
+  static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
   final GlobalKey _scaffoldKey = GlobalKey();
 
@@ -28,7 +30,7 @@ class ArtistsListScreen extends StatelessWidget {
       body: BlocBuilder<ArtistsListBloc, ArtistsListState>(
         buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {
-          if (state.artists.isEmpty) {
+          if (state.artistsWithTags.isEmpty) {
             return const Align(
               alignment: Alignment.center,
               child: Text('No artists yet', style: listEntryStyle),
@@ -38,9 +40,9 @@ class ArtistsListScreen extends StatelessWidget {
           return ListView.separated(
             separatorBuilder: (context, _) => Divider(),
             padding: EdgeInsets.all(16.0),
-            itemCount: state.artists.isNotEmpty ? state.artists.length : 0,
+            itemCount: state.artistsWithTags.isNotEmpty ? state.artistsWithTags.length : 0,
             itemBuilder: (context, i) {
-              return _buildArtistRow(context, state.artists[i], bloc);
+              return _buildArtistRow(context, state.artistsWithTags[i], bloc);
             },
           );
         },
@@ -55,17 +57,41 @@ class ArtistsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildArtistRow(BuildContext context, Artist artist, ArtistsListBloc bloc) {
+  Widget _buildArtistRow(BuildContext context, ArtistWithTags artistWithTags, ArtistsListBloc bloc) {
     final handleDeleteArtist = () {
-      bloc.add(DeleteArtist(artist));
+      bloc.add(DeleteArtist(artistWithTags.artist));
     };
     return ListTile(
         title: Text(
-          artist.name,
+          artistWithTags.artist.name,
           style: listEntryStyle,
         ),
-        onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
+        subtitle: _buildTagsSubtitle(context, artistWithTags),
+        onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
         onLongPress: () => DeleteDialog.openNew<Artist>(_scaffoldKey.currentContext!,
-            entityToDelete: artist, deleteHandler: handleDeleteArtist));
+            entityToDelete: artistWithTags.artist, deleteHandler: handleDeleteArtist));
+  }
+
+  Widget _buildTagsSubtitle(BuildContext context, ArtistWithTags artistWithTags) {
+    return SizedBox(
+        height: 40,
+        child: Wrap(
+          clipBehavior: Clip.hardEdge,
+          children: artistWithTags.tags.map((tag) => _getTagChipWithPadding(context, tag)).toList(),
+        ));
+  }
+
+  Widget _getTagChipWithPadding(BuildContext context, Tag tag) {
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 3.0),
+        child: InputChip(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+          padding: EdgeInsets.symmetric(horizontal: 6.0),
+          labelPadding: EdgeInsets.all(0.0),
+          label: Text(tag.name),
+          labelStyle: tagChipLabelStyle,
+          disabledColor: Theme.of(context).colorScheme.surface,
+          onPressed: () => {},
+        ));
   }
 }

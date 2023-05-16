@@ -1,26 +1,23 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 
 class ArtistsListState extends Equatable {
   final LoadingStatus loadingStatus;
-  final List<Artist> artists;
+  final List<ArtistWithTags> artistsWithTags;
 
-  const ArtistsListState(
-      {this.loadingStatus = LoadingStatus.initial, List<Artist>? artists, UserReadableException? exception})
-      : artists = artists ?? const [];
+  const ArtistsListState({this.loadingStatus = LoadingStatus.initial, this.artistsWithTags = const []});
 
   @override
-  List<Object> get props => [loadingStatus, artists];
+  List<Object> get props => [loadingStatus, artistsWithTags];
 
   ArtistsListState copyWith({
     LoadingStatus? loadingStatus,
-    List<Artist>? artists,
+    List<ArtistWithTags>? artistsWithTags,
   }) {
     return ArtistsListState(
       loadingStatus: loadingStatus ?? this.loadingStatus,
-      artists: artists ?? this.artists,
+      artistsWithTags: artistsWithTags ?? this.artistsWithTags,
     );
   }
 }

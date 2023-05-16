@@ -27,6 +27,10 @@ class Repository {
     return db.getArtistsOnce();
   }
 
+  Stream<List<ArtistWithTags>> getArtistsWithTags() {
+    return db.getArtistsWithTags();
+  }
+
   Future<Set<String>> getSetOfExistingArtistNames() async {
     final allArtists = await db.getArtistsOnce();
     return allArtists.map((artist) => artist.name).toSet();
@@ -55,7 +59,7 @@ class Repository {
     return _wrapExceptionsAndReturnResponse(deleteArtistFuture);
   }
 
-  Stream<List<Artist>> getArtistsWithTag(int tagId) {
+  Stream<List<Artist>> getArtistsHavingTag(int tagId) {
     return db.artistsWithTag(tagId).watch();
   }
 

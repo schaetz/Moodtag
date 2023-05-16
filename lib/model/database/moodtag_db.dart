@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/database/stream_transformers.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -29,6 +31,16 @@ class MoodtagDB extends _$MoodtagDB {
 
   Future<List<Artist>> getArtistsOnce() {
     return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
+  }
+
+  Stream<List<ArtistWithTags>> getArtistsWithTags() {
+    final query = select(artists).join([
+      leftOuterJoin(assignedTags, assignedTags.artist.equalsExp(artists.id) & assignedTags.tag.equalsExp(tags.id)),
+      innerJoin(tags, assignedTags.tag.equalsExp(tags.id)),
+    ])
+      ..orderBy([OrderingTerm.asc(artists.orderingName)]);
+    final typedResultStream = query.watch();
+    return typedResultStream.transform(ArtistsWithTagTransformer(this));
   }
 
   Stream<List<ArtistWithTagFlag>> getArtistsWithTagFlag(int tagId) {

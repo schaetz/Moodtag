@@ -18,13 +18,13 @@ class ArtistUpdated extends ArtistEvent {
 }
 
 class ArtistsListUpdated extends ArtistEvent {
-  final List<Artist>? artists;
+  final List<ArtistWithTags>? artistsWithTags;
   final Object? error;
 
-  const ArtistsListUpdated({this.artists, this.error});
+  const ArtistsListUpdated({this.artistsWithTags, this.error});
 
   @override
-  List<Object?> get props => [artists, error];
+  List<Object?> get props => [artistsWithTags, error];
 }
 
 class ArtistsListPlusUpdated extends ArtistEvent {

@@ -23,9 +23,9 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
     on<DeleteArtist>(_mapDeleteArtistEventToState);
 
     _artistsStreamSubscription = _repository
-        .getArtists()
+        .getArtistsWithTags()
         .handleError((error) => add(ArtistsListUpdated(error: error)))
-        .listen((artistsListFromStream) => add(ArtistsListUpdated(artists: artistsListFromStream)));
+        .listen((artistsListFromStream) => add(ArtistsListUpdated(artistsWithTags: artistsListFromStream)));
 
     setupErrorHandler(mainContext);
   }
@@ -37,8 +37,8 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
   }
 
   void _mapArtistsListUpdatedEventToState(ArtistsListUpdated event, Emitter<ArtistsListState> emit) {
-    if (event.artists != null) {
-      emit(state.copyWith(artists: event.artists, loadingStatus: LoadingStatus.success));
+    if (event.artistsWithTags != null) {
+      emit(state.copyWith(artistsWithTags: event.artistsWithTags, loadingStatus: LoadingStatus.success));
     } else {
       emit(state.copyWith(loadingStatus: LoadingStatus.error));
     }
