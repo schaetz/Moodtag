@@ -27,6 +27,15 @@ class ArtistsListUpdated extends ArtistEvent {
   List<Object?> get props => [artistsWithTags, error];
 }
 
+class ChangeArtistsListFilters extends ArtistEvent {
+  final Set<Tag> filterTags;
+
+  const ChangeArtistsListFilters({required this.filterTags});
+
+  @override
+  List<Object> get props => [filterTags];
+}
+
 class ArtistsListPlusUpdated extends ArtistEvent {
   final List<ArtistWithTagFlag>? artistWithTagFlag;
   final Object? error;

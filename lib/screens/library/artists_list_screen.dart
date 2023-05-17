@@ -14,6 +14,7 @@ import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class ArtistsListScreen extends StatelessWidget {
+  static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
@@ -28,9 +29,25 @@ class ArtistsListScreen extends StatelessWidget {
       key: _scaffoldKey,
       appBar: MtAppBar(context),
       body: BlocBuilder<ArtistsListBloc, ArtistsListState>(
-        buildWhen: (previous, current) => current.loadingStatus.isSuccess, // TODO Show loading or error symbols
         builder: (context, state) {
-          if (state.artistsWithTags.isEmpty) {
+          if (state.loadingStatus == LoadingStatus.loading || state.loadingStatus == LoadingStatus.initial) {
+            return Align(alignment: Alignment.center, child: CircularProgressIndicator());
+          } else if (state.loadingStatus == LoadingStatus.error) {
+            return Align(
+              alignment: Alignment.center,
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    WidgetSpan(
+                      child: Icon(Icons.error),
+                      style: errorLabelStyle,
+                    ),
+                    TextSpan(text: " Error: Could not obtain artists ", style: errorLabelStyle),
+                  ],
+                ),
+              ),
+            );
+          } else if (state.artistsWithTags.isEmpty) {
             return const Align(
               alignment: Alignment.center,
               child: Text('No artists yet', style: listEntryStyle),
@@ -50,6 +67,18 @@ class ArtistsListScreen extends StatelessWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          FloatingActionButton(
+              onPressed: () => bloc.add(ChangeArtistsListFilters(
+                  // TODO Allow the user to select tags for filtering
+                  filterTags: bloc.state.filterTags.isEmpty
+                      ? {bloc.state.artistsWithTags[2].tags.firstWhere((element) => element.name == 'pop punk')}
+                      : const {})),
+              child: const Icon(Icons.filter_list),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              heroTag: 'fab_change_filters'),
+          SizedBox(
+            height: 16,
+          ),
           FloatingActionButton(
               onPressed: () => bloc.add(ToggleTagSubtitles()),
               child: _buildTagSubtitlesToggleIcon(),

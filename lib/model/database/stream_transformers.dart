@@ -7,11 +7,12 @@ import 'moodtag_db.dart';
 
 class ArtistsWithTagTransformer implements StreamTransformer<List<TypedResult>, List<ArtistWithTags>> {
   final MoodtagDB _moodtagDB;
+  final Set<Tag> filterTags;
 
   StreamController<List<ArtistWithTags>> _controller = StreamController();
   Map<Artist, ArtistWithTags> artistToEnhancedArtistMap = {};
 
-  ArtistsWithTagTransformer(this._moodtagDB);
+  ArtistsWithTagTransformer(this._moodtagDB, this.filterTags);
 
   @override
   Stream<List<ArtistWithTags>> bind(Stream<List<TypedResult>> stream) {
@@ -23,6 +24,11 @@ class ArtistsWithTagTransformer implements StreamTransformer<List<TypedResult>, 
         final artistWithTags = artistToEnhancedArtistMap.putIfAbsent(artist, () => ArtistWithTags(artist, Set<Tag>()));
         artistWithTags.tags.add(tag);
       });
+
+      if (filterTags.isNotEmpty) {
+        artistToEnhancedArtistMap
+            .removeWhere((artist, artistWithTags) => artistWithTags.tags.intersection(filterTags!).isEmpty);
+      }
       _controller.add(artistToEnhancedArtistMap.values.toList());
     });
     return _controller.stream;

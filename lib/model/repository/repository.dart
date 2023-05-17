@@ -27,8 +27,8 @@ class Repository {
     return db.getArtistsOnce();
   }
 
-  Stream<List<ArtistWithTags>> getArtistsWithTags() {
-    return db.getArtistsWithTags();
+  Stream<List<ArtistWithTags>> getArtistsWithTags({Set<Tag> filterTags = const {}}) {
+    return db.getArtistsWithTags(filterTags);
   }
 
   Future<Set<String>> getSetOfExistingArtistNames() async {

@@ -33,14 +33,14 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
   }
 
-  Stream<List<ArtistWithTags>> getArtistsWithTags() {
+  Stream<List<ArtistWithTags>> getArtistsWithTags(Set<Tag> filterTags) {
     final query = select(artists).join([
       leftOuterJoin(assignedTags, assignedTags.artist.equalsExp(artists.id) & assignedTags.tag.equalsExp(tags.id)),
       innerJoin(tags, assignedTags.tag.equalsExp(tags.id)),
     ])
       ..orderBy([OrderingTerm.asc(artists.orderingName)]);
     final typedResultStream = query.watch();
-    return typedResultStream.transform(ArtistsWithTagTransformer(this));
+    return typedResultStream.transform(ArtistsWithTagTransformer(this, filterTags));
   }
 
   Stream<List<ArtistWithTagFlag>> getArtistsWithTagFlag(int tagId) {
