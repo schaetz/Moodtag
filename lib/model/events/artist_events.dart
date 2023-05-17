@@ -79,3 +79,8 @@ class ToggleTagForArtist extends ArtistEvent {
   @override
   List<Object> get props => [artist, tag];
 }
+
+class ToggleTagSubtitles extends ArtistEvent {
+  @override
+  List<Object> get props => [];
+}

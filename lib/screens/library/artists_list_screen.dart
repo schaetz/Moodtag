@@ -47,14 +47,32 @@ class ArtistsListScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => bloc.add(CreateArtists(input))),
-        child: const Icon(Icons.add),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+              onPressed: () => bloc.add(ToggleTagSubtitles()),
+              child: _buildTagSubtitlesToggleIcon(),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              heroTag: 'fab_toggle_tag_subtitles'),
+          SizedBox(
+            height: 16,
+          ),
+          FloatingActionButton(
+            onPressed: () =>
+                AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => bloc.add(CreateArtists(input))),
+            child: const Icon(Icons.add),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+          )
+        ],
       ),
       bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists),
     );
+  }
+
+  Widget _buildTagSubtitlesToggleIcon() {
+    return BlocBuilder<ArtistsListBloc, ArtistsListState>(
+        builder: (context, state) => state.displayTagSubtitles ? const Icon(Icons.label_off) : const Icon(Icons.label));
   }
 
   Widget _buildArtistRow(BuildContext context, ArtistWithTags artistWithTags, ArtistsListBloc bloc) {
@@ -66,7 +84,7 @@ class ArtistsListScreen extends StatelessWidget {
           artistWithTags.artist.name,
           style: listEntryStyle,
         ),
-        subtitle: _buildTagsSubtitle(context, artistWithTags),
+        subtitle: bloc.state.displayTagSubtitles ? _buildTagsSubtitle(context, artistWithTags) : null,
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
         onLongPress: () => DeleteDialog.openNew<Artist>(_scaffoldKey.currentContext!,
             entityToDelete: artistWithTags.artist, deleteHandler: handleDeleteArtist));
@@ -77,6 +95,7 @@ class ArtistsListScreen extends StatelessWidget {
         height: 40,
         child: Wrap(
           clipBehavior: Clip.hardEdge,
+          alignment: WrapAlignment.start,
           children: artistWithTags.tags.map((tag) => _getTagChipWithPadding(context, tag)).toList(),
         ));
   }
@@ -87,7 +106,7 @@ class ArtistsListScreen extends StatelessWidget {
         child: InputChip(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
           padding: EdgeInsets.symmetric(horizontal: 6.0),
-          labelPadding: EdgeInsets.all(0.0),
+          labelPadding: EdgeInsets.symmetric(horizontal: 4.0),
           label: Text(tag.name),
           labelStyle: tagChipLabelStyle,
           disabledColor: Theme.of(context).colorScheme.surface,

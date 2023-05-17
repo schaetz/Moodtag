@@ -21,6 +21,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
     on<ArtistsListUpdated>(_mapArtistsListUpdatedEventToState);
     on<CreateArtists>(_mapCreateArtistsEventToState);
     on<DeleteArtist>(_mapDeleteArtistEventToState);
+    on<ToggleTagSubtitles>(_mapToggleTagSubtitlesEventToState);
 
     _artistsStreamSubscription = _repository
         .getArtistsWithTags()
@@ -56,5 +57,9 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
     if (deleteArtistResponse.didFail()) {
       errorStreamController.add(deleteArtistResponse.getUserFeedbackException());
     }
+  }
+
+  void _mapToggleTagSubtitlesEventToState(ToggleTagSubtitles event, Emitter<ArtistsListState> emit) {
+    emit(state.copyWith(displayTagSubtitles: !state.displayTagSubtitles));
   }
 }
