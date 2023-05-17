@@ -27,7 +27,7 @@ class ArtistsWithTagTransformer implements StreamTransformer<List<TypedResult>, 
 
       if (filterTags.isNotEmpty) {
         artistToEnhancedArtistMap
-            .removeWhere((artist, artistWithTags) => artistWithTags.tags.intersection(filterTags!).isEmpty);
+            .removeWhere((artist, artistWithTags) => artistWithTags.tags.intersection(filterTags).isEmpty);
       }
       _controller.add(artistToEnhancedArtistMap.values.toList());
     });

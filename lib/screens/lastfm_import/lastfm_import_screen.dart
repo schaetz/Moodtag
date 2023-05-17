@@ -8,7 +8,6 @@ import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/lastfm_events.dart';
-import 'package:provider/provider.dart';
 
 class LastfmImportScreen extends StatelessWidget {
   final String serviceName = 'Last.fm';

@@ -5,7 +5,7 @@ Future<Map<String, Artist>> getMapFromArtistNameToObject(Repository repository) 
   List<Artist> allArtists = await repository.getArtistsOnce();
 
   final artistNameToObject = Map<String, Artist>();
-  allArtists!.forEach((artist) {
+  allArtists.forEach((artist) {
     artistNameToObject[artist.name] = artist;
   });
   return artistNameToObject;

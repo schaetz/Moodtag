@@ -72,7 +72,7 @@ class TagsListScreen extends StatelessWidget {
               ),
             ),
             Text(
-              artistFreq.freq.toString() ?? "",
+              artistFreq.freq.toString(),
               style: listEntryStylePale,
             )
           ],
