@@ -28,8 +28,8 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState>
       : super(ArtistDetailsState(
             artistId: artistId, tagEditMode: false, loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
     subscribeToEntityLoader(entityLoaderBloc);
-    emitNewStateOnTagsListUpdate();
 
+    onTagsListUpdateEmit();
     on<ArtistUpdated>(_mapArtistUpdatedEventToState);
     on<TagsForArtistListUpdated>(_mapTagsForArtistListUpdatedEventToState);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);

@@ -19,23 +19,45 @@ mixin EntityUserMixin<S extends AbstractEntityUserState> implements Bloc<Library
     });
   }
 
-  void emitNewStateOnArtistsListUpdate() {
-    this.on<DataUpdated<ArtistsList>>((DataUpdated<ArtistsList> event, Emitter<S> emit) {
-      if (event.data != null) {
-        emit(this.state.copyWith(loadedDataAllArtists: LoadedData.success(event.data)) as S);
-      } else {
-        emit(this.state.copyWith(loadedDataAllArtists: LoadedData.error()) as S);
-      }
-    });
+  void onArtistsListUpdateEmit() {
+    this.on<StartedLoading<ArtistsList>>(
+        (StartedLoading<ArtistsList> event, Emitter<S> emit) => _handleStartedLoadingArtistsList(event, emit));
+    this.on<DataUpdated<ArtistsList>>(
+        (DataUpdated<ArtistsList> event, Emitter<S> emit) => _handleArtistsListUpdate(event, emit));
   }
 
-  void emitNewStateOnTagsListUpdate() {
-    this.on<DataUpdated<TagsList>>((DataUpdated<TagsList> event, Emitter<S> emit) {
-      if (event.data != null) {
-        emit(this.state.copyWith(loadedDataAllTags: LoadedData.success(event.data)) as S);
-      } else {
-        emit(this.state.copyWith(loadedDataAllTags: LoadedData.error()) as S);
-      }
-    });
+  void onTagsListUpdateEmit() {
+    this.on<StartedLoading<TagsList>>(
+        (StartedLoading<TagsList> event, Emitter<S> emit) => _handleStartedLoadingTagsList(event, emit));
+    this.on<DataUpdated<TagsList>>(
+        (DataUpdated<TagsList> event, Emitter<S> emit) => _handleTagsListUpdate(event, emit));
+  }
+
+  void _handleStartedLoadingArtistsList(StartedLoading<ArtistsList> event, Emitter<S> emit) {
+    if (this.state.loadedDataAllArtists?.loadingStatus == LoadedData.initial()) {
+      emit(this.state.copyWith(loadedDataAllArtists: LoadedData.loading()) as S);
+    }
+  }
+
+  void _handleStartedLoadingTagsList(StartedLoading<TagsList> event, Emitter<S> emit) {
+    if (this.state.loadedDataAllTags?.loadingStatus == LoadedData.initial()) {
+      emit(this.state.copyWith(loadedDataAllTags: LoadedData.loading()) as S);
+    }
+  }
+
+  void _handleArtistsListUpdate(DataUpdated<ArtistsList> event, Emitter<S> emit) {
+    if (event.data != null) {
+      emit(this.state.copyWith(loadedDataAllArtists: LoadedData.success(event.data)) as S);
+    } else {
+      emit(this.state.copyWith(loadedDataAllArtists: LoadedData.error()) as S);
+    }
+  }
+
+  void _handleTagsListUpdate(DataUpdated<TagsList> event, Emitter<S> emit) {
+    if (event.data != null) {
+      emit(this.state.copyWith(loadedDataAllTags: LoadedData.success(event.data)) as S);
+    } else {
+      emit(this.state.copyWith(loadedDataAllTags: LoadedData.error()) as S);
+    }
   }
 }

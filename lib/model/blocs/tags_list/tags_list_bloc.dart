@@ -18,8 +18,8 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with EntityUserMixi
   TagsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc)
       : super(TagsListState(loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
     subscribeToEntityLoader(entityLoaderBloc);
-    emitNewStateOnTagsListUpdate();
 
+    onTagsListUpdateEmit();
     on<CreateTags>(_mapCreateTagsEventToState);
     on<DeleteTag>(_mapDeleteTagEventToState);
 
