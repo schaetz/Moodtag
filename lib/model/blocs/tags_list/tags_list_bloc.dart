@@ -11,16 +11,15 @@ import '../entity_loader/entity_loader_user.dart';
 import '../error_stream_handling.dart';
 import 'tags_list_state.dart';
 
-class TagsListBloc extends EntityLoaderUser<TagsListState> with ErrorStreamHandling {
+class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with EntityLoaderUser, ErrorStreamHandling {
   final Repository _repository;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
-  TagsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc)
-      : super(TagsListState(), entityLoaderBloc) {
+  TagsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc) : super(TagsListState()) {
     on<CreateTags>(_mapCreateTagsEventToState);
     on<DeleteTag>(_mapDeleteTagEventToState);
 
-    entityLoaderBloc.on<StartedLoading>((event, emit) => this.add(event));
+    subscribeToAllEntities(this, entityLoaderBloc, withTags: true);
 
     setupErrorHandler(mainContext);
   }
