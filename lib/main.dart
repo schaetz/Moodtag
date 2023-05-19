@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
+import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/navigation/routes.dart';
@@ -42,6 +43,7 @@ class _AppState extends State<MoodtagApp> {
         child: MultiBlocProvider(
             providers: [
               BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),
+              BlocProvider<EntityLoaderBloc>(create: (context) => EntityLoaderBloc()),
               BlocProvider<SpotifyAuthBloc>(create: (context) => SpotifyAuthBloc(context)),
             ],
             child: MaterialApp(

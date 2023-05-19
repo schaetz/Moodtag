@@ -6,10 +6,10 @@ import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
-import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import 'artist_details_state.dart';

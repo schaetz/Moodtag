@@ -1,7 +1,7 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
 
-class ArtistWithTags {
-  ArtistWithTags(this.artist, this.tags);
+class ArtistData {
+  ArtistData(this.artist, this.tags);
 
   final Artist artist;
   final Set<Tag> tags;
@@ -15,8 +15,8 @@ class ArtistWithTagFlag {
   final bool hasTag;
 }
 
-class TagWithArtistFreq {
-  TagWithArtistFreq(this.tag, this.freq);
+class TagData {
+  TagData(this.tag, this.freq);
 
   final Tag tag;
   final int? freq;

@@ -1,28 +1,25 @@
-import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/blocs/loading_status.dart';
+import 'package:moodtag/model/blocs/entity_loader/entity_loader_user_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository/loaded_object.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 
-class TagsListState extends Equatable {
-  final LoadingStatus loadingStatus;
-  final List<TagWithArtistFreq> _tagsWithArtistFreq;
+class TagsListState extends EntityLoaderUserState {
+  // List<Tag> get tags => _tagsWithArtistFreq.map((tagWithFreq) => tagWithFreq.tag).toList();
+  // List<TagData> get artistFrequencies => _tagsWithArtistFreq;
 
-  List<Tag> get tags => _tagsWithArtistFreq.map((tagWithFreq) => tagWithFreq.tag).toList();
-  List<TagWithArtistFreq> get artistFrequencies => _tagsWithArtistFreq;
-
-  const TagsListState({this.loadingStatus = LoadingStatus.initial, List<TagWithArtistFreq>? tagsWithArtistFreq})
-      : _tagsWithArtistFreq = tagsWithArtistFreq ?? const [];
+  TagsListState({this.loadingStatus = LoadingStatus.initial, LoadedObject<List<TagData>>? tagsWithArtistFreq})
+      : _tags = tagsWithArtistFreq ?? LoadedObject.initial();
 
   @override
-  List<Object> get props => [loadingStatus, _tagsWithArtistFreq];
+  List<Object> get props => [loadingStatus, _tags];
 
   TagsListState copyWith({
     LoadingStatus? loadingStatus,
-    List<TagWithArtistFreq>? tagsWithArtistFreq,
+    LoadedObject<List<TagData>>? tagsWithArtistFreq,
   }) {
     return TagsListState(
       loadingStatus: loadingStatus ?? this.loadingStatus,
-      tagsWithArtistFreq: tagsWithArtistFreq ?? this._tagsWithArtistFreq,
+      tagsWithArtistFreq: tagsWithArtistFreq ?? this._tags,
     );
   }
 }

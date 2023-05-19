@@ -27,7 +27,7 @@ class Repository {
     return db.getArtistsOnce();
   }
 
-  Stream<List<ArtistWithTags>> getArtistsWithTags({Set<Tag> filterTags = const {}}) {
+  Stream<List<ArtistData>> getArtistsWithTags({Set<Tag> filterTags = const {}}) {
     return db.getArtistsWithTags(filterTags);
   }
 
@@ -83,7 +83,7 @@ class Repository {
     return allTags.map((tag) => tag.name).toSet();
   }
 
-  Stream<List<TagWithArtistFreq>> getTagsWithArtistFreq() {
+  Stream<List<TagData>> getTagsWithArtistFreq() {
     return db.getTagsWithArtistFreq();
   }
 

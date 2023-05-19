@@ -18,7 +18,7 @@ class ArtistUpdated extends ArtistEvent {
 }
 
 class ArtistsListUpdated extends ArtistEvent {
-  final List<ArtistWithTags>? artistsWithTags;
+  final List<ArtistData>? artistsWithTags;
   final Object? error;
 
   const ArtistsListUpdated({this.artistsWithTags, this.error});

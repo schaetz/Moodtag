@@ -6,10 +6,10 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
-import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -104,7 +104,7 @@ class ArtistsListScreen extends StatelessWidget {
         builder: (context, state) => state.displayTagSubtitles ? const Icon(Icons.label_off) : const Icon(Icons.label));
   }
 
-  Widget _buildArtistRow(BuildContext context, ArtistWithTags artistWithTags, ArtistsListBloc bloc) {
+  Widget _buildArtistRow(BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc) {
     final handleDeleteArtist = () {
       bloc.add(DeleteArtist(artistWithTags.artist));
     };
@@ -119,7 +119,7 @@ class ArtistsListScreen extends StatelessWidget {
             entityToDelete: artistWithTags.artist, deleteHandler: handleDeleteArtist));
   }
 
-  Widget _buildTagsSubtitle(BuildContext context, ArtistWithTags artistWithTags) {
+  Widget _buildTagsSubtitle(BuildContext context, ArtistData artistWithTags) {
     return SizedBox(
         height: 40,
         child: Wrap(

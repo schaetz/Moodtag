@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
+import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
@@ -43,8 +44,9 @@ class Routes {
     return {
       artistsList: (context) =>
           BlocProvider(create: (_) => ArtistsListBloc(context.read<Repository>(), context), child: ArtistsListScreen()),
-      tagsList: (context) =>
-          BlocProvider(create: (_) => TagsListBloc(context.read<Repository>(), context), child: TagsListScreen()),
+      tagsList: (context) => BlocProvider(
+          create: (_) => TagsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
+          child: TagsListScreen()),
       artistsDetails: (context) => BlocProvider(
           create: (_) =>
               ArtistDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),

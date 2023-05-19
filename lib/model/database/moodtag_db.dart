@@ -33,7 +33,7 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
   }
 
-  Stream<List<ArtistWithTags>> getArtistsWithTags(Set<Tag> filterTags) {
+  Stream<List<ArtistData>> getArtistsWithTags(Set<Tag> filterTags) {
     final query = select(artists).join([
       leftOuterJoin(assignedTags, assignedTags.artist.equalsExp(artists.id) & assignedTags.tag.equalsExp(tags.id)),
       innerJoin(tags, assignedTags.tag.equalsExp(tags.id)),
@@ -87,7 +87,7 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
   }
 
-  Stream<List<TagWithArtistFreq>> getTagsWithArtistFreq() {
+  Stream<List<TagData>> getTagsWithArtistFreq() {
     final query = select(tags).join([
       leftOuterJoin(assignedTags, tags.id.equalsExp(assignedTags.tag)),
     ])
@@ -98,9 +98,9 @@ class MoodtagDB extends _$MoodtagDB {
     return _mapTagsWithArtistFreqStream(typedResultStream);
   }
 
-  Stream<List<TagWithArtistFreq>> _mapTagsWithArtistFreqStream(Stream<List<TypedResult>> typedResultStream) {
+  Stream<List<TagData>> _mapTagsWithArtistFreqStream(Stream<List<TypedResult>> typedResultStream) {
     return typedResultStream.map((r) => r.map((row) {
-          return TagWithArtistFreq(
+          return TagData(
             row.readTable(tags),
             row.read(assignedTags.artist.count()),
           );

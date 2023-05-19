@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 
 class TagDetailsState extends Equatable {
   final int tagId;

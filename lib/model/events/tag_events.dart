@@ -18,23 +18,13 @@ class TagUpdated extends TagEvent {
 }
 
 class TagsListUpdated extends TagEvent {
-  final List<Tag>? tags;
+  final List<TagData>? tags;
   final Object? error;
 
   const TagsListUpdated({this.tags, this.error});
 
   @override
   List<Object?> get props => [tags, error];
-}
-
-class TagsListPlusUpdated extends TagEvent {
-  final List<TagWithArtistFreq>? tagsWithArtistFreq;
-  final Object? error;
-
-  const TagsListPlusUpdated({this.tagsWithArtistFreq, this.error});
-
-  @override
-  List<Object?> get props => [tagsWithArtistFreq, error];
 }
 
 class TagsForArtistListUpdated extends TagEvent {

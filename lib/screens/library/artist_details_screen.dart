@@ -4,10 +4,10 @@ import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
-import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 
 class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);

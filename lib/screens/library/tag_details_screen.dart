@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/remove_tag_from_artist_dialog.dart';
-import 'package:moodtag/model/blocs/loading_status.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class TagDetailsScreen extends StatelessWidget {
