@@ -3,29 +3,29 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_object.dart';
 
 class EntityLoaderState extends Equatable {
-  late final LoadedObject<List<ArtistData>> allArtistsWithTags;
-  late final LoadedObject<List<TagData>> allTags;
+  late final LoadedData<ArtistsList> loadedDataAllArtists;
+  late final LoadedData<TagsList> loadedDataAllTags;
 
   EntityLoaderState({
-    required this.allArtistsWithTags,
-    required this.allTags,
+    required this.loadedDataAllArtists,
+    required this.loadedDataAllTags,
   });
 
   EntityLoaderState.initial() {
-    this.allArtistsWithTags = LoadedObject.initial();
-    this.allTags = LoadedObject.initial();
+    this.loadedDataAllArtists = LoadedData.initial();
+    this.loadedDataAllTags = LoadedData.initial();
   }
 
   @override
-  List<Object> get props => [allArtistsWithTags, allTags];
+  List<Object> get props => [loadedDataAllArtists, loadedDataAllTags];
 
   EntityLoaderState copyWith({
-    LoadedObject<List<ArtistData>>? allArtistsWithTags,
-    LoadedObject<List<TagData>>? allTags,
+    LoadedData<ArtistsList>? allArtistsWithTags,
+    LoadedData<TagsList>? allTags,
   }) {
     return EntityLoaderState(
-      allArtistsWithTags: allArtistsWithTags ?? this.allArtistsWithTags,
-      allTags: allTags ?? this.allTags,
+      loadedDataAllArtists: allArtistsWithTags ?? this.loadedDataAllArtists,
+      loadedDataAllTags: allTags ?? this.loadedDataAllTags,
     );
   }
 }

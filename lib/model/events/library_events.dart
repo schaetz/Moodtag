@@ -8,12 +8,3 @@ class ResetLibrary extends LibraryEvent {
   @override
   List<Object?> get props => [];
 }
-
-class StartedLoading extends LibraryEvent {
-  final Type loadedType;
-
-  StartedLoading(this.loadedType);
-
-  @override
-  List<Object> get props => [loadedType];
-}

@@ -43,7 +43,7 @@ class _AppState extends State<MoodtagApp> {
         child: MultiBlocProvider(
             providers: [
               BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),
-              BlocProvider<EntityLoaderBloc>(create: (context) => EntityLoaderBloc()),
+              BlocProvider<EntityLoaderBloc>(create: (context) => EntityLoaderBloc(context)),
               BlocProvider<SpotifyAuthBloc>(create: (context) => SpotifyAuthBloc(context)),
             ],
             child: MaterialApp(

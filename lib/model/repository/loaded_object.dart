@@ -1,27 +1,27 @@
 import 'loading_status.dart';
 
-class LoadedObject<T> {
-  late final T? obj;
+class LoadedData<T> {
+  late final T? data;
   late final LoadingStatus loadingStatus;
 
-  LoadedObject(this.obj, {this.loadingStatus = LoadingStatus.initial});
+  LoadedData(this.data, {this.loadingStatus = LoadingStatus.initial});
 
-  LoadedObject.initial() {
-    this.obj = null;
+  LoadedData.initial() {
+    this.data = null;
     this.loadingStatus = LoadingStatus.initial;
   }
 
-  LoadedObject.loading() {
-    this.obj = null;
+  LoadedData.loading() {
+    this.data = null;
     this.loadingStatus = LoadingStatus.loading;
   }
 
-  LoadedObject.success(this.obj) {
+  LoadedData.success(this.data) {
     this.loadingStatus = LoadingStatus.success;
   }
 
-  LoadedObject.error() {
-    this.obj = null;
+  LoadedData.error() {
+    this.data = null;
     this.loadingStatus = LoadingStatus.error;
   }
 }

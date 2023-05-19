@@ -4,6 +4,7 @@ import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
@@ -29,7 +30,7 @@ class ArtistDetailsScreen extends StatelessWidget {
             buildWhen: (previous, current) =>
                 current.artistLoadingStatus.isSuccess &&
                 current.tagsForArtistLoadingStatus.isSuccess &&
-                current.allTagsLoadingStatus.isSuccess, // TODO Show artist even when tags list is not available
+                current.isTagsListLoaded, // TODO Show artist even when tags list is not available
             builder: (context, state) {
               if (!state.artistLoadingStatus.isSuccess ||
                   state.artist == null ||
@@ -61,7 +62,7 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state) {
     if (state.tagEditMode) {
-      if (state.allTagsLoadingStatus.isError || state.allTags == null) {
+      if (state.loadedDataAllTags == null || state.loadedDataAllTags!.loadingStatus.isError || state.allTags == null) {
         return const Align(
           alignment: Alignment.center,
           child: Text('Error loading the tags', style: infoLabelStyle),
@@ -83,7 +84,7 @@ class ArtistDetailsScreen extends StatelessWidget {
       }
     }
 
-    List<Tag> tagsToDisplay = state.tagEditMode ? state.allTags! : state.tagsForArtist!;
+    List<Tag> tagsToDisplay = state.tagEditMode ? _convertTagDataListToTagList(state.allTags!) : state.tagsForArtist!;
 
     List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (_value) {})).toList();
     if (state.tagEditMode) {
@@ -96,6 +97,10 @@ class ArtistDetailsScreen extends StatelessWidget {
       children: chipsList,
     );
   }
+
+  // TODO Maybe find a less costly solution
+  List<Tag> _convertTagDataListToTagList(List<TagData> tagDataList) =>
+      tagDataList.map((tagData) => tagData.tag).toList();
 
   Widget _buildTagChip(BuildContext context, ArtistDetailsState state, Tag tag, ValueChanged<Tag> onTapped) {
     return InputChip(

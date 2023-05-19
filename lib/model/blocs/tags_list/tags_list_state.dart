@@ -1,18 +1,19 @@
-import 'package:moodtag/model/blocs/entity_loader/entity_loader_user_state.dart';
+import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_object.dart';
 
-class TagsListState extends EntityLoaderUserState<TagsListState> {
-  TagsListState({required LoadedObject<List<TagData>> allTags}) : super(allTags: allTags, allArtistsWithTags: null);
+class TagsListState extends AbstractEntityUserState {
+  TagsListState({required LoadedData<TagsList> loadedDataAllTags}) : super(loadedDataAllTags: loadedDataAllTags);
 
   @override
-  List<Object?> get props => [allTags];
+  List<Object?> get props => [loadedDataAllTags];
 
   TagsListState copyWith({
-    LoadedObject<List<TagData>>? allTags,
+    LoadedData<ArtistsList>? loadedDataAllArtists, // not used, but required by interface
+    LoadedData<TagsList>? loadedDataAllTags,
   }) {
     return TagsListState(
-      allTags: allTags ?? this.allTags!,
+      loadedDataAllTags: loadedDataAllTags ?? this.loadedDataAllTags!,
     );
   }
 }

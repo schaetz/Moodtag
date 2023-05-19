@@ -48,8 +48,8 @@ class Routes {
           create: (_) => TagsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
           child: TagsListScreen()),
       artistsDetails: (context) => BlocProvider(
-          create: (_) =>
-              ArtistDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),
+          create: (_) => ArtistDetailsBloc(context.read<Repository>(), context,
+              ModalRoute.of(context)?.settings.arguments as int, context.read<EntityLoaderBloc>()),
           child: ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
           create: (_) =>

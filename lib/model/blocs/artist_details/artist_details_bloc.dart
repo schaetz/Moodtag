@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/exceptions/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
+import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
+import 'package:moodtag/model/blocs/entity_loader/entity_user_mixin.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
@@ -14,19 +16,22 @@ import 'package:moodtag/model/repository/repository.dart';
 
 import 'artist_details_state.dart';
 
-class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with ErrorStreamHandling {
+class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState>
+    with EntityUserMixin<ArtistDetailsState>, ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _artistStreamSubscription;
   late final StreamSubscription _tagsForArtistStreamSubscription;
-  late final StreamSubscription _allTagsStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
   StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
-  ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId)
-      : super(ArtistDetailsState(artistId: artistId, tagEditMode: false)) {
+  ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId, EntityLoaderBloc entityLoaderBloc)
+      : super(ArtistDetailsState(
+            artistId: artistId, tagEditMode: false, loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
+    subscribeToEntityLoader(entityLoaderBloc);
+    emitNewStateOnTagsListUpdate();
+
     on<ArtistUpdated>(_mapArtistUpdatedEventToState);
     on<TagsForArtistListUpdated>(_mapTagsForArtistListUpdatedEventToState);
-    on<TagsListUpdated>(_mapTagsListUpdatedEventToState);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
     on<CreateTags>(_mapCreateTagsEventToState);
     on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
@@ -39,10 +44,6 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
         .getTagsForArtist(artistId)
         .handleError((error) => add(TagsForArtistListUpdated(error: error)))
         .listen((tagsListFromStream) => add(TagsForArtistListUpdated(tags: tagsListFromStream)));
-    _allTagsStreamSubscription = _repository
-        .getTags()
-        .handleError((error) => add(TagsListUpdated(error: error)))
-        .listen((tagsListFromStream) => add(TagsListUpdated(tags: tagsListFromStream)));
 
     setupErrorHandler(mainContext);
   }
@@ -51,7 +52,6 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
   Future<void> close() async {
     _artistStreamSubscription.cancel();
     _tagsForArtistStreamSubscription.cancel();
-    _allTagsStreamSubscription.cancel();
     super.close();
   }
 
@@ -68,14 +68,6 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Erro
       emit(state.copyWith(tagsForArtist: event.tags, tagsForArtistLoadingStatus: LoadingStatus.success));
     } else {
       emit(state.copyWith(tagsForArtistLoadingStatus: LoadingStatus.error));
-    }
-  }
-
-  void _mapTagsListUpdatedEventToState(TagsListUpdated event, Emitter<ArtistDetailsState> emit) {
-    if (event.tags != null) {
-      emit(state.copyWith(allTags: event.tags, allTagsLoadingStatus: LoadingStatus.success));
-    } else {
-      emit(state.copyWith(allTagsLoadingStatus: LoadingStatus.error));
     }
   }
 

@@ -7,17 +7,21 @@ class ArtistData {
   final Set<Tag> tags;
 }
 
-class ArtistWithTagFlag {
-  ArtistWithTagFlag(this.artist, this.tagId, this.hasTag);
-
-  final Artist artist;
-  final int tagId;
-  final bool hasTag;
-}
+typedef ArtistsList = List<ArtistData>;
 
 class TagData {
   TagData(this.tag, this.freq);
 
   final Tag tag;
   final int? freq;
+}
+
+typedef TagsList = List<TagData>;
+
+class ArtistWithTagFlag {
+  ArtistWithTagFlag(this.artist, this.tagId, this.hasTag);
+
+  final Artist artist;
+  final int tagId;
+  final bool hasTag;
 }

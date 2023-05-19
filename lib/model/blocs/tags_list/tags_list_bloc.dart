@@ -7,19 +7,21 @@ import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/tag_events.dart';
-import '../entity_loader/entity_loader_user.dart';
+import '../entity_loader/entity_user_mixin.dart';
 import '../error_stream_handling.dart';
 import 'tags_list_state.dart';
 
-class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with EntityLoaderUser, ErrorStreamHandling {
+class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with EntityUserMixin<TagsListState>, ErrorStreamHandling {
   final Repository _repository;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
-  TagsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc) : super(TagsListState()) {
+  TagsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc)
+      : super(TagsListState(loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
+    subscribeToEntityLoader(entityLoaderBloc);
+    emitNewStateOnTagsListUpdate();
+
     on<CreateTags>(_mapCreateTagsEventToState);
     on<DeleteTag>(_mapDeleteTagEventToState);
-
-    subscribeToAllEntities(this, entityLoaderBloc, withTags: true);
 
     setupErrorHandler(mainContext);
   }
