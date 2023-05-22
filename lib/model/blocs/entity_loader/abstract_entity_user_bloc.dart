@@ -8,19 +8,39 @@ import 'package:moodtag/model/events/library_events.dart';
 
 import 'entity_loader_bloc.dart';
 
-mixin EntityUserMixin<S extends AbstractEntityUserState> implements Bloc<LibraryEvent, S> {
-  StreamSubscription subscribeToEntityLoader(EntityLoaderBloc entityLoaderBloc, {useArtists = false, useTags = false}) {
-    return entityLoaderBloc.stream.listen((entityLoaderState) {
-      if (useArtists && entityLoaderState.loadedDataAllArtists != this.state.loadedDataAllArtists) {
+abstract class AbstractEntityUserBloc<S extends AbstractEntityUserState> extends Bloc<LibraryEvent, S> {
+  late final StreamSubscription _allEntitiesStreamSubscription;
+
+  AbstractEntityUserBloc(
+      {required S initialState,
+      required EntityLoaderBloc entityLoaderBloc,
+      useAllArtistsStream = false,
+      useAllTagsStream = false})
+      : super(initialState) {
+    if (useAllArtistsStream) {
+      _onArtistsListLoadingStatusChangedEmit();
+    }
+    if (useAllTagsStream) {
+      _onTagsListLoadingStatusChangedEmit();
+    }
+
+    _allEntitiesStreamSubscription = entityLoaderBloc.stream.listen((entityLoaderState) {
+      if (useAllArtistsStream && entityLoaderState.loadedDataAllArtists != this.state.loadedDataAllArtists) {
         this.add(EntityLoaderStatusChanged<ArtistsList>(entityLoaderState.loadedDataAllArtists));
       }
-      if (useTags && entityLoaderState.loadedDataAllTags != this.state.loadedDataAllTags) {
+      if (useAllTagsStream && entityLoaderState.loadedDataAllTags != this.state.loadedDataAllTags) {
         this.add(EntityLoaderStatusChanged<TagsList>(entityLoaderState.loadedDataAllTags));
       }
     });
   }
 
-  void onArtistsListLoadingStatusChangedEmit() {
+  @override
+  Future<void> close() async {
+    _allEntitiesStreamSubscription.cancel();
+    super.close();
+  }
+
+  void _onArtistsListLoadingStatusChangedEmit() {
     this.on<EntityLoaderStatusChanged<ArtistsList>>((EntityLoaderStatusChanged<ArtistsList> event, Emitter<S> emit) {
       if (event.loadedData.loadingStatus != this.state.loadedDataAllArtists?.loadingStatus) {
         emit(this.state.copyWith(loadedDataAllArtists: event.loadedData) as S);
@@ -28,7 +48,7 @@ mixin EntityUserMixin<S extends AbstractEntityUserState> implements Bloc<Library
     });
   }
 
-  void onTagsListLoadingStatusChangedEmit() {
+  void _onTagsListLoadingStatusChangedEmit() {
     this.on<EntityLoaderStatusChanged<TagsList>>((EntityLoaderStatusChanged<TagsList> event, Emitter<S> emit) {
       if (event.loadedData.loadingStatus != this.state.loadedDataAllTags?.loadingStatus) {
         emit(this.state.copyWith(loadedDataAllTags: event.loadedData) as S);
