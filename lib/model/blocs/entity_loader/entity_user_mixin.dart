@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
@@ -7,8 +9,8 @@ import 'package:moodtag/model/events/library_events.dart';
 import 'entity_loader_bloc.dart';
 
 mixin EntityUserMixin<S extends AbstractEntityUserState> implements Bloc<LibraryEvent, S> {
-  void subscribeToEntityLoader(EntityLoaderBloc entityLoaderBloc, {useArtists = false, useTags = false}) {
-    entityLoaderBloc.stream.listen((entityLoaderState) {
+  StreamSubscription subscribeToEntityLoader(EntityLoaderBloc entityLoaderBloc, {useArtists = false, useTags = false}) {
+    return entityLoaderBloc.stream.listen((entityLoaderState) {
       if (useArtists && entityLoaderState.loadedDataAllArtists != this.state.loadedDataAllArtists) {
         this.add(EntityLoaderStatusChanged<ArtistsList>(entityLoaderState.loadedDataAllArtists));
       }

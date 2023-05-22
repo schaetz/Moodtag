@@ -22,6 +22,7 @@ import 'artist_details_state.dart';
 class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState>
     with EntityUserMixin<ArtistDetailsState>, ErrorStreamHandling {
   final Repository _repository;
+  late final StreamSubscription _allEntitiesStreamSubscription;
   late final StreamSubscription _artistStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
   StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
@@ -32,7 +33,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState>
             loadedArtistData: LoadedData.initial(),
             tagEditMode: false,
             loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
-    subscribeToEntityLoader(entityLoaderBloc, useTags: true);
+    _allEntitiesStreamSubscription = subscribeToEntityLoader(entityLoaderBloc, useTags: true);
 
     onTagsListLoadingStatusChangedEmit();
     on<StartedLoading<ArtistData>>(_handleStartedLoadingArtistData);
@@ -52,6 +53,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState>
 
   @override
   Future<void> close() async {
+    _allEntitiesStreamSubscription.cancel();
     _artistStreamSubscription.cancel();
     super.close();
   }

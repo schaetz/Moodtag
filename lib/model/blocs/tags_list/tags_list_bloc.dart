@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
@@ -13,17 +15,24 @@ import 'tags_list_state.dart';
 
 class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with EntityUserMixin<TagsListState>, ErrorStreamHandling {
   final Repository _repository;
+  late final StreamSubscription _allEntitiesStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc)
       : super(TagsListState(loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
-    subscribeToEntityLoader(entityLoaderBloc, useTags: true);
+    _allEntitiesStreamSubscription = subscribeToEntityLoader(entityLoaderBloc, useTags: true);
 
     onTagsListLoadingStatusChangedEmit();
     on<CreateTags>(_mapCreateTagsEventToState);
     on<DeleteTag>(_mapDeleteTagEventToState);
 
     setupErrorHandler(mainContext);
+  }
+
+  @override
+  Future<void> close() async {
+    _allEntitiesStreamSubscription.cancel();
+    super.close();
   }
 
   void _mapCreateTagsEventToState(CreateTags event, Emitter<TagsListState> emit) async {
