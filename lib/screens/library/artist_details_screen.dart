@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/components/chips_row_info_label.dart';
+import 'package:moodtag/components/data_loading_screen_backdrop.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
@@ -12,7 +14,6 @@ import 'package:moodtag/model/repository/loading_status.dart';
 
 class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
-  static const infoLabelStyle = TextStyle(fontSize: 18.0);
 
   final GlobalKey _scaffoldKey = GlobalKey();
 
@@ -26,31 +27,26 @@ class ArtistDetailsScreen extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: BlocBuilder<ArtistDetailsBloc, ArtistDetailsState>(
-            // TODO Show loading or error symbols
-            buildWhen: (previous, current) =>
-                current.artistLoadingStatus.isSuccess &&
-                current.tagsForArtistLoadingStatus.isSuccess &&
-                current.isTagsListLoaded, // TODO Show artist even when tags list is not available
             builder: (context, state) {
-              if (!state.artistLoadingStatus.isSuccess ||
-                  state.artist == null ||
-                  state.tagsForArtist == null ||
-                  state.allTags == null) {
-                return Container(); // TODO Show loading symbol or something alike
-              }
-
-              return ListView(children: [
-                Padding(
-                  padding: EdgeInsets.only(bottom: 12.0),
-                  child: Text(state.artist!.name, style: ArtistDetailsScreen.artistNameStyle),
-                ),
-                _buildTagChipsRow(context, state),
-                Padding(
-                    padding: EdgeInsets.only(top: 12.0),
-                    child: ElevatedButton(
-                        child: Text(state.tagEditMode ? 'Finish editing' : 'Edit tags'),
-                        onPressed: () => _toggleEditMode(context)))
-              ]);
+              return LoadedDataDisplayWrapper<ArtistData>(
+                  loadedData: state.loadedArtistData,
+                  captionForError: 'Artist could not be loaded',
+                  captionForEmptyData: 'Artist does not exist',
+                  buildOnSuccess: () {
+                    return ListView(children: [
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 12.0),
+                        child:
+                            Text(state.loadedArtistData.data!.artist.name, style: ArtistDetailsScreen.artistNameStyle),
+                      ),
+                      _buildTagChipsRow(context, state),
+                      Padding(
+                          padding: EdgeInsets.only(top: 12.0),
+                          child: ElevatedButton(
+                              child: Text(state.tagEditMode ? 'Finish editing' : 'Edit tags'),
+                              onPressed: () => _toggleEditMode(context)))
+                    ]);
+                  });
             },
           ),
         ));
@@ -63,32 +59,28 @@ class ArtistDetailsScreen extends StatelessWidget {
   Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state) {
     if (state.tagEditMode) {
       if (state.loadedDataAllTags == null || state.loadedDataAllTags!.loadingStatus.isError || state.allTags == null) {
-        return const Align(
-          alignment: Alignment.center,
-          child: Text('Error loading the tags', style: infoLabelStyle),
-        );
+        return ChipsRowInfoLabel('Error loading the tags');
+      } else if (state.loadedArtistData.data == null) {
+        return ChipsRowInfoLabel('Something went wrong');
       }
     } else {
       // TODO Improve loading / error labels
-      if (state.tagsForArtistLoadingStatus.isInitialOrLoading) {
-        return const Align(
-          alignment: Alignment.center,
-          child: Text('Loading tags...', style: infoLabelStyle),
-        );
+      if (state.loadedArtistData.loadingStatus.isInitialOrLoading) {
+        return ChipsRowInfoLabel('Loading tags...');
       }
-      if (state.tagsForArtistLoadingStatus.isError || state.tagsForArtist == null) {
-        return const Align(
-          alignment: Alignment.center,
-          child: Text('Error loading the tags for the artist', style: infoLabelStyle),
-        );
+      if (state.loadedArtistData.loadingStatus.isError || state.loadedArtistData.data == null) {
+        return ChipsRowInfoLabel('Error loading the tags for the artist');
       }
     }
 
-    List<Tag> tagsToDisplay = state.tagEditMode ? _convertTagDataListToTagList(state.allTags!) : state.tagsForArtist!;
+    final ArtistData artistData = state.loadedArtistData.data!;
+    List<Tag> tagsToDisplay =
+        state.tagEditMode ? _convertTagDataListToTagList(state.allTags!) : artistData.tags.toList();
 
-    List<Widget> chipsList = tagsToDisplay.map((tag) => _buildTagChip(context, state, tag, (_value) {})).toList();
+    List<Widget> chipsList =
+        tagsToDisplay.map((tag) => _buildTagChip(context, state.tagEditMode, artistData, tag, (_value) {})).toList();
     if (state.tagEditMode) {
-      chipsList.add(_buildAddTagChip(context, state));
+      chipsList.add(_buildAddTagChip(context, artistData));
     }
 
     return Wrap(
@@ -102,11 +94,12 @@ class ArtistDetailsScreen extends StatelessWidget {
   List<Tag> _convertTagDataListToTagList(List<TagData> tagDataList) =>
       tagDataList.map((tagData) => tagData.tag).toList();
 
-  Widget _buildTagChip(BuildContext context, ArtistDetailsState state, Tag tag, ValueChanged<Tag> onTapped) {
+  Widget _buildTagChip(
+      BuildContext context, bool tagEditMode, ArtistData artistData, Tag tag, ValueChanged<Tag> onTapped) {
     return InputChip(
         label: Text(tag.name),
-        selected: state.tagEditMode && state.tagsForArtist!.contains(tag),
-        onPressed: () => _onTagChipPressed(context, state.artist!, tag, state.tagEditMode, onTapped));
+        selected: tagEditMode && artistData.tags.contains(tag),
+        onPressed: () => _onTagChipPressed(context, artistData.artist, tag, tagEditMode, onTapped));
   }
 
   void _onTagChipPressed(
@@ -118,15 +111,15 @@ class ArtistDetailsScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildAddTagChip(BuildContext context, ArtistDetailsState state) {
+  Widget _buildAddTagChip(BuildContext context, ArtistData artistData) {
     final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),
       backgroundColor: Theme.of(context).colorScheme.secondary,
       onPressed: () => AddEntityDialog.openAddTagDialog(
         context,
-        preselectedArtist: state.artist,
-        onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: state.artist)),
+        preselectedArtist: artistData.artist,
+        onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: artistData.artist)),
       ),
     );
   }

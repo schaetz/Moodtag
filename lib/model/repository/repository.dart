@@ -40,8 +40,12 @@ class Repository {
     return db.getArtistsWithTagFlag(tagId);
   }
 
-  Stream<Artist?> getArtistById(int id) {
-    return db.getArtistById(id);
+  Stream<Artist?> getArtistById(int artistId) {
+    return db.getArtistById(artistId);
+  }
+
+  Stream<ArtistData?> getArtistWithTagsById(int artistId) {
+    return db.getArtistWithTagsById(artistId);
   }
 
   Future<Artist?> getArtistByNameOnce(String name) {

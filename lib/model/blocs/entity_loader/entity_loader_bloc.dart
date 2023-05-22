@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/entity_loader/entity_loader_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
-import 'package:moodtag/model/repository/loaded_object.dart';
+import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
@@ -17,7 +17,8 @@ class EntityLoaderBloc extends Bloc<DataLoadingEvent, EntityLoaderState> {
   EntityLoaderBloc(BuildContext mainContext) : super(EntityLoaderState.initial()) {
     this._repository = mainContext.read<Repository>();
 
-    on<StartedLoading>(_handleStartedLoading);
+    on<StartedLoading<ArtistsList>>(_handleStartedLoading);
+    on<StartedLoading<TagsList>>(_handleStartedLoading);
     on<DataUpdated<ArtistsList>>(_handleArtistsListUpdated);
     on<DataUpdated<TagsList>>(_handleTagsListUpdated);
 

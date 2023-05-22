@@ -8,9 +8,12 @@ import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/blocs/entity_loader/entity_user_mixin.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
@@ -20,30 +23,29 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState>
     with EntityUserMixin<ArtistDetailsState>, ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _artistStreamSubscription;
-  late final StreamSubscription _tagsForArtistStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
   StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
 
   ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId, EntityLoaderBloc entityLoaderBloc)
       : super(ArtistDetailsState(
-            artistId: artistId, tagEditMode: false, loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
+            artistId: artistId,
+            loadedArtistData: LoadedData.initial(),
+            tagEditMode: false,
+            loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags)) {
     subscribeToEntityLoader(entityLoaderBloc, useTags: true);
 
     onTagsListLoadingStatusChangedEmit();
-    on<ArtistUpdated>(_mapArtistUpdatedEventToState);
-    on<TagsForArtistListUpdated>(_mapTagsForArtistListUpdatedEventToState);
+    on<StartedLoading<ArtistData>>(_handleStartedLoadingArtistData);
+    on<DataUpdated<ArtistData>>(_handleArtistDataUpdated);
     on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
     on<CreateTags>(_mapCreateTagsEventToState);
     on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
 
     _artistStreamSubscription = _repository
-        .getArtistById(artistId)
-        .handleError((error) => add(ArtistUpdated(error: error)))
-        .listen((artistFromStream) => add(ArtistUpdated(artist: artistFromStream)));
-    _tagsForArtistStreamSubscription = _repository
-        .getTagsForArtist(artistId)
-        .handleError((error) => add(TagsForArtistListUpdated(error: error)))
-        .listen((tagsListFromStream) => add(TagsForArtistListUpdated(tags: tagsListFromStream)));
+        .getArtistWithTagsById(artistId)
+        .handleError((error) => add(DataUpdated<ArtistData>(error: error)))
+        .listen((artistFromStream) => add(DataUpdated<ArtistData>(data: artistFromStream)));
+    add(StartedLoading<ArtistData>());
 
     setupErrorHandler(mainContext);
   }
@@ -51,23 +53,20 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState>
   @override
   Future<void> close() async {
     _artistStreamSubscription.cancel();
-    _tagsForArtistStreamSubscription.cancel();
     super.close();
   }
 
-  void _mapArtistUpdatedEventToState(ArtistUpdated event, Emitter<ArtistDetailsState> emit) {
-    if (event.artist != null) {
-      emit(state.copyWith(artist: event.artist, artistLoadingStatus: LoadingStatus.success));
-    } else {
-      emit(state.copyWith(artistLoadingStatus: LoadingStatus.error));
+  void _handleStartedLoadingArtistData(StartedLoading<ArtistData> event, Emitter<ArtistDetailsState> emit) {
+    if (state.loadedArtistData.loadingStatus == LoadingStatus.initial) {
+      emit(state.copyWith(loadedArtistData: LoadedData.loading()));
     }
   }
 
-  void _mapTagsForArtistListUpdatedEventToState(TagsForArtistListUpdated event, Emitter<ArtistDetailsState> emit) {
-    if (event.tags != null) {
-      emit(state.copyWith(tagsForArtist: event.tags, tagsForArtistLoadingStatus: LoadingStatus.success));
+  void _handleArtistDataUpdated(DataUpdated<ArtistData> event, Emitter<ArtistDetailsState> emit) {
+    if (event.data != null) {
+      emit(state.copyWith(loadedArtistData: LoadedData.success(event.data)));
     } else {
-      emit(state.copyWith(tagsForArtistLoadingStatus: LoadingStatus.error));
+      emit(state.copyWith(loadedArtistData: LoadedData.error()));
     }
   }
 

@@ -1,6 +1,6 @@
 import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/repository/loaded_object.dart';
+import 'package:moodtag/model/repository/loaded_data.dart';
 
 class TagsListState extends AbstractEntityUserState {
   TagsListState({required LoadedData<TagsList> loadedDataAllTags}) : super(loadedDataAllTags: loadedDataAllTags);

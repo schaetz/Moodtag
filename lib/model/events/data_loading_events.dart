@@ -1,5 +1,5 @@
 import 'package:moodtag/model/events/library_events.dart';
-import 'package:moodtag/model/repository/loaded_object.dart';
+import 'package:moodtag/model/repository/loaded_data.dart';
 
 abstract class DataLoadingEvent extends LibraryEvent {
   const DataLoadingEvent();

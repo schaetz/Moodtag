@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/stream_transformers.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+
+import 'transformers/artists_with_tag_transformer.dart';
 
 part 'moodtag_db.g.dart';
 
@@ -17,10 +18,11 @@ class MoodtagDB extends _$MoodtagDB {
   @override
   int get schemaVersion => 1;
 
-  // Currently not used
-  // Stream<List<Artist>> get allArtists => (select(artists)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
-  // Stream<List<Tag>> get allTags => (select(tags)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
-  // Stream<List<AssignedTag>> get allArtistTagPairs => select(assignedTags).watch();
+  final joinTagsForArtist = (MoodtagDB db) => [
+        leftOuterJoin(db.assignedTags,
+            db.assignedTags.artist.equalsExp(db.artists.id) & db.assignedTags.tag.equalsExp(db.tags.id)),
+        innerJoin(db.tags, db.assignedTags.tag.equalsExp(db.tags.id)),
+      ];
 
   //
   // GET
@@ -34,13 +36,9 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   Stream<List<ArtistData>> getArtistsWithTags(Set<Tag> filterTags) {
-    final query = select(artists).join([
-      leftOuterJoin(assignedTags, assignedTags.artist.equalsExp(artists.id) & assignedTags.tag.equalsExp(tags.id)),
-      innerJoin(tags, assignedTags.tag.equalsExp(tags.id)),
-    ])
-      ..orderBy([OrderingTerm.asc(artists.orderingName)]);
+    final query = select(artists).join(joinTagsForArtist(this))..orderBy([OrderingTerm.asc(artists.orderingName)]);
     final typedResultStream = query.watch();
-    return typedResultStream.transform(ArtistsWithTagTransformer(this, filterTags));
+    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistsList>(this, filterTags: filterTags));
   }
 
   Stream<List<ArtistWithTagFlag>> getArtistsWithTagFlag(int tagId) {
@@ -73,6 +71,12 @@ class MoodtagDB extends _$MoodtagDB {
 
   Future<Artist?> getArtistByIdOnce(int artistId) {
     return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull();
+  }
+
+  Stream<ArtistData?> getArtistWithTagsById(int artistId) {
+    final query = select(artists).join(joinTagsForArtist(this))..where(artists.id.equals(artistId));
+    final typedResultStream = query.watch();
+    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistData?>(this));
   }
 
   Future<Artist?> getArtistByNameOnce(String artistName) {

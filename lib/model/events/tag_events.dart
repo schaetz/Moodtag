@@ -1,4 +1,3 @@
-import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 
 import 'library_events.dart';
@@ -15,26 +14,6 @@ class TagUpdated extends TagEvent {
 
   @override
   List<Object?> get props => [tag, error];
-}
-
-class TagsListUpdated extends TagEvent {
-  final List<TagData>? tags;
-  final Object? error;
-
-  const TagsListUpdated({this.tags, this.error});
-
-  @override
-  List<Object?> get props => [tags, error];
-}
-
-class TagsForArtistListUpdated extends TagEvent {
-  final List<Tag>? tags;
-  final Object? error;
-
-  const TagsForArtistListUpdated({this.tags, this.error});
-
-  @override
-  List<Object?> get props => [tags, error];
 }
 
 class CreateTags extends TagEvent {
