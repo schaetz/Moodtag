@@ -19,29 +19,17 @@ class Repository {
   //
   // Artists
   //
-  Stream<List<Artist>> getArtists() {
-    return db.getArtists();
+  Stream<List<ArtistData>> getArtistsWithTags({Set<Tag> filterTags = const {}}) {
+    return db.getArtistsWithTags(filterTags);
   }
 
   Future<List<Artist>> getArtistsOnce() {
     return db.getArtistsOnce();
   }
 
-  Stream<List<ArtistData>> getArtistsWithTags({Set<Tag> filterTags = const {}}) {
-    return db.getArtistsWithTags(filterTags);
-  }
-
   Future<Set<String>> getSetOfExistingArtistNames() async {
     final allArtists = await db.getArtistsOnce();
     return allArtists.map((artist) => artist.name).toSet();
-  }
-
-  Stream<List<ArtistWithTagFlag>> getArtistsWithTagFlag(int tagId) {
-    return db.getArtistsWithTagFlag(tagId);
-  }
-
-  Stream<Artist?> getArtistById(int artistId) {
-    return db.getArtistById(artistId);
   }
 
   Stream<ArtistData?> getArtistWithTagsById(int artistId) {
@@ -74,14 +62,6 @@ class Repository {
   //
   // Tags
   //
-  Stream<List<Tag>> getTags() {
-    return db.getTags();
-  }
-
-  Future<List<Tag>> getTagsOnce() {
-    return db.getTagsOnce();
-  }
-
   Future<Set<String>> getSetOfExistingTagNames() async {
     final allTags = await db.getTagsOnce();
     return allTags.map((tag) => tag.name).toSet();
@@ -91,8 +71,8 @@ class Repository {
     return db.getTagsWithArtistFreq();
   }
 
-  Stream<Tag?> getTagById(int id) {
-    return db.getTagById(id);
+  Stream<TagData?> getTagWithArtistFreqById(int id) {
+    return db.getTagWithArtistFreqById(id);
   }
 
   Future getTagByNameOnce(String name) {

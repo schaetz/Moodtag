@@ -6,16 +6,6 @@ abstract class TagEvent extends LibraryEvent {
   const TagEvent();
 }
 
-class TagUpdated extends TagEvent {
-  final Tag? tag;
-  final Object? error;
-
-  const TagUpdated({this.tag, this.error});
-
-  @override
-  List<Object?> get props => [tag, error];
-}
-
 class CreateTags extends TagEvent {
   final String input;
   final Artist? preselectedArtist;

@@ -5,6 +5,8 @@ class ArtistData {
 
   final Artist artist;
   final Set<Tag> tags;
+
+  bool hasTag(Tag tag) => tags.contains(tag);
 }
 
 typedef ArtistsList = List<ArtistData>;

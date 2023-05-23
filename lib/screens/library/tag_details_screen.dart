@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/remove_tag_from_artist_dialog.dart';
@@ -9,7 +10,6 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class TagDetailsScreen extends StatelessWidget {
@@ -27,89 +27,93 @@ class TagDetailsScreen extends StatelessWidget {
       key: _scaffoldKey,
       appBar: MtAppBar(context),
       body: BlocBuilder<TagDetailsBloc, TagDetailsState>(
-        buildWhen: (previous, current) =>
-            // TODO Show loading or error symbols
-            current.tagLoadingStatus.isSuccess &&
-            current.artistsListLoadingStatus.isSuccess, // TODO Show tag even when artists list is not available
         builder: (context, state) {
           return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 12.0),
-                child: state.tag != null && state.artistsWithTagFlag != null
-                    ? Text('${state.tag!.name} (${state.artistsWithTagOnly.length.toString()})', style: tagNameStyle)
-                    : Text(''),
-              ),
-              Expanded(child: Builder(builder: (BuildContext context) {
-                if (state.artistsWithTagFlag == null || state.tag == null) {
-                  return Container(); // TODO Show loading symbol or somethink alike
-                } else if (state.artistsWithTagFlag!.isEmpty) {
-                  return const Align(
-                    alignment: Alignment.center,
-                    child: Text('No artists with this tag', style: listEntryStyle),
-                  );
-                }
-
-                return ListView.separated(
-                  separatorBuilder: (context, _) => Divider(),
-                  padding: EdgeInsets.all(4.0),
-                  itemCount: state.checklistMode ? state.artistsWithTagFlag!.length : state.artistsWithTagOnly.length,
-                  itemBuilder: (context, i) {
-                    return state.checklistMode
-                        ? _buildArtistWithCheckboxRow(context, state.tag!, state.artistsWithTagFlag![i], bloc)
-                        : _buildArtistWithTagRow(context, state.tag!, state.artistsWithTagOnly[i], bloc);
-                  },
-                );
-              })),
-            ]),
-          );
+              padding: const EdgeInsets.all(16.0),
+              child: LoadedDataDisplayWrapper<TagData>(
+                  loadedData: state.loadedTagData,
+                  captionForError: 'Tag could not be loaded',
+                  captionForEmptyData: 'Tag does not exist',
+                  buildOnSuccess: (tagData) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 12.0),
+                          child: _buildHeadline(tagData.tag, state.artistsWithThisTagOnly.data),
+                        ),
+                        Expanded(
+                            child: LoadedDataDisplayWrapper<ArtistsList>(
+                          loadedData: state.artistsWithThisTagOnly,
+                          captionForError: 'Artists with this tag could not be loaded',
+                          captionForEmptyData: 'No artists with this tag',
+                          additionalCheckData: state.loadedDataAllArtists,
+                          buildOnSuccess: (artistsWithThisTagOnly) => ListView.separated(
+                            separatorBuilder: (context, _) => Divider(),
+                            padding: EdgeInsets.all(4.0),
+                            itemCount:
+                                state.checklistMode ? state.allArtistsWithTags!.length : artistsWithThisTagOnly.length,
+                            itemBuilder: (context, i) {
+                              return state.checklistMode
+                                  ? _buildRowForArtistSelection(
+                                      context, tagData.tag, state.allArtistsWithTags![i], bloc)
+                                  : _buildRowForAssociatedArtist(
+                                      context, tagData.tag, artistsWithThisTagOnly[i].artist, bloc);
+                            },
+                          ),
+                        )),
+                      ])));
         },
       ),
-      floatingActionButton: BlocBuilder<TagDetailsBloc, TagDetailsState>(
-          buildWhen: (previous, current) => current.tagLoadingStatus.isSuccess,
-          builder: (context, state) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FloatingActionButton(
-                    onPressed: () => bloc.add(ToggleArtistsForTagChecklist()),
-                    child: const Icon(Icons.ballot),
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    heroTag: 'fab_checklist_mode'),
-                SizedBox(
-                  height: 16,
-                ),
-                FloatingActionButton(
-                  onPressed: () => AddEntityDialog.openAddArtistDialog(context,
-                      preselectedTag: state.tag, onSendInput: (input) => bloc.add(AddArtistsForTag(input, state.tag!))),
-                  child: const Icon(Icons.add),
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                ),
-              ],
-            );
-          }),
+      floatingActionButton: BlocBuilder<TagDetailsBloc, TagDetailsState>(builder: (context, state) {
+        return LoadedDataDisplayWrapper<TagData>(
+            loadedData: state.loadedTagData,
+            additionalCheckData: state.loadedDataAllArtists,
+            showPlaceholders: false,
+            buildOnSuccess: (tagData) => _buildFloatingActionButtons(context, state.loadedTagData.data!.tag, bloc));
+      }),
     );
   }
 
-  Widget _buildArtistWithCheckboxRow(
-      BuildContext context, Tag tag, ArtistWithTagFlag artistWithTagFlag, TagDetailsBloc bloc) {
-    final artist = artistWithTagFlag.artist;
+  Widget _buildHeadline(Tag tag, ArtistsList? artistsWithThisTagOnly) {
+    String headlineText =
+        artistsWithThisTagOnly == null ? tag.name : '${tag.name} (${artistsWithThisTagOnly.length.toString()})';
+    return Text(headlineText, style: tagNameStyle);
+  }
+
+  Widget _buildFloatingActionButtons(BuildContext context, Tag tag, TagDetailsBloc bloc) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        FloatingActionButton(
+            onPressed: () => bloc.add(ToggleArtistsForTagChecklist()),
+            child: const Icon(Icons.ballot),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            heroTag: 'fab_checklist_mode'),
+        SizedBox(
+          height: 16,
+        ),
+        FloatingActionButton(
+          onPressed: () => AddEntityDialog.openAddArtistDialog(context,
+              preselectedTag: tag, onSendInput: (input) => bloc.add(AddArtistsForTag(input, tag))),
+          child: const Icon(Icons.add),
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRowForArtistSelection(BuildContext context, Tag tag, ArtistData artistData, TagDetailsBloc bloc) {
     return CheckboxListTile(
       title: Text(
-        artist.name,
+        artistData.artist.name,
         style: listEntryStyle,
       ),
       controlAffinity: ListTileControlAffinity.leading,
       contentPadding: EdgeInsets.only(right: 4.0),
-      value: artistWithTagFlag.hasTag,
-      onChanged: (bool? value) => bloc.add(ToggleTagForArtist(artist, tag)),
+      value: artistData.hasTag(tag),
+      onChanged: (bool? value) => bloc.add(ToggleTagForArtist(artistData.artist, tag)),
     );
   }
 
-  Widget _buildArtistWithTagRow(
-      BuildContext context, Tag tag, ArtistWithTagFlag artistWithTagFlag, TagDetailsBloc bloc) {
-    final artist = artistWithTagFlag.artist;
+  Widget _buildRowForAssociatedArtist(BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc) {
     final handleRemoveTagFromArtist = () {
       bloc.add(RemoveTagFromArtist(artist, tag));
     };

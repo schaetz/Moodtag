@@ -1,20 +1,9 @@
-import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 
 import 'library_events.dart';
 
 abstract class ArtistEvent extends LibraryEvent {
   const ArtistEvent();
-}
-
-class ArtistsListUpdated extends ArtistEvent {
-  final List<ArtistData>? artistsWithTags;
-  final Object? error;
-
-  const ArtistsListUpdated({this.artistsWithTags, this.error});
-
-  @override
-  List<Object?> get props => [artistsWithTags, error];
 }
 
 class ChangeArtistsListFilters extends ArtistEvent {
@@ -24,16 +13,6 @@ class ChangeArtistsListFilters extends ArtistEvent {
 
   @override
   List<Object> get props => [filterTags];
-}
-
-class ArtistsListPlusUpdated extends ArtistEvent {
-  final List<ArtistWithTagFlag>? artistWithTagFlag;
-  final Object? error;
-
-  const ArtistsListPlusUpdated({this.artistWithTagFlag, this.error});
-
-  @override
-  List<Object?> get props => [artistWithTagFlag, error];
 }
 
 class CreateArtists extends ArtistEvent {

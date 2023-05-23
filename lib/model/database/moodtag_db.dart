@@ -24,6 +24,10 @@ class MoodtagDB extends _$MoodtagDB {
         innerJoin(db.tags, db.assignedTags.tag.equalsExp(db.tags.id)),
       ];
 
+  final joinArtistFreqsForTag = (MoodtagDB db) => [
+        leftOuterJoin(db.assignedTags, db.tags.id.equalsExp(db.assignedTags.tag)),
+      ];
+
   //
   // GET
   //
@@ -92,23 +96,12 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   Stream<List<TagData>> getTagsWithArtistFreq() {
-    final query = select(tags).join([
-      leftOuterJoin(assignedTags, tags.id.equalsExp(assignedTags.tag)),
-    ])
+    final query = select(tags).join(joinArtistFreqsForTag(this))
       ..addColumns([assignedTags.artist.count()])
       ..groupBy([tags.id])
       ..orderBy([OrderingTerm.asc(tags.name)]);
     final typedResultStream = query.watch();
-    return _mapTagsWithArtistFreqStream(typedResultStream);
-  }
-
-  Stream<List<TagData>> _mapTagsWithArtistFreqStream(Stream<List<TypedResult>> typedResultStream) {
-    return typedResultStream.map((r) => r.map((row) {
-          return TagData(
-            row.readTable(tags),
-            row.read(assignedTags.artist.count()),
-          );
-        }).toList());
+    return typedResultStream.map((r) => r.map(_mapTagWithArtistFreqToTagData).toList());
   }
 
   Stream<Tag?> getTagById(int tagId) {
@@ -117,6 +110,21 @@ class MoodtagDB extends _$MoodtagDB {
 
   Future<Tag?> getTagByIdOnce(int tagId) {
     return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
+  }
+
+  Stream<TagData?> getTagWithArtistFreqById(int tagId) {
+    final query = select(tags).join(joinArtistFreqsForTag(this))
+      ..addColumns([assignedTags.artist.count()])
+      ..groupBy([tags.id])
+      ..where(tags.id.equals(tagId));
+    return query.map(_mapTagWithArtistFreqToTagData).watchSingleOrNull();
+  }
+
+  TagData _mapTagWithArtistFreqToTagData(TypedResult row) {
+    return TagData(
+      row.readTable(tags),
+      row.read(assignedTags.artist.count()),
+    );
   }
 
   Future<Tag?> getTagByNameOnce(String tagName) {

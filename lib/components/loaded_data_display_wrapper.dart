@@ -8,19 +8,34 @@ class LoadedDataDisplayWrapper<T> extends StatelessWidget {
 
   final LoadedData<T> loadedData;
   final Widget Function(T) buildOnSuccess;
+  final bool showPlaceholders;
   final String captionForError;
   final String captionForEmptyData;
+  final LoadedData? additionalCheckData;
 
   const LoadedDataDisplayWrapper(
       {super.key,
       required this.loadedData,
       required this.buildOnSuccess,
+      this.showPlaceholders = true,
       this.captionForError = 'Could not obtain data',
-      this.captionForEmptyData = 'No data available'});
+      this.captionForEmptyData = 'No data available',
+      this.additionalCheckData});
 
   @override
   Widget build(BuildContext context) {
-    final loadingStatus = loadedData.loadingStatus;
+    final loadingStatus = _getLoadingStatus();
+    return showPlaceholders ? _buildWithPlaceholders(loadingStatus) : _buildWithoutPlaceholders(loadingStatus);
+  }
+
+  Widget _buildWithoutPlaceholders(LoadingStatus loadingStatus) {
+    if (!loadingStatus.isSuccess || _isDataEmpty()) {
+      return Container();
+    }
+    return buildOnSuccess(loadedData.data!);
+  }
+
+  Widget _buildWithPlaceholders(LoadingStatus loadingStatus) {
     if (loadingStatus.isInitialOrLoading) {
       return Align(alignment: Alignment.center, child: CircularProgressIndicator());
     } else if (loadingStatus.isError) {
@@ -38,7 +53,7 @@ class LoadedDataDisplayWrapper<T> extends StatelessWidget {
           ),
         ),
       );
-    } else if (loadedData.data == null || (loadedData.data is List && (loadedData.data as List).isEmpty)) {
+    } else if (_isDataEmpty()) {
       return Align(
         alignment: Alignment.center,
         child: Text(captionForEmptyData, style: emptyDataLabelStyle),
@@ -47,4 +62,16 @@ class LoadedDataDisplayWrapper<T> extends StatelessWidget {
 
     return buildOnSuccess(loadedData.data!);
   }
+
+  LoadingStatus _getLoadingStatus() => additionalCheckData != null
+      ? loadedData.loadingStatus.merge(additionalCheckData!.loadingStatus)
+      : loadedData.loadingStatus;
+
+  bool _isDataEmpty() => loadedData.data == null || _isDataAnEmptyList(loadedData.data) || _isAdditionalDataEmpty();
+
+  bool _isAdditionalDataEmpty() =>
+      additionalCheckData != null &&
+      (additionalCheckData!.data == null || _isDataAnEmptyList(additionalCheckData!.data!));
+
+  bool _isDataAnEmptyList(dynamic data) => (data is List && data.isEmpty);
 }

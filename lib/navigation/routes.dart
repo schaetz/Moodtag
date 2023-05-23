@@ -52,8 +52,8 @@ class Routes {
               ModalRoute.of(context)?.settings.arguments as int, context.read<EntityLoaderBloc>()),
           child: ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
-          create: (_) =>
-              TagDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),
+          create: (_) => TagDetailsBloc(context.read<Repository>(), context,
+              ModalRoute.of(context)?.settings.arguments as int, context.read<EntityLoaderBloc>()),
           child: TagDetailsScreen()),
       lastFmImport: (context) => BlocProvider(
           create: (_) => LastFmImportBloc(context.read<Repository>(), context), child: LastfmImportScreen()),

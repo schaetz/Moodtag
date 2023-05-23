@@ -1,46 +1,48 @@
-import 'package:equatable/equatable.dart';
+import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 
-class TagDetailsState extends Equatable {
+class TagDetailsState extends AbstractEntityUserState {
   final int tagId;
-  final LoadingStatus tagLoadingStatus;
-  final Tag? tag;
-  final LoadingStatus artistsListLoadingStatus;
-  final List<ArtistWithTagFlag>? artistsWithTagFlag;
+  final LoadedData<TagData> loadedTagData;
   final bool checklistMode;
 
-  // redundant properties
-  late final List<ArtistWithTagFlag> artistsWithTagOnly;
+  // deduced properties
+  late final LoadedData<List<ArtistData>> artistsWithThisTagOnly;
 
   TagDetailsState(
-      {required this.tagId,
-      this.tagLoadingStatus = LoadingStatus.initial,
-      this.tag,
-      this.artistsListLoadingStatus = LoadingStatus.initial,
-      this.artistsWithTagFlag,
-      required this.checklistMode}) {
-    artistsWithTagOnly = artistsWithTagFlag?.where((artistPlus) => artistPlus.hasTag).toList() ?? <ArtistWithTagFlag>[];
+      {required LoadedData<ArtistsList> loadedDataAllArtists,
+      required this.tagId,
+      this.loadedTagData = const LoadedData.initial(),
+      required this.checklistMode})
+      : super(loadedDataAllArtists: loadedDataAllArtists) {
+    artistsWithThisTagOnly = _determineArtistsWithTagOnlyIfPossible();
+  }
+
+  LoadedData<List<ArtistData>> _determineArtistsWithTagOnlyIfPossible() {
+    if (loadedTagData.loadingStatus.isSuccess && loadedDataAllArtists.loadingStatus.isSuccess) {
+      return LoadedData.success(
+          loadedDataAllArtists.data!.where((artist) => artist.tags.contains(loadedTagData.data?.tag)).toList());
+    } else if (loadedTagData.loadingStatus.isError || loadedDataAllArtists.loadingStatus.isError) {
+      return LoadedData.error();
+    }
+    return LoadedData.loading();
   }
 
   @override
-  List<Object?> get props =>
-      [tagId, tagLoadingStatus, tag, artistsListLoadingStatus, artistsWithTagFlag, checklistMode];
+  List<Object> get props => [loadedDataAllArtists, tagId, loadedTagData, checklistMode, artistsWithThisTagOnly];
 
   TagDetailsState copyWith(
-      {int? tagId,
-      LoadingStatus? tagLoadingStatus,
-      Tag? tag,
-      LoadingStatus? artistsListLoadingStatus,
-      List<ArtistWithTagFlag>? artistsWithTagFlag,
+      {LoadedData<ArtistsList>? loadedDataAllArtists,
+      LoadedData<TagsList>? loadedDataAllTags, // not used, but required by interface
+      int? tagId,
+      LoadedData<TagData>? loadedTagData,
       bool? checklistMode}) {
     return TagDetailsState(
+        loadedDataAllArtists: loadedDataAllArtists ?? this.loadedDataAllArtists,
         tagId: tagId ?? this.tagId,
-        tagLoadingStatus: tagLoadingStatus ?? this.tagLoadingStatus,
-        tag: tag ?? this.tag,
-        artistsListLoadingStatus: artistsListLoadingStatus ?? this.artistsListLoadingStatus,
-        artistsWithTagFlag: artistsWithTagFlag ?? this.artistsWithTagFlag,
+        loadedTagData: loadedTagData ?? this.loadedTagData,
         checklistMode: checklistMode ?? this.checklistMode);
   }
 }
