@@ -69,7 +69,7 @@ class CreateEntityBlocHelper {
   }
 
   Future<UserReadableException?> handleToggleTagForArtistEvent(ToggleTagForArtist event, Repository repository) async {
-    bool isTagAssignedToArtist = await repository.artistHasTag(event.artist, event.tag);
+    bool isTagAssignedToArtist = await repository.doesArtistHaveTag(event.artist, event.tag);
     if (isTagAssignedToArtist) {
       return await _removeTagFromArtist(event.artist, event.tag, repository);
     } else {
@@ -79,7 +79,7 @@ class CreateEntityBlocHelper {
 
   Future<UserReadableException?> handleRemoveTagFromArtistEvent(
       RemoveTagFromArtist event, Repository repository) async {
-    bool isTagAssignedToArtist = await repository.artistHasTag(event.artist, event.tag);
+    bool isTagAssignedToArtist = await repository.doesArtistHaveTag(event.artist, event.tag);
     if (isTagAssignedToArtist) {
       return await _removeTagFromArtist(event.artist, event.tag, repository);
     }

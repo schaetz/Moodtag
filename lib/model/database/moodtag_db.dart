@@ -24,57 +24,26 @@ class MoodtagDB extends _$MoodtagDB {
         innerJoin(db.tags, db.assignedTags.tag.equalsExp(db.tags.id)),
       ];
 
-  final joinArtistFreqsForTag = (MoodtagDB db) => [
+  final joinAssignedTagsForTag = (MoodtagDB db) => [
         leftOuterJoin(db.assignedTags, db.tags.id.equalsExp(db.assignedTags.tag)),
+      ];
+
+  final joinArtistsForTag = (MoodtagDB db) => [
+        leftOuterJoin(db.assignedTags,
+            db.assignedTags.tag.equalsExp(db.tags.id) & db.assignedTags.artist.equalsExp(db.artists.id)),
+        innerJoin(db.artists, db.assignedTags.artist.equalsExp(db.artists.id)),
       ];
 
   //
   // GET
   //
-  Stream<List<Artist>> getArtists() {
-    return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).watch();
-  }
 
-  Future<List<Artist>> getArtistsOnce() {
-    return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
-  }
+  // GET Artists
 
   Stream<List<ArtistData>> getArtistsWithTags(Set<Tag> filterTags) {
     final query = select(artists).join(joinTagsForArtist(this))..orderBy([OrderingTerm.asc(artists.orderingName)]);
     final typedResultStream = query.watch();
     return typedResultStream.transform(ArtistsWithTagTransformer<ArtistsList>(this, filterTags: filterTags));
-  }
-
-  Stream<List<ArtistWithTagFlag>> getArtistsWithTagFlag(int tagId) {
-    final tagFlagForArtistExpr = assignedTags.tag.isNotNull();
-
-    final query = select(artists).join([
-      leftOuterJoin(assignedTags, assignedTags.artist.equalsExp(artists.id) & assignedTags.tag.equals(tagId),
-          useColumns: false),
-    ])
-      ..addColumns([tagFlagForArtistExpr])
-      ..orderBy([OrderingTerm.asc(artists.orderingName)]);
-    final typedResultStream = query.watch();
-    return _mapArtistsWithTagFlagStream(tagFlagForArtistExpr, typedResultStream, tagId);
-  }
-
-  Stream<List<ArtistWithTagFlag>> _mapArtistsWithTagFlagStream(
-      Expression tagFlagForArtistExpr, Stream<List<TypedResult>> typedResultStream, int tagId) {
-    return typedResultStream.map((r) => r.map((row) {
-          return ArtistWithTagFlag(
-            row.readTable(artists),
-            tagId,
-            row.read(tagFlagForArtistExpr) == true,
-          );
-        }).toList());
-  }
-
-  Stream<Artist?> getArtistById(int artistId) {
-    return (select(artists)..where((a) => a.id.equals(artistId))).watchSingleOrNull();
-  }
-
-  Future<Artist?> getArtistByIdOnce(int artistId) {
-    return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull();
   }
 
   Stream<ArtistData?> getArtistWithTagsById(int artistId) {
@@ -83,20 +52,18 @@ class MoodtagDB extends _$MoodtagDB {
     return typedResultStream.transform(ArtistsWithTagTransformer<ArtistData?>(this));
   }
 
-  Future<Artist?> getArtistByNameOnce(String artistName) {
-    return (select(artists)..where((a) => a.name.equals(artistName))).getSingleOrNull();
+  Future<List<Artist>> getArtistsOnce() {
+    return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
   }
 
-  Stream<List<Tag>> getTags() {
-    return (select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
+  Future<Artist?> getArtistByIdOnce(int artistId) {
+    return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull();
   }
 
-  Future<List<Tag>> getTagsOnce() {
-    return (select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
-  }
+  // GET Tags
 
   Stream<List<TagData>> getTagsWithArtistFreq() {
-    final query = select(tags).join(joinArtistFreqsForTag(this))
+    final query = select(tags).join(joinAssignedTagsForTag(this))
       ..addColumns([assignedTags.artist.count()])
       ..groupBy([tags.id])
       ..orderBy([OrderingTerm.asc(tags.name)]);
@@ -104,20 +71,26 @@ class MoodtagDB extends _$MoodtagDB {
     return typedResultStream.map((r) => r.map(_mapTagWithArtistFreqToTagData).toList());
   }
 
-  Stream<Tag?> getTagById(int tagId) {
-    return (select(tags)..where((t) => t.id.equals(tagId))).watchSingleOrNull();
-  }
-
-  Future<Tag?> getTagByIdOnce(int tagId) {
-    return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
-  }
-
   Stream<TagData?> getTagWithArtistFreqById(int tagId) {
-    final query = select(tags).join(joinArtistFreqsForTag(this))
+    final query = select(tags).join(joinAssignedTagsForTag(this))
       ..addColumns([assignedTags.artist.count()])
       ..groupBy([tags.id])
       ..where(tags.id.equals(tagId));
     return query.map(_mapTagWithArtistFreqToTagData).watchSingleOrNull();
+  }
+
+  Future<List<Tag>> getTagsOnce({Set<Artist>? filterArtists}) {
+    final query = select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)]);
+    if (filterArtists != null) {
+      final filterArtistsIds = filterArtists.map((artist) => artist.id).toSet();
+      final queryWithJoin = query.join(joinArtistsForTag(this))..where(artists.id.isIn(filterArtistsIds));
+      return queryWithJoin.map((row) => row.readTable(tags)).get();
+    }
+    return query.get();
+  }
+
+  Future<Tag?> getTagByIdOnce(int tagId) {
+    return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
   }
 
   TagData _mapTagWithArtistFreqToTagData(TypedResult row) {
@@ -127,9 +100,7 @@ class MoodtagDB extends _$MoodtagDB {
     );
   }
 
-  Future<Tag?> getTagByNameOnce(String tagName) {
-    return (select(tags)..where((t) => t.name.equals(tagName))).getSingleOrNull();
-  }
+  // GET UserProperty
 
   Stream<UserProperty?> getUserProperty(String propertyKey) {
     return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).watchSingleOrNull();

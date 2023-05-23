@@ -19,15 +19,3 @@ CREATE TABLE user_properties (
     prop_key VARCHAR(255) NOT NULL PRIMARY KEY,
     prop_value VARCHAR(512)
 ) AS UserProperty;
-
-artistsWithTag:
-    SELECT * FROM artists WHERE artists.id IN (
-        SELECT artist FROM assigned_tags WHERE tag = :tagId
-    )
-    ORDER BY ordering_name ASC;
-
-tagsForArtist:
-    SELECT * FROM tags WHERE tags.id IN (
-        SELECT tag FROM assigned_tags WHERE artist = :artistId
-    )
-    ORDER BY name ASC;

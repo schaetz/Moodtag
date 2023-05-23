@@ -1,16 +1,17 @@
-import 'package:diacritic/diacritic.dart';
 import 'package:drift/drift.dart';
-import 'package:moodtag/exceptions/database_error.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
-import 'package:moodtag/exceptions/invalid_argument_exception.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/repository/repository_helper.dart';
 
 import '../database/moodtag_db.dart';
 
 class Repository {
   final MoodtagDB db;
+  late final RepositoryHelper helper;
 
-  Repository() : db = MoodtagDB();
+  Repository() : db = MoodtagDB() {
+    helper = RepositoryHelper(db);
+  }
 
   void close() {
     db.close();
@@ -23,8 +24,21 @@ class Repository {
     return db.getArtistsWithTags(filterTags);
   }
 
+  Stream<List<ArtistData>> getArtistsHavingTag(Tag tag) {
+    return getArtistsWithTags(filterTags: {tag});
+  }
+
+  Stream<ArtistData?> getArtistWithTagsById(int artistId) {
+    return db.getArtistWithTagsById(artistId);
+  }
+
   Future<List<Artist>> getArtistsOnce() {
     return db.getArtistsOnce();
+  }
+
+  Future<bool> doesArtistHaveTag(Artist artist, Tag tag) async {
+    final List<Tag> tagsWithArtist = await db.getTagsOnce(filterArtists: {artist});
+    return tagsWithArtist.contains(tag);
   }
 
   Future<Set<String>> getSetOfExistingArtistNames() async {
@@ -32,27 +46,15 @@ class Repository {
     return allArtists.map((artist) => artist.name).toSet();
   }
 
-  Stream<ArtistData?> getArtistWithTagsById(int artistId) {
-    return db.getArtistWithTagsById(artistId);
-  }
-
-  Future<Artist?> getArtistByNameOnce(String name) {
-    return db.getArtistByNameOnce(name);
-  }
-
   Future<DbRequestResponse<Artist>> createArtist(String name) async {
     Future<int> createArtistFuture =
-        db.createArtist(ArtistsCompanion.insert(name: name, orderingName: _getOrderingNameForArtist(name)));
-    return _wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
+        db.createArtist(ArtistsCompanion.insert(name: name, orderingName: helper.getOrderingNameForArtist(name)));
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
   }
 
   Future<DbRequestResponse> deleteArtist(Artist artist) async {
     Future deleteArtistFuture = db.deleteArtistById(artist.id);
-    return _wrapExceptionsAndReturnResponse(deleteArtistFuture);
-  }
-
-  Stream<List<Artist>> getArtistsHavingTag(int tagId) {
-    return db.artistsWithTag(tagId).watch();
+    return helper.wrapExceptionsAndReturnResponse(deleteArtistFuture);
   }
 
   Future deleteAllArtists() {
@@ -62,11 +64,6 @@ class Repository {
   //
   // Tags
   //
-  Future<Set<String>> getSetOfExistingTagNames() async {
-    final allTags = await db.getTagsOnce();
-    return allTags.map((tag) => tag.name).toSet();
-  }
-
   Stream<List<TagData>> getTagsWithArtistFreq() {
     return db.getTagsWithArtistFreq();
   }
@@ -75,22 +72,19 @@ class Repository {
     return db.getTagWithArtistFreqById(id);
   }
 
-  Future getTagByNameOnce(String name) {
-    return db.getTagByNameOnce(name);
+  Future<Set<String>> getSetOfExistingTagNames() async {
+    final allTags = await db.getTagsOnce();
+    return allTags.map((tag) => tag.name).toSet();
   }
 
   Future<DbRequestResponse<Tag>> createTag(String name) {
     Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name));
-    return _wrapExceptionsAndReturnResponseWithCreatedEntity<Tag>(createTagFuture, name);
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Tag>(createTagFuture, name);
   }
 
   Future<DbRequestResponse> deleteTag(Tag tag) {
     Future deleteArtistFuture = db.deleteTagById(tag.id);
-    return _wrapExceptionsAndReturnResponse(deleteArtistFuture);
-  }
-
-  Stream<List<Tag>> getTagsForArtist(int artistId) {
-    return db.tagsForArtist(artistId).watch();
+    return helper.wrapExceptionsAndReturnResponse(deleteArtistFuture);
   }
 
   Future deleteAllTags() {
@@ -102,15 +96,11 @@ class Repository {
   //
   Future<DbRequestResponse> assignTagToArtist(Artist artist, Tag tag) async {
     Future<int> assignTagFuture = db.assignTagToArtist(AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id));
-    return _wrapExceptionsAndReturnResponse(assignTagFuture);
+    return helper.wrapExceptionsAndReturnResponse(assignTagFuture);
   }
 
   Future<DbRequestResponse> removeTagFromArtist(Artist artist, Tag tag) {
-    return _wrapExceptionsAndReturnResponse(db.removeTagFromArtist(artist.id, tag.id));
-  }
-
-  Future<bool> artistHasTag(Artist artist, Tag tag) {
-    return db.tagsForArtist(artist.id).get().then((tagsList) => tagsList.contains(tag));
+    return helper.wrapExceptionsAndReturnResponse(db.removeTagFromArtist(artist.id, tag.id));
   }
 
   //
@@ -125,65 +115,12 @@ class Repository {
   }
 
   Future<DbRequestResponse> createOrUpdateUserProperty(String propertyKey, String? propertyValue) {
-    return _wrapExceptionsAndReturnResponse(db.createOrUpdateUserProperty(
+    return helper.wrapExceptionsAndReturnResponse(db.createOrUpdateUserProperty(
         UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue))));
   }
 
   Future<DbRequestResponse> deleteUserProperty(String propertyKey) {
-    return _wrapExceptionsAndReturnResponse(
+    return helper.wrapExceptionsAndReturnResponse(
         db.createOrUpdateUserProperty(UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(null))));
-  }
-
-  //
-  // Helper methods
-  //
-  Future<DbRequestResponse> _wrapExceptionsAndReturnResponse(Future changedEntityFuture) async {
-    Exception? exception = null;
-    await changedEntityFuture.onError<Exception>((e, stackTrace) {
-      exception = e;
-    });
-
-    if (exception != null) {
-      return new DbRequestResponse.fail(exception);
-    }
-    return new DbRequestResponse.success();
-  }
-
-  Future<DbRequestResponse<E>> _wrapExceptionsAndReturnResponseWithCreatedEntity<E>(
-      Future<int?> createEntityFuture, String name) async {
-    try {
-      E? newEntity = await createEntityFuture.then((newEntityId) async => await _getEntityById<E>(newEntityId));
-
-      if (newEntity == null) {
-        final exception = DatabaseError('The ID of the newly created entity could not be retrieved.');
-        return new DbRequestResponse<E>.fail(exception, parameters: [name]);
-      }
-      return new DbRequestResponse<E>.success(changedEntity: newEntity, parameters: [name]);
-    } on Exception catch (e) {
-      return new DbRequestResponse<E>.fail(e, parameters: [name]);
-    }
-  }
-
-  Future<E?> _getEntityById<E>(int? id) {
-    if (id == null) {
-      return Future.error(new InvalidArgumentException('getEntityById was called without a valid ID.'));
-    }
-
-    if (E == Artist) {
-      return db.getArtistByIdOnce(id) as Future<E?>;
-    } else if (E == Tag) {
-      return db.getTagByIdOnce(id) as Future<E?>;
-    } else {
-      return Future.error(
-          new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString()));
-    }
-  }
-
-  String _getOrderingNameForArtist(String artistName) {
-    final lowerCased = artistName.toLowerCase();
-    final diacriticsReplaced = removeDiacritics(lowerCased);
-    final leadingTheRemoved = diacriticsReplaced.replaceFirst(RegExp('^the\\s'), '');
-    print("$artistName => $leadingTheRemoved");
-    return leadingTheRemoved;
   }
 }

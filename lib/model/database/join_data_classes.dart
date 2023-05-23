@@ -19,11 +19,3 @@ class TagData {
 }
 
 typedef TagsList = List<TagData>;
-
-class ArtistWithTagFlag {
-  ArtistWithTagFlag(this.artist, this.tagId, this.hasTag);
-
-  final Artist artist;
-  final int tagId;
-  final bool hasTag;
-}
