@@ -1,32 +1,27 @@
-import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/model/repository/loaded_data.dart';
 
-class ArtistsListState extends Equatable {
-  final LoadingStatus loadingStatus;
-  final List<ArtistData> artistsWithTags;
+class ArtistsListState {
+  final LoadedData<ArtistsList> loadedDataFilteredArtists;
   final bool displayTagSubtitles;
   final Set<Tag> filterTags;
 
-  const ArtistsListState(
-      {this.loadingStatus = LoadingStatus.initial,
-      this.artistsWithTags = const [],
-      this.displayTagSubtitles = false,
-      this.filterTags = const {}});
+  ArtistsListState({
+    this.loadedDataFilteredArtists = const LoadedData.initial(),
+    this.displayTagSubtitles = false,
+    this.filterTags = const {},
+  });
 
-  @override
-  List<Object> get props => [loadingStatus, artistsWithTags, displayTagSubtitles, filterTags];
+  List<Object> get props => [loadedDataFilteredArtists, displayTagSubtitles, filterTags];
 
   ArtistsListState copyWith({
-    LoadingStatus? loadingStatus,
-    List<ArtistData>? artistsWithTags,
+    LoadedData<ArtistsList>? loadedDataFilteredArtists,
     bool? displayTagSubtitles,
     Set<Tag>? filterTags,
   }) {
     return ArtistsListState(
-      loadingStatus: loadingStatus ?? this.loadingStatus,
-      artistsWithTags: artistsWithTags ?? this.artistsWithTags,
+      loadedDataFilteredArtists: loadedDataFilteredArtists ?? this.loadedDataFilteredArtists,
       displayTagSubtitles: displayTagSubtitles ?? this.displayTagSubtitles,
       filterTags: filterTags != null ? filterTags : this.filterTags, // filterTags can be overridden by an empty set
     );

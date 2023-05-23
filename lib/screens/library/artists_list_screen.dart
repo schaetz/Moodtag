@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/components/data_loading_screen_backdrop.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
@@ -9,7 +10,6 @@ import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -28,42 +28,23 @@ class ArtistsListScreen extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       appBar: MtAppBar(context),
-      body: BlocBuilder<ArtistsListBloc, ArtistsListState>(
-        builder: (context, state) {
-          if (state.loadingStatus == LoadingStatus.loading || state.loadingStatus == LoadingStatus.initial) {
-            return Align(alignment: Alignment.center, child: CircularProgressIndicator());
-          } else if (state.loadingStatus == LoadingStatus.error) {
-            return Align(
-              alignment: Alignment.center,
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    WidgetSpan(
-                      child: Icon(Icons.error),
-                      style: errorLabelStyle,
-                    ),
-                    TextSpan(text: " Error: Could not obtain artists ", style: errorLabelStyle),
-                  ],
-                ),
-              ),
-            );
-          } else if (state.artistsWithTags.isEmpty) {
-            return const Align(
-              alignment: Alignment.center,
-              child: Text('No artists yet', style: listEntryStyle),
-            );
-          }
-
-          return ListView.separated(
-            separatorBuilder: (context, _) => Divider(),
-            padding: EdgeInsets.all(16.0),
-            itemCount: state.artistsWithTags.isNotEmpty ? state.artistsWithTags.length : 0,
-            itemBuilder: (context, i) {
-              return _buildArtistRow(context, state.artistsWithTags[i], bloc);
-            },
-          );
-        },
-      ),
+      body: BlocBuilder<ArtistsListBloc, ArtistsListState>(builder: (context, state) {
+        return LoadedDataDisplayWrapper<ArtistsList>(
+            loadedData: state.loadedDataFilteredArtists,
+            captionForError: 'Artists could not be loaded',
+            captionForEmptyData: state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
+            buildOnSuccess: () {
+              return ListView.separated(
+                separatorBuilder: (context, _) => Divider(),
+                padding: EdgeInsets.all(16.0),
+                itemCount:
+                    state.loadedDataFilteredArtists.data!.isNotEmpty ? state.loadedDataFilteredArtists.data!.length : 0,
+                itemBuilder: (context, i) {
+                  return _buildArtistRow(context, state.loadedDataFilteredArtists.data![i], bloc);
+                },
+              );
+            });
+      }),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -71,7 +52,10 @@ class ArtistsListScreen extends StatelessWidget {
               onPressed: () => bloc.add(ChangeArtistsListFilters(
                   // TODO Allow the user to select tags for filtering
                   filterTags: bloc.state.filterTags.isEmpty
-                      ? {bloc.state.artistsWithTags[2].tags.firstWhere((element) => element.name == 'pop punk')}
+                      ? {
+                          bloc.state.loadedDataFilteredArtists.data![2].tags
+                              .firstWhere((element) => element.name == 'pop punk')
+                        }
                       : const {})),
               child: const Icon(Icons.filter_list),
               backgroundColor: Theme.of(context).colorScheme.secondary,

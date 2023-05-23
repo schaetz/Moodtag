@@ -11,14 +11,14 @@ class ArtistDetailsState extends AbstractEntityUserState {
   ArtistDetailsState(
       {required LoadedData<TagsList> loadedDataAllTags,
       required this.artistId,
-      required this.loadedArtistData,
+      this.loadedArtistData = const LoadedData.initial(),
       required this.tagEditMode})
       : super(loadedDataAllTags: loadedDataAllTags);
 
-  bool get isArtistLoaded => loadedArtistData?.loadingStatus == LoadingStatus.success;
+  bool get isArtistLoaded => loadedArtistData.loadingStatus == LoadingStatus.success;
 
   @override
-  List<Object?> get props => [loadedDataAllTags, artistId, loadedArtistData, tagEditMode];
+  List<Object> get props => [loadedDataAllTags, artistId, loadedArtistData, tagEditMode];
 
   ArtistDetailsState copyWith(
       {LoadedData<ArtistsList>? loadedDataAllArtists, // not used, but required by interface

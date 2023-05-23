@@ -27,10 +27,7 @@ class ArtistDetailsBloc extends AbstractEntityUserBloc<ArtistDetailsState> with 
   ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId, EntityLoaderBloc entityLoaderBloc)
       : super(
             initialState: ArtistDetailsState(
-                artistId: artistId,
-                loadedArtistData: LoadedData.initial(),
-                tagEditMode: false,
-                loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags),
+                artistId: artistId, tagEditMode: false, loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags),
             entityLoaderBloc: entityLoaderBloc,
             useAllTagsStream: true) {
     on<StartedLoading<ArtistData>>(_handleStartedLoadingArtistData);

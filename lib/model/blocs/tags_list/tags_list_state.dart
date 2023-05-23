@@ -6,7 +6,7 @@ class TagsListState extends AbstractEntityUserState {
   TagsListState({required LoadedData<TagsList> loadedDataAllTags}) : super(loadedDataAllTags: loadedDataAllTags);
 
   @override
-  List<Object?> get props => [loadedDataAllTags];
+  List<Object> get props => [loadedDataAllTags];
 
   TagsListState copyWith({
     LoadedData<ArtistsList>? loadedDataAllArtists, // not used, but required by interface
