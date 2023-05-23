@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/chips_row_info_label.dart';
-import 'package:moodtag/components/data_loading_screen_backdrop.dart';
+import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
@@ -32,21 +32,18 @@ class ArtistDetailsScreen extends StatelessWidget {
                   loadedData: state.loadedArtistData,
                   captionForError: 'Artist could not be loaded',
                   captionForEmptyData: 'Artist does not exist',
-                  buildOnSuccess: () {
-                    return ListView(children: [
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 12.0),
-                        child:
-                            Text(state.loadedArtistData.data!.artist.name, style: ArtistDetailsScreen.artistNameStyle),
-                      ),
-                      _buildTagChipsRow(context, state),
-                      Padding(
-                          padding: EdgeInsets.only(top: 12.0),
-                          child: ElevatedButton(
-                              child: Text(state.tagEditMode ? 'Finish editing' : 'Edit tags'),
-                              onPressed: () => _toggleEditMode(context)))
-                    ]);
-                  });
+                  buildOnSuccess: (artistData) => ListView(children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 12.0),
+                          child: Text(artistData.artist.name, style: ArtistDetailsScreen.artistNameStyle),
+                        ),
+                        _buildTagChipsRow(context, state),
+                        Padding(
+                            padding: EdgeInsets.only(top: 12.0),
+                            child: ElevatedButton(
+                                child: Text(state.tagEditMode ? 'Finish editing' : 'Edit tags'),
+                                onPressed: () => _toggleEditMode(context)))
+                      ]));
             },
           ),
         ));

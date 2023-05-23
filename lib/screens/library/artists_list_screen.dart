@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/data_loading_screen_backdrop.dart';
+import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
@@ -33,17 +33,14 @@ class ArtistsListScreen extends StatelessWidget {
             loadedData: state.loadedDataFilteredArtists,
             captionForError: 'Artists could not be loaded',
             captionForEmptyData: state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
-            buildOnSuccess: () {
-              return ListView.separated(
-                separatorBuilder: (context, _) => Divider(),
-                padding: EdgeInsets.all(16.0),
-                itemCount:
-                    state.loadedDataFilteredArtists.data!.isNotEmpty ? state.loadedDataFilteredArtists.data!.length : 0,
-                itemBuilder: (context, i) {
-                  return _buildArtistRow(context, state.loadedDataFilteredArtists.data![i], bloc);
-                },
-              );
-            });
+            buildOnSuccess: (filteredArtistsList) => ListView.separated(
+                  separatorBuilder: (context, _) => Divider(),
+                  padding: EdgeInsets.all(16.0),
+                  itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
+                  itemBuilder: (context, i) {
+                    return _buildArtistRow(context, filteredArtistsList[i], bloc);
+                  },
+                ));
       }),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,

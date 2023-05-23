@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
@@ -8,7 +7,7 @@ class LoadedDataDisplayWrapper<T> extends StatelessWidget {
   static const emptyDataLabelStyle = TextStyle(fontSize: 18.0);
 
   final LoadedData<T> loadedData;
-  final Function() buildOnSuccess;
+  final Widget Function(T) buildOnSuccess;
   final String captionForError;
   final String captionForEmptyData;
 
@@ -46,6 +45,6 @@ class LoadedDataDisplayWrapper<T> extends StatelessWidget {
       );
     }
 
-    return buildOnSuccess();
+    return buildOnSuccess(loadedData.data!);
   }
 }

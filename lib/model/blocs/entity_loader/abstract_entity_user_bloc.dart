@@ -19,10 +19,10 @@ abstract class AbstractEntityUserBloc<S extends AbstractEntityUserState> extends
       useAllTagsStream = false})
       : super(initialState) {
     if (useAllArtistsStream) {
-      _onArtistsListLoadingStatusChangedEmit();
+      on<EntityLoaderStatusChanged<ArtistsList>>(_handleArtistsListLoadingStatusChanged);
     }
     if (useAllTagsStream) {
-      _onTagsListLoadingStatusChangedEmit();
+      on<EntityLoaderStatusChanged<TagsList>>(_handleTagsListLoadingStatusChanged);
     }
 
     _allEntitiesStreamSubscription = entityLoaderBloc.stream.listen((entityLoaderState) {
@@ -41,25 +41,21 @@ abstract class AbstractEntityUserBloc<S extends AbstractEntityUserState> extends
     super.close();
   }
 
-  void _onArtistsListLoadingStatusChangedEmit() {
-    this.on<EntityLoaderStatusChanged<ArtistsList>>((EntityLoaderStatusChanged<ArtistsList> event, Emitter<S> emit) {
-      if (_hasLoadingStatusChanged(event) ||
-          _hasDataChangedAfterLoadingFinished(event, this.state.loadedDataAllArtists)) {
-        emit(this.state.copyWith(loadedDataAllArtists: event.loadedData) as S);
-      }
-    });
+  void _handleArtistsListLoadingStatusChanged(EntityLoaderStatusChanged<ArtistsList> event, Emitter<S> emit) {
+    if (_hasLoadingStatusChanged(event) ||
+        _hasDataChangedAfterLoadingFinished(event, this.state.loadedDataAllArtists)) {
+      emit(this.state.copyWith(loadedDataAllArtists: event.loadedData) as S);
+    }
   }
 
-  void _onTagsListLoadingStatusChangedEmit() {
-    this.on<EntityLoaderStatusChanged<TagsList>>((EntityLoaderStatusChanged<TagsList> event, Emitter<S> emit) {
-      if (_hasLoadingStatusChanged(event) || _hasDataChangedAfterLoadingFinished(event, this.state.loadedDataAllTags)) {
-        emit(this.state.copyWith(loadedDataAllTags: event.loadedData) as S);
-      }
-    });
+  void _handleTagsListLoadingStatusChanged(EntityLoaderStatusChanged<TagsList> event, Emitter<S> emit) {
+    if (_hasLoadingStatusChanged(event) || _hasDataChangedAfterLoadingFinished(event, this.state.loadedDataAllTags)) {
+      emit(this.state.copyWith(loadedDataAllTags: event.loadedData) as S);
+    }
   }
 
   bool _hasLoadingStatusChanged(EntityLoaderStatusChanged event) =>
-      event.loadedData.loadingStatus != this.state.loadedDataAllTags?.loadingStatus;
+      event.loadedData.loadingStatus != this.state.loadedDataAllTags.loadingStatus;
 
   bool _hasDataChangedAfterLoadingFinished(EntityLoaderStatusChanged event, dynamic currentStateData) =>
       event.loadedData.loadingStatus == LoadingStatus.success && event.loadedData.data != currentStateData;
