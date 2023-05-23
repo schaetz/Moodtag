@@ -35,7 +35,7 @@ class TagDetailsBloc extends AbstractEntityUserBloc<TagDetailsState> with ErrorS
     on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
 
     _tagStreamSubscription = _repository
-        .getTagWithArtistFreqById(tagId)
+        .getTagDataById(tagId)
         .handleError((error) => add(DataUpdated<TagData>(error: error)))
         .listen((tagFromStream) => add(DataUpdated<TagData>(data: tagFromStream)));
     add(StartedLoading<TagData>());

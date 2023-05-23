@@ -37,7 +37,7 @@ class ArtistDetailsBloc extends AbstractEntityUserBloc<ArtistDetailsState> with 
     on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
 
     _artistStreamSubscription = _repository
-        .getArtistWithTagsById(artistId)
+        .getArtistDataById(artistId)
         .handleError((error) => add(DataUpdated<ArtistData>(error: error)))
         .listen((artistFromStream) => add(DataUpdated<ArtistData>(data: artistFromStream)));
     add(StartedLoading<ArtistData>());

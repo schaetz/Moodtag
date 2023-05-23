@@ -43,7 +43,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
 
   void _requestArtistsFromRepository({Set<Tag> filterTags = const {}}) {
     _filteredArtistsListStreamSubscription = _repository
-        .getArtistsWithTags(filterTags: filterTags)
+        .getArtistsDataList(filterTags: filterTags)
         .handleError((error) => add(DataUpdated<ArtistsList>(error: error)))
         .listen((artistsListFromStream) => add(DataUpdated<ArtistsList>(data: artistsListFromStream)));
   }

@@ -20,16 +20,16 @@ class Repository {
   //
   // Artists
   //
-  Stream<List<ArtistData>> getArtistsWithTags({Set<Tag> filterTags = const {}}) {
-    return db.getArtistsWithTags(filterTags);
+  Stream<List<ArtistData>> getArtistsDataList({Set<Tag> filterTags = const {}}) {
+    return db.getArtistsDataList(filterTags);
   }
 
-  Stream<List<ArtistData>> getArtistsHavingTag(Tag tag) {
-    return getArtistsWithTags(filterTags: {tag});
+  Stream<List<ArtistData>> getArtistsDataHavingTag(Tag tag) {
+    return getArtistsDataList(filterTags: {tag});
   }
 
-  Stream<ArtistData?> getArtistWithTagsById(int artistId) {
-    return db.getArtistWithTagsById(artistId);
+  Stream<ArtistData?> getArtistDataById(int artistId) {
+    return db.getArtistDataById(artistId);
   }
 
   Future<List<Artist>> getArtistsOnce() {
@@ -64,12 +64,12 @@ class Repository {
   //
   // Tags
   //
-  Stream<List<TagData>> getTagsWithArtistFreq() {
-    return db.getTagsWithArtistFreq();
+  Stream<List<TagData>> getTagsDataList() {
+    return db.getTagsDataList();
   }
 
-  Stream<TagData?> getTagWithArtistFreqById(int id) {
-    return db.getTagWithArtistFreqById(id);
+  Stream<TagData?> getTagDataById(int id) {
+    return db.getTagDataById(id);
   }
 
   Future<Set<String>> getSetOfExistingTagNames() async {

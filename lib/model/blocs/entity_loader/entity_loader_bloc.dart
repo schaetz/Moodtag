@@ -23,13 +23,13 @@ class EntityLoaderBloc extends Bloc<DataLoadingEvent, EntityLoaderState> {
     on<DataUpdated<TagsList>>(_handleTagsListUpdated);
 
     _artistsStreamSubscription = _repository
-        .getArtistsWithTags()
+        .getArtistsDataList()
         .handleError((error) => add(DataUpdated<ArtistsList>(error: error)))
         .listen((artistsListFromStream) => add(DataUpdated<ArtistsList>(data: artistsListFromStream)));
     add(StartedLoading<ArtistsList>());
 
     _tagsStreamSubscription = _repository
-        .getTagsWithArtistFreq()
+        .getTagsDataList()
         .handleError((error) => add(DataUpdated<TagsList>(error: error)))
         .listen((tagsListFromStream) => add(DataUpdated<TagsList>(data: tagsListFromStream)));
     add(StartedLoading<TagsList>());

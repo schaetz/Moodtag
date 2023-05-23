@@ -74,7 +74,7 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
       Tag tag = entityToDelete as Tag;
       final mainMessage = 'Are you sure that you want to delete the tag "${tag.name}"?';
       String appendix = '';
-      final artistsWithTagStream = await repository.getArtistsHavingTag(tag);
+      final artistsWithTagStream = await repository.getArtistsDataHavingTag(tag);
       if (await artistsWithTagStream.isEmpty) {
         appendix = ' It is currently not assigned to any artist.';
       } else {
