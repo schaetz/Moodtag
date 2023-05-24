@@ -4,10 +4,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
+import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_bloc.dart';
+import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
-import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -16,18 +17,23 @@ import '../../events/artist_events.dart';
 import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
-class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStreamHandling {
+class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with ErrorStreamHandling {
   late final Repository _repository;
   late StreamSubscription _filteredArtistsListStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
-  ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
+  ArtistsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc)
+      : super(
+            initialState: ArtistsListState(loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags),
+            entityLoaderBloc: entityLoaderBloc,
+            useAllTagsStream: true) {
     on<StartedLoading<ArtistsList>>(_handleStartedLoadingArtistsList);
     on<DataUpdated<ArtistsList>>(_handleArtistsListUpdated);
     on<ChangeArtistsListFilters>(_handleChangeArtistsListFilters);
     on<CreateArtists>(_mapCreateArtistsEventToState);
     on<DeleteArtist>(_mapDeleteArtistEventToState);
     on<ToggleTagSubtitles>(_mapToggleTagSubtitlesEventToState);
+    on<ToggleFilterOverlay>(_mapToggleFilterOverlayEventToState);
 
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
@@ -86,5 +92,9 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with ErrorStr
 
   void _mapToggleTagSubtitlesEventToState(ToggleTagSubtitles event, Emitter<ArtistsListState> emit) {
     emit(state.copyWith(displayTagSubtitles: !state.displayTagSubtitles));
+  }
+
+  void _mapToggleFilterOverlayEventToState(ToggleFilterOverlay event, Emitter<ArtistsListState> emit) {
+    emit(state.copyWith(showFilterOverlay: !state.showFilterOverlay));
   }
 }

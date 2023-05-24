@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:moodtag/components/filter_selector_overlay.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
@@ -10,17 +12,22 @@ import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
-class ArtistsListScreen extends StatelessWidget {
-  static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);
+class ArtistsListScreen extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _ArtistsListScreenState();
+}
+
+class _ArtistsListScreenState extends State<ArtistsListScreen> {
+  // static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
   final GlobalKey _scaffoldKey = GlobalKey();
-
-  ArtistsListScreen();
+  FilterSelectorOverlay? _filterSelectorOverlay;
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +35,21 @@ class ArtistsListScreen extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       appBar: MtAppBar(context),
-      body: BlocBuilder<ArtistsListBloc, ArtistsListState>(builder: (context, state) {
+      body: BlocConsumer<ArtistsListBloc, ArtistsListState>(listener: (context, state) async {
+        if (state.showFilterOverlay && _filterSelectorOverlay == null) {
+          if (state.loadedDataAllTags.loadingStatus.isSuccess) {
+            _filterSelectorOverlay = await _displayFilterBottomSheet(context, state.allTags!, state.filterTags, bloc);
+          } else {
+            _filterSelectorOverlay = null;
+            // TODO Further error handling?
+          }
+        } else if (!state.showFilterOverlay && _filterSelectorOverlay != null) {
+          // TODO Close filter overlay
+        }
+      }, builder: (context, state) {
         return LoadedDataDisplayWrapper<ArtistsList>(
             loadedData: state.loadedDataFilteredArtists,
+            additionalCheckData: state.loadedDataAllTags,
             captionForError: 'Artists could not be loaded',
             captionForEmptyData: state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
             buildOnSuccess: (filteredArtistsList) => ListView.separated(
@@ -46,14 +65,7 @@ class ArtistsListScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-              onPressed: () => bloc.add(ChangeArtistsListFilters(
-                  // TODO Allow the user to select tags for filtering
-                  filterTags: bloc.state.filterTags.isEmpty
-                      ? {
-                          bloc.state.loadedDataFilteredArtists.data![2].tags
-                              .firstWhere((element) => element.name == 'pop punk')
-                        }
-                      : const {})),
+              onPressed: () => bloc.add(ToggleFilterOverlay()),
               child: const Icon(Icons.filter_list),
               backgroundColor: Theme.of(context).colorScheme.secondary,
               heroTag: 'fab_change_filters'),
@@ -123,4 +135,24 @@ class ArtistsListScreen extends StatelessWidget {
           onPressed: () => {},
         ));
   }
+
+  Future<FilterSelectorOverlay?> _displayFilterBottomSheet(
+      BuildContext context, TagsList allTagsList, Set<Tag> filterTags, ArtistsListBloc bloc) {
+    return showMaterialModalBottomSheet<FilterSelectorOverlay>(
+      context: context,
+      expand: false,
+      enableDrag: false,
+      builder: (context) => FilterSelectorOverlay(
+          entitiesWithInitialSelection: _getSelectionForFilterOverlay(allTagsList, filterTags),
+          onClose: () => _onCloseModal(bloc)),
+    );
+  }
+
+  void _onCloseModal(ArtistsListBloc bloc) {
+    bloc.add(ToggleFilterOverlay());
+  }
+
+  Map<String, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>
+      Map<String, bool>.fromIterable(allTagsList,
+          key: (tagData) => tagData.tag.name, value: (tagData) => filterTags.contains(tagData.tag));
 }
