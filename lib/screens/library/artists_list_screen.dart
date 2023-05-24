@@ -142,17 +142,23 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
       context: context,
       expand: false,
       enableDrag: false,
-      builder: (context) => FilterSelectorOverlay(
+      builder: (context) => FilterSelectorOverlay<TagData>(
           entitiesWithInitialSelection: _getSelectionForFilterOverlay(allTagsList, filterTags),
-          onClose: () => _onCloseModal(bloc)),
+          onConfirmChanges: (Set<TagData> newFilterTagsData) =>
+              _onConfirmFilterChanges(newFilterTagsData.map((tagData) => tagData.tag).toSet(), bloc),
+          onCloseModal: () => _onCloseModal(bloc)),
     );
+  }
+
+  void _onConfirmFilterChanges(Set<Tag> newFilterTags, ArtistsListBloc bloc) {
+    bloc.add(ChangeArtistsListFilters(filterTags: newFilterTags));
   }
 
   void _onCloseModal(ArtistsListBloc bloc) {
     bloc.add(ToggleFilterOverlay());
   }
 
-  Map<String, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>
-      Map<String, bool>.fromIterable(allTagsList,
-          key: (tagData) => tagData.tag.name, value: (tagData) => filterTags.contains(tagData.tag));
+  Map<TagData, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>
+      Map<TagData, bool>.fromIterable(allTagsList,
+          key: (tagData) => tagData, value: (tagData) => filterTags.contains(tagData.tag));
 }
