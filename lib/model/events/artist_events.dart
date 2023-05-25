@@ -64,6 +64,19 @@ class ToggleTagSubtitles extends ArtistEvent {
 }
 
 class ToggleFilterOverlay extends ArtistEvent {
+  final bool? wantedOpen;
+
+  ToggleFilterOverlay({this.wantedOpen});
+
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [wantedOpen];
+}
+
+class FilterOverlayStateChanged extends ArtistEvent {
+  final bool open;
+
+  FilterOverlayStateChanged({required this.open});
+
+  @override
+  List<Object> get props => [open];
 }

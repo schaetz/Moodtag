@@ -9,6 +9,7 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
+import 'package:moodtag/model/blocs/modal_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
@@ -35,37 +36,29 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: MtAppBar(context),
-      body: BlocConsumer<ArtistsListBloc, ArtistsListState>(listener: (context, state) async {
-        if (state.showFilterOverlay && _filterSelectorOverlay == null) {
-          if (state.loadedDataAllTags.loadingStatus.isSuccess) {
-            _filterSelectorOverlay = await _displayFilterBottomSheet(context, state.allTags!, state.filterTags, bloc);
-          } else {
-            _filterSelectorOverlay = null;
-            // TODO Further error handling?
-          }
-        } else if (!state.showFilterOverlay && _filterSelectorOverlay != null) {
-          // TODO Close filter overlay
-        }
-      }, builder: (context, state) {
-        return LoadedDataDisplayWrapper<ArtistsList>(
-            loadedData: state.loadedDataFilteredArtists,
-            additionalCheckData: state.loadedDataAllTags,
-            captionForError: 'Artists could not be loaded',
-            captionForEmptyData: state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
-            buildOnSuccess: (filteredArtistsList) => ListView.separated(
-                  separatorBuilder: (context, _) => Divider(),
-                  padding: EdgeInsets.all(16.0),
-                  itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
-                  itemBuilder: (context, i) {
-                    return _buildArtistRow(context, filteredArtistsList[i], bloc);
-                  },
-                ));
-      }),
+      body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
+          listener: (context, state) => _checkFilterOverlayState(state, bloc),
+          builder: (context, state) {
+            return LoadedDataDisplayWrapper<ArtistsList>(
+                loadedData: state.loadedDataFilteredArtists,
+                additionalCheckData: state.loadedDataAllTags,
+                captionForError: 'Artists could not be loaded',
+                captionForEmptyData:
+                    state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
+                buildOnSuccess: (filteredArtistsList) => ListView.separated(
+                      separatorBuilder: (context, _) => Divider(),
+                      padding: EdgeInsets.all(16.0),
+                      itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
+                      itemBuilder: (context, i) {
+                        return _buildArtistRow(context, filteredArtistsList[i], bloc);
+                      },
+                    ));
+          }),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-              onPressed: () => bloc.add(ToggleFilterOverlay()),
+              onPressed: () => bloc.add(ToggleFilterOverlay(wantedOpen: true)),
               child: const Icon(Icons.filter_list),
               backgroundColor: Theme.of(context).colorScheme.secondary,
               heroTag: 'fab_change_filters'),
@@ -90,6 +83,17 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
       ),
       bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists),
     );
+  }
+
+  void _checkFilterOverlayState(ArtistsListState state, ArtistsListBloc bloc) async {
+    if (_filterSelectorOverlay == null) {
+      if (state.filterOverlayState == ModalState.opening && state.loadedDataAllTags.loadingStatus.isSuccess) {
+        bloc.add(FilterOverlayStateChanged(open: true));
+        _filterSelectorOverlay = await _displayFilterBottomSheet(context, state.allTags!, state.filterTags, bloc);
+      } else if (state.filterOverlayState == ModalState.closing) {
+        bloc.add(FilterOverlayStateChanged(open: false));
+      }
+    }
   }
 
   Widget _buildTagSubtitlesToggleIcon() {
@@ -144,7 +148,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
       enableDrag: false,
       builder: (context) => FilterSelectorOverlay<TagData>(
           entitiesWithInitialSelection: _getSelectionForFilterOverlay(allTagsList, filterTags),
-          onConfirmChanges: (Set<TagData> newFilterTagsData) =>
+          onConfirmSelection: (Set<TagData> newFilterTagsData) =>
               _onConfirmFilterChanges(newFilterTagsData.map((tagData) => tagData.tag).toSet(), bloc),
           onCloseModal: () => _onCloseModal(bloc)),
     );
@@ -155,7 +159,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
   }
 
   void _onCloseModal(ArtistsListBloc bloc) {
-    bloc.add(ToggleFilterOverlay());
+    bloc.add(ToggleFilterOverlay(wantedOpen: false));
   }
 
   Map<TagData, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>

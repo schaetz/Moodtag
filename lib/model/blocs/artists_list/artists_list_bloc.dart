@@ -6,6 +6,7 @@ import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_bloc.dart';
 import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
+import 'package:moodtag/model/blocs/modal_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
@@ -34,6 +35,7 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     on<DeleteArtist>(_mapDeleteArtistEventToState);
     on<ToggleTagSubtitles>(_mapToggleTagSubtitlesEventToState);
     on<ToggleFilterOverlay>(_mapToggleFilterOverlayEventToState);
+    on<FilterOverlayStateChanged>(_mapFilterOverlayStateChangedEventToState);
 
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
@@ -95,6 +97,24 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
   }
 
   void _mapToggleFilterOverlayEventToState(ToggleFilterOverlay event, Emitter<ArtistsListState> emit) {
-    emit(state.copyWith(showFilterOverlay: !state.showFilterOverlay));
+    if (!state.filterOverlayState.isInTransition) {
+      if (event.wantedOpen == null) {
+        if (state.filterOverlayState == ModalState.open) {
+          emit(state.copyWith(filterOverlayState: ModalState.closing));
+        } else if (state.filterOverlayState == ModalState.closed) {
+          emit(state.copyWith(filterOverlayState: ModalState.opening));
+        }
+      } else if (event.wantedOpen == false && state.filterOverlayState == ModalState.open) {
+        emit(state.copyWith(filterOverlayState: ModalState.closing));
+      } else if (event.wantedOpen == true && state.filterOverlayState == ModalState.closed) {
+        emit(state.copyWith(filterOverlayState: ModalState.opening));
+      }
+    }
+  }
+
+  void _mapFilterOverlayStateChangedEventToState(FilterOverlayStateChanged event, Emitter<ArtistsListState> emit) {
+    if (state.filterOverlayState.isInTransition) {
+      emit(state.copyWith(filterOverlayState: event.open ? ModalState.open : ModalState.closed));
+    }
   }
 }
