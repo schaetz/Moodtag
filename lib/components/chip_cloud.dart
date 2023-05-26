@@ -49,7 +49,7 @@ class ChipCloudDelegate extends FlowDelegate {
       {this.debug = false});
 
   @override
-  BoxConstraints getConstraintsForChild(int i, BoxConstraints constraints) => constraints.loosen();
+  Size getSize(BoxConstraints _) => constraints;
 
   @override
   void paintChildren(FlowPaintingContext context) {
@@ -65,6 +65,7 @@ class ChipCloudDelegate extends FlowDelegate {
     double x = leftPadding;
     double y = topPadding;
     debug ? print('row 0 - y=' + y.toString()) : {};
+    debug ? print('First element height: ' + context.getChildSize(0)!.height.toString()) : {};
     bool isOverflowingY =
         context.childCount > 0 && _isElementOverflowingY(y, context.getChildSize(0)!.height, bottomPadding);
     if (isOverflowingY) {

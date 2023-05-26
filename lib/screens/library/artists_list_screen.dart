@@ -113,18 +113,15 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
           bottom: MediaQuery.of(context).size.height * 0.10,
           child: Material(
               color: Colors.transparent,
-              child: SizedBox(
-                  width: overlayWidth,
-                  height: overlayHeight,
-                  child: Container(
-                      color: Colors.black.withOpacity(0.5),
-                      child: ChipCloud(
-                        captions: filterTags.map((tag) => tag.name).toList(),
-                        constraints: Size(overlayWidth, overlayHeight),
-                        elementSpacing: 8,
-                        padding: EdgeInsets.all(8),
-                        debug: true,
-                      )))),
+              child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: ChipCloud(
+                    captions: filterTags.map((tag) => tag.name).toList(),
+                    constraints: Size(overlayWidth, overlayHeight),
+                    elementSpacing: 8,
+                    padding: EdgeInsets.all(8),
+                    debug: true,
+                  ))),
         );
       });
       Overlay.of(context)?.insert(_filterDisplayOverlay!);
