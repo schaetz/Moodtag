@@ -30,7 +30,7 @@ class ChipCloud extends StatelessWidget {
   }
 
   Widget _buildElement(String caption) {
-    return InputChip(
+    return Chip(
       label: Text(caption),
       labelStyle: TextStyle(fontSize: 14.0),
     );

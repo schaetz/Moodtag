@@ -114,7 +114,10 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
           child: Material(
               color: Colors.transparent,
               child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
                   child: ChipCloud(
                     captions: filterTags.map((tag) => tag.name).toList(),
                     constraints: Size(overlayWidth, overlayHeight),
