@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:moodtag/components/chip_cloud.dart';
+import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
+import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
@@ -118,13 +119,10 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
                     color: Colors.black.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(16.0),
                   ),
-                  child: ChipCloud(
-                    captions: filterTags.map((tag) => tag.name).toList(),
-                    constraints: Size(overlayWidth, overlayHeight),
-                    elementSpacing: 8,
-                    padding: EdgeInsets.all(8),
-                    debug: true,
-                  ))),
+                  child: ChipCloud<String>(
+                      data: filterTags.map((tag) => tag.name).toList(),
+                      constraints: Size(overlayWidth, overlayHeight),
+                      options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: true)))),
         );
       });
       Overlay.of(context)?.insert(_filterDisplayOverlay!);
