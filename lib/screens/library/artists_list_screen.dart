@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:moodtag/components/chip_cloud.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
@@ -105,16 +106,26 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
   void _showFilterDisplayOverlay(Set<Tag> filterTags) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _filterDisplayOverlay = OverlayEntry(builder: (context) {
+        final overlayWidth = MediaQuery.of(context).size.width * 0.75;
+        final overlayHeight = MediaQuery.of(context).size.height * 0.20;
         return Positioned(
-            left: MediaQuery.of(context).size.width * 0.05,
-            bottom: MediaQuery.of(context).size.height * 0.10,
-            child: Material(
-                child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    height: MediaQuery.of(context).size.height * 0.2,
-                    child: ClipRect(
-                        clipBehavior: Clip.hardEdge,
-                        child: Wrap(spacing: 8.0, runSpacing: 2.0, children: _buildFilterDisplayChips(filterTags))))));
+          left: MediaQuery.of(context).size.width * 0.05,
+          bottom: MediaQuery.of(context).size.height * 0.10,
+          child: Material(
+              color: Colors.transparent,
+              child: SizedBox(
+                  width: overlayWidth,
+                  height: overlayHeight,
+                  child: Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: ChipCloud(
+                        captions: filterTags.map((tag) => tag.name).toList(),
+                        constraints: Size(overlayWidth, overlayHeight),
+                        elementSpacing: 8,
+                        padding: EdgeInsets.all(8),
+                        debug: true,
+                      )))),
+        );
       });
       Overlay.of(context)?.insert(_filterDisplayOverlay!);
     });
