@@ -34,8 +34,8 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     on<CreateArtists>(_mapCreateArtistsEventToState);
     on<DeleteArtist>(_mapDeleteArtistEventToState);
     on<ToggleTagSubtitles>(_mapToggleTagSubtitlesEventToState);
-    on<ToggleFilterOverlay>(_mapToggleFilterOverlayEventToState);
-    on<FilterOverlayStateChanged>(_mapFilterOverlayStateChangedEventToState);
+    on<ToggleFilterSelectionModal>(_mapToggleFilterOverlayEventToState);
+    on<FilterSelectionModalStateChanged>(_mapFilterOverlayStateChangedEventToState);
 
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
@@ -96,25 +96,26 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     emit(state.copyWith(displayTagSubtitles: !state.displayTagSubtitles));
   }
 
-  void _mapToggleFilterOverlayEventToState(ToggleFilterOverlay event, Emitter<ArtistsListState> emit) {
-    if (!state.filterOverlayState.isInTransition) {
+  void _mapToggleFilterOverlayEventToState(ToggleFilterSelectionModal event, Emitter<ArtistsListState> emit) {
+    if (!state.filterSelectionModalState.isInTransition) {
       if (event.wantedOpen == null) {
-        if (state.filterOverlayState == ModalState.open) {
-          emit(state.copyWith(filterOverlayState: ModalState.closing));
-        } else if (state.filterOverlayState == ModalState.closed) {
-          emit(state.copyWith(filterOverlayState: ModalState.opening));
+        if (state.filterSelectionModalState == ModalState.open) {
+          emit(state.copyWith(filterSelectionModalState: ModalState.closing));
+        } else if (state.filterSelectionModalState == ModalState.closed) {
+          emit(state.copyWith(filterSelectionModalState: ModalState.opening));
         }
-      } else if (event.wantedOpen == false && state.filterOverlayState == ModalState.open) {
-        emit(state.copyWith(filterOverlayState: ModalState.closing));
-      } else if (event.wantedOpen == true && state.filterOverlayState == ModalState.closed) {
-        emit(state.copyWith(filterOverlayState: ModalState.opening));
+      } else if (event.wantedOpen == false && state.filterSelectionModalState == ModalState.open) {
+        emit(state.copyWith(filterSelectionModalState: ModalState.closing));
+      } else if (event.wantedOpen == true && state.filterSelectionModalState == ModalState.closed) {
+        emit(state.copyWith(filterSelectionModalState: ModalState.opening));
       }
     }
   }
 
-  void _mapFilterOverlayStateChangedEventToState(FilterOverlayStateChanged event, Emitter<ArtistsListState> emit) {
-    if (state.filterOverlayState.isInTransition) {
-      emit(state.copyWith(filterOverlayState: event.open ? ModalState.open : ModalState.closed));
+  void _mapFilterOverlayStateChangedEventToState(
+      FilterSelectionModalStateChanged event, Emitter<ArtistsListState> emit) {
+    if (state.filterSelectionModalState.isInTransition) {
+      emit(state.copyWith(filterSelectionModalState: event.open ? ModalState.open : ModalState.closed));
     }
   }
 }

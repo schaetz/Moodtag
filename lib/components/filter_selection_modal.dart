@@ -2,19 +2,19 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 
-class FilterSelectorOverlay<T extends DataClassWithEntityName> extends StatefulWidget {
+class FilterSelectionModal<T extends DataClassWithEntityName> extends StatefulWidget {
   final Map<T, bool> entitiesWithInitialSelection;
   final Function(Set<T>)? onConfirmSelection;
   final Function? onCloseModal;
 
-  const FilterSelectorOverlay(
+  const FilterSelectionModal(
       {required this.entitiesWithInitialSelection, this.onConfirmSelection = null, this.onCloseModal = null});
 
   @override
-  State<StatefulWidget> createState() => _FilterSelectorOverlayState<T>();
+  State<StatefulWidget> createState() => _FilterSelectionModalState<T>();
 }
 
-class _FilterSelectorOverlayState<T extends DataClassWithEntityName> extends State<FilterSelectorOverlay<T>> {
+class _FilterSelectionModalState<T extends DataClassWithEntityName> extends State<FilterSelectionModal<T>> {
   static const headlineLabelStyle = TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
 
   late final Map<T, bool> _selectionsState;
@@ -67,7 +67,7 @@ class _FilterSelectorOverlayState<T extends DataClassWithEntityName> extends Sta
                     label: const Text('Clear filters'),
                   ),
                   ElevatedButton.icon(
-                    onPressed: () => _closeOverlay(context),
+                    onPressed: () => _closeModal(context),
                     icon: Icon(Icons.undo),
                     label: const Text('Discard'),
                   ),
@@ -103,7 +103,7 @@ class _FilterSelectorOverlayState<T extends DataClassWithEntityName> extends Sta
         .toList();
   }
 
-  void _closeOverlay(BuildContext context) {
+  void _closeModal(BuildContext context) {
     if (widget.onCloseModal != null) {
       widget.onCloseModal!();
       setState(() {
@@ -125,7 +125,7 @@ class _FilterSelectorOverlayState<T extends DataClassWithEntityName> extends Sta
     if (widget.onConfirmSelection != null) {
       widget.onConfirmSelection!(selectedEntities);
     }
-    _closeOverlay(context);
+    _closeModal(context);
   }
 
   Set<T> _getSelectedSet() =>

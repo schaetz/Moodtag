@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:moodtag/components/filter_selector_overlay.dart';
+import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
@@ -28,7 +29,8 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
   final GlobalKey _scaffoldKey = GlobalKey();
-  FilterSelectorOverlay? _filterSelectorOverlay;
+  FilterSelectionModal? _filterSelectionModal;
+  OverlayEntry? _filterDisplayOverlay;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
       key: _scaffoldKey,
       appBar: MtAppBar(context),
       body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
-          listener: (context, state) => _checkFilterOverlayState(state, bloc),
+          listener: (context, state) => _checkFilterSelectionModalState(state, bloc),
           builder: (context, state) {
             return LoadedDataDisplayWrapper<ArtistsList>(
                 loadedData: state.loadedDataFilteredArtists,
@@ -58,7 +60,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-              onPressed: () => bloc.add(ToggleFilterOverlay(wantedOpen: true)),
+              onPressed: () => bloc.add(ToggleFilterSelectionModal(wantedOpen: true)),
               child: const Icon(Icons.filter_list),
               backgroundColor: Theme.of(context).colorScheme.secondary,
               heroTag: 'fab_change_filters'),
@@ -85,15 +87,51 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
     );
   }
 
-  void _checkFilterOverlayState(ArtistsListState state, ArtistsListBloc bloc) async {
-    if (_filterSelectorOverlay == null) {
-      if (state.filterOverlayState == ModalState.opening && state.loadedDataAllTags.loadingStatus.isSuccess) {
-        bloc.add(FilterOverlayStateChanged(open: true));
-        _filterSelectorOverlay = await _displayFilterBottomSheet(context, state.allTags!, state.filterTags, bloc);
-      } else if (state.filterOverlayState == ModalState.closing) {
-        bloc.add(FilterOverlayStateChanged(open: false));
+  void _checkFilterSelectionModalState(ArtistsListState state, ArtistsListBloc bloc) async {
+    if (_filterSelectionModal == null) {
+      if (state.filterSelectionModalState == ModalState.opening && state.loadedDataAllTags.loadingStatus.isSuccess) {
+        bloc.add(FilterSelectionModalStateChanged(open: true));
+        _hideFilterDisplayOverlay(context);
+        _filterSelectionModal = await _displayFilterBottomSheet(context, state.allTags!, state.filterTags, bloc);
+      } else if (state.filterSelectionModalState == ModalState.closing) {
+        bloc.add(FilterSelectionModalStateChanged(open: false));
+        if (state.filterTags.isNotEmpty) {
+          _showFilterDisplayOverlay(state.filterTags);
+        }
       }
     }
+  }
+
+  void _showFilterDisplayOverlay(Set<Tag> filterTags) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _filterDisplayOverlay = OverlayEntry(builder: (context) {
+        return Positioned(
+            left: MediaQuery.of(context).size.width * 0.05,
+            bottom: MediaQuery.of(context).size.height * 0.10,
+            child: Material(
+                child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    child: ClipRect(
+                        clipBehavior: Clip.hardEdge,
+                        child: Wrap(spacing: 8.0, runSpacing: 2.0, children: _buildFilterDisplayChips(filterTags))))));
+      });
+      Overlay.of(context)?.insert(_filterDisplayOverlay!);
+    });
+  }
+
+  List<Widget> _buildFilterDisplayChips(Set<Tag> filterTags) {
+    return filterTags
+        .map((tag) => InputChip(
+              label: Text(tag.name),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+            ))
+        .toList();
+  }
+
+  void _hideFilterDisplayOverlay(BuildContext context) {
+    _filterDisplayOverlay?.remove();
+    _filterDisplayOverlay = null;
   }
 
   Widget _buildTagSubtitlesToggleIcon() {
@@ -140,13 +178,13 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
         ));
   }
 
-  Future<FilterSelectorOverlay?> _displayFilterBottomSheet(
+  Future<FilterSelectionModal?> _displayFilterBottomSheet(
       BuildContext context, TagsList allTagsList, Set<Tag> filterTags, ArtistsListBloc bloc) {
-    return showMaterialModalBottomSheet<FilterSelectorOverlay>(
+    return showMaterialModalBottomSheet<FilterSelectionModal>(
       context: context,
       expand: false,
       enableDrag: false,
-      builder: (context) => FilterSelectorOverlay<TagData>(
+      builder: (context) => FilterSelectionModal<TagData>(
           entitiesWithInitialSelection: _getSelectionForFilterOverlay(allTagsList, filterTags),
           onConfirmSelection: (Set<TagData> newFilterTagsData) =>
               _onConfirmFilterChanges(newFilterTagsData.map((tagData) => tagData.tag).toSet(), bloc),
@@ -159,7 +197,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
   }
 
   void _onCloseModal(ArtistsListBloc bloc) {
-    bloc.add(ToggleFilterOverlay(wantedOpen: false));
+    bloc.add(ToggleFilterSelectionModal(wantedOpen: false));
   }
 
   Map<TagData, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>
