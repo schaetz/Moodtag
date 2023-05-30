@@ -104,7 +104,7 @@ class ChipCloudCursor {
 
     final nextToLastElementIndex = _displayedElementsIndices.last;
     final nextToLastElementPosition = _determinedElementPositions[nextToLastElementIndex]!;
-    final nextToLastElementWidth = _displayedElementsWidth[nextToLastElementIndex]!;
+    final nextToLastElementWidth = _displayedElementsWidth.last;
 
     _position = nextToLastElementPosition + Point(nextToLastElementWidth + options.elementSpacing, 0);
   }
