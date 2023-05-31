@@ -9,6 +9,7 @@ import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 
@@ -21,6 +22,7 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<ArtistDetailsBloc>();
     return Scaffold(
         key: _scaffoldKey,
         appBar: MtAppBar(context),
@@ -37,12 +39,24 @@ class ArtistDetailsScreen extends StatelessWidget {
                           padding: EdgeInsets.only(bottom: 12.0),
                           child: Text(artistData.artist.name, style: ArtistDetailsScreen.artistNameStyle),
                         ),
+                        if (artistData.artist.spotifyId != null)
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 8.0),
+                              child: Text('Spotify ID: ' + artistData.artist.spotifyId!)),
+                        if (artistData.artist.spotifyId != null)
+                          Padding(
+                              padding: EdgeInsets.only(bottom: 12.0),
+                              child: ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor: MaterialStateColor.resolveWith((states) => Colors.green)),
+                                  child: Text('Play on Spotify'),
+                                  onPressed: () => bloc.add(PlayArtist(artistData)))), // TODO Implement event mapper
                         _buildTagChipsRow(context, state),
                         Padding(
-                            padding: EdgeInsets.only(top: 12.0),
+                            padding: EdgeInsets.only(top: 8.0),
                             child: ElevatedButton(
                                 child: Text(state.tagEditMode ? 'Finish editing' : 'Edit tags'),
-                                onPressed: () => _toggleEditMode(context)))
+                                onPressed: () => _toggleEditMode(context))),
                       ]));
             },
           ),

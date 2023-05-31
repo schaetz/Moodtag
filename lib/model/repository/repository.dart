@@ -46,9 +46,9 @@ class Repository {
     return allArtists.map((artist) => artist.name).toSet();
   }
 
-  Future<DbRequestResponse<Artist>> createArtist(String name) async {
-    Future<int> createArtistFuture =
-        db.createArtist(ArtistsCompanion.insert(name: name, orderingName: helper.getOrderingNameForArtist(name)));
+  Future<DbRequestResponse<Artist>> createArtist(String name, {String? spotifyId}) async {
+    Future<int> createArtistFuture = db.createArtist(ArtistsCompanion.insert(
+        name: name, orderingName: helper.getOrderingNameForArtist(name), spotifyId: Value(spotifyId)));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
   }
 

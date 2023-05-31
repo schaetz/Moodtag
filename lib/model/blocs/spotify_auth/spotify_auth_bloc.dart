@@ -19,7 +19,7 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
   SpotifyAuthBloc(this.mainContext) : super(SpotifyAuthState()) {
     on<RequestUserAuthorization>(_mapRequestUserAuthorizationEventToState);
     on<LoginWebviewUrlChange>(_mapLoginWebviewUrlChangeEventToState);
-    on<RequestAccessToken>(_mapRequestAccessTokenEventToState);
+    // on<RequestAccessToken>(_mapRequestAccessTokenEventToState); TODO Check if this is still needed
 
     setupErrorHandler(mainContext);
   }
@@ -27,7 +27,7 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
   Future<SpotifyAccessToken?> getAccessToken() async {
     SpotifyAccessToken? accessToken = state.spotifyAccessToken;
     if (accessToken == null || accessToken.hasExpired()) {
-      this.add(RequestAccessToken());
+      // this.add(RequestAccessToken()); TODO Check if this is still needed
       await stream
           .timeout(Duration(seconds: 1), onTimeout: (_) {
             accessToken = null;
@@ -75,16 +75,17 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
     }
   }
 
-  void _mapRequestAccessTokenEventToState(RequestAccessToken event, Emitter<SpotifyAuthState> emit) async {
-    try {
-      SpotifyAccessToken accessToken = await _getAccessTokenWithoutStateUpdate();
-      if (accessToken != state.spotifyAccessToken) {
-        emit(state.copyWith(spotifyAccessToken: accessToken));
-      }
-    } catch (e) {
-      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
-    }
-  }
+  // TODO Check if this is still needed
+  // void _mapRequestAccessTokenEventToState(RequestAccessToken event, Emitter<SpotifyAuthState> emit) async {
+  //   try {
+  //     SpotifyAccessToken accessToken = await _getAccessTokenWithoutStateUpdate();
+  //     if (accessToken != state.spotifyAccessToken) {
+  //       emit(state.copyWith(spotifyAccessToken: accessToken));
+  //     }
+  //   } catch (e) {
+  //     throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
+  //   }
+  // }
 
   void _redirectAfterSuccessfulAuthorization(Function? redirect) {
     if (redirect != null) {

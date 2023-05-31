@@ -139,7 +139,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
   Set<ImportedArtist> followedArtists;
   try {
     followedArtists = Set<ImportedArtist>.from(responseBodyStructure['artists']['items']
-        ?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']))));
+        ?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']), item['id'])));
   } catch (error) {
     throw ExternalServiceQueryException('The Spotify data has an unknown structure.');
   }
@@ -165,7 +165,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
   Set<ImportedArtist> topArtists;
   try {
     topArtists = Set<ImportedArtist>.from(
-        responseBodyMap['items']?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']))));
+        responseBodyMap['items']?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']), item['id'])));
   } catch (error) {
     throw ExternalServiceQueryException('The Spotify data has an unknown structure.');
   }

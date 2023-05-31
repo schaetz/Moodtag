@@ -1,3 +1,4 @@
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/screens/spotify_import/import_flow.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
@@ -35,12 +36,13 @@ class LoginWebviewUrlChange extends SpotifyEvent {
   List<Object?> get props => [url];
 }
 
-class RequestAccessToken extends SpotifyEvent {
-  const RequestAccessToken();
-
-  @override
-  List<Object?> get props => [];
-}
+// TODO Check if this is still needed
+// class RequestAccessToken extends SpotifyEvent {
+//   const RequestAccessToken();
+//
+//   @override
+//   List<Object?> get props => [];
+// }
 
 class ChangeConfigForSpotifyImport extends SpotifyEvent {
   final Map<String, bool> selectedOptions;
@@ -84,4 +86,13 @@ class CompleteSpotifyImport extends SpotifyEvent {
 
   @override
   List<Object?> get props => [selectedArtists, selectedGenres];
+}
+
+class PlayArtist extends SpotifyEvent {
+  final ArtistData artistData;
+
+  PlayArtist(this.artistData);
+
+  @override
+  List<Object?> get props => [artistData];
 }

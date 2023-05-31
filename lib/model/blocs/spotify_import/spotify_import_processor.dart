@@ -30,7 +30,8 @@ class SpotifyImportProcessor {
     final DbRequestSuccessCounter creationSuccessCounter = DbRequestSuccessCounter();
 
     await Future.forEach(artists, (ImportedArtist importedArtist) async {
-      DbRequestResponse<Artist> creationResponse = await repository.createArtist(importedArtist.name);
+      DbRequestResponse<Artist> creationResponse =
+          await repository.createArtist(importedArtist.name, spotifyId: importedArtist.spotifyId);
       if (creationResponse.changedEntity != null) {
         createdArtistsByEntity.putIfAbsent(importedArtist, () => creationResponse.changedEntity!);
       }

@@ -1,7 +1,8 @@
 CREATE TABLE artists (
     id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL UNIQUE,
-    ordering_name VARCHAR(255) NOT NULL
+    ordering_name VARCHAR(255) NOT NULL,
+    spotify_id VARCHAR(255) NULL,
 );
 
 CREATE TABLE tags (
