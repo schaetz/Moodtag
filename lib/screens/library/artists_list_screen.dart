@@ -12,10 +12,11 @@ import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
-import 'package:moodtag/model/blocs/modal_state.dart';
+import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
@@ -25,14 +26,53 @@ class ArtistsListScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _ArtistsListScreenState();
 }
 
-class _ArtistsListScreenState extends State<ArtistsListScreen> {
+class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   // static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
   final GlobalKey _scaffoldKey = GlobalKey();
+  late final RouteObserver _routeObserver;
   FilterSelectionModal? _filterSelectionModal;
+  bool _filterDisplayOverlayVisible = false;
   OverlayEntry? _filterDisplayOverlay;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeObserver = context.read<RouteObserver>();
+    _routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    _routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPush() {
+    final bloc = context.read<ArtistsListBloc>();
+    bloc.add(ActiveScreenChanged(true));
+  }
+
+  @override
+  void didPopNext() {
+    final bloc = context.read<ArtistsListBloc>();
+    bloc.add(ActiveScreenChanged(true));
+  }
+
+  @override
+  void didPop() {
+    final bloc = context.read<ArtistsListBloc>();
+    bloc.add(ActiveScreenChanged(false));
+  }
+
+  @override
+  void didPushNext() {
+    final bloc = context.read<ArtistsListBloc>();
+    bloc.add(ActiveScreenChanged(false));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +81,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
       key: _scaffoldKey,
       appBar: MtAppBar(context),
       body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
-          listener: (context, state) => _checkFilterSelectionModalState(state, bloc),
+          listener: (context, state) => _checkFilterModalAndOverlayState(context, state, bloc),
           builder: (context, state) {
             return LoadedDataDisplayWrapper<ArtistsList>(
                 loadedData: state.loadedDataFilteredArtists,
@@ -89,22 +129,32 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
     );
   }
 
-  void _checkFilterSelectionModalState(ArtistsListState state, ArtistsListBloc bloc) async {
+  void _checkFilterModalAndOverlayState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
+    _checkFilterModalState(context, state, bloc);
+    _checkFilterDisplayOverlayState(context, state);
+  }
+
+  void _checkFilterModalState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) async {
     if (_filterSelectionModal == null) {
       if (state.filterSelectionModalState == ModalState.opening && state.loadedDataAllTags.loadingStatus.isSuccess) {
         bloc.add(FilterSelectionModalStateChanged(open: true));
-        _hideFilterDisplayOverlay(context);
         _filterSelectionModal = await _displayFilterBottomSheet(context, state.allTags!, state.filterTags, bloc);
       } else if (state.filterSelectionModalState == ModalState.closing) {
         bloc.add(FilterSelectionModalStateChanged(open: false));
-        if (state.filterTags.isNotEmpty) {
-          _showFilterDisplayOverlay(state.filterTags);
-        }
       }
     }
   }
 
-  void _showFilterDisplayOverlay(Set<Tag> filterTags) {
+  void _checkFilterDisplayOverlayState(BuildContext context, ArtistsListState state) {
+    if (state.filterDisplayOverlayState == OverlayVisibility.on && !_filterDisplayOverlayVisible) {
+      _showFilterDisplayOverlay(context, state.filterTags);
+    } else if (state.filterDisplayOverlayState != OverlayVisibility.on && _filterDisplayOverlayVisible) {
+      _hideFilterDisplayOverlay(context);
+    }
+  }
+
+  void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags) {
+    _filterDisplayOverlayVisible = true;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _filterDisplayOverlay = OverlayEntry(builder: (context) {
         final overlayWidth = MediaQuery.of(context).size.width * 0.75;
@@ -122,25 +172,16 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> {
                   child: ChipCloud<String>(
                       data: filterTags.map((tag) => tag.name).toList(),
                       constraints: Size(overlayWidth, overlayHeight),
-                      options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: true)))),
+                      options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: false)))),
         );
       });
       Overlay.of(context)?.insert(_filterDisplayOverlay!);
     });
   }
 
-  List<Widget> _buildFilterDisplayChips(Set<Tag> filterTags) {
-    return filterTags
-        .map((tag) => InputChip(
-              label: Text(tag.name),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-            ))
-        .toList();
-  }
-
   void _hideFilterDisplayOverlay(BuildContext context) {
+    _filterDisplayOverlayVisible = false;
     _filterDisplayOverlay?.remove();
-    _filterDisplayOverlay = null;
   }
 
   Widget _buildTagSubtitlesToggleIcon() {

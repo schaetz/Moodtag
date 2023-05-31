@@ -21,6 +21,7 @@ import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(MoodtagApp());
@@ -36,24 +37,30 @@ class MoodtagApp extends StatefulWidget {
 }
 
 class _AppState extends State<MoodtagApp> {
+  final _routeObserver = RouteObserver<PageRoute>();
+
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider(
         create: (context) => Repository(),
-        child: MultiBlocProvider(
-            providers: [
-              BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),
-              BlocProvider<EntityLoaderBloc>(create: (context) => EntityLoaderBloc(context)),
-              BlocProvider<SpotifyAuthBloc>(create: (context) => SpotifyAuthBloc(context)),
-            ],
-            child: MaterialApp(
-                title: MoodtagApp.appTitle,
-                theme: ThemeData(
-                    primarySwatch: Colors.red,
-                    primaryColor: Colors.red,
-                    unselectedWidgetColor: Colors.grey,
-                    dividerColor: Colors.black54),
-                initialRoute: Routes.initialRoute,
-                routes: Routes.instance().getRoutes())));
+        child: Provider<RouteObserver>(
+            create: (context) => _routeObserver,
+            child: MultiBlocProvider(
+                providers: [
+                  BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),
+                  BlocProvider<EntityLoaderBloc>(create: (context) => EntityLoaderBloc(context)),
+                  BlocProvider<SpotifyAuthBloc>(create: (context) => SpotifyAuthBloc(context)),
+                ],
+                child: MaterialApp(
+                  title: MoodtagApp.appTitle,
+                  theme: ThemeData(
+                      primarySwatch: Colors.red,
+                      primaryColor: Colors.red,
+                      unselectedWidgetColor: Colors.grey,
+                      dividerColor: Colors.black54),
+                  initialRoute: Routes.initialRoute,
+                  routes: Routes.instance().getRoutes(),
+                  navigatorObservers: [_routeObserver],
+                ))));
   }
 }

@@ -6,10 +6,11 @@ import 'package:moodtag/exceptions/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_bloc.dart';
 import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
-import 'package:moodtag/model/blocs/modal_state.dart';
+import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
+import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -35,7 +36,8 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     on<DeleteArtist>(_mapDeleteArtistEventToState);
     on<ToggleTagSubtitles>(_mapToggleTagSubtitlesEventToState);
     on<ToggleFilterSelectionModal>(_mapToggleFilterOverlayEventToState);
-    on<FilterSelectionModalStateChanged>(_mapFilterOverlayStateChangedEventToState);
+    on<FilterSelectionModalStateChanged>(_mapFilterSelectionModalStateChangedEventToState);
+    on<ActiveScreenChanged>(_mapActiveScreenChangedEventToState);
 
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
@@ -112,10 +114,26 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     }
   }
 
-  void _mapFilterOverlayStateChangedEventToState(
+  void _mapFilterSelectionModalStateChangedEventToState(
       FilterSelectionModalStateChanged event, Emitter<ArtistsListState> emit) {
     if (state.filterSelectionModalState.isInTransition) {
-      emit(state.copyWith(filterSelectionModalState: event.open ? ModalState.open : ModalState.closed));
+      if (event.open) {
+        emit(state.copyWith(
+            filterSelectionModalState: ModalState.open, filterDisplayOverlayState: OverlayVisibility.off));
+      } else {
+        emit(state.copyWith(
+            filterSelectionModalState: ModalState.closed,
+            filterDisplayOverlayState: state.filterTags.isNotEmpty ? OverlayVisibility.on : OverlayVisibility.off));
+      }
+    }
+  }
+
+  void _mapActiveScreenChangedEventToState(ActiveScreenChanged event, Emitter<ArtistsListState> emit) {
+    if (event.isActive) {
+      emit(state.copyWith(
+          filterDisplayOverlayState: state.filterTags.isNotEmpty ? OverlayVisibility.on : OverlayVisibility.off));
+    } else if (state.filterTags.isNotEmpty) {
+      emit(state.copyWith(filterDisplayOverlayState: OverlayVisibility.suspended));
     }
   }
 }
