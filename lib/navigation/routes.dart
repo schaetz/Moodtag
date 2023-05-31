@@ -49,8 +49,12 @@ class Routes {
           create: (_) => TagsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
           child: TagsListScreen()),
       artistsDetails: (context) => BlocProvider(
-          create: (_) => ArtistDetailsBloc(context.read<Repository>(), context,
-              ModalRoute.of(context)?.settings.arguments as int, context.read<EntityLoaderBloc>()),
+          create: (_) => ArtistDetailsBloc(
+              context.read<Repository>(),
+              context,
+              ModalRoute.of(context)?.settings.arguments as int,
+              context.read<EntityLoaderBloc>(),
+              context.read<SpotifyAuthBloc>()),
           child: ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
           create: (_) => TagDetailsBloc(context.read<Repository>(), context,

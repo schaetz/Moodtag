@@ -4,7 +4,9 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:moodtag/exceptions/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/internal_exception.dart';
 import 'package:moodtag/exceptions/unknown_error.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/helpers.dart';
@@ -18,6 +20,7 @@ const accessTokenSubroute = '/api/token';
 const spotifyApiBaseUrl = 'api.spotify.com';
 const topArtistsSubroute = '/v1/me/top/artists';
 const followedArtistsSubroute = '/v1/me/following';
+const startPlaybackSubroute = '/v1/me/player/play';
 
 const clientId = 'c6f54e34aabb42a9b8add087c8642857';
 const redirectUri = 'http://localhost:8888/callback';
@@ -28,7 +31,7 @@ String? codeVerifier;
 
 Uri getSpotifyAuthUri() {
   var state = getRandomString(16);
-  var scope = 'user-follow-read user-top-read user-library-read';
+  var scope = 'user-follow-read user-top-read user-library-read user-modify-playback-state';
 
   final queryParameters = {
     'response_type': 'code',
@@ -171,6 +174,23 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
   }
 
   return UniqueNamedEntitySet<ImportedArtist>.from(topArtists);
+}
+
+void playArtist(String accessToken, Artist artist) async {
+  if (artist.spotifyId == null) {
+    throw InternalException('The artists $artist has no Spotify ID.');
+  }
+
+  final queryParameters = {
+    'context_uri': 'spotify:artist:${artist.spotifyId!}',
+  };
+
+  final uri = Uri.https(spotifyApiBaseUrl, startPlaybackSubroute, queryParameters);
+  final response = await http.put(uri, headers: _getHeaderWithAccessToken(accessToken));
+
+  if (!isHttpRequestSuccessful(response)) {
+    throw ExternalServiceQueryException(_getRequestErrorMessage(response));
+  }
 }
 
 String _getRequestErrorMessage(Response response) {
