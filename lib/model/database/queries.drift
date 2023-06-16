@@ -23,6 +23,6 @@ CREATE TABLE last_fm_accounts (
     artist_count INT NULL,
     track_count INT NULL,
     album_count INT NULL,
-    last_data_update TIMESTAMP,
+    last_account_update TIMESTAMP,
     last_top_artists_update TIMESTAMP
 );

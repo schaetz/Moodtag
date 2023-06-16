@@ -26,19 +26,16 @@ Future<LastFmAccount> getUserInfo(String username) async {
     return _extractLastFmAccountFromUserInfoResults(responseBodyJSON);
   } else {
     if (response.statusCode == 404) {
-      return Future.error(
-          ExternalServiceQueryException('There is no Last.fm user with the name "$username".'));
+      return Future.error(ExternalServiceQueryException('There is no Last.fm user with the name "$username".'));
     } else {
-      return Future.error(
-          ExternalServiceQueryException('The Last.fm service could not be reached.'));
+      return Future.error(ExternalServiceQueryException('The Last.fm service could not be reached.'));
     }
   }
 }
 
 LastFmAccount _extractLastFmAccountFromUserInfoResults(dynamic responseBodyJSON) {
   if (!responseBodyJSON.containsKey('user')) {
-    throw ExternalServiceQueryException(
-        'The result obtained from the Last.fm API could not be processed.');
+    throw ExternalServiceQueryException('The result obtained from the Last.fm API could not be processed.');
   }
 
   final userJSON = responseBodyJSON['user'];
@@ -49,7 +46,7 @@ LastFmAccount _extractLastFmAccountFromUserInfoResults(dynamic responseBodyJSON)
       artistCount: _parseNumberFromJson(userJSON, 'artist_count'),
       trackCount: _parseNumberFromJson(userJSON, 'track_count'),
       albumCount: _parseNumberFromJson(userJSON, 'album_count'),
-      lastDataUpdate: DateTime.now().millisecondsSinceEpoch.toDouble());
+      lastAccountUpdate: DateTime.now().millisecondsSinceEpoch.toDouble());
 }
 
 int? _parseNumberFromJson(dynamic userJSON, String attribute) {
