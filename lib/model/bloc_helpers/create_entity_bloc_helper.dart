@@ -87,20 +87,21 @@ class CreateEntityBlocHelper {
     return Future.value(null);
   }
 
-  Future<UserReadableException?> handleCreateOrUpdateUserPropertyEvent(
-      String key, String? value, Repository repository) async {
-    final createOrUpdatePropResponse = await repository.createOrUpdateUserProperty(key, value);
-    if (createOrUpdatePropResponse.didFail()) {
-      return createOrUpdatePropResponse.getUserFeedbackException();
+  Future<UserReadableException?> handleCreateOrUpdateLastFmAccountEvent(
+      LastFmAccount lastFmAccount, Repository repository) async {
+    final createOrUpdateResponse = await repository.createOrUpdateLastFmAccount(lastFmAccount);
+    if (createOrUpdateResponse.didFail()) {
+      return createOrUpdateResponse.getUserFeedbackException();
     }
 
     return Future.value(null);
   }
 
-  Future<UserReadableException?> handleRemoveUserPropertyEvent(String key, Repository repository) async {
-    final removePropResponse = await repository.deleteUserProperty(key);
-    if (removePropResponse.didFail()) {
-      return removePropResponse.getUserFeedbackException();
+  Future<UserReadableException?> handleRemoveLastFmAccount(Repository repository) async {
+    final removeResponse = await repository.removeLastFmAccount();
+
+    if (removeResponse.didFail()) {
+      return removeResponse.getUserFeedbackException();
     }
 
     return Future.value(null);

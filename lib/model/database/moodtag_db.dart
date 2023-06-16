@@ -100,14 +100,14 @@ class MoodtagDB extends _$MoodtagDB {
     );
   }
 
-  // GET UserProperty
+  // GET LastFmAccount
 
-  Stream<UserProperty?> getUserProperty(String propertyKey) {
-    return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).watchSingleOrNull();
+  Stream<LastFmAccount?> getLastFmAccount() {
+    return (select(lastFmAccounts)).watchSingleOrNull();
   }
 
-  Future<UserProperty?> getUserPropertyOnce(String propertyKey) {
-    return (select(userProperties)..where((t) => t.propKey.equals(propertyKey))).getSingleOrNull();
+  Future<LastFmAccount?> getLastFmAccountOnce() {
+    return (select(lastFmAccounts)).getSingleOrNull();
   }
 
   //
@@ -125,8 +125,8 @@ class MoodtagDB extends _$MoodtagDB {
     return into(assignedTags).insert(artistTagPair);
   }
 
-  Future<int> createOrUpdateUserProperty(UserPropertiesCompanion userPropertyPair) {
-    return into(userProperties).insertOnConflictUpdate(userPropertyPair);
+  Future<int> createOrUpdateLastFmAccount(LastFmAccount lastFmAccount) {
+    return into(lastFmAccounts).insertOnConflictUpdate(lastFmAccount);
   }
 
   //
@@ -156,6 +156,10 @@ class MoodtagDB extends _$MoodtagDB {
 
   Future deleteAllTags() {
     return delete(tags).go();
+  }
+
+  Future<int> deleteAllLastFmAccounts() {
+    return delete(lastFmAccounts).go();
   }
 }
 

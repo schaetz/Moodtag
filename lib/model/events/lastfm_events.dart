@@ -1,3 +1,5 @@
+import 'package:moodtag/model/database/moodtag_db.dart';
+
 import 'library_events.dart';
 
 abstract class LastFmEvent extends LibraryEvent {
@@ -5,13 +7,13 @@ abstract class LastFmEvent extends LibraryEvent {
 }
 
 class LastFmAccountUpdated extends LastFmEvent {
-  final String? accountName;
+  final LastFmAccount? lastFmAccount;
   final Object? error;
 
-  const LastFmAccountUpdated({this.accountName, this.error});
+  const LastFmAccountUpdated({this.lastFmAccount, this.error});
 
   @override
-  List<Object?> get props => [accountName, error];
+  List<Object?> get props => [lastFmAccount, error];
 }
 
 class AddLastFmAccount extends LastFmEvent {

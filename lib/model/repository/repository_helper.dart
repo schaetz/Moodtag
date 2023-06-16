@@ -45,6 +45,8 @@ class RepositoryHelper {
       return _db.getArtistByIdOnce(id) as Future<E?>;
     } else if (E == Tag) {
       return _db.getTagByIdOnce(id) as Future<E?>;
+    } else if (E == LastFmAccount) {
+      return _db.getLastFmAccountOnce() as Future<E?>;
     } else {
       return Future.error(
           new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString()));

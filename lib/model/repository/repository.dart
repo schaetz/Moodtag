@@ -104,23 +104,25 @@ class Repository {
   }
 
   //
-  // User properties
+  // Last.fm accounts
   //
-  Stream<String?> getUserProperty(String propertyKey) {
-    return db.getUserProperty(propertyKey).map((userProperty) => userProperty?.propValue ?? null);
+  Stream<LastFmAccount?> getLastFmAccount() {
+    return db.getLastFmAccount();
   }
 
-  Future<String?> getUserPropertyOnce(String propertyKey) {
-    return db.getUserPropertyOnce(propertyKey).then((userProperty) => userProperty?.propValue ?? null);
+  Future<LastFmAccount?> getLastFmAccountOnce() {
+    return db.getLastFmAccountOnce();
   }
 
-  Future<DbRequestResponse> createOrUpdateUserProperty(String propertyKey, String? propertyValue) {
-    return helper.wrapExceptionsAndReturnResponse(db.createOrUpdateUserProperty(
-        UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(propertyValue))));
+  Future<DbRequestResponse<LastFmAccount>> createOrUpdateLastFmAccount(LastFmAccount lastFmAccount) async {
+    await db.deleteAllLastFmAccounts();
+    Future<int> createAccountFuture = db.createOrUpdateLastFmAccount(lastFmAccount);
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<LastFmAccount>(
+        createAccountFuture, lastFmAccount.accountName);
   }
 
-  Future<DbRequestResponse> deleteUserProperty(String propertyKey) {
-    return helper.wrapExceptionsAndReturnResponse(
-        db.createOrUpdateUserProperty(UserPropertiesCompanion.insert(propKey: propertyKey, propValue: Value(null))));
+  Future removeLastFmAccount() {
+    Future<int> deleteAccountFuture = db.deleteAllLastFmAccounts();
+    return helper.wrapExceptionsAndReturnResponse(deleteAccountFuture);
   }
 }

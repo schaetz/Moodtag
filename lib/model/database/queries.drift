@@ -2,7 +2,7 @@ CREATE TABLE artists (
     id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL UNIQUE,
     ordering_name VARCHAR(255) NOT NULL,
-    spotify_id VARCHAR(255) NULL,
+    spotify_id VARCHAR(255) NULL
 );
 
 CREATE TABLE tags (
@@ -16,7 +16,13 @@ CREATE TABLE assigned_tags (
     PRIMARY KEY (artist, tag)
 );
 
-CREATE TABLE user_properties (
-    prop_key VARCHAR(255) NOT NULL PRIMARY KEY,
-    prop_value VARCHAR(512)
-) AS UserProperty;
+CREATE TABLE last_fm_accounts (
+    account_name VARCHAR(255) NOT NULL PRIMARY KEY,
+    real_name VARCHAR(255) NULL,
+    play_count INT NULL,
+    artist_count INT NULL,
+    track_count INT NULL,
+    album_count INT NULL,
+    last_data_update TIMESTAMP,
+    last_top_artists_update TIMESTAMP
+);

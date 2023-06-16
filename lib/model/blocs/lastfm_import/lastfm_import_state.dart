@@ -1,20 +1,21 @@
 import 'package:equatable/equatable.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 
 class LastFmImportState extends Equatable {
-  final String? accountName;
-  final LoadingStatus accountNameLoadingStatus;
+  final LastFmAccount? lastFmAccount;
+  final LoadingStatus accountLoadingStatus;
 
-  const LastFmImportState({this.accountName, this.accountNameLoadingStatus = LoadingStatus.initial});
+  const LastFmImportState({this.lastFmAccount, this.accountLoadingStatus = LoadingStatus.initial});
 
   @override
-  List<Object?> get props => [accountName, accountNameLoadingStatus];
+  List<Object?> get props => [lastFmAccount, accountLoadingStatus];
 
   LastFmImportState copyWith(
-      {String? accountName, LoadingStatus? accountNameLoadingStatus, bool updateAccountName = false}) {
+      {LastFmAccount? lastFmAccount, LoadingStatus? accountNameLoadingStatus, bool removeAccount = false}) {
+    // For the account, the state may be overwritten by null
     return LastFmImportState(
-        accountName:
-            updateAccountName ? accountName : this.accountName, // For accountName, the state may be overwritten by null
-        accountNameLoadingStatus: accountNameLoadingStatus ?? this.accountNameLoadingStatus);
+        lastFmAccount: removeAccount ? null : lastFmAccount ?? this.lastFmAccount,
+        accountLoadingStatus: accountNameLoadingStatus ?? this.accountLoadingStatus);
   }
 }

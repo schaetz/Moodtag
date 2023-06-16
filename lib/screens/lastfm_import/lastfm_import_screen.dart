@@ -21,11 +21,11 @@ class LastfmImportScreen extends StatelessWidget {
           child: Column(
             children: [
               BlocBuilder<LastFmImportBloc, LastFmImportState>(
-                  buildWhen: (previous, current) => current.accountNameLoadingStatus == LoadingStatus.success,
+                  buildWhen: (previous, current) => current.accountLoadingStatus == LoadingStatus.success,
                   builder: (context, state) {
                     return ExternalAccountSelector(
                       serviceName: serviceName,
-                      accountName: state.accountName,
+                      accountName: state.lastFmAccount?.accountName,
                       onAddAccountClick: () => _openSetAccountNameDialog(context, bloc),
                       onRemoveAccountClick: () => bloc.add(RemoveLastFmAccount()),
                       onAddAccountError: (e) => _handleAddAccountError(e, bloc),
