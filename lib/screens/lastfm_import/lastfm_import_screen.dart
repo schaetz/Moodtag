@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/external_account_selector.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
@@ -8,6 +7,7 @@ import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/events/lastfm_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/screens/lastfm_import/last_fm_account_selector.dart';
 
 class LastfmImportScreen extends StatelessWidget {
   final String serviceName = 'Last.fm';
@@ -23,18 +23,19 @@ class LastfmImportScreen extends StatelessWidget {
               BlocBuilder<LastFmImportBloc, LastFmImportState>(
                   buildWhen: (previous, current) => current.accountLoadingStatus == LoadingStatus.success,
                   builder: (context, state) {
-                    return ExternalAccountSelector(
-                      serviceName: serviceName,
-                      accountName: state.lastFmAccount?.accountName,
-                      artistCount: state.lastFmAccount?.artistCount,
-                      playCount: state.lastFmAccount?.playCount,
-                      lastAccountUpdate: _getDateTimeFromTimestamp(state.lastFmAccount?.lastAccountUpdate),
-                      lastTopArtistsUpdate: _getDateTimeFromTimestamp(state.lastFmAccount?.lastTopArtistsUpdate),
-                      onAddAccountClick: () => _openSetAccountNameDialog(context, bloc),
-                      onRemoveAccountClick: () => bloc.add(RemoveLastFmAccount()),
-                      onAddAccountError: (e) => _handleAddAccountError(e, bloc),
-                      onRemoveAccountError: (e) => _handleRemoveAccountError(e, bloc),
-                    );
+                    return LastFmAccountSelector(
+                        serviceName: serviceName,
+                        accountName: state.lastFmAccount?.accountName,
+                        artistCount: state.lastFmAccount?.artistCount,
+                        playCount: state.lastFmAccount?.playCount,
+                        lastAccountUpdate: _getDateTimeFromTimestamp(state.lastFmAccount?.lastAccountUpdate),
+                        lastTopArtistsUpdate: _getDateTimeFromTimestamp(state.lastFmAccount?.lastTopArtistsUpdate),
+                        onAddAccountClick: () => _openSetAccountNameDialog(context, bloc),
+                        onRemoveAccountClick: () => bloc.add(RemoveLastFmAccount()),
+                        onUpdateAccountInfoClick: () => bloc.add(UpdateLastFmAccountInfo()),
+                        onAddAccountError: (e) => _handleAddAccountError(e, bloc),
+                        onRemoveAccountError: (e) => _handleRemoveAccountError(e, bloc),
+                        onUpdateAccountInfoError: (e) => _handleUpdateAccountInfoError(e, bloc));
                   }),
             ],
           ),
@@ -57,10 +58,17 @@ class LastfmImportScreen extends StatelessWidget {
   }
 
   void _handleAddAccountError(Exception e, LastFmImportBloc bloc) {
-    bloc.errorStreamController.add(UnknownError("Something went wrong trying to set the ${serviceName} account."));
+    bloc.errorStreamController
+        .add(UnknownError("Something went wrong trying to set the ${serviceName} account.", cause: e));
   }
 
   void _handleRemoveAccountError(Exception e, LastFmImportBloc bloc) {
-    bloc.errorStreamController.add(UnknownError("Something went wrong trying to remove the ${serviceName} account."));
+    bloc.errorStreamController
+        .add(UnknownError("Something went wrong trying to remove the ${serviceName} account.", cause: e));
+  }
+
+  void _handleUpdateAccountInfoError(Exception e, LastFmImportBloc bloc) {
+    bloc.errorStreamController
+        .add(UnknownError("Something went wrong trying to update the ${serviceName} account info.", cause: e));
   }
 }

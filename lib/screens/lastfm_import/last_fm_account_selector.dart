@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:moodtag/exceptions/internal_exception.dart';
+import 'package:moodtag/exceptions/internal/internal_exception.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
-class ExternalAccountSelector extends StatelessWidget {
+class LastFmAccountSelector extends StatelessWidget {
   late final Repository bloc;
 
   final DateFormat formatter = DateFormat('MM-dd-yyyy');
@@ -16,10 +16,12 @@ class ExternalAccountSelector extends StatelessWidget {
   final DateTime? lastTopArtistsUpdate;
   final Function onAddAccountClick;
   final Function onRemoveAccountClick;
+  final Function onUpdateAccountInfoClick;
   final Function(Exception) onAddAccountError;
   final Function(Exception) onRemoveAccountError;
+  final Function(Exception) onUpdateAccountInfoError;
 
-  ExternalAccountSelector({
+  LastFmAccountSelector({
     Key? key,
     required this.serviceName,
     required this.accountName,
@@ -29,9 +31,13 @@ class ExternalAccountSelector extends StatelessWidget {
     this.lastTopArtistsUpdate,
     required this.onAddAccountClick,
     required this.onRemoveAccountClick,
+    required this.onUpdateAccountInfoClick,
     required this.onAddAccountError,
     required this.onRemoveAccountError,
+    required this.onUpdateAccountInfoError,
   }) : super(key: key);
+
+  bool get hasAccountName => accountName != null;
 
   @override
   Widget build(BuildContext context) {
@@ -41,21 +47,19 @@ class ExternalAccountSelector extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.all(32.0),
       child: Column(children: [
-        accountName == null
-            ? Text('No associated ${serviceName} account', style: TextStyle(fontStyle: FontStyle.italic))
-            : Text(accountName!, style: TextStyle(fontWeight: FontWeight.bold)),
+        hasAccountName
+            ? Text(accountName!, style: TextStyle(fontWeight: FontWeight.bold))
+            : Text('No associated ${serviceName} account', style: TextStyle(fontStyle: FontStyle.italic)),
         SizedBox(height: 16),
-        if (artistCount != null) Text('Artists: ${artistCount!.toString()}'),
-        if (playCount != null) Text('Play count: ${playCount!.toString()}'),
-        if (lastAccountUpdate != null) Text('Last account update: ${formatter.format(lastAccountUpdate!)}'),
-        if (lastTopArtistsUpdate != null) Text('Last top artists update: ${formatter.format(lastTopArtistsUpdate!)}'),
-        _accountChangeButton(accountName != null),
+        ..._accountInfo(),
+        _accountChangeButton(),
+        if (hasAccountName) _updateAccountInfoButton(),
       ]),
     );
   }
 
-  Widget _accountChangeButton(bool hasAccountName) {
-    if (!hasAccountName) {
+  Widget _accountChangeButton() {
+    if (hasAccountName) {
       return ElevatedButton(
         onPressed: () => _addAccount(),
         child: Text('Add ${serviceName} account'),
@@ -66,6 +70,20 @@ class ExternalAccountSelector extends StatelessWidget {
         child: Text('Remove ${serviceName} account'),
       );
     }
+  }
+
+  List<Widget> _accountInfo() {
+    final List<Widget> accountInfoWidgets = [
+      if (artistCount != null) Text('Artists: ${artistCount!.toString()}'),
+      if (playCount != null) Text('Play count: ${playCount!.toString()}'),
+      if (lastAccountUpdate != null) Text('Last account update: ${formatter.format(lastAccountUpdate!)}'),
+      if (lastTopArtistsUpdate != null) Text('Last top artists update: ${formatter.format(lastTopArtistsUpdate!)}')
+    ];
+    return accountInfoWidgets;
+  }
+
+  Widget _updateAccountInfoButton() {
+    return ElevatedButton(onPressed: () => _updateAccountInfo(), child: Text('Update account info'));
   }
 
   void _addAccount() {
@@ -81,6 +99,15 @@ class ExternalAccountSelector extends StatelessWidget {
       onRemoveAccountClick();
     } catch (error) {
       onRemoveAccountError(
+          InternalException('Something went wrong trying to remove the associated ${serviceName} account.'));
+    }
+  }
+
+  void _updateAccountInfo() {
+    try {
+      onUpdateAccountInfoClick();
+    } catch (error) {
+      onUpdateAccountInfoError(
           InternalException('Something went wrong trying to remove the associated ${serviceName} account.'));
     }
   }
