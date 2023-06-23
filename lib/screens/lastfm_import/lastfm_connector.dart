@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:moodtag/exceptions/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/utils/helpers.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/exceptions/name_already_taken_exception.dart';
+import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';

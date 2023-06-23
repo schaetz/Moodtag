@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/exceptions/internal_exception.dart';
+import 'package:moodtag/exceptions/internal/internal_exception.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:provider/provider.dart';

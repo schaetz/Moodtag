@@ -1,8 +1,8 @@
 import 'package:drift/native.dart';
-import 'package:moodtag/exceptions/database_error.dart';
-import 'package:moodtag/exceptions/name_already_taken_exception.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
-import 'package:moodtag/exceptions/user_readable_exception.dart';
+import 'package:moodtag/exceptions/user_readable/database_error.dart';
+import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
 
 class DbRequestResponse<E> {
   late final E? changedEntity;
@@ -40,11 +40,11 @@ class DbRequestResponse<E> {
         final message = alreadyExistingName != null
             ? 'There is already an entity with the name $alreadyExistingName.'
             : 'There is already an entity with the same name.';
-        return new NameAlreadyTakenException(message);
+        return new NameAlreadyTakenException(message, cause: exception);
       }
-      return new DatabaseError('A database error occurred.');
+      return new DatabaseError('A database error occurred.', cause: exception);
     } else {
-      return new UnknownError('An unknown error occurred.');
+      return new UnknownError('An unknown error occurred.', cause: exception);
     }
   }
 

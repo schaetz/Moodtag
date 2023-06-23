@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/exceptions/database_error.dart';
-import 'package:moodtag/exceptions/external_service_query_exception.dart';
-import 'package:moodtag/exceptions/user_readable_exception.dart';
+import 'package:moodtag/exceptions/user_readable/database_error.dart';
+import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
@@ -42,13 +42,10 @@ class LastFmImportBloc extends Bloc<LibraryEvent, LastFmImportState> with ErrorS
     return super.close();
   }
 
-  void _mapLastFmAccountUpdatedEventToState(
-      LastFmAccountUpdated event, Emitter<LastFmImportState> emit) async {
+  void _mapLastFmAccountUpdatedEventToState(LastFmAccountUpdated event, Emitter<LastFmImportState> emit) async {
     if (event.error != null) {
-      errorStreamController
-          .add(DatabaseError("The Last.fm account name could not be retrieved from the database."));
-      emit(state.copyWith(
-          lastFmAccount: null, accountNameLoadingStatus: LoadingStatus.error, removeAccount: true));
+      errorStreamController.add(DatabaseError("The Last.fm account name could not be retrieved from the database."));
+      emit(state.copyWith(lastFmAccount: null, accountNameLoadingStatus: LoadingStatus.error, removeAccount: true));
     } else {
       emit(state.copyWith(
           lastFmAccount: event.lastFmAccount,
@@ -57,12 +54,11 @@ class LastFmImportBloc extends Bloc<LibraryEvent, LastFmImportState> with ErrorS
     }
   }
 
-  void _mapAddLastFmAccountEventToState(
-      AddLastFmAccount event, Emitter<LastFmImportState> emit) async {
+  void _mapAddLastFmAccountEventToState(AddLastFmAccount event, Emitter<LastFmImportState> emit) async {
     try {
       final chosenLastFmAccount = await LastFmConnector.getUserInfo(event.accountName);
-      final exception = await _createEntityBlocHelper.handleCreateOrUpdateLastFmAccountEvent(
-          chosenLastFmAccount, _repository);
+      final exception =
+          await _createEntityBlocHelper.handleCreateOrUpdateLastFmAccountEvent(chosenLastFmAccount, _repository);
       if (exception != null) {
         errorStreamController.add(exception);
       } else {
@@ -71,13 +67,12 @@ class LastFmImportBloc extends Bloc<LibraryEvent, LastFmImportState> with ErrorS
     } on UserReadableException catch (e) {
       errorStreamController.add(e);
     } catch (e) {
-      errorStreamController.add(ExternalServiceQueryException(
-          'The request to the Last.fm API failed for an unknown reason.'));
+      errorStreamController
+          .add(ExternalServiceQueryException('The request to the Last.fm API failed for an unknown reason.'));
     }
   }
 
-  void _mapRemoveLastFmAccountEventToState(
-      RemoveLastFmAccount event, Emitter<LastFmImportState> emit) async {
+  void _mapRemoveLastFmAccountEventToState(RemoveLastFmAccount event, Emitter<LastFmImportState> emit) async {
     final exception = await _createEntityBlocHelper.handleRemoveLastFmAccount(_repository);
     if (exception != null) {
       errorStreamController.add(exception);

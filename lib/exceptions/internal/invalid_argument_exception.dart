@@ -1,4 +1,4 @@
-import 'package:moodtag/exceptions/internal_exception.dart';
+import 'package:moodtag/exceptions/internal/internal_exception.dart';
 
 class InvalidArgumentException implements InternalException {
   final String message;

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/exceptions/external_service_query_exception.dart';
-import 'package:moodtag/exceptions/name_already_taken_exception.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
-import 'package:moodtag/exceptions/user_readable_exception.dart';
+import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_bloc.dart';
 import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
@@ -101,7 +101,7 @@ class ArtistDetailsBloc extends AbstractEntityUserBloc<ArtistDetailsState> with 
     try {
       playArtist(accessToken.token, event.artistData.artist);
     } catch (e) {
-      errorStreamController.add(UnknownError('Could not start playback.'));
+      errorStreamController.add(UnknownError('Could not start playback.', cause: e));
     }
   }
 }

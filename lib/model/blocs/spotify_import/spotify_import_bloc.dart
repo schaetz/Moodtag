@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/exceptions/external_service_query_exception.dart';
-import 'package:moodtag/exceptions/invalid_user_input_exception.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
-import 'package:moodtag/exceptions/user_info.dart';
+import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/exceptions/user_readable/user_info.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart';
@@ -93,8 +93,8 @@ class SpotifyImportBloc extends Bloc<SpotifyEvent, SpotifyImportState> with Erro
       errorStreamController.add(e);
     } catch (e) {
       print("Getting available artists from Spotify failed: $e");
-      errorStreamController
-          .add(ExternalServiceQueryException("Internal error - could not retrieve artists from the Spotify API."));
+      errorStreamController.add(
+          ExternalServiceQueryException("Internal error - could not retrieve artists from the Spotify API.", cause: e));
     }
   }
 

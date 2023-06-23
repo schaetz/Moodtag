@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/exceptions/external_service_query_exception.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
+import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_state.dart';
@@ -61,7 +61,7 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
           newAccessToken = await _getAccessTokenWithoutStateUpdate(authorizationCode: authorizationCode);
         } catch (e) {
           errorStreamController
-              .add(ExternalServiceQueryException('Could not retrieve an access token for Spotify API.'));
+              .add(ExternalServiceQueryException('Could not retrieve an access token for Spotify API.', cause: e));
         }
 
         if (newAccessToken != null && newAccessToken != state.spotifyAccessToken) {
@@ -114,7 +114,7 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
         return await connector.getAccessToken(usedAuthCode);
       }
     } catch (e) {
-      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.');
+      throw ExternalServiceQueryException('The authorization to the Spotify Web API failed.', cause: e);
     }
   }
 }

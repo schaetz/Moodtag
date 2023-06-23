@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:moodtag/exceptions/external_service_query_exception.dart';
-import 'package:moodtag/exceptions/internal_exception.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
+import 'package:moodtag/exceptions/internal/internal_exception.dart';
+import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
@@ -144,7 +144,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
     followedArtists = Set<ImportedArtist>.from(responseBodyStructure['artists']['items']
         ?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']), item['id'])));
   } catch (error) {
-    throw ExternalServiceQueryException('The Spotify data has an unknown structure.');
+    throw ExternalServiceQueryException('The Spotify data has an unknown structure.', cause: error);
   }
 
   return UniqueNamedEntitySet<ImportedArtist>.from(followedArtists);
@@ -170,7 +170,7 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
     topArtists = Set<ImportedArtist>.from(
         responseBodyMap['items']?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']), item['id'])));
   } catch (error) {
-    throw ExternalServiceQueryException('The Spotify data has an unknown structure.');
+    throw ExternalServiceQueryException('The Spotify data has an unknown structure.', cause: error);
   }
 
   return UniqueNamedEntitySet<ImportedArtist>.from(topArtists);

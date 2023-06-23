@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/external_account_selector.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/events/lastfm_events.dart';

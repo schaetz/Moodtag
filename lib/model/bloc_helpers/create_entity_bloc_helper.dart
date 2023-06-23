@@ -1,6 +1,6 @@
 import 'package:moodtag/exceptions/db_request_response.dart';
-import 'package:moodtag/exceptions/unknown_error.dart';
-import 'package:moodtag/exceptions/user_readable_exception.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';

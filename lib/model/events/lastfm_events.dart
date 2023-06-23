@@ -31,3 +31,10 @@ class RemoveLastFmAccount extends LastFmEvent {
   @override
   List<Object?> get props => [];
 }
+
+class UpdateLastFmAccountInfo extends LastFmEvent {
+  const UpdateLastFmAccountInfo();
+
+  @override
+  List<Object?> get props => [];
+}
