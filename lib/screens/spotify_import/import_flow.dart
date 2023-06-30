@@ -7,6 +7,7 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/import_selection_list_screen.dart';
+import 'package:moodtag/screens/spotify_import/import_flow_screen_wrapper.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_confirmation_screen.dart';
 import 'package:moodtag/structs/imported_artist.dart';
@@ -17,6 +18,8 @@ import 'package:provider/provider.dart';
 import 'import_flow_state.dart';
 
 class ImportFlow extends StatelessWidget {
+  static const importSteps = 4;
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
@@ -37,15 +40,24 @@ class ImportFlow extends StatelessWidget {
 
   List<Page> _onGenerateImportFlowPages(ImportFlowState importFlowState, List<Page> pages, SpotifyImportBloc bloc) {
     return [
-      MaterialPage<void>(child: SpotifyImportConfigScreen(), name: Routes.spotifyImport),
+      _createMaterialPageForImportStep(1, screen: SpotifyImportConfigScreen(), route: Routes.spotifyImport),
       if (importFlowState.step.index >= SpotifyImportFlowStep.artistsSelection.index)
-        MaterialPage<void>(child: _getArtistsSelectionScreen(bloc)),
+        _createMaterialPageForImportStep(2, screen: _getArtistsSelectionScreen(bloc)),
       if (importFlowState.step.index >= SpotifyImportFlowStep.genreTagsSelection.index &&
           importFlowState.doShowGenreImportScreen)
-        MaterialPage<void>(child: _getGenreSelectionScreen(bloc)),
+        _createMaterialPageForImportStep(3, screen: _getGenreSelectionScreen(bloc)),
       if (importFlowState.step.index >= SpotifyImportFlowStep.confirmation.index)
-        MaterialPage<void>(child: SpotifyImportConfirmationScreen(), name: Routes.spotifyImport)
+        _createMaterialPageForImportStep(4, screen: SpotifyImportConfirmationScreen(), route: Routes.spotifyImport)
     ];
+  }
+
+  Page _createMaterialPageForImportStep(int stepNumber, {required Widget screen, String? route}) {
+    return MaterialPage<void>(
+        child: ImportFlowScreenWrapper(
+          childScreen: screen,
+          importProgress: stepNumber / importSteps,
+        ),
+        name: route);
   }
 
   void _onBackButtonPressed(BuildContext context, SpotifyImportBloc bloc) {
