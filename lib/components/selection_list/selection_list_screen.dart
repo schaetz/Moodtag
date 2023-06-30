@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/structs/named_entity.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
-import '../components/mt_app_bar.dart';
-
 // A generic screen that displays a list of named entities with checkboxes
-// and has a FloatingActionButton for carrying out an action on the entities
+// and has a FloatingActionButton for carrying out an action on the entities.
+// The default rowBuilder function can be overridden to customize the layout
+// of the CheckboxListTiles.
 class SelectionListScreen<E extends NamedEntity> extends StatefulWidget {
   final UniqueNamedEntitySet<E> namedEntitySet;
+  final PreferredSizeWidget appBar;
+  final Function(E, bool, Function(bool?))? rowBuilder; // Properties: entity, isBoxSelected, onListTileChanged
   final String mainButtonLabel;
   final Function(BuildContext, List<E>, List<bool>, int) onMainButtonPressed;
 
   SelectionListScreen({
     required this.namedEntitySet,
+    required this.appBar,
+    this.rowBuilder,
     required this.mainButtonLabel,
     required this.onMainButtonPressed,
   });
@@ -38,14 +42,17 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MtAppBar(context),
+      appBar: widget.appBar,
       body: ListView.separated(
         separatorBuilder: (context, _) => Divider(),
         padding: EdgeInsets.all(16.0),
         itemCount: _sortedEntities.length,
         itemBuilder: (context, i) {
-          return buildRow(context,
-              entity: _sortedEntities[i], isChecked: _isBoxSelected[i], onChanged: _onListTileChanged(i));
+          if (widget.rowBuilder != null) {
+            return widget.rowBuilder!(
+                _sortedEntities[i], _isBoxSelected[i], (newValue) => _onListTileChanged(newValue, i));
+          }
+          return _buildDefaultRow(i, entity: _sortedEntities[i], isChecked: _isBoxSelected[i]);
         },
       ),
       floatingActionButton: Container(
@@ -75,6 +82,17 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
     );
   }
 
+  Widget _buildDefaultRow(int index, {required E entity, required bool isChecked}) {
+    return CheckboxListTile(
+        title: Text(
+          entity.name,
+          style: listEntryStyle,
+        ),
+        value: isChecked,
+        controlAffinity: ListTileControlAffinity.leading,
+        onChanged: (newValue) => _onListTileChanged(newValue, index));
+  }
+
   void _setBoxSelections(int entityCount, bool value) {
     setState(() {
       _isBoxSelected = List.filled(entityCount, value);
@@ -84,31 +102,17 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
 
   bool _isSelectionValid() => _selectedBoxesCount > 0;
 
-  Function(bool?) _onListTileChanged(int index) {
-    return (bool? newValue) {
-      setState(() {
-        if (newValue != null) {
-          _isBoxSelected[index] = newValue;
-          if (newValue == true) {
-            _selectedBoxesCount++;
-          } else {
-            _selectedBoxesCount--;
-          }
+  void _onListTileChanged(bool? newValue, int index) {
+    setState(() {
+      if (newValue != null) {
+        _isBoxSelected[index] = newValue;
+        if (newValue == true) {
+          _selectedBoxesCount++;
+        } else {
+          _selectedBoxesCount--;
         }
-      });
-    };
-  }
-
-  Widget buildRow(BuildContext context,
-      {required E entity, required bool isChecked, required Function(bool?) onChanged}) {
-    return CheckboxListTile(
-        title: Text(
-          entity.name,
-          style: listEntryStyle,
-        ),
-        value: isChecked,
-        controlAffinity: ListTileControlAffinity.leading,
-        onChanged: onChanged);
+      }
+    });
   }
 
   Widget _buildFloatingSelectButton(BuildContext context, int entityCount) {

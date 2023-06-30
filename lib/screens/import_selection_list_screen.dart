@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/screens/spotify_import/spotify_selection_list_screen.dart';
+import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/selection_list/highlight_selection_list_screen.dart';
 import 'package:moodtag/structs/import_entity.dart';
+import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
-// Wrapper for the SelectionListScreen that allows handling imports of ImportEntity´s
+// Wrapper for the HighlightSelectionListScreen that allows handling imports of ImportEntity´s
 class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget {
   final UniqueNamedEntitySet<E> namedEntitySet;
   final String confirmationButtonLabel;
@@ -22,11 +24,14 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
 
   @override
   Widget build(BuildContext context) {
-    // TODO This screen should be independent of Spotify and work for other imports, too
-    return SpotifySelectionListScreen<E>(
-        namedEntitySet: namedEntitySet,
-        mainButtonLabel: confirmationButtonLabel,
-        onMainButtonPressed: _onConfirmButtonPressed);
+    return HighlightSelectionListScreen(
+      namedEntitySet: namedEntitySet,
+      appBar: MtAppBar(context),
+      mainButtonLabel: confirmationButtonLabel,
+      onMainButtonPressed: _onConfirmButtonPressed,
+      doHighlightEntity: (E entity) => entity.alreadyExists,
+      doDisableEntity: (E entity) => entity.alreadyExists && E == _typeOf<ImportedGenre>(),
+    );
   }
 
   void _onConfirmButtonPressed(
@@ -44,4 +49,6 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
     }
     return selectedEntities;
   }
+
+  Type _typeOf<T>() => T;
 }
