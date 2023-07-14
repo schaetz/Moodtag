@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/structs/named_entity.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+
+import 'selection_list_config.dart';
 
 // A generic screen that displays a list of named entities with checkboxes
 // and has a FloatingActionButton for carrying out an action on the entities.
 // The default rowBuilder function can be overridden to customize the layout
 // of the CheckboxListTiles.
 class SelectionListScreen<E extends NamedEntity> extends StatefulWidget {
-  final UniqueNamedEntitySet<E> namedEntitySet;
-  final PreferredSizeWidget appBar;
-  final Function(E, bool, Function(bool?))? rowBuilder; // Properties: entity, isBoxSelected, onListTileChanged
-  final String mainButtonLabel;
-  final Function(BuildContext, List<E>, List<bool>, int) onMainButtonPressed;
+  final SelectionListConfig<E> config;
 
-  SelectionListScreen({
-    required this.namedEntitySet,
-    required this.appBar,
-    this.rowBuilder,
-    required this.mainButtonLabel,
-    required this.onMainButtonPressed,
-  });
+  SelectionListScreen(this.config);
 
   @override
   State<StatefulWidget> createState() => SelectionListScreenState<E>();
@@ -35,21 +26,21 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
   @override
   void initState() {
     super.initState();
-    _sortedEntities = widget.namedEntitySet.toSortedList() as List<E>;
+    _sortedEntities = widget.config.namedEntitySet.toSortedList() as List<E>;
     _setBoxSelections(_sortedEntities.length, true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: widget.appBar,
+      appBar: widget.config.appBar,
       body: ListView.separated(
         separatorBuilder: (context, _) => Divider(),
         padding: EdgeInsets.all(16.0),
         itemCount: _sortedEntities.length,
         itemBuilder: (context, i) {
-          if (widget.rowBuilder != null) {
-            return widget.rowBuilder!(
+          if (widget.config.rowBuilder != null) {
+            return widget.config.rowBuilder!(
                 _sortedEntities[i], _isBoxSelected[i], (newValue) => _onListTileChanged(newValue, i));
           }
           return _buildDefaultRow(i, entity: _sortedEntities[i], isChecked: _isBoxSelected[i]);
@@ -66,9 +57,9 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
             ),
             FloatingActionButton.extended(
               onPressed: () => _isSelectionValid()
-                  ? widget.onMainButtonPressed(context, _sortedEntities, _isBoxSelected, _selectedBoxesCount)
+                  ? widget.config.onMainButtonPressed(context, _sortedEntities, _isBoxSelected, _selectedBoxesCount)
                   : null,
-              label: Text(widget.mainButtonLabel),
+              label: Text(widget.config.mainButtonLabel),
               icon: const Icon(Icons.add_circle_outline),
               backgroundColor: _isSelectionValid()
                   ? Theme.of(context).colorScheme.secondary

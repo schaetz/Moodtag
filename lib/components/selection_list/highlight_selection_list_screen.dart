@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/components/selection_list/selection_list_config.dart';
 import 'package:moodtag/structs/named_entity.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 import 'selection_list_screen.dart';
 
@@ -11,30 +11,21 @@ class HighlightSelectionListScreen<E extends NamedEntity> extends StatelessWidge
   static const highlightEntityColor = Colors.indigo;
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  final UniqueNamedEntitySet<E> namedEntitySet;
-  final PreferredSizeWidget appBar;
-  final String mainButtonLabel;
-  final Function(BuildContext, List<E>, List<bool>, int) onMainButtonPressed;
+  late final SelectionListConfig<E> config;
   final Function(E) doHighlightEntity;
   final Function(E) doDisableEntity;
 
-  const HighlightSelectionListScreen(
+  HighlightSelectionListScreen(
       {super.key,
-      required this.namedEntitySet,
-      required this.appBar,
-      required this.mainButtonLabel,
-      required this.onMainButtonPressed,
+      required SelectionListConfig<E> config,
       required this.doHighlightEntity,
-      required this.doDisableEntity});
+      required this.doDisableEntity}) {
+    this.config = config.copyWith(rowBuilder: _buildRow);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SelectionListScreen(
-        namedEntitySet: namedEntitySet,
-        appBar: appBar,
-        rowBuilder: _buildRow,
-        mainButtonLabel: mainButtonLabel,
-        onMainButtonPressed: onMainButtonPressed);
+    return SelectionListScreen(config);
   }
 
   Widget _buildRow(E entity, bool isChecked, Function(bool?) _onListTileChanged) {
