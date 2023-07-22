@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/structs/named_entity.dart';
 
+import 'row_builder_strategy.dart';
 import 'selection_list_config.dart';
 
 // A generic screen that displays a list of named entities with checkboxes
@@ -9,16 +10,19 @@ import 'selection_list_config.dart';
 // of the CheckboxListTiles.
 class SelectionListScreen<E extends NamedEntity> extends StatefulWidget {
   final SelectionListConfig<E> config;
+  late final RowBuilderStrategy rowBuilderStrategy;
 
-  SelectionListScreen(this.config);
+  SelectionListScreen({required this.config, required this.rowBuilderStrategy});
+
+  SelectionListScreen.defaultStyle(this.config) {
+    this.rowBuilderStrategy = RowBuilderStrategy();
+  }
 
   @override
   State<StatefulWidget> createState() => SelectionListScreenState<E>();
 }
 
 class SelectionListScreenState<E extends NamedEntity> extends State<SelectionListScreen> {
-  static const listEntryStyle = TextStyle(fontSize: 18.0);
-
   late final List<E> _sortedEntities;
   List<bool> _isBoxSelected = [];
   int _selectedBoxesCount = 0;
@@ -38,13 +42,8 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
         separatorBuilder: (context, _) => Divider(),
         padding: EdgeInsets.all(16.0),
         itemCount: _sortedEntities.length,
-        itemBuilder: (context, i) {
-          if (widget.config.rowBuilder != null) {
-            return widget.config.rowBuilder!(
-                _sortedEntities[i], _isBoxSelected[i], (newValue) => _onListTileChanged(newValue, i));
-          }
-          return _buildDefaultRow(i, entity: _sortedEntities[i], isChecked: _isBoxSelected[i]);
-        },
+        itemBuilder: (context, i) => widget.rowBuilderStrategy.buildRow(i,
+            entity: _sortedEntities[i], isChecked: _isBoxSelected[i], onListTileChanged: _onListTileChanged),
       ),
       floatingActionButton: Container(
         child: Row(
@@ -71,17 +70,6 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
         ),
       ),
     );
-  }
-
-  Widget _buildDefaultRow(int index, {required E entity, required bool isChecked}) {
-    return CheckboxListTile(
-        title: Text(
-          entity.name,
-          style: listEntryStyle,
-        ),
-        value: isChecked,
-        controlAffinity: ListTileControlAffinity.leading,
-        onChanged: (newValue) => _onListTileChanged(newValue, index));
   }
 
   void _setBoxSelections(int entityCount, bool value) {
