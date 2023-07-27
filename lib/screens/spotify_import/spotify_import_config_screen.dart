@@ -5,7 +5,7 @@ import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
-import 'package:moodtag/model/events/spotify_events.dart';
+import 'package:moodtag/model/events/import_events.dart';
 
 import 'spotify_import_option.dart';
 
@@ -57,10 +57,10 @@ class SpotifyImportConfigScreen extends StatelessWidget {
   }
 
   void _onChangeSelection(Map<String, bool> newSelection, SpotifyImportBloc bloc) {
-    bloc.add(ChangeConfigForSpotifyImport(newSelection));
+    bloc.add(ChangeImportConfig(newSelection));
   }
 
   void _confirmImportConfiguration(SpotifyImportBloc bloc) async {
-    bloc.add(ConfirmConfigForSpotifyImport());
+    bloc.add(ConfirmImportConfig());
   }
 }

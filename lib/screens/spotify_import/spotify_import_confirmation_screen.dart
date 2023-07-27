@@ -5,7 +5,7 @@ import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_f
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
-import 'package:moodtag/model/events/spotify_events.dart';
+import 'package:moodtag/model/events/import_events.dart';
 
 class SpotifyImportConfirmationScreen extends StatelessWidget {
   // TODO Use common property with list screens?
@@ -62,7 +62,7 @@ class SpotifyImportConfirmationScreen extends StatelessWidget {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             if (bloc.state.selectedArtists != null && bloc.state.selectedGenres != null) {
-              bloc.add(CompleteSpotifyImport(bloc.state.selectedArtists!, bloc.state.selectedGenres!));
+              bloc.add(CompleteImport(bloc.state.selectedArtists!, bloc.state.selectedGenres!));
             } else {
               bloc.errorStreamController.add(UnknownError('Something went wrong.'));
             }

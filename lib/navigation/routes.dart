@@ -9,12 +9,13 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/screens/import_flow/import_flow.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_import_screen.dart';
 import 'package:moodtag/screens/library/artist_details_screen.dart';
 import 'package:moodtag/screens/library/artists_list_screen.dart';
 import 'package:moodtag/screens/library/tag_details_screen.dart';
 import 'package:moodtag/screens/library/tags_list_screen.dart';
-import 'package:moodtag/screens/spotify_import/import_flow.dart';
+import 'package:moodtag/screens/spotify_import/spotify_import_flow_page_generator_strategy.dart';
 import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 
 class Routes {
@@ -65,7 +66,7 @@ class Routes {
       spotifyAuth: (context) => SpotifyLoginWebview(),
       spotifyImport: (context) => BlocProvider(
           create: (_) => SpotifyImportBloc(context.read<Repository>(), context, context.read<SpotifyAuthBloc>()),
-          child: ImportFlow('Spotify Import')),
+          child: ImportFlow<SpotifyImportBloc>(SpotifyImportFlowPageGeneratorStrategy('Spotify Import', 4))),
     };
   }
 }

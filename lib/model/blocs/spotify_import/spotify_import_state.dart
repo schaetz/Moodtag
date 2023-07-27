@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
+import 'package:moodtag/model/blocs/abstract_import/abstract_import_state.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_option.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
-class SpotifyImportState extends Equatable {
+class SpotifyImportState extends Equatable implements AbstractImportState {
   final SpotifyImportFlowStep step;
   final Map<SpotifyImportOption, bool> configuration;
 
