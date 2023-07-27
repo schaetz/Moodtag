@@ -2,28 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/import_config_form.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 
-enum SpotifyImportOption { topArtists, followedArtists, artistGenres }
+import 'spotify_import_option.dart';
 
 class SpotifyImportConfigScreen extends StatelessWidget {
-  const SpotifyImportConfigScreen({Key? key}) : super(key: key);
+  final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
+
+  const SpotifyImportConfigScreen({Key? key, required this.scaffoldBodyWrapperFactory}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
     return Scaffold(
         appBar: MtAppBar(context),
-        body: Center(
-            child: ImportConfigForm(
+        body: scaffoldBodyWrapperFactory.create(
+            bodyWidget: Center(
+                child: ImportConfigForm(
           headlineCaption: 'Select what should be imported:',
           sendButtonCaption: 'Start Spotify Import',
           configItemsWithCaption: _getConfigItemsWithCaption(),
           initialConfig: _getConfigItemsWithInitialValues(bloc.state),
           onChangeSelection: (Map<String, bool> newSelection) => _onChangeSelection(newSelection, bloc),
-        )),
+        ))),
         floatingActionButton: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(
             builder: (context, state) => FloatingActionButton.extended(
                   onPressed: state.isConfigurationValid ? () => _confirmImportConfiguration(bloc) : null,

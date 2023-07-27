@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper.dart';
 
-class ImportFlowScreenWrapper extends StatelessWidget {
-  Widget childScreen;
-  double importProgress;
+class ImportFlowScreenWrapper extends ScaffoldBodyWrapper {
+  static const captionStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
 
-  ImportFlowScreenWrapper({required this.childScreen, required this.importProgress}) {
-    print(this.importProgress);
-  }
+  final Widget bodyWidget;
+  final double importProgress;
+  final String captionText;
+
+  ImportFlowScreenWrapper({required this.bodyWidget, required this.importProgress, required this.captionText})
+      : super(bodyWidget: bodyWidget);
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      LinearProgressIndicator(
-        value: importProgress,
-        minHeight: 50,
-        semanticsLabel: 'Linear progress indicator',
-      ),
-      Expanded(child: childScreen),
+      SizedBox(
+          height: 50,
+          child: Stack(
+            children: <Widget>[
+              SizedBox.expand(
+                child: LinearProgressIndicator(
+                  value: importProgress,
+                  minHeight: 50,
+                  semanticsLabel: 'Linear progress indicator',
+                ),
+              ),
+              Center(child: Text(captionText, style: captionStyle)),
+            ],
+          )),
+      Expanded(child: bodyWidget),
     ]);
   }
 }

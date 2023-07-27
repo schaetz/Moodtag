@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
@@ -13,13 +14,18 @@ class SpotifyImportConfirmationScreen extends StatelessWidget {
 
   final GlobalKey _scaffoldKey = GlobalKey();
 
+  final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
+
+  SpotifyImportConfirmationScreen({Key? key, required this.scaffoldBodyWrapperFactory}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
     return Scaffold(
         key: _scaffoldKey,
         appBar: MtAppBar(context),
-        body: Center(child: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
+        body: scaffoldBodyWrapperFactory.create(
+            bodyWidget: Center(child: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
           final entityFrequencies = _getEntityFrequencies(state);
           return Column(children: [
             Align(
@@ -52,7 +58,7 @@ class SpotifyImportConfirmationScreen extends StatelessWidget {
                           ),
                         )))
           ]);
-        })),
+        }))),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             if (bloc.state.selectedArtists != null && bloc.state.selectedGenres != null) {

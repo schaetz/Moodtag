@@ -38,13 +38,14 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: widget.config.appBar,
-      body: ListView.separated(
+      body: widget.config.scaffoldBodyWrapperFactory.create(
+          bodyWidget: ListView.separated(
         separatorBuilder: (context, _) => Divider(),
         padding: EdgeInsets.all(16.0),
         itemCount: _sortedEntities.length,
         itemBuilder: (context, i) => widget.rowBuilderStrategy.buildRow(i,
             entity: _sortedEntities[i], isChecked: _isBoxSelected[i], onListTileChanged: _onListTileChanged),
-      ),
+      )),
       floatingActionButton: Container(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,

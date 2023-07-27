@@ -65,7 +65,7 @@ class Routes {
       spotifyAuth: (context) => SpotifyLoginWebview(),
       spotifyImport: (context) => BlocProvider(
           create: (_) => SpotifyImportBloc(context.read<Repository>(), context, context.read<SpotifyAuthBloc>()),
-          child: ImportFlow()),
+          child: ImportFlow('Spotify Import')),
     };
   }
 }

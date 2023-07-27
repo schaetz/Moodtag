@@ -12,7 +12,7 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
-import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
+import 'package:moodtag/screens/spotify_import/spotify_import_option.dart';
 import 'package:moodtag/structs/import_entity.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';

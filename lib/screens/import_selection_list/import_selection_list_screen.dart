@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/components/selection_list/highlight_row_builder_strategy.dart';
 import 'package:moodtag/components/selection_list/selection_list_config.dart';
 import 'package:moodtag/components/selection_list/selection_list_screen.dart';
@@ -9,20 +10,22 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 // Wrapper for the SelectionListScreen that allows handling imports of ImportEntity´s
 class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget {
+  final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
   final UniqueNamedEntitySet<E> namedEntitySet;
   final String confirmationButtonLabel;
   final String entityDenotationSingular;
   final String entityDenotationPlural;
   final Function onSelectionConfirmed;
 
-  const ImportSelectionListScreen(
-      {Key? key,
-      required this.namedEntitySet,
-      this.confirmationButtonLabel = "Import",
-      required this.entityDenotationSingular,
-      required this.entityDenotationPlural,
-      required this.onSelectionConfirmed})
-      : super(key: key);
+  const ImportSelectionListScreen({
+    Key? key,
+    required this.scaffoldBodyWrapperFactory,
+    required this.namedEntitySet,
+    this.confirmationButtonLabel = "Import",
+    required this.entityDenotationSingular,
+    required this.entityDenotationPlural,
+    required this.onSelectionConfirmed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +33,7 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
       config: SelectionListConfig<E>(
         namedEntitySet: namedEntitySet,
         appBar: MtAppBar(context),
+        scaffoldBodyWrapperFactory: scaffoldBodyWrapperFactory,
         mainButtonLabel: confirmationButtonLabel,
         onMainButtonPressed: _onConfirmButtonPressed,
       ),

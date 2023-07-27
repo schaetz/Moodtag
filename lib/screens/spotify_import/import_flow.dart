@@ -6,8 +6,7 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/import_selection_list_screen.dart';
-import 'package:moodtag/screens/spotify_import/import_flow_screen_wrapper.dart';
+import 'package:moodtag/screens/import_selection_list/import_selection_list_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_config_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_confirmation_screen.dart';
 import 'package:moodtag/structs/imported_artist.dart';
@@ -15,10 +14,15 @@ import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:provider/provider.dart';
 
+import 'import_flow_screen_wrapper_factory.dart';
 import 'import_flow_state.dart';
 
 class ImportFlow extends StatelessWidget {
   static const importSteps = 4;
+
+  final String _importName;
+
+  const ImportFlow(this._importName);
 
   @override
   Widget build(BuildContext context) {
@@ -38,26 +42,37 @@ class ImportFlow extends StatelessWidget {
     });
   }
 
+  double _calculateImportProgress(SpotifyImportFlowStep step) => (step.index + 1) / importSteps;
+
+  String _getCaptionText(SpotifyImportFlowStep step) {
+    int stepNumber = step.index + 1;
+    return "$_importName ($stepNumber/$importSteps)";
+  }
+
+  ImportFlowScreenWrapperFactory _getImportFlowScreenWrapperFactory(SpotifyImportFlowStep step) =>
+      ImportFlowScreenWrapperFactory(_calculateImportProgress(step), _getCaptionText(step));
+
   List<Page> _onGenerateImportFlowPages(ImportFlowState importFlowState, List<Page> pages, SpotifyImportBloc bloc) {
     return [
-      _createMaterialPageForImportStep(1, screen: SpotifyImportConfigScreen(), route: Routes.spotifyImport),
+      _createMaterialPageForImportStep(1,
+          screen: SpotifyImportConfigScreen(
+              scaffoldBodyWrapperFactory: _getImportFlowScreenWrapperFactory(bloc.state.step)),
+          route: Routes.spotifyImport),
       if (importFlowState.step.index >= SpotifyImportFlowStep.artistsSelection.index)
         _createMaterialPageForImportStep(2, screen: _getArtistsSelectionScreen(bloc)),
       if (importFlowState.step.index >= SpotifyImportFlowStep.genreTagsSelection.index &&
           importFlowState.doShowGenreImportScreen)
         _createMaterialPageForImportStep(3, screen: _getGenreSelectionScreen(bloc)),
       if (importFlowState.step.index >= SpotifyImportFlowStep.confirmation.index)
-        _createMaterialPageForImportStep(4, screen: SpotifyImportConfirmationScreen(), route: Routes.spotifyImport)
+        _createMaterialPageForImportStep(4,
+            screen: SpotifyImportConfirmationScreen(
+                scaffoldBodyWrapperFactory: _getImportFlowScreenWrapperFactory(bloc.state.step)),
+            route: Routes.spotifyImport)
     ];
   }
 
   Page _createMaterialPageForImportStep(int stepNumber, {required Widget screen, String? route}) {
-    return MaterialPage<void>(
-        child: ImportFlowScreenWrapper(
-          childScreen: screen,
-          importProgress: stepNumber / importSteps,
-        ),
-        name: route);
+    return MaterialPage<void>(child: screen, name: route);
   }
 
   void _onBackButtonPressed(BuildContext context, SpotifyImportBloc bloc) {
@@ -70,6 +85,7 @@ class ImportFlow extends StatelessWidget {
 
   Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {
     return ImportSelectionListScreen<ImportedArtist>(
+      scaffoldBodyWrapperFactory: _getImportFlowScreenWrapperFactory(bloc.state.step),
       namedEntitySet: bloc.state.availableSpotifyArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
@@ -81,6 +97,7 @@ class ImportFlow extends StatelessWidget {
 
   Widget _getGenreSelectionScreen(SpotifyImportBloc bloc) {
     return ImportSelectionListScreen<ImportedGenre>(
+      scaffoldBodyWrapperFactory: _getImportFlowScreenWrapperFactory(bloc.state.step),
       namedEntitySet: bloc.state.availableGenresForSelectedArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: "genre tag",
