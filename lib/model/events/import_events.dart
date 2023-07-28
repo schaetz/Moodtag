@@ -1,4 +1,4 @@
-import 'package:moodtag/screens/import_flow/import_flow.dart';
+import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_genre.dart';
 
@@ -9,7 +9,7 @@ abstract class ImportEvent extends LibraryEvent {
 }
 
 class ReturnToPreviousImportScreen extends ImportEvent {
-  final ImportFlow importFlow;
+  final AbstractImportFlow importFlow;
 
   const ReturnToPreviousImportScreen(this.importFlow);
 
