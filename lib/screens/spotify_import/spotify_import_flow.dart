@@ -24,7 +24,7 @@ class SpotifyImportFlow extends AbstractImportFlow {
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
     return BlocConsumer<SpotifyImportBloc, SpotifyImportState>(listener: (context, state) {
-      if (state.step == SpotifyImportFlowStep.finished) {
+      if (state.isFinished) {
         returnToLibraryScreens(context);
       }
     }, builder: (context, state) {
@@ -40,26 +40,28 @@ class SpotifyImportFlow extends AbstractImportFlow {
 
   List<Page> onGenerateImportFlowPages(
       SpotifyImportFlowState importFlowState, List<Page> pages, SpotifyImportBloc bloc) {
-    return [
-      createMaterialPageForImportStep(1,
-          screen:
-              SpotifyImportConfigScreen(scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step)),
-          route: Routes.spotifyImport),
-      if (importFlowState.step.index >= SpotifyImportFlowStep.artistsSelection.index)
-        createMaterialPageForImportStep(2, screen: _getArtistsSelectionScreen(bloc)),
-      if (importFlowState.step.index >= SpotifyImportFlowStep.genreTagsSelection.index &&
-          importFlowState.doShowGenreImportScreen)
-        createMaterialPageForImportStep(3, screen: _getGenreSelectionScreen(bloc)),
-      if (importFlowState.step.index >= SpotifyImportFlowStep.confirmation.index)
-        createMaterialPageForImportStep(4,
-            screen: SpotifyImportConfirmationScreen(
-                scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step)),
-            route: Routes.spotifyImport)
-    ];
+    final List<SpotifyImportFlowStep> flowStepsTillCurrentStep =
+        SpotifyImportFlowStep.values.where((step) => importFlowState.step.index >= step.index).toList();
+
+    return flowStepsTillCurrentStep
+        .map((step) => createMaterialPageForImportStep(step.index,
+            screen: _getScreenForFlowStep(bloc, step), route: Routes.spotifyImport))
+        .toList();
   }
 
-  Page createMaterialPageForImportStep(int stepNumber, {required Widget screen, String? route}) {
-    return MaterialPage<void>(child: screen, name: route);
+  Widget _getScreenForFlowStep(SpotifyImportBloc bloc, SpotifyImportFlowStep step) {
+    switch (step) {
+      case SpotifyImportFlowStep.config:
+        return SpotifyImportConfigScreen(
+            scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step));
+      case SpotifyImportFlowStep.artistsSelection:
+        return _getArtistsSelectionScreen(bloc);
+      case SpotifyImportFlowStep.genreTagsSelection:
+        return _getGenreSelectionScreen(bloc);
+      case SpotifyImportFlowStep.confirmation:
+        return SpotifyImportConfirmationScreen(
+            scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step));
+    }
   }
 
   Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {

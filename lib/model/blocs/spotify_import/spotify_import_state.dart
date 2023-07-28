@@ -8,6 +8,7 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 class SpotifyImportState extends Equatable implements AbstractImportState {
   final SpotifyImportFlowStep step;
+  final bool isFinished;
   final Map<SpotifyImportOption, bool> configuration;
 
   final UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists;
@@ -17,6 +18,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
 
   const SpotifyImportState({
     this.step = SpotifyImportFlowStep.config,
+    this.isFinished = false,
     this.configuration = const {},
     this.availableSpotifyArtists,
     this.availableGenresForSelectedArtists,
@@ -27,6 +29,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
   @override
   List<Object?> get props => [
         step,
+        isFinished,
         configuration,
         availableSpotifyArtists,
         availableGenresForSelectedArtists,
@@ -39,6 +42,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
 
   SpotifyImportState copyWith({
     SpotifyImportFlowStep? step,
+    bool? isFinished,
     Map<SpotifyImportOption, bool>? configuration,
     UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists,
     UniqueNamedEntitySet<ImportedGenre>? availableGenresForSelectedArtists,
@@ -47,6 +51,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
   }) {
     return SpotifyImportState(
       step: step ?? this.step,
+      isFinished: isFinished ?? this.isFinished,
       configuration: configuration ?? this.configuration,
       availableSpotifyArtists: availableSpotifyArtists ?? this.availableSpotifyArtists,
       availableGenresForSelectedArtists: availableGenresForSelectedArtists ?? this.availableGenresForSelectedArtists,

@@ -22,7 +22,7 @@ import 'package:moodtag/utils/db_request_success_counter.dart';
 
 import 'spotify_import_state.dart';
 
-enum SpotifyImportFlowStep { config, artistsSelection, genreTagsSelection, confirmation, finished }
+enum SpotifyImportFlowStep { config, artistsSelection, genreTagsSelection, confirmation }
 
 class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with ErrorStreamHandling {
   final Repository _repository;
@@ -159,7 +159,7 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     final resultMessage = _getResultMessage(successCounters);
     errorStreamController.add(UserInfo(resultMessage));
 
-    emit(state.copyWith(step: SpotifyImportFlowStep.finished));
+    emit(state.copyWith(isFinished: true));
   }
 
   SpotifyImportFlowStep _getNextFlowStep(SpotifyImportState currentState) {

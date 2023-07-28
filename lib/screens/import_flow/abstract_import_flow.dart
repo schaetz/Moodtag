@@ -12,6 +12,10 @@ abstract class AbstractImportFlow extends StatelessWidget {
 
   AbstractImportFlow(this._importName, this._importSteps);
 
+  Page createMaterialPageForImportStep(int stepNumber, {required Widget screen, String? route}) {
+    return MaterialPage<void>(child: screen, name: route);
+  }
+
   void onBackButtonPressed(BuildContext context, AbstractImportBloc bloc) {
     if (bloc.state.step.index <= SpotifyImportFlowStep.config.index) {
       returnToLibraryScreens(context);
