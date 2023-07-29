@@ -1,9 +1,12 @@
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/structs/imported_entities/imported_artist.dart';
 
 class LastFmArtist extends ImportedArtist {
-  final int _playCount;
+  late final Map<LastFmImportPeriod, int> _playCounts;
 
-  LastFmArtist(super.name, this._playCount);
+  LastFmArtist.withSinglePlayCount(super.name, LastFmImportPeriod period, int overallPlayCount) {
+    this._playCounts = {period: overallPlayCount};
+  }
 
-  int get playCount => _playCount;
+  Map<LastFmImportPeriod, int> get playCounts => _playCounts;
 }

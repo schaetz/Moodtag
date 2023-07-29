@@ -16,16 +16,20 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
   final String entityDenotationSingular;
   final String entityDenotationPlural;
   final Function onSelectionConfirmed;
+  final String? Function(E)? getSubtitleText;
+  final IconData? subtitleIcon;
 
-  const ImportSelectionListScreen({
-    Key? key,
-    required this.scaffoldBodyWrapperFactory,
-    required this.namedEntitySet,
-    this.confirmationButtonLabel = "Import",
-    required this.entityDenotationSingular,
-    required this.entityDenotationPlural,
-    required this.onSelectionConfirmed,
-  }) : super(key: key);
+  const ImportSelectionListScreen(
+      {Key? key,
+      required this.scaffoldBodyWrapperFactory,
+      required this.namedEntitySet,
+      this.confirmationButtonLabel = "Import",
+      required this.entityDenotationSingular,
+      required this.entityDenotationPlural,
+      required this.onSelectionConfirmed,
+      this.getSubtitleText,
+      this.subtitleIcon})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,9 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
       ),
       rowBuilderStrategy: HighlightRowBuilderStrategy<E>(
           doHighlightEntity: (E entity) => entity.alreadyExists,
-          doDisableEntity: (E entity) => entity.alreadyExists && E == _typeOf<ImportedTag>()),
+          doDisableEntity: (E entity) => entity.alreadyExists && E == _typeOf<ImportedTag>(),
+          getSubtitleText: getSubtitleText,
+          subtitleIcon: subtitleIcon),
     );
   }
 

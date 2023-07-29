@@ -8,8 +8,6 @@ import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/events/import_events.dart';
 
-import '../../model/blocs/spotify_import/spotify_import_option.dart';
-
 class LastFmImportConfigScreen extends StatelessWidget {
   final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
 
@@ -50,7 +48,7 @@ class LastFmImportConfigScreen extends StatelessWidget {
 
   Map<String, bool> _getConfigItemsWithInitialValues(LastFmImportState state) {
     final Map<String, bool> configItemsWithInitialValues = {};
-    SpotifyImportOption.values.forEach((option) {
+    LastFmImportOption.values.forEach((option) {
       configItemsWithInitialValues[option.name] = state.configuration[option] ?? false;
     });
     return configItemsWithInitialValues;

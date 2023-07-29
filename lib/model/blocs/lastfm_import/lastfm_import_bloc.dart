@@ -7,19 +7,20 @@ import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_flow_step.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/screens/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 import '../../../screens/lastfm_import/lastfm_connector.dart';
 
 class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorStreamHandling {
-  LastFmImportBloc(Repository repository, BuildContext mainContext) : super(LastFmImportState(), repository) {
+  LastFmImportBloc(Repository repository, BuildContext mainContext)
+      : super(LastFmImportState(configuration: _getInitialImportConfig()), repository) {
     on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
     on<ChangeImportConfig>(_handleChangeImportConfigEvent);
     on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
@@ -30,6 +31,14 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     // TODO Context seems not to be correct for LastFmImportScreen;
     //  some Snackbars are only shown after returning to ArtistsList
     setupErrorHandler(mainContext);
+  }
+
+  static Map<LastFmImportOption, bool> _getInitialImportConfig() {
+    Map<LastFmImportOption, bool> initialConfig = {};
+    LastFmImportOption.values.forEach((option) {
+      initialConfig[option] = true;
+    });
+    return initialConfig;
   }
 
   void _handleReturnToPreviousImportScreenEvent(ReturnToPreviousImportScreen event, Emitter<LastFmImportState> emit) {
@@ -85,9 +94,9 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
       availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.overall, 1000));
     }
 
-    // TODO Prevent play counts from being overwritten
     if (selectedOptions[LastFmImportOption.lastMonthTopArtists] == true) {
-      availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.one_month, 1000));
+      final lastMonthTopArtists = await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.one_month, 1000);
+      availableLastFmArtists.addOrUpdateAll(lastMonthTopArtists, _combineLastFmArtistPlays);
     }
 
     if (!availableLastFmArtists.isEmpty) {
@@ -95,6 +104,13 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     }
 
     return availableLastFmArtists;
+  }
+
+  LastFmArtist _combineLastFmArtistPlays(LastFmArtist existingArtist, LastFmArtist duplicate) {
+    for (MapEntry<LastFmImportPeriod, int> playCountEntry in duplicate.playCounts.entries) {
+      existingArtist.playCounts[playCountEntry.key] = playCountEntry.value;
+    }
+    return existingArtist;
   }
 
   void _handleConfirmLastFmArtistsForImportEvent(

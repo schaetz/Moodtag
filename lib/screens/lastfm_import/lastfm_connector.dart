@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/screens/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/helpers.dart';
@@ -42,7 +42,7 @@ Future<UniqueNamedEntitySet<LastFmArtist>> getTopArtists(String username, LastFm
     'api_key': apiKey,
     'method': methodGetTopArtists,
     'limit': limit.toString(),
-    'period': getLastFmImportPeriodString(period),
+    'period': period.apiStringId,
     'format': 'json'
   };
 
@@ -57,7 +57,7 @@ Future<UniqueNamedEntitySet<LastFmArtist>> getTopArtists(String username, LastFm
   Set<LastFmArtist> topArtists;
   try {
     topArtists = Set<LastFmArtist>.from(responseBodyMap['topartists']?['artist']
-        ?.map((item) => LastFmArtist(item['name'], int.parse(item['playcount']))));
+        ?.map((item) => LastFmArtist.withSinglePlayCount(item['name'], period, int.parse(item['playcount']))));
   } catch (error) {
     throw ExternalServiceQueryException('The Last.fm data has an unknown structure.', cause: error);
   }

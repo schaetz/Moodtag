@@ -25,9 +25,20 @@ class UniqueNamedEntitySet<T extends NamedEntity> {
     _entitiesByName.putIfAbsent(newEntity.name, () => newEntity);
   }
 
+  void addOrUpdate(T updateEntity, T Function(T, T) updateFunction) {
+    _entitiesByName.update(updateEntity.name, (existingEntity) => updateFunction(existingEntity, updateEntity),
+        ifAbsent: () => updateEntity);
+  }
+
   void addAll(UniqueNamedEntitySet<T> otherSet) {
     for (T entity in otherSet.values) {
       add(entity);
+    }
+  }
+
+  void addOrUpdateAll(UniqueNamedEntitySet<T> otherSet, T Function(T, T) updateFunction) {
+    for (T entity in otherSet.values) {
+      addOrUpdate(entity, updateFunction);
     }
   }
 

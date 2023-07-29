@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/app_bar_context_data.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_flow_step.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
@@ -75,7 +76,25 @@ class LastFmImportFlow extends AbstractImportFlow {
       entityDenotationPlural: I10n.ARTIST_DENOTATION_PLURAL,
       onSelectionConfirmed: (List<LastFmArtist> selectedArtists) =>
           bloc.add(ConfirmLastFmArtistsForImport(selectedArtists)),
+      getSubtitleText: (LastFmArtist artist) => _getPlayCountSubtitleForArtist(artist),
+      subtitleIcon: Icons.headphones,
     );
+  }
+
+  String? _getPlayCountSubtitleForArtist(LastFmArtist artist) {
+    if (artist.playCounts.isEmpty) {
+      return null;
+    }
+
+    final longestPeriod = artist.playCounts.keys.first;
+    final playCountString = artist.playCounts[longestPeriod].toString();
+
+    if (longestPeriod != LastFmImportPeriod.overall) {
+      final periodString = longestPeriod.humanReadableString;
+      return '$playCountString ($periodString)';
+    }
+
+    return playCountString;
   }
 
   Widget _getTagsSelectionScreen(LastFmImportBloc bloc) {
