@@ -56,7 +56,7 @@ class LastFmAccountManagementBloc extends Bloc<LastFmEvent, LastFmAccountManagem
   }
 
   void _handleAddLastFmAccountEvent(AddLastFmAccount event, Emitter<LastFmAccountManagementState> emit) async {
-    final createdAccountUserInfo = await _createOrUpdateLastFmAccount(state.lastFmAccount!.accountName);
+    final createdAccountUserInfo = await _createOrUpdateLastFmAccount(event.accountName);
     if (createdAccountUserInfo != null) {
       emit(state.copyWith(lastFmAccount: createdAccountUserInfo));
     }

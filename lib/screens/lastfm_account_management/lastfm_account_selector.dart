@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moodtag/exceptions/internal/internal_exception.dart';
-import 'package:moodtag/model/repository/repository.dart';
 
 class LastFmAccountSelector extends StatelessWidget {
-  late final Repository bloc;
-
   final DateFormat formatter = DateFormat('MM-dd-yyyy');
 
   final String serviceName;
@@ -59,7 +56,7 @@ class LastFmAccountSelector extends StatelessWidget {
   }
 
   Widget _accountChangeButton() {
-    if (hasAccountName) {
+    if (!hasAccountName) {
       return ElevatedButton(
         onPressed: () => _addAccount(),
         child: Text('Add ${serviceName} account'),
