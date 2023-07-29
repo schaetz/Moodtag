@@ -3,24 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
-import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
-import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
-import 'package:moodtag/model/events/lastfm_import_events.dart';
+import 'package:moodtag/model/blocs/lastfm_account_management/lastfm_account_management_bloc.dart';
+import 'package:moodtag/model/blocs/lastfm_account_management/lastfm_account_management_state.dart';
+import 'package:moodtag/model/events/lastfm_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_account_selector.dart';
 
-class LastfmImportScreen extends StatelessWidget {
+class LastFmAccountManagementScreen extends StatelessWidget {
   final String serviceName = 'Last.fm';
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<LastFmImportBloc>();
+    final bloc = context.read<LastFmAccountManagementBloc>();
     return Scaffold(
         appBar: MtAppBar(context),
         body: Center(
           child: Column(
             children: [
-              BlocBuilder<LastFmImportBloc, LastFmImportState>(
+              BlocBuilder<LastFmAccountManagementBloc, LastFmAccountManagementState>(
                   buildWhen: (previous, current) => current.accountLoadingStatus == LoadingStatus.success,
                   builder: (context, state) {
                     return LastFmAccountSelector(
@@ -49,7 +49,7 @@ class LastfmImportScreen extends StatelessWidget {
     return DateTime.fromMillisecondsSinceEpoch(timestamp.round(), isUtc: true);
   }
 
-  void _openSetAccountNameDialog(BuildContext context, LastFmImportBloc bloc) async {
+  void _openSetAccountNameDialog(BuildContext context, LastFmAccountManagementBloc bloc) async {
     AddExternalAccountDialog(context, serviceName, onTerminate: (newAccountName) {
       if (newAccountName != null) {
         bloc.add(AddLastFmAccount(newAccountName));
@@ -57,17 +57,17 @@ class LastfmImportScreen extends StatelessWidget {
     });
   }
 
-  void _handleAddAccountError(Exception e, LastFmImportBloc bloc) {
+  void _handleAddAccountError(Exception e, LastFmAccountManagementBloc bloc) {
     bloc.errorStreamController
         .add(UnknownError("Something went wrong trying to set the ${serviceName} account.", cause: e));
   }
 
-  void _handleRemoveAccountError(Exception e, LastFmImportBloc bloc) {
+  void _handleRemoveAccountError(Exception e, LastFmAccountManagementBloc bloc) {
     bloc.errorStreamController
         .add(UnknownError("Something went wrong trying to remove the ${serviceName} account.", cause: e));
   }
 
-  void _handleUpdateAccountInfoError(Exception e, LastFmImportBloc bloc) {
+  void _handleUpdateAccountInfoError(Exception e, LastFmAccountManagementBloc bloc) {
     bloc.errorStreamController
         .add(UnknownError("Something went wrong trying to update the ${serviceName} account info.", cause: e));
   }

@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_state.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/structs/imported_artist.dart';
 import 'package:moodtag/structs/imported_tag.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
@@ -10,9 +8,6 @@ import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'lastfm_import_flow_step.dart';
 
 class LastFmImportState extends Equatable implements AbstractImportState {
-  final LastFmAccount? lastFmAccount;
-  final LoadingStatus accountLoadingStatus;
-
   final LastFmImportFlowStep step;
   final bool isFinished;
   final Map<LastFmImportOption, bool> configuration;
@@ -23,8 +18,6 @@ class LastFmImportState extends Equatable implements AbstractImportState {
   final List<ImportedTag>? selectedTags;
 
   const LastFmImportState({
-    this.lastFmAccount,
-    this.accountLoadingStatus = LoadingStatus.initial,
     this.step = LastFmImportFlowStep.config,
     this.isFinished = false,
     this.configuration = const {},
@@ -36,8 +29,6 @@ class LastFmImportState extends Equatable implements AbstractImportState {
 
   @override
   List<Object?> get props => [
-        lastFmAccount,
-        accountLoadingStatus,
         step,
         isFinished,
         configuration,
@@ -50,9 +41,6 @@ class LastFmImportState extends Equatable implements AbstractImportState {
   bool get isConfigurationValid => configuration.values.where((selection) => selection == true).toList().isNotEmpty;
 
   LastFmImportState copyWith({
-    LastFmAccount? lastFmAccount,
-    LoadingStatus? accountNameLoadingStatus,
-    bool removeAccount = false,
     LastFmImportFlowStep? step,
     bool? isFinished,
     Map<LastFmImportOption, bool>? configuration,
@@ -61,10 +49,7 @@ class LastFmImportState extends Equatable implements AbstractImportState {
     List<ImportedArtist>? selectedArtists,
     List<ImportedTag>? selectedTags,
   }) {
-    // For the account, the state may be overwritten by null
     return LastFmImportState(
-      lastFmAccount: removeAccount ? null : lastFmAccount ?? this.lastFmAccount,
-      accountLoadingStatus: accountNameLoadingStatus ?? this.accountLoadingStatus,
       step: step ?? this.step,
       isFinished: isFinished ?? this.isFinished,
       configuration: configuration ?? this.configuration,

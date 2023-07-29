@@ -13,9 +13,9 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const titleLabelStyle = TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold);
 
   static const menuItemSpotifyImport = 'Spotify Import';
-  static const menuItemLastFmImport = 'LastFm Import';
+  static const menuItemLastFm = 'Last.fm';
   static const menuItemResetLibrary = 'Reset library';
-  static const popupMenuItems = [menuItemSpotifyImport, menuItemLastFmImport, menuItemResetLibrary];
+  static const popupMenuItems = [menuItemSpotifyImport, menuItemLastFm, menuItemResetLibrary];
   static const double height = 60;
 
   final BuildContext context;
@@ -82,8 +82,8 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
           Navigator.of(context).pushNamed(Routes.spotifyImport);
         }
         break;
-      case menuItemLastFmImport:
-        Navigator.of(context).pushNamed(Routes.lastFmImport);
+      case menuItemLastFm:
+        Navigator.of(context).pushNamed(Routes.lastFmAccountManagement);
         break;
       case menuItemResetLibrary:
         DeleteDialog.openNew(context, deleteHandler: handleResetLibrary, entityToDelete: null, resetLibrary: true);
