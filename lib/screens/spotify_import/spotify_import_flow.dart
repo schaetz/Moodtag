@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/app_bar_context_data.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
+import 'package:moodtag/model/blocs/spotify_import/spotify_import_flow_step.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/import_events.dart';
+import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
 import 'package:moodtag/screens/import_selection_list/import_selection_list_screen.dart';
 import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_genre.dart';
+import 'package:moodtag/structs/imported_tag.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:provider/provider.dart';
 
@@ -29,9 +31,10 @@ class SpotifyImportFlow extends AbstractImportFlow {
       }
     }, builder: (context, state) {
       return Provider(
-          create: (_) => AppBarContextData(onBackButtonPressed: () => onBackButtonPressed(context, bloc)),
+          create: (_) => AppBarContextData(
+              onBackButtonPressed: () => onBackButtonPressed(context, bloc, SpotifyImportFlowStep.config.index)),
           child: FlowBuilder<SpotifyImportFlowState>(
-            state: SpotifyImportFlowState(step: state.step, doShowGenreImportScreen: state.doImportGenres),
+            state: SpotifyImportFlowState(step: state.step),
             onGeneratePages: (SpotifyImportFlowState importFlowState, List<Page> pages) =>
                 onGenerateImportFlowPages(importFlowState, pages, bloc),
           ));
@@ -53,20 +56,20 @@ class SpotifyImportFlow extends AbstractImportFlow {
     switch (step) {
       case SpotifyImportFlowStep.config:
         return SpotifyImportConfigScreen(
-            scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step));
+            scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index));
       case SpotifyImportFlowStep.artistsSelection:
         return _getArtistsSelectionScreen(bloc);
       case SpotifyImportFlowStep.genreTagsSelection:
         return _getGenreSelectionScreen(bloc);
       case SpotifyImportFlowStep.confirmation:
         return SpotifyImportConfirmationScreen(
-            scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step));
+            scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index));
     }
   }
 
   Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {
     return ImportSelectionListScreen<ImportedArtist>(
-      scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step),
+      scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index),
       namedEntitySet: bloc.state.availableSpotifyArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
@@ -77,13 +80,13 @@ class SpotifyImportFlow extends AbstractImportFlow {
   }
 
   Widget _getGenreSelectionScreen(SpotifyImportBloc bloc) {
-    return ImportSelectionListScreen<ImportedGenre>(
-      scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step),
+    return ImportSelectionListScreen<ImportedTag>(
+      scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index),
       namedEntitySet: bloc.state.availableGenresForSelectedArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: "genre tag",
       entityDenotationPlural: "genre tags",
-      onSelectionConfirmed: (List<ImportedGenre> selectedGenres) => bloc.add(ConfirmGenreTagsForImport(selectedGenres)),
+      onSelectionConfirmed: (List<ImportedTag> selectedGenres) => bloc.add(ConfirmGenreTagsForImport(selectedGenres)),
     );
   }
 }

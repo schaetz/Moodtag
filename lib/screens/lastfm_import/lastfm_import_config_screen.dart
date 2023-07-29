@@ -3,32 +3,33 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/import_config_form.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
-import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
-import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/events/import_events.dart';
 
 import '../../model/blocs/spotify_import/spotify_import_option.dart';
 
-class SpotifyImportConfigScreen extends StatelessWidget {
+class LastFmImportConfigScreen extends StatelessWidget {
   final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
 
-  const SpotifyImportConfigScreen({Key? key, required this.scaffoldBodyWrapperFactory}) : super(key: key);
+  const LastFmImportConfigScreen({Key? key, required this.scaffoldBodyWrapperFactory}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<SpotifyImportBloc>();
+    final bloc = context.read<LastFmImportBloc>();
     return Scaffold(
         appBar: MtAppBar(context),
         body: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(
                 child: ImportConfigForm(
           headlineCaption: 'Select what should be imported:',
-          sendButtonCaption: 'Start Spotify Import',
+          sendButtonCaption: 'Start LastFm Import',
           configItemsWithCaption: _getConfigItemsWithCaption(),
           initialConfig: _getConfigItemsWithInitialValues(bloc.state),
           onChangeSelection: (Map<String, bool> newSelection) => _onChangeSelection(newSelection, bloc),
         ))),
-        floatingActionButton: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(
+        floatingActionButton: BlocBuilder<LastFmImportBloc, LastFmImportState>(
             builder: (context, state) => FloatingActionButton.extended(
                   onPressed: state.isConfigurationValid ? () => _confirmImportConfiguration(bloc) : null,
                   label: Text('OK'),
@@ -41,14 +42,13 @@ class SpotifyImportConfigScreen extends StatelessWidget {
 
   Map<String, String> _getConfigItemsWithCaption() {
     final Map<String, String> configItemsWithCaption = {
-      SpotifyImportOption.topArtists.name: 'Top artists',
-      SpotifyImportOption.followedArtists.name: 'Followed artists',
-      SpotifyImportOption.artistGenres.name: 'Artist genres'
+      LastFmImportOption.allTimeTopArtists.name: 'All-time top artists',
+      LastFmImportOption.lastMonthTopArtists.name: 'Last month\'s top artists',
     };
     return configItemsWithCaption;
   }
 
-  Map<String, bool> _getConfigItemsWithInitialValues(SpotifyImportState state) {
+  Map<String, bool> _getConfigItemsWithInitialValues(LastFmImportState state) {
     final Map<String, bool> configItemsWithInitialValues = {};
     SpotifyImportOption.values.forEach((option) {
       configItemsWithInitialValues[option.name] = state.configuration[option] ?? false;
@@ -56,11 +56,11 @@ class SpotifyImportConfigScreen extends StatelessWidget {
     return configItemsWithInitialValues;
   }
 
-  void _onChangeSelection(Map<String, bool> newSelection, SpotifyImportBloc bloc) {
+  void _onChangeSelection(Map<String, bool> newSelection, LastFmImportBloc bloc) {
     bloc.add(ChangeImportConfig(newSelection));
   }
 
-  void _confirmImportConfiguration(SpotifyImportBloc bloc) async {
+  void _confirmImportConfiguration(LastFmImportBloc bloc) async {
     bloc.add(ConfirmImportConfig());
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
-import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 
@@ -16,8 +15,8 @@ abstract class AbstractImportFlow extends StatelessWidget {
     return MaterialPage<void>(child: screen, name: route);
   }
 
-  void onBackButtonPressed(BuildContext context, AbstractImportBloc bloc) {
-    if (bloc.state.step.index <= SpotifyImportFlowStep.config.index) {
+  void onBackButtonPressed(BuildContext context, AbstractImportBloc bloc, int configIndex) {
+    if (bloc.state.step.index <= configIndex) {
       returnToLibraryScreens(context);
     } else {
       bloc.add(ReturnToPreviousImportScreen(this));
@@ -28,13 +27,13 @@ abstract class AbstractImportFlow extends StatelessWidget {
     Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
   }
 
-  ImportFlowScreenWrapperFactory getImportFlowScreenWrapperFactory(SpotifyImportFlowStep step) =>
-      ImportFlowScreenWrapperFactory(_calculateImportProgress(step), _getCaptionText(step));
+  ImportFlowScreenWrapperFactory getImportFlowScreenWrapperFactory(int stepIndex) =>
+      ImportFlowScreenWrapperFactory(_calculateImportProgress(stepIndex), _getCaptionText(stepIndex));
 
-  double _calculateImportProgress(SpotifyImportFlowStep step) => (step.index + 1) / _importSteps;
+  double _calculateImportProgress(int stepIndex) => (stepIndex + 1) / _importSteps;
 
-  String _getCaptionText(SpotifyImportFlowStep step) {
-    int stepNumber = step.index + 1;
+  String _getCaptionText(int stepIndex) {
+    int stepNumber = stepIndex + 1;
     return "$_importName ($stepNumber/$_importSteps)";
   }
 }

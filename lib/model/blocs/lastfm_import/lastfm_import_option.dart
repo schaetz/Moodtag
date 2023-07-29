@@ -1,0 +1,1 @@
+enum LastFmImportOption { allTimeTopArtists, lastMonthTopArtists }

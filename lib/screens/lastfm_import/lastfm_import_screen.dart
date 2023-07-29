@@ -5,9 +5,9 @@ import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
-import 'package:moodtag/model/events/lastfm_events.dart';
+import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
-import 'package:moodtag/screens/lastfm_import/last_fm_account_selector.dart';
+import 'package:moodtag/screens/lastfm_import/lastfm_account_selector.dart';
 
 class LastfmImportScreen extends StatelessWidget {
   final String serviceName = 'Last.fm';

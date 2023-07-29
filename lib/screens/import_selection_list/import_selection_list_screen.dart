@@ -5,7 +5,7 @@ import 'package:moodtag/components/selection_list/highlight_row_builder_strategy
 import 'package:moodtag/components/selection_list/selection_list_config.dart';
 import 'package:moodtag/components/selection_list/selection_list_screen.dart';
 import 'package:moodtag/structs/import_entity.dart';
-import 'package:moodtag/structs/imported_genre.dart';
+import 'package:moodtag/structs/imported_tag.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 // Wrapper for the SelectionListScreen that allows handling imports of ImportEntity´s
@@ -39,7 +39,7 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
       ),
       rowBuilderStrategy: HighlightRowBuilderStrategy<E>(
           doHighlightEntity: (E entity) => entity.alreadyExists,
-          doDisableEntity: (E entity) => entity.alreadyExists && E == _typeOf<ImportedGenre>()),
+          doDisableEntity: (E entity) => entity.alreadyExists && E == _typeOf<ImportedTag>()),
     );
   }
 

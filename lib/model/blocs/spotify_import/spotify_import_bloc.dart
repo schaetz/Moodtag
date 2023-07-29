@@ -9,35 +9,32 @@ import 'package:moodtag/exceptions/user_readable/user_info.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
+import 'package:moodtag/model/blocs/spotify_import/spotify_import_option.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart';
 import 'package:moodtag/model/events/import_events.dart';
+import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
-import 'package:moodtag/screens/spotify_import/spotify_import_option.dart';
-import 'package:moodtag/structs/import_entity.dart';
 import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_genre.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
+import 'spotify_import_flow_step.dart';
 import 'spotify_import_state.dart';
 
-enum SpotifyImportFlowStep { config, artistsSelection, genreTagsSelection, confirmation }
-
 class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with ErrorStreamHandling {
-  final Repository _repository;
   final SpotifyImportProcessor _spotifyImportProcessor = SpotifyImportProcessor();
 
   final SpotifyAccessTokenProvider accessTokenProvider;
 
-  SpotifyImportBloc(this._repository, BuildContext mainContext, this.accessTokenProvider)
-      : super(SpotifyImportState(configuration: _getInitialImportConfig())) {
-    on<ReturnToPreviousImportScreen>(_mapReturnToPreviousImportScreenEventToState);
-    on<ChangeImportConfig>(_mapChangeImportConfigEventToState);
-    on<ConfirmImportConfig>(_mapConfirmImportConfigEventToState);
-    on<ConfirmArtistsForImport>(_mapConfirmArtistsForImportEventToState);
-    on<ConfirmGenreTagsForImport>(_mapConfirmGenreTagsForImportEventToState);
-    on<CompleteImport>(_mapCompleteImportEventToState);
+  SpotifyImportBloc(Repository repository, BuildContext mainContext, this.accessTokenProvider)
+      : super(SpotifyImportState(configuration: _getInitialImportConfig()), repository) {
+    on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
+    on<ChangeImportConfig>(_handleChangeImportConfigEvent);
+    on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
+    on<ConfirmArtistsForImport>(_handleConfirmArtistsForImportEvent);
+    on<ConfirmGenreTagsForImport>(_handleConfirmGenreTagsForImportEvent);
+    on<CompleteSpotifyImport>(_handleCompleteImportEvent);
 
     setupErrorHandler(mainContext);
   }
@@ -50,14 +47,13 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     return initialConfig;
   }
 
-  void _mapReturnToPreviousImportScreenEventToState(
-      ReturnToPreviousImportScreen event, Emitter<SpotifyImportState> emit) {
+  void _handleReturnToPreviousImportScreenEvent(ReturnToPreviousImportScreen event, Emitter<SpotifyImportState> emit) {
     if (state.step.index > SpotifyImportFlowStep.config.index) {
       emit(state.copyWith(step: SpotifyImportFlowStep.values[state.step.index - 1]));
     }
   }
 
-  void _mapChangeImportConfigEventToState(ChangeImportConfig event, Emitter<SpotifyImportState> emit) async {
+  void _handleChangeImportConfigEvent(ChangeImportConfig event, Emitter<SpotifyImportState> emit) async {
     final selectedOptions = event.selectedOptions;
     final Map<SpotifyImportOption, bool> configItemsWithSelection = {
       SpotifyImportOption.topArtists: selectedOptions[SpotifyImportOption.topArtists.name] ?? false,
@@ -67,7 +63,7 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     emit(state.copyWith(configuration: configItemsWithSelection));
   }
 
-  void _mapConfirmImportConfigEventToState(ConfirmImportConfig event, Emitter<SpotifyImportState> emit) async {
+  void _handleConfirmImportConfigEvent(ConfirmImportConfig event, Emitter<SpotifyImportState> emit) async {
     try {
       if (!state.isConfigurationValid) {
         errorStreamController.add(InvalidUserInputException("Nothing selected for import."));
@@ -110,22 +106,17 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     }
 
     if (!availableSpotifyArtists.isEmpty) {
-      final existingArtistNames = await _repository.getSetOfExistingArtistNames();
-      _annotateImportEntitiesWithAlreadyExistsProp(availableSpotifyArtists, existingArtistNames);
+      await annotateImportEntitiesWithAlreadyExistsProp(availableSpotifyArtists);
     }
 
     return availableSpotifyArtists;
   }
 
-  void _mapConfirmArtistsForImportEventToState(ConfirmArtistsForImport event, Emitter<SpotifyImportState> emit) async {
+  void _handleConfirmArtistsForImportEvent(ConfirmArtistsForImport event, Emitter<SpotifyImportState> emit) async {
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {
-      final availableGenresForSelectedArtists = _getAvailableGenresForSelectedArtists(event.selectedArtists);
-      if (!availableGenresForSelectedArtists.isEmpty) {
-        final existingGenreNames = await _repository.getSetOfExistingTagNames();
-        _annotateImportEntitiesWithAlreadyExistsProp(availableGenresForSelectedArtists, existingGenreNames);
-      }
+      final availableGenresForSelectedArtists = await getAvailableTagsForSelectedArtists(event.selectedArtists);
 
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
@@ -134,16 +125,7 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     }
   }
 
-  UniqueNamedEntitySet<ImportedGenre> _getAvailableGenresForSelectedArtists(List<ImportedArtist> selectedArtists) {
-    final UniqueNamedEntitySet<ImportedGenre> availableGenresForSelectedArtists = UniqueNamedEntitySet();
-    selectedArtists.forEach((artist) {
-      List<ImportedGenre> genresList = artist.genres.map((genreName) => ImportedGenre(genreName)).toList();
-      genresList.forEach((genreEntity) => availableGenresForSelectedArtists.add(genreEntity));
-    });
-    return availableGenresForSelectedArtists;
-  }
-
-  void _mapConfirmGenreTagsForImportEventToState(ConfirmGenreTagsForImport event, Emitter<SpotifyImportState> emit) {
+  void _handleConfirmGenreTagsForImportEvent(ConfirmGenreTagsForImport event, Emitter<SpotifyImportState> emit) {
     if (state.availableGenresForSelectedArtists == null) {
       errorStreamController.add(UnknownError("Something went wrong: Genres are not available for import."));
     } else if (event.selectedGenres.isEmpty && state.availableGenresForSelectedArtists!.isEmpty == false) {
@@ -153,10 +135,10 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     }
   }
 
-  void _mapCompleteImportEventToState(CompleteImport event, Emitter<SpotifyImportState> emit) async {
+  void _handleCompleteImportEvent(CompleteSpotifyImport event, Emitter<SpotifyImportState> emit) async {
     final Map<ImportSubProcess, DbRequestSuccessCounter> successCounters =
-        await _spotifyImportProcessor.conductImport(event.selectedArtists, event.selectedGenres, _repository);
-    final resultMessage = _getResultMessage(successCounters);
+        await _spotifyImportProcessor.conductImport(event.selectedArtists, event.selectedGenres, repository);
+    final resultMessage = getResultMessage(successCounters);
     errorStreamController.add(UserInfo(resultMessage));
 
     emit(state.copyWith(isFinished: true));
@@ -167,38 +149,5 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
       return SpotifyImportFlowStep.confirmation;
     }
     return SpotifyImportFlowStep.values[currentState.step.index + 1];
-  }
-
-  String _getResultMessage(Map<ImportSubProcess, DbRequestSuccessCounter> creationSuccessCountersByType) {
-    String message;
-
-    if (creationSuccessCountersByType[ImportSubProcess.createArtists] == null) {
-      message = "No entities were added.";
-    } else {
-      final successfulArtists = creationSuccessCountersByType[ImportSubProcess.createArtists]?.successCount ?? 0;
-      final successfulGenres = creationSuccessCountersByType[ImportSubProcess.createTags]?.successCount ?? 0;
-      if (successfulArtists > 0) {
-        if (successfulGenres > 0) {
-          message = "Successfully added ${successfulArtists} artists and ${successfulGenres} tags.";
-        } else {
-          message = "Successfully added ${successfulArtists} artists.";
-        }
-      } else if (successfulGenres > 0) {
-        message = "Successfully added ${successfulGenres} genres.";
-      } else {
-        message = "No entities were added.";
-      }
-    }
-
-    return message;
-  }
-
-  void _annotateImportEntitiesWithAlreadyExistsProp(
-      UniqueNamedEntitySet<ImportEntity> entities, Set<String> existingNames) {
-    entities.values.forEach((entity) {
-      if (existingNames.contains(entity.name)) {
-        entity.alreadyExists = true;
-      }
-    });
   }
 }

@@ -4,29 +4,37 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.dart';
+import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
-import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
+import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_flow_step.dart';
+import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/events/lastfm_events.dart';
+import 'package:moodtag/model/events/import_events.dart';
+import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_connector.dart' as LastFmConnector;
 
-class LastFmImportBloc extends Bloc<LastFmEvent, LastFmImportState> with ErrorStreamHandling {
-  final Repository _repository;
-  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
-
+class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorStreamHandling {
   late final StreamSubscription<LastFmAccount?> _accountStreamSubscription;
 
-  LastFmImportBloc(this._repository, BuildContext mainContext) : super(LastFmImportState()) {
-    on<LastFmAccountUpdated>(_mapLastFmAccountUpdatedEventToState);
-    on<AddLastFmAccount>(_mapAddLastFmAccountEventToState);
-    on<RemoveLastFmAccount>(_mapRemoveLastFmAccountEventToState);
-    on<UpdateLastFmAccountInfo>(_mapUpdateLastFmAccountInfoEventToState);
+  LastFmImportBloc(Repository repository, BuildContext mainContext) : super(LastFmImportState(), repository) {
+    on<LastFmAccountUpdated>(_handleLastFmAccountUpdatedEvent);
+    on<AddLastFmAccount>(_handleAddLastFmAccountEvent);
+    on<RemoveLastFmAccount>(_handleRemoveLastFmAccountEvent);
+    on<UpdateLastFmAccountInfo>(_handleUpdateLastFmAccountInfoEvent);
+    on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
+    on<ChangeImportConfig>(_handleChangeImportConfigEvent);
+    on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
+    on<ConfirmArtistsForImport>(_handleConfirmArtistsForImportEvent);
+    on<ConfirmTagsForImport>(_handleConfirmTagsForImportEvent);
+    on<CompleteLastFmImport>(_handleCompleteImportEvent);
 
-    _accountStreamSubscription = _repository
+    _accountStreamSubscription = repository
         .getLastFmAccount()
         .handleError((error) => add(LastFmAccountUpdated(error: error)))
         .listen((accountName) => add(LastFmAccountUpdated(lastFmAccount: accountName)));
@@ -42,7 +50,7 @@ class LastFmImportBloc extends Bloc<LastFmEvent, LastFmImportState> with ErrorSt
     return super.close();
   }
 
-  void _mapLastFmAccountUpdatedEventToState(LastFmAccountUpdated event, Emitter<LastFmImportState> emit) async {
+  void _handleLastFmAccountUpdatedEvent(LastFmAccountUpdated event, Emitter<LastFmImportState> emit) async {
     if (event.error != null) {
       errorStreamController
           .add(DatabaseError("The Last.fm account name could not be retrieved from the database.", cause: event.error));
@@ -55,21 +63,21 @@ class LastFmImportBloc extends Bloc<LastFmEvent, LastFmImportState> with ErrorSt
     }
   }
 
-  void _mapAddLastFmAccountEventToState(AddLastFmAccount event, Emitter<LastFmImportState> emit) async {
+  void _handleAddLastFmAccountEvent(AddLastFmAccount event, Emitter<LastFmImportState> emit) async {
     final createdAccountUserInfo = await _createOrUpdateLastFmAccount(state.lastFmAccount!.accountName);
     if (createdAccountUserInfo != null) {
       emit(state.copyWith(lastFmAccount: createdAccountUserInfo));
     }
   }
 
-  void _mapRemoveLastFmAccountEventToState(RemoveLastFmAccount event, Emitter<LastFmImportState> emit) async {
-    final exception = await _createEntityBlocHelper.handleRemoveLastFmAccount(_repository);
+  void _handleRemoveLastFmAccountEvent(RemoveLastFmAccount event, Emitter<LastFmImportState> emit) async {
+    final exception = await createEntityBlocHelper.handleRemoveLastFmAccount(repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }
   }
 
-  void _mapUpdateLastFmAccountInfoEventToState(UpdateLastFmAccountInfo event, Emitter<LastFmImportState> emit) async {
+  void _handleUpdateLastFmAccountInfoEvent(UpdateLastFmAccountInfo event, Emitter<LastFmImportState> emit) async {
     if (state.lastFmAccount == null) {
       errorStreamController
           .add(ExternalServiceQueryException('Update of Last.fm account info failed: No account configured'));
@@ -85,7 +93,7 @@ class LastFmImportBloc extends Bloc<LastFmEvent, LastFmImportState> with ErrorSt
   Future<LastFmAccount?> _createOrUpdateLastFmAccount(String accountName) async {
     try {
       final userInfo = await LastFmConnector.getUserInfo(accountName);
-      final exception = await _createEntityBlocHelper.handleCreateOrUpdateLastFmAccountEvent(userInfo, _repository);
+      final exception = await createEntityBlocHelper.handleCreateOrUpdateLastFmAccountEvent(userInfo, repository);
       if (exception != null) {
         errorStreamController.add(exception);
       } else {
@@ -97,5 +105,62 @@ class LastFmImportBloc extends Bloc<LastFmEvent, LastFmImportState> with ErrorSt
       errorStreamController
           .add(ExternalServiceQueryException('The request to the Last.fm API failed for an unknown reason.', cause: e));
     }
+    return null;
+  }
+
+  void _handleReturnToPreviousImportScreenEvent(ReturnToPreviousImportScreen event, Emitter<LastFmImportState> emit) {
+    if (state.step.index > LastFmImportFlowStep.config.index) {
+      emit(state.copyWith(step: LastFmImportFlowStep.values[state.step.index - 1]));
+    }
+  }
+
+  void _handleChangeImportConfigEvent(ChangeImportConfig event, Emitter<LastFmImportState> emit) async {
+    final selectedOptions = event.selectedOptions;
+    final Map<LastFmImportOption, bool> configItemsWithSelection = {
+      LastFmImportOption.allTimeTopArtists: selectedOptions[LastFmImportOption.allTimeTopArtists.name] ?? false,
+      LastFmImportOption.lastMonthTopArtists: selectedOptions[LastFmImportOption.lastMonthTopArtists.name] ?? false,
+    };
+    emit(state.copyWith(configuration: configItemsWithSelection));
+  }
+
+  void _handleConfirmImportConfigEvent(ConfirmImportConfig event, Emitter<LastFmImportState> emit) async {
+    // TODO
+  }
+
+  void _handleConfirmArtistsForImportEvent(ConfirmArtistsForImport event, Emitter<LastFmImportState> emit) async {
+    if (event.selectedArtists.isEmpty) {
+      errorStreamController.add(InvalidUserInputException("No artists selected for import."));
+    } else {
+      final availableTagsForSelectedArtists = await getAvailableTagsForSelectedArtists(event.selectedArtists);
+
+      emit(state.copyWith(
+          selectedArtists: event.selectedArtists,
+          availableTagsForSelectedArtists: availableTagsForSelectedArtists,
+          step: _getNextFlowStep(state)));
+    }
+  }
+
+  void _handleConfirmTagsForImportEvent(ConfirmTagsForImport event, Emitter<LastFmImportState> emit) {
+    if (state.availableTagsForSelectedArtists == null) {
+      errorStreamController.add(UnknownError("Something went wrong: Tags are not available for import."));
+    } else if (event.selectedTags.isEmpty && state.availableTagsForSelectedArtists!.isEmpty == false) {
+      errorStreamController.add(InvalidUserInputException("No tags selected for import."));
+    } else {
+      emit(state.copyWith(selectedTags: event.selectedTags, step: _getNextFlowStep(state)));
+    }
+  }
+
+  void _handleCompleteImportEvent(CompleteLastFmImport event, Emitter<LastFmImportState> emit) async {
+    // TODO
+    // final Map<ImportSubProcess, DbRequestSuccessCounter> successCounters =
+    //     await _spotifyImportProcessor.conductImport(event.selectedArtists, event.selectedGenres, _repository);
+    // final resultMessage = getResultMessage(successCounters);
+    // errorStreamController.add(UserInfo(resultMessage));
+
+    emit(state.copyWith(isFinished: true));
+  }
+
+  LastFmImportFlowStep _getNextFlowStep(LastFmImportState currentState) {
+    return LastFmImportFlowStep.values[currentState.step.index + 1];
   }
 }

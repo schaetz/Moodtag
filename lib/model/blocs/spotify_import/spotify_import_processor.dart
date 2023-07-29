@@ -2,7 +2,7 @@ import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_genre.dart';
+import 'package:moodtag/structs/imported_tag.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
 enum ImportSubProcess { createArtists, createTags, assignTags }
@@ -12,7 +12,7 @@ class SpotifyImportProcessor {
   final Map<String, Tag> createdTagsByGenreName = Map();
 
   Future<Map<ImportSubProcess, DbRequestSuccessCounter>> conductImport(
-      List<ImportedArtist> artistsToImport, List<ImportedGenre> genresToImport, Repository repository) async {
+      List<ImportedArtist> artistsToImport, List<ImportedTag> genresToImport, Repository repository) async {
     final DbRequestSuccessCounter createArtistsSuccessCounter =
         await _createArtistsForImport(artistsToImport, repository);
     final DbRequestSuccessCounter createTagsSuccessCounter =
@@ -41,13 +41,13 @@ class SpotifyImportProcessor {
     return creationSuccessCounter;
   }
 
-  Future<DbRequestSuccessCounter> _createGenreTagsForImport(List<ImportedGenre> genres, Repository repository) async {
+  Future<DbRequestSuccessCounter> _createGenreTagsForImport(List<ImportedTag> genres, Repository repository) async {
     final DbRequestSuccessCounter creationSuccessCounter = DbRequestSuccessCounter();
 
-    await Future.forEach(genres, (ImportedGenre importedGenre) async {
-      DbRequestResponse creationResponse = await repository.createTag(importedGenre.name);
+    await Future.forEach(genres, (ImportedTag ImportedTag) async {
+      DbRequestResponse creationResponse = await repository.createTag(ImportedTag.name);
       if (creationResponse.changedEntity != null) {
-        createdTagsByGenreName.putIfAbsent(importedGenre.name, () => creationResponse.changedEntity!);
+        createdTagsByGenreName.putIfAbsent(ImportedTag.name, () => creationResponse.changedEntity!);
       }
       creationSuccessCounter.registerResponse(creationResponse);
     });
@@ -61,7 +61,7 @@ class SpotifyImportProcessor {
     await Future.forEach(createdArtistsByEntity.entries, (MapEntry<ImportedArtist, Artist> createdArtistPair) async {
       final ImportedArtist importedArtistEntity = createdArtistPair.key;
       final Artist artist = createdArtistPair.value;
-      await Future.forEach(importedArtistEntity.genres, (genreName) async {
+      await Future.forEach(importedArtistEntity.tags, (genreName) async {
         if (createdTagsByGenreName.containsKey(genreName) && createdTagsByGenreName[genreName] != null) {
           DbRequestResponse assignTagsResponse =
               await repository.assignTagToArtist(artist, createdTagsByGenreName[genreName]!);
