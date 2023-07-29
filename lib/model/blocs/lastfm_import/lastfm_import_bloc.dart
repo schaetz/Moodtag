@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
@@ -7,9 +8,15 @@ import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_flow_step.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/screens/lastfm_import/lastfm_import_period.dart';
+import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
+import 'package:moodtag/structs/unique_named_entity_set.dart';
+
+import '../../../screens/lastfm_import/lastfm_connector.dart';
 
 class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorStreamHandling {
   LastFmImportBloc(Repository repository, BuildContext mainContext) : super(LastFmImportState(), repository) {
@@ -41,7 +48,53 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   }
 
   void _handleConfirmImportConfigEvent(ConfirmImportConfig event, Emitter<LastFmImportState> emit) async {
-    // TODO
+    try {
+      if (!state.isConfigurationValid) {
+        errorStreamController.add(InvalidUserInputException("Nothing selected for import."));
+        return;
+      }
+
+      LastFmAccount? lastFmAccount = await repository.getLastFmAccountOnce();
+      if (lastFmAccount == null) {
+        errorStreamController.add(InvalidUserInputException("Could not retrieve the configured Last.fm account."));
+        return;
+      }
+
+      final availableLastFmArtists = await _getAvailableLastFmArtists(lastFmAccount, state.configuration);
+
+      if (availableLastFmArtists.isEmpty) {
+        errorStreamController.add(InvalidUserInputException("No artists to import."));
+      } else {
+        emit(state.copyWith(availableLastFmArtists: availableLastFmArtists, step: _getNextFlowStep(state)));
+      }
+    } on ExternalServiceQueryException catch (e) {
+      print("Getting available artists from Last.fm failed: $e");
+      errorStreamController.add(e);
+    } catch (e) {
+      print("Getting available artists from Last.fm failed: $e");
+      errorStreamController.add(
+          ExternalServiceQueryException("Internal error - could not retrieve artists from the Last.fm API.", cause: e));
+    }
+  }
+
+  Future<UniqueNamedEntitySet<LastFmArtist>> _getAvailableLastFmArtists(
+      LastFmAccount lastFmAccount, Map<LastFmImportOption, bool> selectedOptions) async {
+    final availableLastFmArtists = UniqueNamedEntitySet<LastFmArtist>();
+
+    if (selectedOptions[LastFmImportOption.allTimeTopArtists] == true) {
+      availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.overall, 1000));
+    }
+
+    // TODO Prevent play counts from being overwritten
+    if (selectedOptions[LastFmImportOption.lastMonthTopArtists] == true) {
+      availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.one_month, 1000));
+    }
+
+    if (!availableLastFmArtists.isEmpty) {
+      await annotateImportEntitiesWithAlreadyExistsProp(availableLastFmArtists);
+    }
+
+    return availableLastFmArtists;
   }
 
   void _handleConfirmLastFmArtistsForImportEvent(

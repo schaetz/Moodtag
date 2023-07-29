@@ -56,10 +56,10 @@ Future<UniqueNamedEntitySet<LastFmArtist>> getTopArtists(String username, LastFm
   final responseBodyMap = json.decode(response.body);
   Set<LastFmArtist> topArtists;
   try {
-    topArtists = Set<LastFmArtist>.from(
-        responseBodyMap['topartists']?['artist']?.map((item) => LastFmArtist(item['name'], item['playcount'])));
+    topArtists = Set<LastFmArtist>.from(responseBodyMap['topartists']?['artist']
+        ?.map((item) => LastFmArtist(item['name'], int.parse(item['playcount']))));
   } catch (error) {
-    throw ExternalServiceQueryException('The Spotify data has an unknown structure.', cause: error);
+    throw ExternalServiceQueryException('The Last.fm data has an unknown structure.', cause: error);
   }
 
   return UniqueNamedEntitySet<LastFmArtist>.from(topArtists);
