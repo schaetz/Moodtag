@@ -1,6 +1,5 @@
 import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
-import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 
 import 'library_events.dart';
 
@@ -31,15 +30,6 @@ class ConfirmImportConfig extends ImportEvent {
 
   @override
   List<Object?> get props => [];
-}
-
-class ConfirmArtistsForImport extends ImportEvent {
-  final List<ImportedArtist> selectedArtists;
-
-  const ConfirmArtistsForImport(this.selectedArtists);
-
-  @override
-  List<Object?> get props => [selectedArtists];
 }
 
 class ConfirmTagsForImport extends ImportEvent {

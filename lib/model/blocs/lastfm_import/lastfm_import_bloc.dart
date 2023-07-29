@@ -16,7 +16,7 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
     on<ChangeImportConfig>(_handleChangeImportConfigEvent);
     on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
-    on<ConfirmArtistsForImport>(_handleConfirmArtistsForImportEvent);
+    on<ConfirmLastFmArtistsForImport>(_handleConfirmLastFmArtistsForImportEvent);
     on<ConfirmTagsForImport>(_handleConfirmTagsForImportEvent);
     on<CompleteLastFmImport>(_handleCompleteImportEvent);
 
@@ -44,15 +44,17 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     // TODO
   }
 
-  void _handleConfirmArtistsForImportEvent(ConfirmArtistsForImport event, Emitter<LastFmImportState> emit) async {
+  void _handleConfirmLastFmArtistsForImportEvent(
+      ConfirmLastFmArtistsForImport event, Emitter<LastFmImportState> emit) async {
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {
-      final availableTagsForSelectedArtists = await getAvailableTagsForSelectedArtists(event.selectedArtists);
+      // TODO
+      // final availableTagsForSelectedArtists = await getAvailableTagsForSelectedArtists(event.selectedArtists);
 
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
-          availableTagsForSelectedArtists: availableTagsForSelectedArtists,
+          // availableTagsForSelectedArtists: availableTagsForSelectedArtists,
           step: _getNextFlowStep(state)));
     }
   }

@@ -1,12 +1,14 @@
-import 'package:moodtag/structs/import_entity.dart';
+import 'package:moodtag/structs/imported_entities/import_entity.dart';
 
-class ImportedTag extends ImportEntity {
+class ImportedArtist extends ImportEntity {
   final String _name;
+
   bool _alreadyExists = false;
 
-  ImportedTag(this._name);
+  ImportedArtist(this._name);
 
   String get name => _name;
+
   bool get alreadyExists => _alreadyExists;
   void set alreadyExists(bool exists) => _alreadyExists = exists;
 }

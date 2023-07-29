@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_state.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_option.dart';
-import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
 import 'spotify_import_flow_step.dart';
@@ -12,9 +12,9 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
   final bool isFinished;
   final Map<SpotifyImportOption, bool> configuration;
 
-  final UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists;
+  final UniqueNamedEntitySet<SpotifyArtist>? availableSpotifyArtists;
   final UniqueNamedEntitySet<ImportedTag>? availableGenresForSelectedArtists;
-  final List<ImportedArtist>? selectedArtists;
+  final List<SpotifyArtist>? selectedArtists;
   final List<ImportedTag>? selectedGenres;
 
   const SpotifyImportState({
@@ -45,9 +45,9 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
     SpotifyImportFlowStep? step,
     bool? isFinished,
     Map<SpotifyImportOption, bool>? configuration,
-    UniqueNamedEntitySet<ImportedArtist>? availableSpotifyArtists,
+    UniqueNamedEntitySet<SpotifyArtist>? availableSpotifyArtists,
     UniqueNamedEntitySet<ImportedTag>? availableGenresForSelectedArtists,
-    List<ImportedArtist>? selectedArtists,
+    List<SpotifyArtist>? selectedArtists,
     List<ImportedTag>? selectedGenres,
   }) {
     return SpotifyImportState(

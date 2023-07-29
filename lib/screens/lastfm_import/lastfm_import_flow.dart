@@ -6,11 +6,12 @@ import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_flow_step.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/events/import_events.dart';
+import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
 import 'package:moodtag/screens/import_selection_list/import_selection_list_screen.dart';
-import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:provider/provider.dart';
 
@@ -66,14 +67,14 @@ class LastFmImportFlow extends AbstractImportFlow {
   }
 
   Widget _getArtistsSelectionScreen(LastFmImportBloc bloc) {
-    return ImportSelectionListScreen<ImportedArtist>(
+    return ImportSelectionListScreen<LastFmArtist>(
       scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index),
       namedEntitySet: bloc.state.availableLastFmArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
       entityDenotationPlural: I10n.ARTIST_DENOTATION_PLURAL,
-      onSelectionConfirmed: (List<ImportedArtist> selectedArtists) =>
-          bloc.add(ConfirmArtistsForImport(selectedArtists)),
+      onSelectionConfirmed: (List<LastFmArtist> selectedArtists) =>
+          bloc.add(ConfirmLastFmArtistsForImport(selectedArtists)),
     );
   }
 

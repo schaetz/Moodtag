@@ -5,13 +5,12 @@ import 'package:moodtag/components/app_bar_context_data.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_flow_step.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
-import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
 import 'package:moodtag/screens/import_selection_list/import_selection_list_screen.dart';
-import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:provider/provider.dart';
 
@@ -68,14 +67,14 @@ class SpotifyImportFlow extends AbstractImportFlow {
   }
 
   Widget _getArtistsSelectionScreen(SpotifyImportBloc bloc) {
-    return ImportSelectionListScreen<ImportedArtist>(
+    return ImportSelectionListScreen<SpotifyArtist>(
       scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index),
       namedEntitySet: bloc.state.availableSpotifyArtists!,
       confirmationButtonLabel: "OK",
       entityDenotationSingular: I10n.ARTIST_DENOTATION_SINGULAR,
       entityDenotationPlural: I10n.ARTIST_DENOTATION_PLURAL,
-      onSelectionConfirmed: (List<ImportedArtist> selectedArtists) =>
-          bloc.add(ConfirmArtistsForImport(selectedArtists)),
+      onSelectionConfirmed: (List<SpotifyArtist> selectedArtists) =>
+          bloc.add(ConfirmSpotifyArtistsForImport(selectedArtists)),
     );
   }
 

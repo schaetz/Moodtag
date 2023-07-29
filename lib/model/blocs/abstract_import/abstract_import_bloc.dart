@@ -4,9 +4,9 @@ import 'package:moodtag/model/blocs/abstract_import/abstract_import_state.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/structs/import_entity.dart';
-import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/import_entity.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
@@ -27,7 +27,7 @@ class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent
   }
 
   Future<UniqueNamedEntitySet<ImportedTag>> getAvailableTagsForSelectedArtists(
-      List<ImportedArtist> selectedArtists) async {
+      List<SpotifyArtist> selectedArtists) async {
     final UniqueNamedEntitySet<ImportedTag> availableTagsForSelectedArtists = UniqueNamedEntitySet();
     selectedArtists.forEach((artist) {
       List<ImportedTag> tagsList = artist.tags.map((tagName) => ImportedTag(tagName)).toList();

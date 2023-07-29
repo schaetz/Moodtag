@@ -15,7 +15,7 @@ import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
-import 'package:moodtag/structs/imported_artist.dart';
+import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
@@ -32,7 +32,7 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
     on<ChangeImportConfig>(_handleChangeImportConfigEvent);
     on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
-    on<ConfirmArtistsForImport>(_handleConfirmArtistsForImportEvent);
+    on<ConfirmSpotifyArtistsForImport>(_handleConfirmSpotifyArtistsForImportEvent);
     on<ConfirmGenreTagsForImport>(_handleConfirmGenreTagsForImportEvent);
     on<CompleteSpotifyImport>(_handleCompleteImportEvent);
 
@@ -93,9 +93,9 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     }
   }
 
-  Future<UniqueNamedEntitySet<ImportedArtist>> _getAvailableSpotifyArtists(
+  Future<UniqueNamedEntitySet<SpotifyArtist>> _getAvailableSpotifyArtists(
       Map<SpotifyImportOption, bool> selectedOptions, String accessToken) async {
-    final availableSpotifyArtists = UniqueNamedEntitySet<ImportedArtist>();
+    final availableSpotifyArtists = UniqueNamedEntitySet<SpotifyArtist>();
 
     if (selectedOptions[SpotifyImportOption.topArtists] == true) {
       availableSpotifyArtists.addAll(await getTopArtists(accessToken, 50, 0));
@@ -112,7 +112,8 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     return availableSpotifyArtists;
   }
 
-  void _handleConfirmArtistsForImportEvent(ConfirmArtistsForImport event, Emitter<SpotifyImportState> emit) async {
+  void _handleConfirmSpotifyArtistsForImportEvent(
+      ConfirmSpotifyArtistsForImport event, Emitter<SpotifyImportState> emit) async {
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {

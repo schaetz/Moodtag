@@ -1,9 +1,18 @@
 import 'package:moodtag/model/events/import_events.dart';
-import 'package:moodtag/structs/imported_artist.dart';
-import 'package:moodtag/structs/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 
 abstract class SpotifyImportEvent extends ImportEvent {
   const SpotifyImportEvent();
+}
+
+class ConfirmSpotifyArtistsForImport extends ImportEvent {
+  final List<SpotifyArtist> selectedArtists;
+
+  const ConfirmSpotifyArtistsForImport(this.selectedArtists);
+
+  @override
+  List<Object?> get props => [selectedArtists];
 }
 
 class ConfirmGenreTagsForImport extends ImportEvent {
@@ -16,7 +25,7 @@ class ConfirmGenreTagsForImport extends ImportEvent {
 }
 
 class CompleteSpotifyImport extends ImportEvent {
-  final List<ImportedArtist> selectedArtists;
+  final List<SpotifyArtist> selectedArtists;
   final List<ImportedTag> selectedGenres;
 
   CompleteSpotifyImport(this.selectedArtists, this.selectedGenres);

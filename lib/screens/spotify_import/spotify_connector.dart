@@ -7,7 +7,7 @@ import 'package:moodtag/exceptions/internal/internal_exception.dart';
 import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/structs/imported_artist.dart';
+import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/helpers.dart';
 import 'package:moodtag/utils/random_helper.dart';
@@ -125,7 +125,7 @@ SpotifyAccessToken? _extractAccessTokenFromJson(String responseBody) {
   return SpotifyAccessToken(token: token, expiration: expiration, refreshToken: refreshToken);
 }
 
-Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessToken) async {
+Future<UniqueNamedEntitySet<SpotifyArtist>> getFollowedArtists(String accessToken) async {
   final queryParameters = {
     'type': 'artist',
     'limit': '50',
@@ -139,18 +139,18 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getFollowedArtists(String accessTok
   }
 
   final responseBodyStructure = json.decode(response.body);
-  Set<ImportedArtist> followedArtists;
+  Set<SpotifyArtist> followedArtists;
   try {
-    followedArtists = Set<ImportedArtist>.from(responseBodyStructure['artists']['items']
-        ?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']), item['id'])));
+    followedArtists = Set<SpotifyArtist>.from(responseBodyStructure['artists']['items']
+        ?.map((item) => SpotifyArtist(item['name'], Set.from(item['genres']), item['id'])));
   } catch (error) {
     throw ExternalServiceQueryException('The Spotify data has an unknown structure.', cause: error);
   }
 
-  return UniqueNamedEntitySet<ImportedArtist>.from(followedArtists);
+  return UniqueNamedEntitySet<SpotifyArtist>.from(followedArtists);
 }
 
-Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, int limit, int offset) async {
+Future<UniqueNamedEntitySet<SpotifyArtist>> getTopArtists(String accessToken, int limit, int offset) async {
   final queryParameters = {
     'limit': limit.toString(),
     'offset': offset.toString(),
@@ -165,15 +165,15 @@ Future<UniqueNamedEntitySet<ImportedArtist>> getTopArtists(String accessToken, i
   }
 
   final responseBodyMap = json.decode(response.body);
-  Set<ImportedArtist> topArtists;
+  Set<SpotifyArtist> topArtists;
   try {
-    topArtists = Set<ImportedArtist>.from(
-        responseBodyMap['items']?.map((item) => ImportedArtist(item['name'], Set.from(item['genres']), item['id'])));
+    topArtists = Set<SpotifyArtist>.from(
+        responseBodyMap['items']?.map((item) => SpotifyArtist(item['name'], Set.from(item['genres']), item['id'])));
   } catch (error) {
     throw ExternalServiceQueryException('The Spotify data has an unknown structure.', cause: error);
   }
 
-  return UniqueNamedEntitySet<ImportedArtist>.from(topArtists);
+  return UniqueNamedEntitySet<SpotifyArtist>.from(topArtists);
 }
 
 void playArtist(String accessToken, Artist artist) async {
