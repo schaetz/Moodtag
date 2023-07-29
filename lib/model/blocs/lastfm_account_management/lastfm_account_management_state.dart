@@ -17,6 +17,8 @@ class LastFmAccountManagementState extends Equatable {
         accountLoadingStatus,
       ];
 
+  bool get hasAccount => lastFmAccount != null;
+
   LastFmAccountManagementState copyWith({
     LastFmAccount? lastFmAccount,
     bool removeAccount = false,
