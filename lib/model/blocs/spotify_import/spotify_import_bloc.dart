@@ -106,7 +106,7 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     }
 
     if (!availableSpotifyArtists.isEmpty) {
-      await annotateImportEntitiesWithAlreadyExistsProp(availableSpotifyArtists);
+      await annotateImportedArtistsWithAlreadyExistsProp(availableSpotifyArtists);
     }
 
     return availableSpotifyArtists;

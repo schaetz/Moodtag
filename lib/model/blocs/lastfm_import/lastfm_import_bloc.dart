@@ -100,7 +100,7 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     }
 
     if (!availableLastFmArtists.isEmpty) {
-      await annotateImportEntitiesWithAlreadyExistsProp(availableLastFmArtists);
+      await annotateImportedArtistsWithAlreadyExistsProp(availableLastFmArtists);
     }
 
     return availableLastFmArtists;

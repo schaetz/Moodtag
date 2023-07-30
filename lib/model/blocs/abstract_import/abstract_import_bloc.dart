@@ -4,7 +4,7 @@ import 'package:moodtag/model/blocs/abstract_import/abstract_import_state.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/structs/imported_entities/import_entity.dart';
+import 'package:moodtag/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
@@ -17,10 +17,19 @@ class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent
 
   AbstractImportBloc(super.initialState, this._repository);
 
-  Future annotateImportEntitiesWithAlreadyExistsProp(UniqueNamedEntitySet<ImportEntity> entities) async {
-    final existingNames = await _repository.getSetOfExistingTagNames();
+  Future annotateImportedArtistsWithAlreadyExistsProp(UniqueNamedEntitySet<ImportedArtist> entities) async {
+    final existingArtistNames = await _repository.getSetOfExistingArtistNames();
     entities.values.forEach((entity) {
-      if (existingNames.contains(entity.name)) {
+      if (existingArtistNames.contains(entity.name)) {
+        entity.alreadyExists = true;
+      }
+    });
+  }
+
+  Future annotateImportedTagsWithAlreadyExistsProp(UniqueNamedEntitySet<ImportedTag> entities) async {
+    final existingTagNames = await _repository.getSetOfExistingTagNames();
+    entities.values.forEach((entity) {
+      if (existingTagNames.contains(entity.name)) {
         entity.alreadyExists = true;
       }
     });
@@ -35,7 +44,7 @@ class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent
     });
 
     if (!availableTagsForSelectedArtists.isEmpty) {
-      await annotateImportEntitiesWithAlreadyExistsProp(availableTagsForSelectedArtists);
+      await annotateImportedTagsWithAlreadyExistsProp(availableTagsForSelectedArtists);
     }
 
     return availableTagsForSelectedArtists;
