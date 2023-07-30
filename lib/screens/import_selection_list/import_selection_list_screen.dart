@@ -43,7 +43,7 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
       ),
       rowBuilderStrategy: HighlightRowBuilderStrategy<E>(
           doHighlightEntity: (E entity) => entity.alreadyExists,
-          doDisableEntity: (E entity) => entity.alreadyExists && E == _typeOf<ImportedTag>(),
+          doDisableEntity: (E entity) => entity.alreadyExists,
           getSubtitleText: getSubtitleText,
           subtitleIcon: subtitleIcon),
     );
