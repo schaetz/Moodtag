@@ -8,6 +8,7 @@ import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
+import 'package:moodtag/components/multiple_floating_action_buttons_column.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
@@ -98,33 +99,24 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
                       },
                     ));
           }),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-              onPressed: () => bloc.add(ToggleFilterSelectionModal(wantedOpen: true)),
-              child: const Icon(Icons.filter_list),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              heroTag: 'fab_change_filters'),
-          SizedBox(
-            height: 16,
-          ),
-          FloatingActionButton(
-              onPressed: () => bloc.add(ToggleTagSubtitles()),
-              child: _buildTagSubtitlesToggleIcon(),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              heroTag: 'fab_toggle_tag_subtitles'),
-          SizedBox(
-            height: 16,
-          ),
-          FloatingActionButton(
-            onPressed: () =>
-                AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => bloc.add(CreateArtists(input))),
-            child: const Icon(Icons.add),
+      floatingActionButton: MultipleFloatingActionButtonsColumn(children: [
+        FloatingActionButton(
+            onPressed: () => bloc.add(ToggleFilterSelectionModal(wantedOpen: true)),
+            child: const Icon(Icons.filter_list),
             backgroundColor: Theme.of(context).colorScheme.secondary,
-          )
-        ],
-      ),
+            heroTag: 'fab_change_filters'),
+        FloatingActionButton(
+            onPressed: () => bloc.add(ToggleTagSubtitles()),
+            child: _buildTagSubtitlesToggleIcon(),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            heroTag: 'fab_toggle_tag_subtitles'),
+        FloatingActionButton(
+          onPressed: () =>
+              AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => bloc.add(CreateArtists(input))),
+          child: const Icon(Icons.add),
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+        )
+      ]),
       bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists),
     );
   }
