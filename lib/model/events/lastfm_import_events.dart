@@ -1,5 +1,3 @@
-import 'package:moodtag/structs/imported_entities/imported_artist.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 
 import 'import_events.dart';
@@ -18,11 +16,10 @@ class ConfirmLastFmArtistsForImport extends ImportEvent {
 }
 
 class CompleteLastFmImport extends ImportEvent {
-  final List<ImportedArtist> selectedArtists;
-  final List<ImportedTag> selectedTags;
+  final List<LastFmArtist> selectedArtists;
 
-  CompleteLastFmImport(this.selectedArtists, this.selectedTags);
+  CompleteLastFmImport(this.selectedArtists);
 
   @override
-  List<Object?> get props => [selectedArtists, selectedTags];
+  List<Object?> get props => [selectedArtists];
 }

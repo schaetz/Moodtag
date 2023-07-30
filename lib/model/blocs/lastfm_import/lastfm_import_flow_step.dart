@@ -1,1 +1,1 @@
-enum LastFmImportFlowStep { config, artistsSelection, tagsSelection, confirmation }
+enum LastFmImportFlowStep { config, artistsSelection, confirmation }

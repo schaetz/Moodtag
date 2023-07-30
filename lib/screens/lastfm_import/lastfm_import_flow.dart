@@ -6,12 +6,10 @@ import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_flow_step.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
-import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
 import 'package:moodtag/screens/import_selection_list/import_selection_list_screen.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +19,7 @@ import 'lastfm_import_confirmation_screen.dart';
 import 'lastfm_import_flow_state.dart';
 
 class LastFmImportFlow extends AbstractImportFlow {
-  LastFmImportFlow() : super('Last.fm Import', 4);
+  LastFmImportFlow() : super('Last.fm Import', LastFmImportFlowStep.values.length);
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +57,6 @@ class LastFmImportFlow extends AbstractImportFlow {
             scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index));
       case LastFmImportFlowStep.artistsSelection:
         return _getArtistsSelectionScreen(bloc);
-      case LastFmImportFlowStep.tagsSelection:
-        return _getTagsSelectionScreen(bloc);
       case LastFmImportFlowStep.confirmation:
         return LastFmImportConfirmationScreen(
             scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index));
@@ -95,16 +91,5 @@ class LastFmImportFlow extends AbstractImportFlow {
     }
 
     return playCountString;
-  }
-
-  Widget _getTagsSelectionScreen(LastFmImportBloc bloc) {
-    return ImportSelectionListScreen<ImportedTag>(
-      scaffoldBodyWrapperFactory: getImportFlowScreenWrapperFactory(bloc.state.step.index),
-      namedEntitySet: bloc.state.availableTagsForSelectedArtists!,
-      confirmationButtonLabel: "OK",
-      entityDenotationSingular: "tag",
-      entityDenotationPlural: "tags",
-      onSelectionConfirmed: (List<ImportedTag> selectedGenres) => bloc.add(ConfirmTagsForImport(selectedGenres)),
-    );
   }
 }

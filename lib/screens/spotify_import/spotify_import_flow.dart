@@ -19,7 +19,7 @@ import 'spotify_import_config_screen.dart';
 import 'spotify_import_confirmation_screen.dart';
 
 class SpotifyImportFlow extends AbstractImportFlow {
-  SpotifyImportFlow() : super('Spotify Import', 4);
+  SpotifyImportFlow() : super('Spotify Import', SpotifyImportFlowStep.values.length);
 
   @override
   Widget build(BuildContext context) {

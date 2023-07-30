@@ -1,11 +1,10 @@
 import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/model/blocs/abstract_import/ImportSubProcess.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
-
-enum ImportSubProcess { createArtists, createTags, assignTags }
 
 class SpotifyImportProcessor {
   final Map<SpotifyArtist, Artist> createdArtistsByEntity = Map();
@@ -29,11 +28,11 @@ class SpotifyImportProcessor {
   Future<DbRequestSuccessCounter> _createArtistsForImport(List<SpotifyArtist> artists, Repository repository) async {
     final DbRequestSuccessCounter creationSuccessCounter = DbRequestSuccessCounter();
 
-    await Future.forEach(artists, (SpotifyArtist SpotifyArtist) async {
+    await Future.forEach(artists, (SpotifyArtist spotifyArtist) async {
       DbRequestResponse<Artist> creationResponse =
-          await repository.createArtist(SpotifyArtist.name, spotifyId: SpotifyArtist.spotifyId);
+          await repository.createArtist(spotifyArtist.name, spotifyId: spotifyArtist.spotifyId);
       if (creationResponse.changedEntity != null) {
-        createdArtistsByEntity.putIfAbsent(SpotifyArtist, () => creationResponse.changedEntity!);
+        createdArtistsByEntity.putIfAbsent(spotifyArtist, () => creationResponse.changedEntity!);
       }
       creationSuccessCounter.registerResponse(creationResponse);
     });

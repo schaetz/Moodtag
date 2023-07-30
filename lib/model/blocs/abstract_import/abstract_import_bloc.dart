@@ -1,13 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_state.dart';
-import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
+
+import 'ImportSubProcess.dart';
 
 class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent, S> {
   final Repository _repository;

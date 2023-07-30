@@ -24,8 +24,8 @@ class LastFmImportConfirmationScreen extends AbstractImportConfirmationScreen {
         }))),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            if (bloc.state.selectedArtists != null && bloc.state.selectedTags != null) {
-              bloc.add(CompleteLastFmImport(bloc.state.selectedArtists!, bloc.state.selectedTags!));
+            if (bloc.state.selectedArtists != null) {
+              bloc.add(CompleteLastFmImport(bloc.state.selectedArtists!));
             } else {
               bloc.errorStreamController.add(UnknownError('Something went wrong.'));
             }
@@ -40,9 +40,6 @@ class LastFmImportConfirmationScreen extends AbstractImportConfirmationScreen {
     final Map<String, int> entityFreq = {};
     if (state.selectedArtists != null && state.selectedArtists!.isNotEmpty) {
       entityFreq.putIfAbsent('Artists', () => state.selectedArtists!.length);
-    }
-    if (state.selectedTags != null && state.selectedTags!.isNotEmpty) {
-      entityFreq.putIfAbsent('Genres', () => state.selectedTags!.length);
     }
     return entityFreq;
   }
