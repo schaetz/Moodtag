@@ -6,7 +6,6 @@ import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
@@ -33,21 +32,6 @@ class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent
         entity.alreadyExists = true;
       }
     });
-  }
-
-  Future<UniqueNamedEntitySet<ImportedTag>> getAvailableTagsForSelectedArtists(
-      List<SpotifyArtist> selectedArtists) async {
-    final UniqueNamedEntitySet<ImportedTag> availableTagsForSelectedArtists = UniqueNamedEntitySet();
-    selectedArtists.forEach((artist) {
-      List<ImportedTag> tagsList = artist.tags.map((tagName) => ImportedTag(tagName)).toList();
-      tagsList.forEach((genreEntity) => availableTagsForSelectedArtists.add(genreEntity));
-    });
-
-    if (!availableTagsForSelectedArtists.isEmpty) {
-      await annotateImportedTagsWithAlreadyExistsProp(availableTagsForSelectedArtists);
-    }
-
-    return availableTagsForSelectedArtists;
   }
 
   String getResultMessage(Map<ImportSubProcess, DbRequestSuccessCounter> creationSuccessCountersByType) {

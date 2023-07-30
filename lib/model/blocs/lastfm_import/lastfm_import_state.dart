@@ -38,7 +38,11 @@ class LastFmImportState extends Equatable implements AbstractImportState {
         selectedTags
       ];
 
-  bool get isConfigurationValid => configuration.values.where((selection) => selection == true).toList().isNotEmpty;
+  bool get isConfigurationValid =>
+      configuration[LastFmImportOption.allTimeTopArtists] == true ||
+      configuration[LastFmImportOption.lastMonthTopArtists] == true;
+  bool get doImportTags =>
+      configuration[LastFmImportOption.topTags] == true || configuration[LastFmImportOption.userTags] == true;
 
   LastFmImportState copyWith({
     LastFmImportFlowStep? step,

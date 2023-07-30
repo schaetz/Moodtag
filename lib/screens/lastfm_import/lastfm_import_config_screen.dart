@@ -39,11 +39,7 @@ class LastFmImportConfigScreen extends StatelessWidget {
   }
 
   Map<String, String> _getConfigItemsWithCaption() {
-    final Map<String, String> configItemsWithCaption = {
-      LastFmImportOption.allTimeTopArtists.name: 'All-time top artists',
-      LastFmImportOption.lastMonthTopArtists.name: 'Last month\'s top artists',
-    };
-    return configItemsWithCaption;
+    return Map.fromEntries(LastFmImportOption.values.map((option) => MapEntry(option.name, option.caption)));
   }
 
   Map<String, bool> _getConfigItemsWithInitialValues(LastFmImportState state) {

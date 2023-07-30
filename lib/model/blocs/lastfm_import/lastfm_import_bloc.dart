@@ -13,6 +13,7 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 
@@ -69,7 +70,7 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
         return;
       }
 
-      final availableLastFmArtists = await _getAvailableLastFmArtists(lastFmAccount, state.configuration);
+      final availableLastFmArtists = await _getAvailableLastFmArtists(lastFmAccount);
 
       if (availableLastFmArtists.isEmpty) {
         errorStreamController.add(InvalidUserInputException("No artists to import."));
@@ -86,15 +87,14 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     }
   }
 
-  Future<UniqueNamedEntitySet<LastFmArtist>> _getAvailableLastFmArtists(
-      LastFmAccount lastFmAccount, Map<LastFmImportOption, bool> selectedOptions) async {
+  Future<UniqueNamedEntitySet<LastFmArtist>> _getAvailableLastFmArtists(LastFmAccount lastFmAccount) async {
     final availableLastFmArtists = UniqueNamedEntitySet<LastFmArtist>();
 
-    if (selectedOptions[LastFmImportOption.allTimeTopArtists] == true) {
+    if (state.configuration[LastFmImportOption.allTimeTopArtists] == true) {
       availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.overall, 1000));
     }
 
-    if (selectedOptions[LastFmImportOption.lastMonthTopArtists] == true) {
+    if (state.configuration[LastFmImportOption.lastMonthTopArtists] == true) {
       final lastMonthTopArtists = await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.one_month, 1000);
       availableLastFmArtists.addOrUpdateAll(lastMonthTopArtists, _combineLastFmArtistPlays);
     }
@@ -118,14 +118,39 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {
-      // TODO
-      // final availableTagsForSelectedArtists = await getAvailableTagsForSelectedArtists(event.selectedArtists);
+      final availableTagsForSelectedArtists =
+          state.doImportTags ? await _getAvailableTagsForSelectedArtists(event.selectedArtists) : null;
 
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
-          // availableTagsForSelectedArtists: availableTagsForSelectedArtists,
+          availableTagsForSelectedArtists: availableTagsForSelectedArtists,
           step: _getNextFlowStep(state)));
     }
+  }
+
+  Future<UniqueNamedEntitySet<ImportedTag>> _getAvailableTagsForSelectedArtists(
+      List<LastFmArtist> selectedArtists) async {
+    final UniqueNamedEntitySet<ImportedTag> tagsForSelectedArtists = UniqueNamedEntitySet();
+
+    // Caution: Using the forEach loop would result in sending way too many requests to the Last.fm API
+    // and might get my application banned!
+    final artist = selectedArtists.first;
+    // selectedArtists.forEach((artist) async {
+    if (state.configuration[LastFmImportOption.topTags] == true) {
+      tagsForSelectedArtists.addOrUpdateAll(await getTags(artist.name), (existingTag, updateTag) => updateTag);
+    }
+
+    // The user tags do not have the "count" property, hence we do not overwrite existing tags which might have it
+    if (state.configuration[LastFmImportOption.userTags] == true) {
+      tagsForSelectedArtists.addOrUpdateAll(await getTags(artist.name), (existingTag, updateTag) => existingTag);
+    }
+    // });
+
+    if (!tagsForSelectedArtists.isEmpty) {
+      await annotateImportedTagsWithAlreadyExistsProp(tagsForSelectedArtists);
+    }
+
+    return tagsForSelectedArtists;
   }
 
   void _handleConfirmTagsForImportEvent(ConfirmTagsForImport event, Emitter<LastFmImportState> emit) {
@@ -149,6 +174,9 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   }
 
   LastFmImportFlowStep _getNextFlowStep(LastFmImportState currentState) {
+    if (currentState.step == LastFmImportFlowStep.artistsSelection && !currentState.doImportTags) {
+      return LastFmImportFlowStep.confirmation;
+    }
     return LastFmImportFlowStep.values[currentState.step.index + 1];
   }
 }

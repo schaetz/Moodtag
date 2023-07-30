@@ -15,6 +15,7 @@ import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
@@ -117,13 +118,28 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {
-      final availableGenresForSelectedArtists = await getAvailableTagsForSelectedArtists(event.selectedArtists);
+      final availableGenresForSelectedArtists = await _getAvailableTagsForSelectedArtists(event.selectedArtists);
 
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
           availableGenresForSelectedArtists: availableGenresForSelectedArtists,
           step: _getNextFlowStep(state)));
     }
+  }
+
+  Future<UniqueNamedEntitySet<ImportedTag>> _getAvailableTagsForSelectedArtists(
+      List<SpotifyArtist> selectedArtists) async {
+    final UniqueNamedEntitySet<ImportedTag> tagsForSelectedArtists = UniqueNamedEntitySet();
+    selectedArtists.forEach((artist) {
+      List<ImportedTag> tagsList = artist.tags.map((tagName) => ImportedTag(tagName)).toList();
+      tagsList.forEach((genreEntity) => tagsForSelectedArtists.add(genreEntity));
+    });
+
+    if (!tagsForSelectedArtists.isEmpty) {
+      await annotateImportedTagsWithAlreadyExistsProp(tagsForSelectedArtists);
+    }
+
+    return tagsForSelectedArtists;
   }
 
   void _handleConfirmGenreTagsForImportEvent(ConfirmGenreTagsForImport event, Emitter<SpotifyImportState> emit) {

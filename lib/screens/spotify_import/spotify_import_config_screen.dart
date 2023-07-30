@@ -40,12 +40,7 @@ class SpotifyImportConfigScreen extends StatelessWidget {
   }
 
   Map<String, String> _getConfigItemsWithCaption() {
-    final Map<String, String> configItemsWithCaption = {
-      SpotifyImportOption.topArtists.name: 'Top artists',
-      SpotifyImportOption.followedArtists.name: 'Followed artists',
-      SpotifyImportOption.artistGenres.name: 'Artist genres'
-    };
-    return configItemsWithCaption;
+    return Map.fromEntries(SpotifyImportOption.values.map((option) => MapEntry(option.name, option.caption)));
   }
 
   Map<String, bool> _getConfigItemsWithInitialValues(SpotifyImportState state) {
