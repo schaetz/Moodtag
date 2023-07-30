@@ -10,28 +10,32 @@ import 'selection_list_config.dart';
 // of the CheckboxListTiles.
 class SelectionListScreen<E extends NamedEntity> extends StatefulWidget {
   final SelectionListConfig<E> config;
-  late final RowBuilderStrategy rowBuilderStrategy;
+  late final RowBuilderStrategy<E> rowBuilderStrategy;
 
   SelectionListScreen({required this.config, required this.rowBuilderStrategy});
 
   SelectionListScreen.defaultStyle(this.config) {
-    this.rowBuilderStrategy = RowBuilderStrategy();
+    this.rowBuilderStrategy = RowBuilderStrategy<E>();
   }
 
   @override
   State<StatefulWidget> createState() => SelectionListScreenState<E>();
 }
 
-class SelectionListScreenState<E extends NamedEntity> extends State<SelectionListScreen> {
+class SelectionListScreenState<E extends NamedEntity> extends State<SelectionListScreen<E>> {
   late final List<E> _sortedEntities;
-  List<bool> _isBoxSelected = [];
+  Map<E, bool> _isBoxSelected = {};
   int _selectedBoxesCount = 0;
+  Set<E> _enabledEntities = {};
+  Set<E> _disabledEntities = {};
+  int _selectedDisabledBoxesCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _sortedEntities = widget.config.namedEntitySet.toSortedList() as List<E>;
-    _setBoxSelections(_sortedEntities.length, true);
+    _sortedEntities = widget.config.namedEntitySet.toSortedList();
+    _initializeBoxSelections(true);
+    _collectEnabledAndDisabledEntities();
   }
 
   @override
@@ -44,7 +48,10 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
         padding: EdgeInsets.all(16.0),
         itemCount: _sortedEntities.length,
         itemBuilder: (context, i) => widget.rowBuilderStrategy.buildRow(i,
-            entity: _sortedEntities[i], isChecked: _isBoxSelected[i], onListTileChanged: _onListTileChanged),
+            entity: _sortedEntities[i],
+            isChecked: _isBoxSelected[_sortedEntities[i]] ?? false,
+            onListTileChanged: _onListTileChanged,
+            isDisabled: _disabledEntities.contains(_sortedEntities[i])),
       )),
       floatingActionButton: Container(
         child: Row(
@@ -53,7 +60,7 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(left: 32),
-              child: _buildFloatingSelectButton(context, _sortedEntities.length),
+              child: _buildFloatingSelectButton(context),
             ),
             FloatingActionButton.extended(
               onPressed: () => _isSelectionValid()
@@ -66,17 +73,51 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
                   : Colors.grey, // TODO Define color in theme
               heroTag: 'main_button',
             ),
-            //add right Widget here with padding right
           ],
         ),
       ),
     );
   }
 
-  void _setBoxSelections(int entityCount, bool value) {
+  void _initializeBoxSelections(bool value) {
     setState(() {
-      _isBoxSelected = List.filled(entityCount, value);
-      _selectedBoxesCount = value == true ? entityCount : 0;
+      _isBoxSelected = Map.fromEntries(_sortedEntities.map((entity) => MapEntry(entity, value)));
+      _selectedBoxesCount = value == true ? _sortedEntities.length : 0;
+    });
+  }
+
+  void _setAllEnabledBoxSelections(bool newValue) {
+    setState(() {
+      _isBoxSelected.updateAll((entity, oldValue) => _enabledEntities.contains(entity) ? newValue : oldValue);
+      _selectedBoxesCount =
+          newValue == true ? _enabledEntities.length + _selectedDisabledBoxesCount : _selectedDisabledBoxesCount;
+    });
+  }
+
+  void _collectEnabledAndDisabledEntities() {
+    final Set<E> enabledEntities = {};
+    final Set<E> disabledEntities = {};
+    var selectedDisabledBoxesCount = 0;
+
+    if (widget.config.doDisableEntity == null) {
+      enabledEntities.addAll(_sortedEntities);
+    } else {
+      _sortedEntities.forEach((entity) {
+        if (!widget.config.doDisableEntity!(entity)) {
+          enabledEntities.add(entity);
+        } else {
+          disabledEntities.add(entity);
+          if (_isBoxSelected[entity] == true) {
+            selectedDisabledBoxesCount++;
+          }
+        }
+      });
+    }
+
+    setState(() {
+      _enabledEntities = enabledEntities;
+      _disabledEntities = disabledEntities;
+      _selectedDisabledBoxesCount = selectedDisabledBoxesCount;
     });
   }
 
@@ -85,7 +126,7 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
   void _onListTileChanged(bool? newValue, int index) {
     setState(() {
       if (newValue != null) {
-        _isBoxSelected[index] = newValue;
+        _isBoxSelected[_sortedEntities[index]] = newValue;
         if (newValue == true) {
           _selectedBoxesCount++;
         } else {
@@ -95,10 +136,12 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
     });
   }
 
-  Widget _buildFloatingSelectButton(BuildContext context, int entityCount) {
-    if (_selectedBoxesCount == entityCount) {
+  Widget _buildFloatingSelectButton(BuildContext context) {
+    final enabledEntitiesCount = _sortedEntities.length - _disabledEntities.length;
+    final selectedEnabledBoxesCount = _selectedBoxesCount - _selectedDisabledBoxesCount;
+    if (selectedEnabledBoxesCount == enabledEntitiesCount) {
       return FloatingActionButton.extended(
-        onPressed: () => _setBoxSelections(entityCount, false),
+        onPressed: () => _setAllEnabledBoxSelections(false),
         label: const Text('Select none'),
         icon: const Icon(Icons.remove_circle_outline),
         backgroundColor: Theme.of(context).colorScheme.secondary,
@@ -106,7 +149,7 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
       );
     } else {
       return FloatingActionButton.extended(
-        onPressed: () => _setBoxSelections(entityCount, true),
+        onPressed: () => _setAllEnabledBoxSelections(true),
         label: const Text('Select all'),
         icon: const Icon(Icons.select_all_outlined),
         backgroundColor: Theme.of(context).colorScheme.secondary,

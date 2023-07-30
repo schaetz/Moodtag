@@ -11,16 +11,19 @@ class HighlightRowBuilderStrategy<E extends NamedEntity> extends RowBuilderStrat
   static const subtitleStyle = TextStyle(fontSize: 14.0, color: subtitleColor);
 
   final bool Function(E) doHighlightEntity;
-  final bool Function(E) doDisableEntity;
+  final IconData? Function(E)? getMainIcon;
+  final IconData? Function(E)? getSubtitleIcon;
   final String? Function(E)? getSubtitleText;
-  final IconData? subtitleIcon;
 
   HighlightRowBuilderStrategy(
-      {required this.doHighlightEntity, required this.doDisableEntity, this.getSubtitleText, this.subtitleIcon});
+      {required this.doHighlightEntity, this.getMainIcon, this.getSubtitleIcon, this.getSubtitleText});
 
   @override
   Widget buildRow(int index,
-      {required E entity, required bool isChecked, required Function(bool?, int) onListTileChanged}) {
+      {required E entity,
+      required bool isChecked,
+      required Function(bool?, int) onListTileChanged,
+      required bool isDisabled}) {
     return CheckboxListTile(
         title: RichText(
             text: TextSpan(style: listEntryStyle.copyWith(color: _getEntityColor(entity)), children: [
@@ -28,32 +31,36 @@ class HighlightRowBuilderStrategy<E extends NamedEntity> extends RowBuilderStrat
             text: entity.name,
           ),
           if (doHighlightEntity(entity))
-            WidgetSpan(
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 2.0),
-                    child: doDisableEntity(entity) ? Icon(Icons.check) : Icon(Icons.update)))
+            WidgetSpan(child: Padding(padding: const EdgeInsets.only(left: 2.0), child: _getMainIcon(entity)))
         ])),
         subtitle: _getSubtitle(entity),
         activeColor: _getEntityColor(entity),
-        enabled: !doDisableEntity(entity),
+        enabled: !isDisabled,
         selected: isChecked,
         value: isChecked,
         controlAffinity: ListTileControlAffinity.leading,
         onChanged: (newValue) => onListTileChanged(newValue, index));
   }
 
-  Widget? _getSubtitle(entity) {
+  Widget? _getMainIcon(E entity) {
+    if (getMainIcon == null || getMainIcon!(entity) == null) {
+      return null;
+    }
+    return Icon(getMainIcon!(entity));
+  }
+
+  Widget? _getSubtitle(E entity) {
     if (getSubtitleText == null || getSubtitleText!(entity) == null) {
       return null;
     }
 
     final subtitleText = getSubtitleText!(entity)!;
-    if (subtitleIcon != null) {
+    if (getSubtitleIcon != null) {
       return RichText(
           text: TextSpan(children: [
         WidgetSpan(
             child: Icon(
-              subtitleIcon,
+              getSubtitleIcon!(entity) ?? null,
               size: subtitleIconSize,
               color: subtitleColor,
             ),

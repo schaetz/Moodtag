@@ -40,18 +40,20 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
         scaffoldBodyWrapperFactory: scaffoldBodyWrapperFactory,
         mainButtonLabel: confirmationButtonLabel,
         onMainButtonPressed: _onConfirmButtonPressed,
+        doDisableEntity: (E entity) => entity.alreadyExists,
       ),
       rowBuilderStrategy: HighlightRowBuilderStrategy<E>(
-          doHighlightEntity: (E entity) => entity.alreadyExists,
-          doDisableEntity: (E entity) => entity.alreadyExists,
+          doHighlightEntity: (ImportEntity entity) => entity.alreadyExists,
           getSubtitleText: getSubtitleText,
-          subtitleIcon: subtitleIcon),
+          getMainIcon: (E entity) => entity.alreadyExists ? (E == ImportedTag ? Icons.check : Icons.update) : null,
+          getSubtitleIcon: (_) => subtitleIcon),
     );
   }
 
   void _onConfirmButtonPressed(
-      BuildContext context, List<E> sortedEntities, List<bool> isBoxSelected, int selectedBoxesCount) async {
-    List<E> selectedEntities = _filterOutUnselectedEntities(sortedEntities, isBoxSelected);
+      BuildContext context, List<E> sortedEntities, Map<E, bool> isBoxSelected, int selectedBoxesCount) async {
+    List<E> selectedEntities =
+        isBoxSelected.entries.where((entry) => entry.value == true).map((entry) => entry.key).toList();
     onSelectionConfirmed(selectedEntities);
   }
 

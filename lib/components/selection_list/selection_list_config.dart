@@ -9,29 +9,33 @@ class SelectionListConfig<E extends NamedEntity> extends Equatable {
   final PreferredSizeWidget appBar;
   final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
   final String mainButtonLabel;
-  final Function(BuildContext, List<E>, List<bool>, int) onMainButtonPressed;
+  final Function(BuildContext, List<E>, Map<E, bool>, int) onMainButtonPressed;
+  final bool Function(E)? doDisableEntity;
 
   const SelectionListConfig(
       {required this.namedEntitySet,
       required this.appBar,
       required this.scaffoldBodyWrapperFactory,
       required this.mainButtonLabel,
-      required this.onMainButtonPressed});
+      required this.onMainButtonPressed,
+      required this.doDisableEntity});
 
   @override
-  List<Object?> get props => [namedEntitySet, appBar, mainButtonLabel, onMainButtonPressed];
+  List<Object?> get props => [namedEntitySet, appBar, mainButtonLabel, onMainButtonPressed, doDisableEntity];
 
   SelectionListConfig<E> copyWith(
       {UniqueNamedEntitySet<E>? namedEntitySet,
       PreferredSizeWidget? appBar,
       ScaffoldBodyWrapperFactory? scaffoldBodyWrapperFactory,
       String? mainButtonLabel,
-      Function(BuildContext, List<E>, List<bool>, int)? onMainButtonPressed}) {
+      Function(BuildContext, List<E>, Map<E, bool>, int)? onMainButtonPressed,
+      bool Function(E)? doDisableEntity}) {
     return SelectionListConfig<E>(
         namedEntitySet: namedEntitySet ?? this.namedEntitySet,
         appBar: appBar ?? this.appBar,
         scaffoldBodyWrapperFactory: scaffoldBodyWrapperFactory ?? this.scaffoldBodyWrapperFactory,
         mainButtonLabel: mainButtonLabel ?? this.mainButtonLabel,
-        onMainButtonPressed: onMainButtonPressed ?? this.onMainButtonPressed);
+        onMainButtonPressed: onMainButtonPressed ?? this.onMainButtonPressed,
+        doDisableEntity: doDisableEntity ?? this.doDisableEntity);
   }
 }
