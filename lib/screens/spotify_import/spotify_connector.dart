@@ -138,7 +138,7 @@ Future<UniqueNamedEntitySet<SpotifyArtist>> getFollowedArtists(String accessToke
     throw ExternalServiceQueryException(_getRequestErrorMessage(response));
   }
 
-  final responseBodyStructure = json.decode(response.body);
+  final responseBodyStructure = json.decode(utf8.decode(response.bodyBytes));
   Set<SpotifyArtist> followedArtists;
   try {
     followedArtists = Set<SpotifyArtist>.from(responseBodyStructure['artists']['items']
@@ -164,7 +164,7 @@ Future<UniqueNamedEntitySet<SpotifyArtist>> getTopArtists(String accessToken, in
     throw ExternalServiceQueryException(_getRequestErrorMessage(response));
   }
 
-  final responseBodyMap = json.decode(response.body);
+  final responseBodyMap = json.decode(utf8.decode(response.bodyBytes));
   Set<SpotifyArtist> topArtists;
   try {
     topArtists = Set<SpotifyArtist>.from(
@@ -198,7 +198,7 @@ String _getRequestErrorMessage(Response response) {
   var messageAppendix = '';
 
   try {
-    final responseBodyJSON = json.decode(response.body);
+    final responseBodyJSON = json.decode(utf8.decode(response.bodyBytes));
     messageAppendix = '- message ' + responseBodyJSON['error']['message'];
   } catch (e) {
     // FormatException is thrown for statusCode 403 Forbidden

@@ -23,7 +23,7 @@ Future<LastFmAccount> getUserInfo(String username) async {
 
   final uri = Uri.https(lastFmApiBaseUrl, lastFmBaseRoute, queryParameters);
   final response = await http.get(uri, headers: _getHeaderWithUserAgent());
-  final responseBodyJSON = json.decode(response.body);
+  final responseBodyJSON = json.decode(utf8.decode(response.bodyBytes));
 
   if (isHttpRequestSuccessful(response)) {
     return _extractLastFmAccountFromUserInfoResults(responseBodyJSON);
@@ -53,7 +53,7 @@ Future<UniqueNamedEntitySet<LastFmArtist>> getTopArtists(String username, LastFm
     throw ExternalServiceQueryException(_getRequestErrorMessage(response));
   }
 
-  final responseBodyMap = json.decode(response.body);
+  final responseBodyMap = json.decode(utf8.decode(response.bodyBytes));
   Set<LastFmArtist> topArtists;
   try {
     topArtists = Set<LastFmArtist>.from(responseBodyMap['topartists']?['artist']
