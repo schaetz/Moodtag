@@ -6,8 +6,8 @@ import 'package:moodtag/exceptions/user_readable/external_service_query_exceptio
 import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable/user_info.dart';
-import 'package:moodtag/model/blocs/abstract_import/ImportSubProcess.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
+import 'package:moodtag/model/blocs/abstract_import/import_sub_process.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_option.dart';

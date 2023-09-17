@@ -1,5 +1,5 @@
 import 'package:moodtag/exceptions/db_request_response.dart';
-import 'package:moodtag/model/blocs/abstract_import/ImportSubProcess.dart';
+import 'package:moodtag/model/blocs/abstract_import/import_sub_process.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';

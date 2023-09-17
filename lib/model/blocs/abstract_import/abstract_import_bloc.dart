@@ -8,7 +8,7 @@ import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/unique_named_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
-import 'ImportSubProcess.dart';
+import 'import_sub_process.dart';
 
 class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent, S> {
   final Repository _repository;
