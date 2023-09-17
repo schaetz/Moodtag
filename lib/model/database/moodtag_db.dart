@@ -14,6 +14,7 @@ part 'moodtag_db.g.dart';
 @DriftDatabase(include: {'queries.drift'})
 class MoodtagDB extends _$MoodtagDB {
   MoodtagDB() : super(_openConnection());
+  MoodtagDB.InMemory() : super(NativeDatabase.memory());
 
   @override
   int get schemaVersion => 1;

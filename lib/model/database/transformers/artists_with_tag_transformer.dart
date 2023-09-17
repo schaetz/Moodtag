@@ -34,7 +34,9 @@ class ArtistsWithTagTransformer<ResultType> implements StreamTransformer<List<Ty
       }
 
       if (ResultType == ArtistData || ResultType == ArtistDataOpt) {
-        _controller.add(artistToEnhancedArtistMap.values.first as ResultType);
+        if (artistToEnhancedArtistMap.values.isNotEmpty) {
+          _controller.add(artistToEnhancedArtistMap.values.first as ResultType);
+        }
       } else if (ResultType == ArtistsList) {
         _controller.add(artistToEnhancedArtistMap.values.toList() as ResultType);
       }
