@@ -20,9 +20,8 @@ class MoodtagDB extends _$MoodtagDB {
   int get schemaVersion => 1;
 
   final joinTagsForArtist = (MoodtagDB db) => [
-        leftOuterJoin(db.assignedTags,
-            db.assignedTags.artist.equalsExp(db.artists.id) & db.assignedTags.tag.equalsExp(db.tags.id)),
-        innerJoin(db.tags, db.assignedTags.tag.equalsExp(db.tags.id)),
+        leftOuterJoin(db.assignedTags, db.assignedTags.artist.equalsExp(db.artists.id)),
+        leftOuterJoin(db.tags, db.assignedTags.tag.equalsExp(db.tags.id)),
       ];
 
   final joinAssignedTagsForTag = (MoodtagDB db) => [
@@ -30,9 +29,8 @@ class MoodtagDB extends _$MoodtagDB {
       ];
 
   final joinArtistsForTag = (MoodtagDB db) => [
-        leftOuterJoin(db.assignedTags,
-            db.assignedTags.tag.equalsExp(db.tags.id) & db.assignedTags.artist.equalsExp(db.artists.id)),
-        innerJoin(db.artists, db.assignedTags.artist.equalsExp(db.artists.id)),
+        leftOuterJoin(db.assignedTags, db.assignedTags.tag.equalsExp(db.tags.id)),
+        leftOuterJoin(db.artists, db.assignedTags.artist.equalsExp(db.artists.id)),
       ];
 
   //

@@ -23,9 +23,11 @@ class ArtistsWithTagTransformer<ResultType> implements StreamTransformer<List<Ty
       artistToEnhancedArtistMap = {};
       typedResults.forEach((queryResult) {
         final artist = queryResult.readTable(_moodtagDB.artists);
-        final tag = queryResult.readTable(_moodtagDB.tags);
+        final tag = queryResult.readTableOrNull(_moodtagDB.tags);
         final artistWithTags = artistToEnhancedArtistMap.putIfAbsent(artist, () => ArtistData(artist, Set<Tag>()));
-        artistWithTags.tags.add(tag);
+        if (tag != null) {
+          artistWithTags.tags.add(tag);
+        }
       });
 
       if (filterTags != null && filterTags!.isNotEmpty) {
