@@ -39,10 +39,10 @@ class ArtistDetailsBloc extends AbstractEntityUserBloc<ArtistDetailsState> with 
             useAllTagsStream: true) {
     on<StartedLoading<ArtistData>>(_handleStartedLoadingArtistData);
     on<DataUpdated<ArtistData>>(_handleArtistDataUpdated);
-    on<ToggleTagEditMode>(_mapToggleTagEditModeEventToState);
-    on<CreateTags>(_mapCreateTagsEventToState);
-    on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
-    on<PlayArtist>(_mapPlayArtistEventToState);
+    on<ToggleTagEditMode>(_handleToggleTagEditModeEvent);
+    on<CreateTags>(_handleCreateTagsEvent);
+    on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
+    on<PlayArtist>(_handlePlayArtistEvent);
 
     _artistStreamSubscription = _repository
         .getArtistDataById(artistId)
@@ -73,25 +73,25 @@ class ArtistDetailsBloc extends AbstractEntityUserBloc<ArtistDetailsState> with 
     }
   }
 
-  void _mapToggleTagEditModeEventToState(ToggleTagEditMode event, Emitter<ArtistDetailsState> emit) {
+  void _handleToggleTagEditModeEvent(ToggleTagEditMode event, Emitter<ArtistDetailsState> emit) {
     emit(state.copyWith(tagEditMode: !state.tagEditMode));
   }
 
-  void _mapCreateTagsEventToState(CreateTags event, Emitter<ArtistDetailsState> emit) async {
+  void _handleCreateTagsEvent(CreateTags event, Emitter<ArtistDetailsState> emit) async {
     final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }
   }
 
-  void _mapToggleTagForArtistEventToState(ToggleTagForArtist event, Emitter<ArtistDetailsState> emit) async {
+  void _handleToggleTagForArtistEvent(ToggleTagForArtist event, Emitter<ArtistDetailsState> emit) async {
     final exception = await _createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }
   }
 
-  void _mapPlayArtistEventToState(PlayArtist event, Emitter<ArtistDetailsState> emit) async {
+  void _handlePlayArtistEvent(PlayArtist event, Emitter<ArtistDetailsState> emit) async {
     SpotifyAccessToken? accessToken = await _accessTokenProvider.getAccessToken();
     if (accessToken == null) {
       errorStreamController.add(ExternalServiceQueryException('Authorization to Spotify Web API failed.'));

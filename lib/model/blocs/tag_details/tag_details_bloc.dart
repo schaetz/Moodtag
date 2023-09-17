@@ -29,10 +29,10 @@ class TagDetailsBloc extends AbstractEntityUserBloc<TagDetailsState> with ErrorS
             useAllArtistsStream: true) {
     on<StartedLoading<TagData>>(_handleStartedLoadingTagData);
     on<DataUpdated<TagData>>(_handleTagDataUpdated);
-    on<AddArtistsForTag>(_mapAddArtistsForTagEventToState);
-    on<RemoveTagFromArtist>(_mapRemoveTagFromArtistEventToState);
-    on<ToggleArtistsForTagChecklist>(_mapToggleArtistsForTagChecklistEventToState);
-    on<ToggleTagForArtist>(_mapToggleTagForArtistEventToState);
+    on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
+    on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);
+    on<ToggleArtistsForTagChecklist>(_handleToggleArtistsForTagChecklistEvent);
+    on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
 
     _tagStreamSubscription = _repository
         .getTagDataById(tagId)
@@ -63,26 +63,26 @@ class TagDetailsBloc extends AbstractEntityUserBloc<TagDetailsState> with ErrorS
     }
   }
 
-  void _mapAddArtistsForTagEventToState(AddArtistsForTag event, Emitter<TagDetailsState> emit) async {
+  void _handleAddArtistsForTagEvent(AddArtistsForTag event, Emitter<TagDetailsState> emit) async {
     final exception = await _createEntityBlocHelper.handleAddArtistsForTagEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }
   }
 
-  void _mapRemoveTagFromArtistEventToState(RemoveTagFromArtist event, Emitter<TagDetailsState> emit) async {
+  void _handleRemoveTagFromArtistEvent(RemoveTagFromArtist event, Emitter<TagDetailsState> emit) async {
     final exception = await _createEntityBlocHelper.handleRemoveTagFromArtistEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }
   }
 
-  void _mapToggleArtistsForTagChecklistEventToState(
+  void _handleToggleArtistsForTagChecklistEvent(
       ToggleArtistsForTagChecklist event, Emitter<TagDetailsState> emit) async {
     emit(state.copyWith(checklistMode: !state.checklistMode));
   }
 
-  void _mapToggleTagForArtistEventToState(ToggleTagForArtist event, Emitter<TagDetailsState> emit) async {
+  void _handleToggleTagForArtistEvent(ToggleTagForArtist event, Emitter<TagDetailsState> emit) async {
     final exception = await _createEntityBlocHelper.handleToggleTagForArtistEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);

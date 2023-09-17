@@ -17,9 +17,9 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
   final BuildContext mainContext;
 
   SpotifyAuthBloc(this.mainContext) : super(SpotifyAuthState()) {
-    on<RequestUserAuthorization>(_mapRequestUserAuthorizationEventToState);
-    on<LoginWebviewUrlChange>(_mapLoginWebviewUrlChangeEventToState);
-    // on<RequestAccessToken>(_mapRequestAccessTokenEventToState); TODO Check if this is still needed
+    on<RequestUserAuthorization>(_handleRequestUserAuthorizationEvent);
+    on<LoginWebviewUrlChange>(_handleLoginWebviewUrlChangeEvent);
+    // on<RequestAccessToken>(_handleRequestAccessTokenEvent); TODO Check if this is still needed
 
     setupErrorHandler(mainContext);
   }
@@ -41,11 +41,11 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
     return accessToken;
   }
 
-  void _mapRequestUserAuthorizationEventToState(RequestUserAuthorization event, Emitter<SpotifyAuthState> emit) {
+  void _handleRequestUserAuthorizationEvent(RequestUserAuthorization event, Emitter<SpotifyAuthState> emit) {
     emit(state.copyWith(redirectRoute: event.redirectAfterAuth));
   }
 
-  void _mapLoginWebviewUrlChangeEventToState(LoginWebviewUrlChange event, Emitter<SpotifyAuthState> emit) async {
+  void _handleLoginWebviewUrlChangeEvent(LoginWebviewUrlChange event, Emitter<SpotifyAuthState> emit) async {
     Uri uri = Uri.parse(event.url);
     print(uri.authority);
     print(uri.queryParameters);
@@ -76,7 +76,7 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
   }
 
   // TODO Check if this is still needed
-  // void _mapRequestAccessTokenEventToState(RequestAccessToken event, Emitter<SpotifyAuthState> emit) async {
+  // void _handleRequestAccessTokenEvent(RequestAccessToken event, Emitter<SpotifyAuthState> emit) async {
   //   try {
   //     SpotifyAccessToken accessToken = await _getAccessTokenWithoutStateUpdate();
   //     if (accessToken != state.spotifyAccessToken) {

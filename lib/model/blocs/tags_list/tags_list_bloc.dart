@@ -19,20 +19,20 @@ class TagsListBloc extends AbstractEntityUserBloc<TagsListState> with ErrorStrea
             initialState: TagsListState(loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags),
             entityLoaderBloc: entityLoaderBloc,
             useAllTagsStream: true) {
-    on<CreateTags>(_mapCreateTagsEventToState);
-    on<DeleteTag>(_mapDeleteTagEventToState);
+    on<CreateTags>(_handleCreateTagsEvent);
+    on<DeleteTag>(_handleDeleteTagEvent);
 
     setupErrorHandler(mainContext);
   }
 
-  void _mapCreateTagsEventToState(CreateTags event, Emitter<TagsListState> emit) async {
+  void _handleCreateTagsEvent(CreateTags event, Emitter<TagsListState> emit) async {
     final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }
   }
 
-  void _mapDeleteTagEventToState(DeleteTag event, Emitter<TagsListState> emit) async {
+  void _handleDeleteTagEvent(DeleteTag event, Emitter<TagsListState> emit) async {
     final deleteTagResponse = await _repository.deleteTag(event.tag);
     if (deleteTagResponse.didFail()) {
       errorStreamController.add(deleteTagResponse.getUserFeedbackException());
