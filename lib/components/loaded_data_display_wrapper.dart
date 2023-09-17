@@ -67,11 +67,7 @@ class LoadedDataDisplayWrapper<T> extends StatelessWidget {
       ? loadedData.loadingStatus.merge(additionalCheckData!.loadingStatus)
       : loadedData.loadingStatus;
 
-  bool _isDataEmpty() => loadedData.data == null || _isDataAnEmptyList(loadedData.data) || _isAdditionalDataEmpty();
-
-  bool _isAdditionalDataEmpty() =>
-      additionalCheckData != null &&
-      (additionalCheckData!.data == null || _isDataAnEmptyList(additionalCheckData!.data!));
+  bool _isDataEmpty() => loadedData.data == null || _isDataAnEmptyList(loadedData.data);
 
   bool _isDataAnEmptyList(dynamic data) => (data is List && data.isEmpty);
 }
