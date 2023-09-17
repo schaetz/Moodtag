@@ -116,6 +116,12 @@ class MoodtagDB extends _$MoodtagDB {
     return into(artists).insert(artist);
   }
 
+  Future<void> createArtistsInBatch(List<ArtistsCompanion> artistsList) async {
+    await batch((batch) {
+      batch.insertAll(artists, artistsList, onConflict: DoNothing(target: [artists.name]));
+    });
+  }
+
   Future<int> createTag(TagsCompanion tag) {
     return into(tags).insert(tag);
   }

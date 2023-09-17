@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/repository_helper.dart';
+import 'package:moodtag/structs/imported_entities/imported_artist.dart';
+import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 
 import '../database/moodtag_db.dart';
 
@@ -50,6 +52,13 @@ class Repository {
     Future<int> createArtistFuture = db.createArtist(ArtistsCompanion.insert(
         name: name, orderingName: helper.getOrderingNameForArtist(name), spotifyId: Value(spotifyId)));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
+  }
+
+  Future<void> createImportedArtistsInBatch(List<ImportedArtist> importedArtists) async {
+    await db.createArtistsInBatch(List.from(importedArtists.map((artist) => ArtistsCompanion.insert(
+        name: artist.name,
+        orderingName: helper.getOrderingNameForArtist(artist.name),
+        spotifyId: Value(importedArtists is SpotifyArtist ? (artist as SpotifyArtist).spotifyId : null)))));
   }
 
   Future<DbRequestResponse> deleteArtist(Artist artist) async {
