@@ -16,7 +16,7 @@ import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 
 import '../../../screens/lastfm_import/lastfm_connector.dart';
 import '../../../utils/db_request_success_counter.dart';
@@ -90,8 +90,8 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     }
   }
 
-  Future<UniqueNamedEntitySet<LastFmArtist>> _getAvailableLastFmArtists(LastFmAccount lastFmAccount) async {
-    final availableLastFmArtists = UniqueNamedEntitySet<LastFmArtist>();
+  Future<UniqueImportEntitySet<LastFmArtist>> _getAvailableLastFmArtists(LastFmAccount lastFmAccount) async {
+    final availableLastFmArtists = UniqueImportEntitySet<LastFmArtist>();
 
     if (state.configuration[LastFmImportOption.allTimeTopArtists] == true) {
       availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.overall, 1000));

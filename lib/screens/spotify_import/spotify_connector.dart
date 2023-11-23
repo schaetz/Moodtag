@@ -8,7 +8,7 @@ import 'package:moodtag/exceptions/user_readable/external_service_query_exceptio
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 import 'package:moodtag/utils/helpers.dart';
 import 'package:moodtag/utils/random_helper.dart';
 
@@ -125,7 +125,7 @@ SpotifyAccessToken? _extractAccessTokenFromJson(String responseBody) {
   return SpotifyAccessToken(token: token, expiration: expiration, refreshToken: refreshToken);
 }
 
-Future<UniqueNamedEntitySet<SpotifyArtist>> getFollowedArtists(String accessToken) async {
+Future<UniqueImportEntitySet<SpotifyArtist>> getFollowedArtists(String accessToken) async {
   final queryParameters = {
     'type': 'artist',
     'limit': '50',
@@ -147,10 +147,10 @@ Future<UniqueNamedEntitySet<SpotifyArtist>> getFollowedArtists(String accessToke
     throw ExternalServiceQueryException('The Spotify data has an unknown structure.', cause: error);
   }
 
-  return UniqueNamedEntitySet<SpotifyArtist>.from(followedArtists);
+  return UniqueImportEntitySet<SpotifyArtist>.from(followedArtists);
 }
 
-Future<UniqueNamedEntitySet<SpotifyArtist>> getTopArtists(String accessToken, int limit, int offset) async {
+Future<UniqueImportEntitySet<SpotifyArtist>> getTopArtists(String accessToken, int limit, int offset) async {
   final queryParameters = {
     'limit': limit.toString(),
     'offset': offset.toString(),
@@ -173,7 +173,7 @@ Future<UniqueNamedEntitySet<SpotifyArtist>> getTopArtists(String accessToken, in
     throw ExternalServiceQueryException('The Spotify data has an unknown structure.', cause: error);
   }
 
-  return UniqueNamedEntitySet<SpotifyArtist>.from(topArtists);
+  return UniqueImportEntitySet<SpotifyArtist>.from(topArtists);
 }
 
 void playArtist(String accessToken, Artist artist) async {

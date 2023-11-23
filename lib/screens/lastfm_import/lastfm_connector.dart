@@ -7,7 +7,7 @@ import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_period.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 import 'package:moodtag/utils/helpers.dart';
 
 // TODO Store these constants in a config file
@@ -37,7 +37,7 @@ Future<LastFmAccount> getUserInfo(String username) async {
   }
 }
 
-Future<UniqueNamedEntitySet<LastFmArtist>> getTopArtists(String username, LastFmImportPeriod period, int limit) async {
+Future<UniqueImportEntitySet<LastFmArtist>> getTopArtists(String username, LastFmImportPeriod period, int limit) async {
   final queryParameters = {
     'user': username,
     'api_key': apiKey,
@@ -56,10 +56,10 @@ Future<UniqueNamedEntitySet<LastFmArtist>> getTopArtists(String username, LastFm
     throw ExternalServiceQueryException('The Last.fm data has an unknown structure.', cause: error);
   }
 
-  return UniqueNamedEntitySet<LastFmArtist>.from(topArtists);
+  return UniqueImportEntitySet<LastFmArtist>.from(topArtists);
 }
 
-Future<UniqueNamedEntitySet<ImportedTag>> getTags(String artistName, {String? username}) async {
+Future<UniqueImportEntitySet<ImportedTag>> getTags(String artistName, {String? username}) async {
   final isUserTagsQuery = username != null;
   final queryParameters = {
     'artist': artistName,
@@ -81,7 +81,7 @@ Future<UniqueNamedEntitySet<ImportedTag>> getTags(String artistName, {String? us
     throw ExternalServiceQueryException('The Last.fm data has an unknown structure.', cause: error);
   }
 
-  return UniqueNamedEntitySet<ImportedTag>.from(tags);
+  return UniqueImportEntitySet<ImportedTag>.from(tags);
 }
 
 Future<(Response, dynamic)> _sendGetRequest(Map<String, String?> queryParameters) async {

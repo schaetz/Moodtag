@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_state.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 
 import 'lastfm_import_flow_step.dart';
 
@@ -11,7 +11,7 @@ class LastFmImportState extends Equatable implements AbstractImportState {
   final bool isFinished;
   final Map<LastFmImportOption, bool> configuration;
 
-  final UniqueNamedEntitySet<LastFmArtist>? availableLastFmArtists;
+  final UniqueImportEntitySet<LastFmArtist>? availableLastFmArtists;
   final List<LastFmArtist>? selectedArtists;
 
   const LastFmImportState({
@@ -39,7 +39,7 @@ class LastFmImportState extends Equatable implements AbstractImportState {
     LastFmImportFlowStep? step,
     bool? isFinished,
     Map<LastFmImportOption, bool>? configuration,
-    UniqueNamedEntitySet<LastFmArtist>? availableLastFmArtists,
+    UniqueImportEntitySet<LastFmArtist>? availableLastFmArtists,
     List<LastFmArtist>? selectedArtists,
   }) {
     return LastFmImportState(

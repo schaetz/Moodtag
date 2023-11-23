@@ -6,12 +6,12 @@ import 'package:moodtag/components/selection_list/selection_list_config.dart';
 import 'package:moodtag/components/selection_list/selection_list_screen.dart';
 import 'package:moodtag/structs/imported_entities/import_entity.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 
 // Wrapper for the SelectionListScreen that allows handling imports of ImportEntity´s
 class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget {
   final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
-  final UniqueNamedEntitySet<E> namedEntitySet;
+  final UniqueImportEntitySet<E> namedEntitySet;
   final String confirmationButtonLabel;
   final String entityDenotationSingular;
   final String entityDenotationPlural;
@@ -56,16 +56,4 @@ class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget 
         isBoxSelected.entries.where((entry) => entry.value == true).map((entry) => entry.key).toList();
     onSelectionConfirmed(selectedEntities);
   }
-
-  List<E> _filterOutUnselectedEntities(List<E> sortedEntities, List<bool> isBoxSelected) {
-    List<E> selectedEntities = [];
-    for (int i = 0; i < sortedEntities.length; i++) {
-      if (isBoxSelected[i]) {
-        selectedEntities.add(sortedEntities[i]);
-      }
-    }
-    return selectedEntities;
-  }
-
-  Type _typeOf<T>() => T;
 }

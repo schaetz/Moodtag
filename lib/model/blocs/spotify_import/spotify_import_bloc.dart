@@ -17,7 +17,7 @@ import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
 import 'spotify_import_flow_step.dart';
@@ -94,9 +94,9 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     }
   }
 
-  Future<UniqueNamedEntitySet<SpotifyArtist>> _getAvailableSpotifyArtists(
+  Future<UniqueImportEntitySet<SpotifyArtist>> _getAvailableSpotifyArtists(
       Map<SpotifyImportOption, bool> selectedOptions, String accessToken) async {
-    final availableSpotifyArtists = UniqueNamedEntitySet<SpotifyArtist>();
+    final availableSpotifyArtists = UniqueImportEntitySet<SpotifyArtist>();
 
     if (selectedOptions[SpotifyImportOption.topArtists] == true) {
       availableSpotifyArtists.addAll(await getTopArtists(accessToken, 50, 0));
@@ -127,9 +127,9 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     }
   }
 
-  Future<UniqueNamedEntitySet<ImportedTag>> _getAvailableTagsForSelectedArtists(
+  Future<UniqueImportEntitySet<ImportedTag>> _getAvailableTagsForSelectedArtists(
       List<SpotifyArtist> selectedArtists) async {
-    final UniqueNamedEntitySet<ImportedTag> tagsForSelectedArtists = UniqueNamedEntitySet();
+    final UniqueImportEntitySet<ImportedTag> tagsForSelectedArtists = UniqueImportEntitySet();
     selectedArtists.forEach((artist) {
       List<ImportedTag> tagsList = artist.tags.map((tagName) => ImportedTag(tagName)).toList();
       tagsList.forEach((genreEntity) => tagsForSelectedArtists.add(genreEntity));

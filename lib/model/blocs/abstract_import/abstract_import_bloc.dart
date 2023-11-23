@@ -5,7 +5,7 @@ import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 import 'package:moodtag/utils/db_request_success_counter.dart';
 
 import 'import_sub_process.dart';
@@ -17,7 +17,7 @@ class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent
 
   AbstractImportBloc(super.initialState, this._repository);
 
-  Future annotateImportedArtistsWithAlreadyExistsProp(UniqueNamedEntitySet<ImportedArtist> entities) async {
+  Future annotateImportedArtistsWithAlreadyExistsProp(UniqueImportEntitySet<ImportedArtist> entities) async {
     final existingArtistNames = await _repository.getSetOfExistingArtistNames();
     entities.values.forEach((entity) {
       if (existingArtistNames.contains(entity.name)) {
@@ -26,7 +26,7 @@ class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent
     });
   }
 
-  Future annotateImportedTagsWithAlreadyExistsProp(UniqueNamedEntitySet<ImportedTag> entities) async {
+  Future annotateImportedTagsWithAlreadyExistsProp(UniqueImportEntitySet<ImportedTag> entities) async {
     final existingTagNames = await _repository.getSetOfExistingTagNames();
     entities.values.forEach((entity) {
       if (existingTagNames.contains(entity.name)) {

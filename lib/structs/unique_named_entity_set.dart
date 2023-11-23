@@ -17,6 +17,7 @@ class UniqueNamedEntitySet<T extends NamedEntity> {
     this._entitiesByName = initialMap;
   }
 
+  Map<String, T> get entitiesByName => _entitiesByName;
   bool get isEmpty => _entitiesByName.isEmpty;
 
   Set<T> get values => Set.from(_entitiesByName.values);

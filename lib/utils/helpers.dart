@@ -1,3 +1,4 @@
+import 'package:diacritic/diacritic.dart';
 import 'package:http/http.dart';
 
 String dropThe(String artistName) {
@@ -5,6 +6,14 @@ String dropThe(String artistName) {
     return artistName.substring(4);
   }
   return artistName;
+}
+
+String getOrderingNameForArtist(String artistName) {
+  final lowerCased = artistName.toLowerCase();
+  final diacriticsReplaced = removeDiacritics(lowerCased);
+  final leadingTheRemoved = diacriticsReplaced.replaceFirst(RegExp('^the\\s'), '');
+  print("$artistName => $leadingTheRemoved");
+  return leadingTheRemoved;
 }
 
 List<String> processMultilineInput(String input) {

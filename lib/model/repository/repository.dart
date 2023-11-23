@@ -5,6 +5,7 @@ import 'package:moodtag/model/repository/repository_helper.dart';
 import 'package:moodtag/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
+import 'package:moodtag/utils/helpers.dart';
 
 import '../database/moodtag_db.dart';
 
@@ -54,15 +55,15 @@ class Repository {
   }
 
   Future<DbRequestResponse<Artist>> createArtist(String name, {String? spotifyId}) async {
-    Future<int> createArtistFuture = db.createArtist(ArtistsCompanion.insert(
-        name: name, orderingName: helper.getOrderingNameForArtist(name), spotifyId: Value(spotifyId)));
+    Future<int> createArtistFuture = db.createArtist(
+        ArtistsCompanion.insert(name: name, orderingName: getOrderingNameForArtist(name), spotifyId: Value(spotifyId)));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
   }
 
   Future<void> createImportedArtistsInBatch(List<ImportedArtist> importedArtists) async {
     await db.createArtistsInBatch(List.from(importedArtists.map((artist) => ArtistsCompanion.insert(
         name: artist.name,
-        orderingName: helper.getOrderingNameForArtist(artist.name),
+        orderingName: getOrderingNameForArtist(artist.name),
         spotifyId: Value(artist is SpotifyArtist ? artist.spotifyId : null)))));
   }
 

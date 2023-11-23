@@ -1,4 +1,3 @@
-import 'package:diacritic/diacritic.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/internal/invalid_argument_exception.dart';
 import 'package:moodtag/exceptions/user_readable/database_error.dart';
@@ -51,13 +50,5 @@ class RepositoryHelper {
       return Future.error(
           new InvalidArgumentException('getEntityById was called with an invalid entity type: ' + E.toString()));
     }
-  }
-
-  String getOrderingNameForArtist(String artistName) {
-    final lowerCased = artistName.toLowerCase();
-    final diacriticsReplaced = removeDiacritics(lowerCased);
-    final leadingTheRemoved = diacriticsReplaced.replaceFirst(RegExp('^the\\s'), '');
-    print("$artistName => $leadingTheRemoved");
-    return leadingTheRemoved;
   }
 }
