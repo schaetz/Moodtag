@@ -63,7 +63,7 @@ class Repository {
     await db.createArtistsInBatch(List.from(importedArtists.map((artist) => ArtistsCompanion.insert(
         name: artist.name,
         orderingName: helper.getOrderingNameForArtist(artist.name),
-        spotifyId: Value(importedArtists is SpotifyArtist ? (artist as SpotifyArtist).spotifyId : null)))));
+        spotifyId: Value(artist is SpotifyArtist ? artist.spotifyId : null)))));
   }
 
   Future<DbRequestResponse> deleteArtist(Artist artist) async {
