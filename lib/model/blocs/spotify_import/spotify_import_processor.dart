@@ -1,5 +1,3 @@
-import 'package:moodtag/exceptions/db_request_response.dart';
-import 'package:moodtag/model/blocs/abstract_import/import_sub_process.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
@@ -10,67 +8,56 @@ class SpotifyImportProcessor {
   final Map<SpotifyArtist, Artist> createdArtistsByEntity = Map();
   final Map<String, Tag> createdTagsByGenreName = Map();
 
-  Future<Map<ImportSubProcess, DbRequestSuccessCounter>> conductImport(
+  Future<DbRequestSuccessCounter> conductImport(
       List<SpotifyArtist> artistsToImport, List<ImportedTag> genresToImport, Repository repository) async {
-    final DbRequestSuccessCounter createArtistsSuccessCounter =
-        await _createArtistsForImport(artistsToImport, repository);
-    final DbRequestSuccessCounter createTagsSuccessCounter =
-        await _createGenreTagsForImport(genresToImport, repository);
-    final DbRequestSuccessCounter assignTagsSuccessCounter = await _assignGenreTagsToArtists(repository);
+    await repository.createImportedArtistsInBatch(artistsToImport);
+    await repository.createImportedTagsInBatch(genresToImport);
 
-    return {
-      ImportSubProcess.createArtists: createArtistsSuccessCounter,
-      ImportSubProcess.createTags: createTagsSuccessCounter,
-      ImportSubProcess.assignTags: assignTagsSuccessCounter
-    };
+    final failedAssignments = await _assignTagsToCreatedArtists(artistsToImport, genresToImport, repository);
+    return DbRequestSuccessCounter.instantiate(
+        artistsToImport.length, artistsToImport.length - failedAssignments, failedAssignments);
   }
 
-  Future<DbRequestSuccessCounter> _createArtistsForImport(List<SpotifyArtist> artists, Repository repository) async {
-    final DbRequestSuccessCounter creationSuccessCounter = DbRequestSuccessCounter();
+  Future<int> _assignTagsToCreatedArtists(
+      List<SpotifyArtist> artistsToImport, List<ImportedTag> genresToImport, Repository repository) async {
+    Map<String, Artist> createdArtistsByName = await _getCreatedArtistsByName(repository, artistsToImport);
+    Map<String, Tag> createdTagsByName = await _getCreatedTagsByName(repository, genresToImport);
 
-    await repository.createImportedArtistsInBatch(artists);
-
-    // await Future.forEach(artists, (SpotifyArtist spotifyArtist) async {
-    //   // DbRequestResponse<Artist> creationResponse =
-    //   //     await repository.createArtist(spotifyArtist.name, spotifyId: spotifyArtist.spotifyId);
-    //   // if (creationResponse.changedEntity != null) {
-    //   createdArtistsByEntity.putIfAbsent(spotifyArtist, () => creationResponse.changedEntity!);
-    //   // }
-    //   // creationSuccessCounter.registerResponse(creationResponse);
-    // });
-
-    return creationSuccessCounter;
-  }
-
-  Future<DbRequestSuccessCounter> _createGenreTagsForImport(List<ImportedTag> genres, Repository repository) async {
-    final DbRequestSuccessCounter creationSuccessCounter = DbRequestSuccessCounter();
-
-    await Future.forEach(genres, (ImportedTag ImportedTag) async {
-      DbRequestResponse creationResponse = await repository.createTag(ImportedTag.name);
-      if (creationResponse.changedEntity != null) {
-        createdTagsByGenreName.putIfAbsent(ImportedTag.name, () => creationResponse.changedEntity!);
+    var failedAssignments = 0;
+    Map<Artist, List<Tag>> tagsForArtistsMap = Map();
+    for (SpotifyArtist importArtist in artistsToImport) {
+      Artist? correspondingArtist = createdArtistsByName[importArtist.name] ?? null;
+      if (correspondingArtist == null) {
+        failedAssignments++;
+        continue;
       }
-      creationSuccessCounter.registerResponse(creationResponse);
-    });
+      final assignedTagsIterable =
+          importArtist.tags.map((assignedTagName) => createdTagsByName[assignedTagName] ?? null).nonNulls;
+      if (assignedTagsIterable.nonNulls.length < assignedTagsIterable.length) {
+        failedAssignments++;
+      }
+      tagsForArtistsMap.putIfAbsent(correspondingArtist, () => assignedTagsIterable.nonNulls.toList());
+    }
 
-    return creationSuccessCounter;
+    await repository.assignTagsToArtistsInBatch(tagsForArtistsMap);
+    return failedAssignments;
   }
 
-  Future<DbRequestSuccessCounter> _assignGenreTagsToArtists(Repository repository) async {
-    final DbRequestSuccessCounter successCounter = DbRequestSuccessCounter();
+  Future<Map<String, Artist>> _getCreatedArtistsByName(
+      Repository repository, List<SpotifyArtist> artistsToImport) async {
+    final createdArtists = await repository.getLatestArtistsOnce(artistsToImport.length);
+    final createdArtistsByName = Map.fromEntries(
+        createdArtists.map((createdArtist) => MapEntry<String, Artist>(createdArtist.name, createdArtist)));
+    return createdArtistsByName;
+  }
 
-    await Future.forEach(createdArtistsByEntity.entries, (MapEntry<SpotifyArtist, Artist> createdArtistPair) async {
-      final SpotifyArtist SpotifyArtistEntity = createdArtistPair.key;
-      final Artist artist = createdArtistPair.value;
-      await Future.forEach(SpotifyArtistEntity.tags, (genreName) async {
-        if (createdTagsByGenreName.containsKey(genreName) && createdTagsByGenreName[genreName] != null) {
-          DbRequestResponse assignTagsResponse =
-              await repository.assignTagToArtist(artist, createdTagsByGenreName[genreName]!);
-          successCounter.registerResponse(assignTagsResponse);
-        }
-      });
-    });
-
-    return successCounter;
+  Future<Map<String, Tag>> _getCreatedTagsByName(
+    Repository repository,
+    List<ImportedTag> genresToImport,
+  ) async {
+    final createdTags = await repository.getLatestTagsOnce(genresToImport.length);
+    final createdTagsByName =
+        Map.fromEntries(createdTags.map((createdTag) => MapEntry<String, Tag>(createdTag.name, createdTag)));
+    return createdTagsByName;
   }
 }

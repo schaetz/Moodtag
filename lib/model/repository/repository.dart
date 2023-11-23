@@ -3,6 +3,7 @@ import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/repository_helper.dart';
 import 'package:moodtag/structs/imported_entities/imported_artist.dart';
+import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 
 import '../database/moodtag_db.dart';
@@ -36,6 +37,10 @@ class Repository {
 
   Future<List<Artist>> getArtistsOnce() {
     return db.getArtistsOnce();
+  }
+
+  Future<List<Artist>> getLatestArtistsOnce(int number) {
+    return db.getLatestArtistsOnce(number);
   }
 
   Future<bool> doesArtistHaveTag(Artist artist, Tag tag) async {
@@ -81,6 +86,10 @@ class Repository {
     return db.getTagDataById(id);
   }
 
+  Future<List<Tag>> getLatestTagsOnce(int number) {
+    return db.getLatestTagsOnce(number);
+  }
+
   Future<Set<String>> getSetOfExistingTagNames() async {
     final allTags = await db.getTagsOnce();
     return allTags.map((tag) => tag.name).toSet();
@@ -89,6 +98,12 @@ class Repository {
   Future<DbRequestResponse<Tag>> createTag(String name) {
     Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Tag>(createTagFuture, name);
+  }
+
+  Future<void> createImportedTagsInBatch(List<ImportedTag> importedTags) async {
+    await db.createTagsInBatch(List.from(importedTags.map((tag) => TagsCompanion.insert(
+          name: tag.name,
+        ))));
   }
 
   Future<DbRequestResponse> deleteTag(Tag tag) {
@@ -106,6 +121,13 @@ class Repository {
   Future<DbRequestResponse> assignTagToArtist(Artist artist, Tag tag) async {
     Future<int> assignTagFuture = db.assignTagToArtist(AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id));
     return helper.wrapExceptionsAndReturnResponse(assignTagFuture);
+  }
+
+  Future<void> assignTagsToArtistsInBatch(Map<Artist, List<Tag>> tagsForArtistsMap) async {
+    await db.assignTagsToArtistsInBatch(tagsForArtistsMap.entries
+        .expand((mapEntry) =>
+            mapEntry.value.map((tag) => AssignedTagsCompanion.insert(artist: mapEntry.key.id, tag: tag.id)))
+        .toList());
   }
 
   Future<DbRequestResponse> removeTagFromArtist(Artist artist, Tag tag) {

@@ -55,6 +55,13 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
   }
 
+  Future<List<Artist>> getLatestArtistsOnce(int number) {
+    return (select(artists)
+          ..orderBy([(a) => OrderingTerm.desc(a.id)])
+          ..limit(number))
+        .get();
+  }
+
   Future<Artist?> getArtistByIdOnce(int artistId) {
     return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull();
   }
@@ -86,6 +93,13 @@ class MoodtagDB extends _$MoodtagDB {
       return queryWithJoin.map((row) => row.readTable(tags)).get();
     }
     return query.get();
+  }
+
+  Future<List<Tag>> getLatestTagsOnce(int number) {
+    return (select(tags)
+          ..orderBy([(t) => OrderingTerm.desc(t.id)])
+          ..limit(number))
+        .get();
   }
 
   Future<Tag?> getTagByIdOnce(int tagId) {
@@ -126,8 +140,21 @@ class MoodtagDB extends _$MoodtagDB {
     return into(tags).insert(tag);
   }
 
+  Future<void> createTagsInBatch(List<TagsCompanion> tagsList) async {
+    await batch((batch) {
+      batch.insertAll(tags, tagsList, onConflict: DoNothing(target: [tags.name]));
+    });
+  }
+
   Future<int> assignTagToArtist(AssignedTagsCompanion artistTagPair) {
     return into(assignedTags).insert(artistTagPair);
+  }
+
+  Future<void> assignTagsToArtistsInBatch(List<AssignedTagsCompanion> artistTagPairsList) async {
+    await batch((batch) {
+      batch.insertAll(assignedTags, artistTagPairsList,
+          onConflict: DoNothing(target: [assignedTags.artist, assignedTags.tag]));
+    });
   }
 
   Future<int> createOrUpdateLastFmAccount(LastFmAccount lastFmAccount) {

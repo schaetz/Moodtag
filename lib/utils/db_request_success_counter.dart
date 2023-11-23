@@ -9,6 +9,9 @@ class DbRequestSuccessCounter {
   int get successCount => _successCount;
   int get failureCount => _failureCount;
 
+  DbRequestSuccessCounter();
+  DbRequestSuccessCounter.instantiate(this._totalCount, this._successCount, this._failureCount);
+
   void registerResponse(DbRequestResponse response) {
     _totalCount++;
     if (response.didSucceed()) {

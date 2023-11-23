@@ -7,7 +7,6 @@ import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.da
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable/user_info.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
-import 'package:moodtag/model/blocs/abstract_import/import_sub_process.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_option.dart';
@@ -154,10 +153,11 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
   }
 
   void _handleCompleteImportEvent(CompleteSpotifyImport event, Emitter<SpotifyImportState> emit) async {
-    final Map<ImportSubProcess, DbRequestSuccessCounter> successCounters =
+    final successCounter =
         await _spotifyImportProcessor.conductImport(event.selectedArtists, event.selectedGenres, repository);
-    final resultMessage = getResultMessage(successCounters);
-    errorStreamController.add(UserInfo(resultMessage));
+
+    // TODO Return more specific error message, not only including info on the result of the tag assignment
+    errorStreamController.add(UserInfo(_getResultMessage(successCounter)));
 
     emit(state.copyWith(isFinished: true));
   }
@@ -167,5 +167,17 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
       return SpotifyImportFlowStep.confirmation;
     }
     return SpotifyImportFlowStep.values[currentState.step.index + 1];
+  }
+
+  String _getResultMessage(DbRequestSuccessCounter successCounter) {
+    if (successCounter.failureCount > 1) {
+      return "Added ${successCounter.successCount} artists. There were some errors trying to assign the tags to the artists.";
+    } else if (successCounter.failureCount == 1) {
+      return "Added ${successCounter.successCount} artists. There was an error trying to assign the tags to the artists.";
+    } else if (successCounter.successCount > 0) {
+      return "Successfully added ${successCounter.successCount} artists";
+    } else {
+      return "Something went wrong. No artists were added.";
+    }
   }
 }
