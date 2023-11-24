@@ -4,7 +4,6 @@ import 'package:moodtag/exceptions/user_readable/external_service_query_exceptio
 import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/exceptions/user_readable/user_info.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
-import 'package:moodtag/model/blocs/abstract_import/import_sub_process.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_flow_step.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_option.dart';
@@ -19,7 +18,6 @@ import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 
 import '../../../screens/lastfm_import/lastfm_connector.dart';
-import '../../../utils/db_request_success_counter.dart';
 
 class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorStreamHandling {
   final LastFmImportProcessor _lastFmImportProcessor = LastFmImportProcessor();
@@ -126,9 +124,9 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   }
 
   void _handleCompleteImportEvent(CompleteLastFmImport event, Emitter<LastFmImportState> emit) async {
-    final Map<ImportSubProcess, DbRequestSuccessCounter> successCounters =
-        await _lastFmImportProcessor.conductImport(event.selectedArtists, repository);
-    final resultMessage = getResultMessage(successCounters);
+    await _lastFmImportProcessor.conductImport(event.selectedArtists, repository);
+    // TODO Give a more specific message, including information on potential errors
+    final resultMessage = "Imported ${event.selectedArtists.length} artists.";
     errorStreamController.add(UserInfo(resultMessage));
 
     emit(state.copyWith(isFinished: true));
