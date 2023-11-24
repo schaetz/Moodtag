@@ -54,6 +54,7 @@ class _AppState extends State<MoodtagApp> {
                 child: MaterialApp(
                   title: MoodtagApp.appTitle,
                   theme: ThemeData(
+                      useMaterial3: false,
                       primarySwatch: Colors.red,
                       primaryColor: Colors.red,
                       unselectedWidgetColor: Colors.grey,
