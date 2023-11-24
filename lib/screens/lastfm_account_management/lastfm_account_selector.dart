@@ -38,9 +38,10 @@ class LastFmAccountSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO Maybe replace by Card?
     return Container(
       alignment: Alignment.center,
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.secondary, // TODO The color should not have to be specified here
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.all(32.0),
       child: Column(children: [

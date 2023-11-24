@@ -31,15 +31,14 @@ class ChipCloud<T> extends StatelessWidget {
     return elements;
   }
 
-  Widget buildElement<T>(T dataSet, {Color? backgroundColor}) {
+  Widget buildElement<T>(T dataSet) {
     return Chip(
       label: Text(T == String ? dataSet as String : dataSet.toString()),
       labelStyle: TextStyle(fontSize: 14.0),
-      backgroundColor: backgroundColor,
     );
   }
 
   Widget buildOverflowIndicator() {
-    return buildElement<String>('...', backgroundColor: Colors.white);
+    return buildElement<String>('...');
   }
 }

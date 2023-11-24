@@ -32,7 +32,6 @@ class LastFmImportConfirmationScreen extends AbstractImportConfirmationScreen {
           },
           label: Text('Import'),
           icon: const Icon(Icons.library_add),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
         ));
   }
 

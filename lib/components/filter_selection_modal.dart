@@ -97,7 +97,6 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
         .map((MapEntry<T, bool> entityWithState) => InputChip(
               label: Text(entityWithState.key.name),
               selected: entityWithState.value,
-              backgroundColor: Theme.of(context).colorScheme.secondary,
               onPressed: () => _updateLocalState(entityWithState.key),
             ))
         .toList();

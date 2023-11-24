@@ -28,7 +28,6 @@ class ArtistsListScreen extends StatefulWidget {
 }
 
 class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
-  // static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
@@ -103,18 +102,15 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
         FloatingActionButton(
             onPressed: () => bloc.add(ToggleFilterSelectionModal(wantedOpen: true)),
             child: const Icon(Icons.filter_list),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
             heroTag: 'fab_change_filters'),
         FloatingActionButton(
             onPressed: () => bloc.add(ToggleTagSubtitles()),
             child: _buildTagSubtitlesToggleIcon(),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
             heroTag: 'fab_toggle_tag_subtitles'),
         FloatingActionButton(
           onPressed: () =>
               AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => bloc.add(CreateArtists(input))),
           child: const Icon(Icons.add),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
         )
       ]),
       bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists),
@@ -167,7 +163,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
                       options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: false)))),
         );
       });
-      Overlay.of(context)?.insert(_filterDisplayOverlay!);
+      Overlay.of(context).insert(_filterDisplayOverlay!);
     });
   }
 
@@ -198,7 +194,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
 
   Widget _buildTagsSubtitle(BuildContext context, ArtistData artistWithTags) {
     return SizedBox(
-        height: 40,
+        height: 42,
         child: Wrap(
           clipBehavior: Clip.hardEdge,
           alignment: WrapAlignment.start,
@@ -215,7 +211,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
           labelPadding: EdgeInsets.symmetric(horizontal: 4.0),
           label: Text(tag.name),
           labelStyle: tagChipLabelStyle,
-          disabledColor: Theme.of(context).colorScheme.surface,
           onPressed: () => {},
         ));
   }

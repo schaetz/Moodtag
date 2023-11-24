@@ -69,7 +69,7 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state) {
     if (state.tagEditMode) {
-      if (state.loadedDataAllTags == null || state.loadedDataAllTags!.loadingStatus.isError || state.allTags == null) {
+      if (state.loadedDataAllTags.loadingStatus.isError || state.allTags == null) {
         return ChipsRowInfoLabel('Error loading the tags');
       } else if (state.loadedArtistData.data == null) {
         return ChipsRowInfoLabel('Something went wrong');
@@ -126,7 +126,6 @@ class ArtistDetailsScreen extends StatelessWidget {
     final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),
-      backgroundColor: Theme.of(context).colorScheme.secondary,
       onPressed: () => AddEntityDialog.openAddTagDialog(
         context,
         preselectedArtist: artistData.artist,

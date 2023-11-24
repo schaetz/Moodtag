@@ -144,7 +144,6 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
         onPressed: () => _setAllEnabledBoxSelections(false),
         label: const Text('Select none'),
         icon: const Icon(Icons.remove_circle_outline),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
         heroTag: 'select_button',
       );
     } else {
@@ -152,7 +151,6 @@ class SelectionListScreenState<E extends NamedEntity> extends State<SelectionLis
         onPressed: () => _setAllEnabledBoxSelections(true),
         label: const Text('Select all'),
         icon: const Icon(Icons.select_all_outlined),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
         heroTag: 'select_button',
       );
     }

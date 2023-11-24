@@ -85,7 +85,6 @@ class TagDetailsScreen extends StatelessWidget {
         FloatingActionButton(
             onPressed: () => bloc.add(ToggleArtistsForTagChecklist()),
             child: const Icon(Icons.ballot),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
             heroTag: 'fab_checklist_mode'),
         SizedBox(
           height: 16,
@@ -94,7 +93,6 @@ class TagDetailsScreen extends StatelessWidget {
           onPressed: () => AddEntityDialog.openAddArtistDialog(context,
               preselectedTag: tag, onSendInput: (input) => bloc.add(AddArtistsForTag(input, tag))),
           child: const Icon(Icons.add),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
         ),
       ],
     );

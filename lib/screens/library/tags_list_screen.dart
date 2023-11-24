@@ -49,7 +49,6 @@ class TagsListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddEntityDialog.openAddTagDialog(context, onSendInput: (input) => bloc.add(CreateTags(input))),
         child: const Icon(Icons.add),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
       bottomNavigationBar: MtBottomNavBar(context, NavigationItem.tags),
     );
