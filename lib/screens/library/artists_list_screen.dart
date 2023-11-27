@@ -186,7 +186,9 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
           artistWithTags.artist.name,
           style: listEntryStyle,
         ),
-        subtitle: bloc.state.displayTagSubtitles ? _buildTagsSubtitle(context, artistWithTags) : null,
+        subtitle: bloc.state.displayTagSubtitles && artistWithTags.tags.isNotEmpty
+            ? _buildTagsSubtitle(context, artistWithTags)
+            : null,
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
         onLongPress: () => DeleteDialog.openNew<Artist>(_scaffoldKey.currentContext!,
             entityToDelete: artistWithTags.artist, deleteHandler: handleDeleteArtist));
