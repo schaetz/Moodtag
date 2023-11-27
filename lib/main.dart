@@ -38,6 +38,14 @@ class MoodtagApp extends StatefulWidget {
 
 class _AppState extends State<MoodtagApp> {
   static const mainColor = Color.fromRGBO(230, 50, 50, 1);
+  final baseTheme = ThemeData(
+      brightness: Brightness.light,
+      useMaterial3: true,
+      appBarTheme: const AppBarTheme(
+        color: mainColor,
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      colorScheme: ColorScheme.fromSeed(seedColor: mainColor, brightness: Brightness.light));
 
   final _routeObserver = RouteObserver<PageRoute>();
 
@@ -55,19 +63,8 @@ class _AppState extends State<MoodtagApp> {
                 ],
                 child: MaterialApp(
                   title: MoodtagApp.appTitle,
-                  theme: ThemeData(
-                    brightness: Brightness.light,
-                    useMaterial3: true,
-                    // textTheme: const TextTheme(
-                    //   displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                    //   bodyLarge: TextStyle(fontSize: 18, color: Colors.black87),
-                    // ),
-                    appBarTheme: const AppBarTheme(
-                      color: mainColor,
-                      iconTheme: IconThemeData(color: Colors.white),
-                    ),
-                    colorScheme: ColorScheme.fromSeed(seedColor: mainColor, brightness: Brightness.light),
-                  ),
+                  theme: baseTheme.copyWith(
+                      chipTheme: ChipThemeData(backgroundColor: baseTheme.colorScheme.primaryContainer)),
                   initialRoute: Routes.initialRoute,
                   routes: Routes.instance().getRoutes(),
                   navigatorObservers: [_routeObserver],
