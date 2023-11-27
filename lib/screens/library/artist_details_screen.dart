@@ -48,7 +48,8 @@ class ArtistDetailsScreen extends StatelessWidget {
                               padding: EdgeInsets.only(bottom: 12.0),
                               child: ElevatedButton(
                                   style: ButtonStyle(
-                                      backgroundColor: MaterialStateColor.resolveWith((states) => Colors.green)),
+                                      backgroundColor: MaterialStateColor.resolveWith((states) => Colors.green),
+                                      foregroundColor: MaterialStateColor.resolveWith((states) => Colors.white)),
                                   child: Text('Play on Spotify'),
                                   onPressed: () => bloc.add(PlayArtist(artistData)))), // TODO Implement event mapper
                         _buildTagChipsRow(context, state),
