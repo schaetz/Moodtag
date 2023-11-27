@@ -6,8 +6,6 @@ abstract class AbstractImportConfirmationScreen extends StatelessWidget {
   static const headlineStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  final GlobalKey scaffoldKey = GlobalKey();
-
   final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;
 
   AbstractImportConfirmationScreen({super.key, required this.scaffoldBodyWrapperFactory});

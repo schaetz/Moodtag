@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/import_config_form.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
@@ -17,9 +17,9 @@ class SpotifyImportConfigScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
-    return Scaffold(
-        appBar: MtAppBar(context),
-        body: scaffoldBodyWrapperFactory.create(
+    return MtMainScaffold(
+        scaffoldKey: GlobalKey<ScaffoldState>(),
+        pageWidget: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(
                 child: ImportConfigForm(
           headlineCaption: 'Select what should be imported:',

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/remove_tag_from_artist_dialog.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
@@ -16,17 +16,16 @@ class TagDetailsScreen extends StatelessWidget {
   static const tagNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
-  final GlobalKey _scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   TagDetailsScreen();
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagDetailsBloc>();
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: MtAppBar(context),
-      body: BlocBuilder<TagDetailsBloc, TagDetailsState>(
+    return MtMainScaffold(
+      scaffoldKey: _scaffoldKey,
+      pageWidget: BlocBuilder<TagDetailsBloc, TagDetailsState>(
         builder: (context, state) {
           return Padding(
               padding: const EdgeInsets.all(16.0),

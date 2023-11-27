@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/chips_row_info_label.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_state.dart';
@@ -16,17 +16,16 @@ import 'package:moodtag/model/repository/loading_status.dart';
 class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
 
-  final GlobalKey _scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   ArtistDetailsScreen();
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistDetailsBloc>();
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: MtAppBar(context),
-        body: Padding(
+    return MtMainScaffold(
+        scaffoldKey: _scaffoldKey,
+        pageWidget: Padding(
           padding: const EdgeInsets.all(16.0),
           child: BlocBuilder<ArtistDetailsBloc, ArtistDetailsState>(
             builder: (context, state) {

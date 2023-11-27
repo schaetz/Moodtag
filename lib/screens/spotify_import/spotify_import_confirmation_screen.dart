@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
+import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
@@ -15,10 +15,9 @@ class SpotifyImportConfirmationScreen extends AbstractImportConfirmationScreen {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyImportBloc>();
-    return Scaffold(
-        key: scaffoldKey,
-        appBar: MtAppBar(context),
-        body: scaffoldBodyWrapperFactory.create(
+    return MtMainScaffold(
+        scaffoldKey: GlobalKey<ScaffoldState>(),
+        pageWidget: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(child: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
           return getImportedEntitiesOverviewList(_getEntityFrequencies(state));
         }))),

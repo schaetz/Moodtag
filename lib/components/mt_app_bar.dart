@@ -19,8 +19,13 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double height = 60;
 
   final BuildContext context;
+  late final TabController? tabController;
 
-  MtAppBar(this.context) : super();
+  MtAppBar(this.context) : super() {
+    this.tabController = null;
+  }
+
+  MtAppBar.withMainTabBar(this.context, this.tabController);
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +44,16 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
       automaticallyImplyLeading: onBackButtonPressed == null,
       leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed()) : null,
+      bottom: TabBar(controller: tabController, tabs: const <Widget>[
+        Tab(
+          icon: Icon(Icons.library_music),
+          text: 'Artists',
+        ),
+        Tab(
+          icon: Icon(Icons.label),
+          text: 'Tags',
+        ),
+      ]),
     );
   }
 

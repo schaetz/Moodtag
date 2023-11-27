@@ -6,8 +6,8 @@ import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
+import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/components/multiple_floating_action_buttons_column.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
@@ -31,7 +31,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
-  final GlobalKey _scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   late final RouteObserver _routeObserver;
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
@@ -77,10 +77,9 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: MtAppBar(context),
-      body: BlocConsumer<ArtistsListBloc, ArtistsListState>(
+    return MtMainScaffold(
+      scaffoldKey: _scaffoldKey,
+      pageWidget: BlocConsumer<ArtistsListBloc, ArtistsListState>(
           listener: (context, state) => _checkFilterModalAndOverlayState(context, state, bloc),
           builder: (context, state) {
             return LoadedDataDisplayWrapper<ArtistsList>(

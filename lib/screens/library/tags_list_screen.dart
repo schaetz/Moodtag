@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/mt_bottom_nav_bar.dart';
+import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
@@ -17,17 +17,16 @@ class TagsListScreen extends StatelessWidget {
   // TODO Define pale color in theme
   static const listEntryStylePale = TextStyle(fontSize: 18.0, color: Colors.grey);
 
-  final GlobalKey _scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   TagsListScreen();
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagsListBloc>();
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: MtAppBar(context),
-      body: BlocBuilder<TagsListBloc, TagsListState>(
+    return MtMainScaffold(
+      scaffoldKey: _scaffoldKey,
+      pageWidget: BlocBuilder<TagsListBloc, TagsListState>(
           buildWhen: (previous, current) => current.isTagsListLoaded, // TODO Show loading or error symbols
           builder: (context, state) {
             if (state.allTags == null || state.allTags!.isEmpty) {

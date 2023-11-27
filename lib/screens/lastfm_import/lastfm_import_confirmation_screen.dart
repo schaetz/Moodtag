@@ -9,6 +9,8 @@ import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/screens/import_flow/abstract_import_confirmation_screen.dart';
 
 class LastFmImportConfirmationScreen extends AbstractImportConfirmationScreen {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+
   LastFmImportConfirmationScreen({Key? key, required ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory})
       : super(key: key, scaffoldBodyWrapperFactory: scaffoldBodyWrapperFactory);
 
