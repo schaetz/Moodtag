@@ -24,7 +24,7 @@ abstract class AbstractImportFlow extends StatelessWidget {
   }
 
   void returnToLibraryScreens(BuildContext context) async {
-    Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList));
+    Navigator.of(context).popUntil(ModalRouteExt.withName(Routes.libraryMainScreen));
   }
 
   ImportFlowScreenWrapperFactory getImportFlowScreenWrapperFactory(int stepIndex) =>

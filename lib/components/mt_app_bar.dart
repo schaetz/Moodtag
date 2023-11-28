@@ -16,7 +16,8 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const menuItemLastFm = 'Last.fm';
   static const menuItemResetLibrary = 'Reset library';
   static const popupMenuItems = [menuItemSpotifyImport, menuItemLastFm, menuItemResetLibrary];
-  static const double height = 60;
+  static const double heightWithTabBar = 120;
+  static const double heightWithoutTabBar = 60;
 
   final BuildContext context;
   late final TabController? tabController;
@@ -44,21 +45,24 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
       automaticallyImplyLeading: onBackButtonPressed == null,
       leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed()) : null,
-      bottom: TabBar(controller: tabController, tabs: const <Widget>[
-        Tab(
-          icon: Icon(Icons.library_music),
-          text: 'Artists',
-        ),
-        Tab(
-          icon: Icon(Icons.label),
-          text: 'Tags',
-        ),
-      ]),
+      bottom: tabController != null
+          ? TabBar(controller: tabController, tabs: const <Widget>[
+              Tab(
+                icon: Icon(Icons.library_music),
+                text: 'Artists',
+              ),
+              Tab(
+                icon: Icon(Icons.label),
+                text: 'Tags',
+              ),
+            ])
+          : null,
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(height);
+  Size get preferredSize =>
+      tabController == null ? Size.fromHeight(heightWithoutTabBar) : Size.fromHeight(heightWithTabBar);
 
   static GestureDetector _buildTitle(BuildContext context) {
     return GestureDetector(
@@ -68,7 +72,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       onTap: () => {
         if (Navigator.of(context).canPop())
-          {Navigator.of(context).popUntil(ModalRouteExt.withNames(Routes.artistsList, Routes.tagsList))}
+          {Navigator.of(context).popUntil(ModalRouteExt.withName(Routes.libraryMainScreen))}
       },
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/navigation/navigation_item.dart';
-import 'package:moodtag/navigation/routes.dart';
 
 class MtBottomNavBar extends BottomNavigationBar {
   MtBottomNavBar(BuildContext context, NavigationItem activePage)
@@ -17,11 +16,11 @@ class MtBottomNavBar extends BottomNavigationBar {
           ],
           currentIndex: activePage.index,
           onTap: (int newIndex) {
-            if (newIndex == 0 && activePage != NavigationItem.artists) {
-              Navigator.of(context).pushNamedAndRemoveUntil(Routes.artistsList, (route) => false);
-            } else if (newIndex == 1 && activePage != NavigationItem.tags) {
-              Navigator.of(context).pushNamedAndRemoveUntil(Routes.tagsList, (route) => false);
-            }
+            // if (newIndex == 0 && activePage != NavigationItem.artists) {
+            //   Navigator.of(context).pushNamedAndRemoveUntil(Routes.artistsList, (route) => false);
+            // } else if (newIndex == 1 && activePage != NavigationItem.tags) {
+            //   Navigator.of(context).pushNamedAndRemoveUntil(Routes.tagsList, (route) => false);
+            // }
           },
         );
 }

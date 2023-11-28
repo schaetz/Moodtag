@@ -41,10 +41,6 @@ class _AppState extends State<MoodtagApp> {
   final baseTheme = ThemeData(
       brightness: Brightness.light,
       useMaterial3: true,
-      appBarTheme: const AppBarTheme(
-        color: mainColor,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
       colorScheme: ColorScheme.fromSeed(seedColor: mainColor, brightness: Brightness.light));
 
   final _routeObserver = RouteObserver<PageRoute>();
@@ -64,7 +60,15 @@ class _AppState extends State<MoodtagApp> {
                 child: MaterialApp(
                   title: MoodtagApp.appTitle,
                   theme: baseTheme.copyWith(
-                      chipTheme: ChipThemeData(backgroundColor: baseTheme.colorScheme.primaryContainer)),
+                      chipTheme: ChipThemeData(backgroundColor: baseTheme.colorScheme.primaryContainer),
+                      appBarTheme: const AppBarTheme(
+                        color: mainColor,
+                        iconTheme: IconThemeData(color: Colors.white),
+                      ),
+                      tabBarTheme: TabBarTheme(
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelColor: baseTheme.colorScheme.onPrimary,
+                      )),
                   initialRoute: Routes.initialRoute,
                   routes: Routes.instance().getRoutes(),
                   navigatorObservers: [_routeObserver],

@@ -6,10 +6,6 @@ import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
-import 'package:moodtag/components/mt_bottom_nav_bar.dart';
-import 'package:moodtag/components/mt_main_scaffold.dart';
-import 'package:moodtag/components/multiple_floating_action_buttons_column.dart';
-import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
@@ -19,10 +15,13 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
-import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class ArtistsListScreen extends StatefulWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
+  const ArtistsListScreen(this.scaffoldKey);
+
   @override
   State<StatefulWidget> createState() => _ArtistsListScreenState();
 }
@@ -31,7 +30,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   late final RouteObserver _routeObserver;
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
@@ -77,43 +75,24 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
-    return MtMainScaffold(
-      scaffoldKey: _scaffoldKey,
-      pageWidget: BlocConsumer<ArtistsListBloc, ArtistsListState>(
-          listener: (context, state) => _checkFilterModalAndOverlayState(context, state, bloc),
-          builder: (context, state) {
-            return LoadedDataDisplayWrapper<ArtistsList>(
-                loadedData: state.loadedDataFilteredArtists,
-                additionalCheckData: state.loadedDataAllTags,
-                captionForError: 'Artists could not be loaded',
-                captionForEmptyData:
-                    state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
-                buildOnSuccess: (filteredArtistsList) => ListView.separated(
-                      separatorBuilder: (context, _) => Divider(),
-                      padding: EdgeInsets.all(16.0),
-                      itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
-                      itemBuilder: (context, i) {
-                        return _buildArtistRow(context, filteredArtistsList[i], bloc);
-                      },
-                    ));
-          }),
-      floatingActionButton: MultipleFloatingActionButtonsColumn(children: [
-        FloatingActionButton(
-            onPressed: () => bloc.add(ToggleFilterSelectionModal(wantedOpen: true)),
-            child: const Icon(Icons.filter_list),
-            heroTag: 'fab_change_filters'),
-        FloatingActionButton(
-            onPressed: () => bloc.add(ToggleTagSubtitles()),
-            child: _buildTagSubtitlesToggleIcon(),
-            heroTag: 'fab_toggle_tag_subtitles'),
-        FloatingActionButton(
-          onPressed: () =>
-              AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => bloc.add(CreateArtists(input))),
-          child: const Icon(Icons.add),
-        )
-      ]),
-      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.artists),
-    );
+    return BlocConsumer<ArtistsListBloc, ArtistsListState>(
+        listener: (context, state) => _checkFilterModalAndOverlayState(context, state, bloc),
+        builder: (context, state) {
+          return LoadedDataDisplayWrapper<ArtistsList>(
+              loadedData: state.loadedDataFilteredArtists,
+              additionalCheckData: state.loadedDataAllTags,
+              captionForError: 'Artists could not be loaded',
+              captionForEmptyData:
+                  state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
+              buildOnSuccess: (filteredArtistsList) => ListView.separated(
+                    separatorBuilder: (context, _) => Divider(),
+                    padding: EdgeInsets.all(16.0),
+                    itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
+                    itemBuilder: (context, i) {
+                      return _buildArtistRow(context, filteredArtistsList[i], bloc);
+                    },
+                  ));
+        });
   }
 
   void _checkFilterModalAndOverlayState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
@@ -171,10 +150,10 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
     _filterDisplayOverlay?.remove();
   }
 
-  Widget _buildTagSubtitlesToggleIcon() {
-    return BlocBuilder<ArtistsListBloc, ArtistsListState>(
-        builder: (context, state) => state.displayTagSubtitles ? const Icon(Icons.label_off) : const Icon(Icons.label));
-  }
+  // Widget _buildTagSubtitlesToggleIcon() {
+  //   return BlocBuilder<ArtistsListBloc, ArtistsListState>(
+  //       builder: (context, state) => state.displayTagSubtitles ? const Icon(Icons.label_off) : const Icon(Icons.label));
+  // }
 
   Widget _buildArtistRow(BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc) {
     final handleDeleteArtist = () {
@@ -189,7 +168,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
             ? _buildTagsSubtitle(context, artistWithTags)
             : null,
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
-        onLongPress: () => DeleteDialog.openNew<Artist>(_scaffoldKey.currentContext!,
+        onLongPress: () => DeleteDialog.openNew<Artist>(widget.scaffoldKey.currentContext!,
             entityToDelete: artistWithTags.artist, deleteHandler: handleDeleteArtist));
   }
 

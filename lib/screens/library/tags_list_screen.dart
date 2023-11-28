@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/mt_bottom_nav_bar.dart';
-import 'package:moodtag/components/mt_main_scaffold.dart';
-import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/tag_events.dart';
-import 'package:moodtag/navigation/navigation_item.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class TagsListScreen extends StatelessWidget {
@@ -17,40 +13,32 @@ class TagsListScreen extends StatelessWidget {
   // TODO Define pale color in theme
   static const listEntryStylePale = TextStyle(fontSize: 18.0, color: Colors.grey);
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey;
 
-  TagsListScreen();
+  TagsListScreen(this._scaffoldKey);
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagsListBloc>();
-    return MtMainScaffold(
-      scaffoldKey: _scaffoldKey,
-      pageWidget: BlocBuilder<TagsListBloc, TagsListState>(
-          buildWhen: (previous, current) => current.isTagsListLoaded, // TODO Show loading or error symbols
-          builder: (context, state) {
-            if (state.allTags == null || state.allTags!.isEmpty) {
-              return const Align(
-                alignment: Alignment.center,
-                child: Text('No tags yet', style: listEntryStyle),
-              );
-            }
-
-            return ListView.separated(
-              separatorBuilder: (context, _) => Divider(),
-              padding: EdgeInsets.all(16.0),
-              itemCount: state.allTags!.isNotEmpty ? state.allTags!.length : 0,
-              itemBuilder: (context, i) {
-                return _buildTagRow(context, state.allTags![i], bloc);
-              },
+    return BlocBuilder<TagsListBloc, TagsListState>(
+        buildWhen: (previous, current) => current.isTagsListLoaded, // TODO Show loading or error symbols
+        builder: (context, state) {
+          if (state.allTags == null || state.allTags!.isEmpty) {
+            return const Align(
+              alignment: Alignment.center,
+              child: Text('No tags yet', style: listEntryStyle),
             );
-          }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => AddEntityDialog.openAddTagDialog(context, onSendInput: (input) => bloc.add(CreateTags(input))),
-        child: const Icon(Icons.add),
-      ),
-      bottomNavigationBar: MtBottomNavBar(context, NavigationItem.tags),
-    );
+          }
+
+          return ListView.separated(
+            separatorBuilder: (context, _) => Divider(),
+            padding: EdgeInsets.all(16.0),
+            itemCount: state.allTags!.isNotEmpty ? state.allTags!.length : 0,
+            itemBuilder: (context, i) {
+              return _buildTagRow(context, state.allTags![i], bloc);
+            },
+          );
+        });
   }
 
   Widget _buildTagRow(BuildContext context, TagData tagData, TagsListBloc bloc) {

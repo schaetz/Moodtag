@@ -13,16 +13,14 @@ import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/screens/lastfm_account_management/lastfm_account_management_screen.dart';
 import 'package:moodtag/screens/lastfm_import/lastfm_import_flow.dart';
 import 'package:moodtag/screens/library/artist_details_screen.dart';
-import 'package:moodtag/screens/library/artists_list_screen.dart';
+import 'package:moodtag/screens/library/library_main_screen.dart';
 import 'package:moodtag/screens/library/tag_details_screen.dart';
-import 'package:moodtag/screens/library/tags_list_screen.dart';
 import 'package:moodtag/screens/spotify_import/spotify_import_flow.dart';
 import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 
 class Routes {
-  static const artistsList = '/artists';
+  static const libraryMainScreen = '/library';
   static const artistsDetails = '/artists/details';
-  static const tagsList = '/tags';
   static const tagsDetails = '/tags/details';
   static const lastFmAccountManagement = '/lastFmAccountManagement';
   static const lastFmImport = '/lastFmImport';
@@ -32,7 +30,7 @@ class Routes {
   static const importGenresList = '/importGenres';
   static const webView = '/webView';
 
-  static const initialRoute = artistsList;
+  static const initialRoute = libraryMainScreen;
 
   static Routes? _instance;
 
@@ -45,12 +43,14 @@ class Routes {
 
   Map<String, Widget Function(BuildContext)> getRoutes() {
     return {
-      artistsList: (context) => BlocProvider(
-          create: (_) => ArtistsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
-          child: ArtistsListScreen()),
-      tagsList: (context) => BlocProvider(
-          create: (_) => TagsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
-          child: TagsListScreen()),
+      libraryMainScreen: (context) => MultiBlocProvider(providers: [
+            BlocProvider(
+              create: (_) => ArtistsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
+            ),
+            BlocProvider(
+              create: (_) => TagsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
+            ),
+          ], child: LibraryMainScreen()),
       artistsDetails: (context) => BlocProvider(
           create: (_) => ArtistDetailsBloc(
               context.read<Repository>(),
@@ -77,6 +77,12 @@ class Routes {
 }
 
 extension ModalRouteExt on ModalRoute {
+  static RoutePredicate withName(String name) {
+    return (Route<dynamic> route) {
+      return !route.willHandlePopInternally && route is ModalRoute && route.settings.name == name;
+    };
+  }
+
   static RoutePredicate withNames(String name1, String name2) {
     return (Route<dynamic> route) {
       return !route.willHandlePopInternally &&
