@@ -67,7 +67,6 @@ class _AppState extends State<MoodtagApp> {
                       ),
                       tabBarTheme: TabBarTheme(
                         indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: baseTheme.colorScheme.onPrimary,
                       )),
                   initialRoute: Routes.initialRoute,
                   routes: Routes.instance().getRoutes(),

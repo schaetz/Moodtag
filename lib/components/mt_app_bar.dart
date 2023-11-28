@@ -9,6 +9,8 @@ import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 
+import 'colored_tab_bar.dart';
+
 class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const titleLabelStyle = TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold);
 
@@ -45,18 +47,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
       automaticallyImplyLeading: onBackButtonPressed == null,
       leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed()) : null,
-      bottom: tabController != null
-          ? TabBar(controller: tabController, tabs: const <Widget>[
-              Tab(
-                icon: Icon(Icons.library_music),
-                text: 'Artists',
-              ),
-              Tab(
-                icon: Icon(Icons.label),
-                text: 'Tags',
-              ),
-            ])
-          : null,
+      bottom: tabController != null ? buildTabBar() : null,
     );
   }
 
@@ -75,6 +66,21 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
           {Navigator.of(context).popUntil(ModalRouteExt.withName(Routes.libraryMainScreen))}
       },
     );
+  }
+
+  ColoredTabBar buildTabBar() {
+    return ColoredTabBar(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        tabBar: TabBar(controller: tabController, tabs: const <Widget>[
+          Tab(
+            icon: Icon(Icons.library_music),
+            text: 'Artists',
+          ),
+          Tab(
+            icon: Icon(Icons.label),
+            text: 'Tags',
+          ),
+        ]));
   }
 
   static PopupMenuItem<String> _buildPopupMenuItem(BuildContext context, String choice) {
