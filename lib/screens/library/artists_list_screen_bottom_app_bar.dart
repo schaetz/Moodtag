@@ -13,14 +13,14 @@ class ArtistsListScreenBottomAppBar extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   IconButton(
-                    tooltip: 'Filter',
-                    icon: const Icon(Icons.filter_list),
-                    onPressed: () {},
-                  ),
-                  IconButton(
                     tooltip: 'Search',
                     icon: const Icon(Icons.search),
                     onPressed: () {},
+                  ),
+                  IconButton(
+                    tooltip: 'Filter',
+                    icon: const Icon(Icons.filter_list),
+                    onPressed: () => bloc.add(ToggleFilterSelectionModal()),
                   ),
                   IconButton(
                     tooltip: state.displayTagSubtitles ? 'Hide Tags' : 'Show Tags',

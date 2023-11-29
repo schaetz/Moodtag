@@ -67,7 +67,11 @@ class _AppState extends State<MoodtagApp> {
                       ),
                       tabBarTheme: TabBarTheme(
                         indicatorSize: TabBarIndicatorSize.tab,
-                      )),
+                      ),
+                      // Adjust ElevatedButton text size for the ArtistsList filter modal
+                      elevatedButtonTheme: ElevatedButtonThemeData(
+                          style: ButtonStyle(
+                              textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 18))))),
                   initialRoute: Routes.initialRoute,
                   routes: Routes.instance().getRoutes(),
                   navigatorObservers: [_routeObserver],

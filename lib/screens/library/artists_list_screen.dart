@@ -127,7 +127,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
         final overlayHeight = MediaQuery.of(context).size.height * 0.20;
         return Positioned(
           left: MediaQuery.of(context).size.width * 0.05,
-          bottom: MediaQuery.of(context).size.height * 0.10,
+          bottom: MediaQuery.of(context).size.height * 0.13,
           child: Material(
               color: Colors.transparent,
               child: Container(

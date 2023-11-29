@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 
@@ -59,20 +58,15 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
                   )),
               SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
                     onPressed: () => _confirmSelection(context, {}),
                     icon: Icon(Icons.filter_list_off),
-                    label: const Text('Clear filters'),
+                    label: Text('Clear filters'),
                   ),
                   ElevatedButton.icon(
-                    onPressed: () => _closeModal(context),
-                    icon: Icon(Icons.undo),
-                    label: const Text('Discard'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _hasSelectionChanged ? () => _confirmSelection(context, _getSelectedSet()) : null,
+                    onPressed: () => _confirmSelection(context, _getSelectedSet()),
                     icon: Icon(Icons.check),
                     label: const Text('Confirm'),
                   ),
@@ -86,9 +80,6 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
   void _initializeSelectionsState() {
     this._selectionsState = Map.from(widget.entitiesWithInitialSelection);
   }
-
-  bool get _hasSelectionChanged =>
-      !DeepCollectionEquality().equals(this._selectionsState, widget.entitiesWithInitialSelection);
 
   List<Widget> _buildSelectableChips() {
     return this

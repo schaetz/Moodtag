@@ -7,11 +7,6 @@ class TagsListScreenBottomAppBar extends StatelessWidget {
       child: Row(
         children: <Widget>[
           IconButton(
-            tooltip: 'Filter',
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {},
-          ),
-          IconButton(
             tooltip: 'Search',
             icon: const Icon(Icons.search),
             onPressed: () {},
