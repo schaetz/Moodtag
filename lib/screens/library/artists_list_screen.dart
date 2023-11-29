@@ -150,11 +150,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
     _filterDisplayOverlay?.remove();
   }
 
-  // Widget _buildTagSubtitlesToggleIcon() {
-  //   return BlocBuilder<ArtistsListBloc, ArtistsListState>(
-  //       builder: (context, state) => state.displayTagSubtitles ? const Icon(Icons.label_off) : const Icon(Icons.label));
-  // }
-
   Widget _buildArtistRow(BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc) {
     final handleDeleteArtist = () {
       bloc.add(DeleteArtist(artistWithTags.artist));
