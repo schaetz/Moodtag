@@ -15,8 +15,18 @@ class ArtistsListScreenBottomAppBar extends StatelessWidget {
                   IconButton(
                     tooltip: 'Search',
                     icon: const Icon(Icons.search),
-                    onPressed: () {},
+                    onPressed: () => bloc.add(ToggleSearchBar()),
                   ),
+                  state.displaySearchBar
+                      ? SizedBox(
+                          width: 180,
+                          child: TextField(
+                              onChanged: (searchItem) => bloc.add(ChangeSearchItem(searchItem)),
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                  hintText: "Search",
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))))))
+                      : SizedBox(),
                   IconButton(
                     tooltip: 'Filter',
                     icon: const Icon(Icons.filter_list),

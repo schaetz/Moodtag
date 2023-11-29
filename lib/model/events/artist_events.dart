@@ -58,6 +58,20 @@ class ToggleTagForArtist extends ArtistEvent {
   List<Object> get props => [artist, tag];
 }
 
+class ToggleSearchBar extends ArtistEvent {
+  @override
+  List<Object> get props => [];
+}
+
+class ChangeSearchItem extends ArtistEvent {
+  final String searchItem;
+
+  ChangeSearchItem(this.searchItem);
+
+  @override
+  List<Object> get props => [searchItem];
+}
+
 class ToggleTagSubtitles extends ArtistEvent {
   @override
   List<Object> get props => [];

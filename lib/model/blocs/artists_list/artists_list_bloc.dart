@@ -34,6 +34,8 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     on<ChangeArtistsListFilters>(_handleChangeArtistsListFilters);
     on<CreateArtists>(_handleCreateArtistsEvent);
     on<DeleteArtist>(_handleDeleteArtistEvent);
+    on<ToggleSearchBar>(_handleToggleSearchBarEvent);
+    on<ChangeSearchItem>(_handleChangeSearchItemEvent);
     on<ToggleTagSubtitles>(_handleToggleTagSubtitlesEvent);
     on<ToggleFilterSelectionModal>(_handleToggleFilterOverlayEvent);
     on<FilterSelectionModalStateChanged>(_handleFilterSelectionModalStateChangedEvent);
@@ -92,6 +94,14 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     if (deleteArtistResponse.didFail()) {
       errorStreamController.add(deleteArtistResponse.getUserFeedbackException());
     }
+  }
+
+  void _handleToggleSearchBarEvent(ToggleSearchBar event, Emitter<ArtistsListState> emit) {
+    emit(state.copyWith(displaySearchBar: !state.displaySearchBar));
+  }
+
+  void _handleChangeSearchItemEvent(ChangeSearchItem event, Emitter<ArtistsListState> emit) {
+    //emit(state.copyWith(searchItem: event.searchItem, loadedDataFilteredArtists: LoadedData.loading()));
   }
 
   void _handleToggleTagSubtitlesEvent(ToggleTagSubtitles event, Emitter<ArtistsListState> emit) {
