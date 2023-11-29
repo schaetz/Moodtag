@@ -12,7 +12,7 @@ import 'package:moodtag/screens/library/tags_list_screen.dart';
 import 'package:moodtag/screens/library/tags_list_screen_bottom_app_bar.dart';
 
 class LibraryMainScreen extends StatefulWidget {
-  final bool startOnArtistsList = false;
+  final bool startOnArtistsList = true;
 
   LibraryMainScreen();
   LibraryMainScreen.artistsList({startOnArtistsList = true});
