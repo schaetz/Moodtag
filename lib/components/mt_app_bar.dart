@@ -19,7 +19,7 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const menuItemResetLibrary = 'Reset library';
   static const popupMenuItems = [menuItemSpotifyImport, menuItemLastFm, menuItemResetLibrary];
   static const double heightWithTabBar = 120;
-  static const double heightWithoutTabBar = 60;
+  static const double heightWithoutTabBar = 46;
 
   final BuildContext context;
   late final TabController? tabController;
