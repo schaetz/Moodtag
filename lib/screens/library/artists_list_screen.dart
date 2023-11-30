@@ -210,6 +210,12 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
       context: context,
       expand: false,
       enableDrag: false,
+      backgroundColor: Theme.of(context).colorScheme.background.withOpacity(0.8),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      )),
       builder: (context) => FilterSelectionModal<TagData>(
           entitiesWithInitialSelection: _getSelectionForFilterOverlay(allTagsList, filterTags),
           onConfirmSelection: (Set<TagData> newFilterTagsData) =>

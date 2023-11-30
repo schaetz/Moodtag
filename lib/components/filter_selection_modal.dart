@@ -38,9 +38,8 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Container(
-      height: 550,
+    return SizedBox(
+      height: 500,
       child: Padding(
           padding: EdgeInsets.all(12.0),
           child: Column(
@@ -53,7 +52,16 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
               SizedBox(height: 16),
               Container(
                   height: 350,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background.withOpacity(0.4),
+                    border: Border.all(
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.all(4),
                   child: ListView(
+                    padding: EdgeInsets.zero,
                     children: [Wrap(spacing: 8.0, runSpacing: 2.0, children: _buildSelectableChips())],
                   )),
               SizedBox(height: 16),
@@ -74,7 +82,7 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
               )
             ],
           )),
-    ));
+    );
   }
 
   void _initializeSelectionsState() {
