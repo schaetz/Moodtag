@@ -18,6 +18,11 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
 
   late final Map<T, bool> _selectionsState;
   bool _isClosingAfterButtonClick = false;
+  late final List<String> _alphabetElements;
+
+  _FilterSelectionModalState() {
+    this._alphabetElements = _getAlphabetElements();
+  }
 
   @override
   void initState() {
@@ -50,20 +55,7 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
                 style: headlineLabelStyle,
               ),
               SizedBox(height: 16),
-              Container(
-                  height: 350,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.background.withOpacity(0.4),
-                    border: Border.all(
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: EdgeInsets.all(4),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [Wrap(spacing: 8.0, runSpacing: 2.0, children: _buildSelectableChips())],
-                  )),
+              _buildChipsCloud(context),
               SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -87,6 +79,56 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
 
   void _initializeSelectionsState() {
     this._selectionsState = Map.from(widget.entitiesWithInitialSelection);
+  }
+
+  Widget _buildChipsCloud(BuildContext context) {
+    return Container(
+      height: 350,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.background.withOpacity(0.4),
+        border: Border.all(
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: EdgeInsets.all(4),
+      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+        SizedBox(
+            width: 375,
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [Wrap(spacing: 8.0, runSpacing: 2.0, children: _buildSelectableChips())],
+            )),
+        _buildAlphabetColumn()
+      ]),
+    );
+  }
+
+  Column _buildAlphabetColumn() => Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: _alphabetElements
+            .map((element) => SizedBox(
+                width: 18,
+                height: 12,
+                child: OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+                    child: Text(element, style: TextStyle(fontSize: 8)))))
+            .toList(),
+      );
+
+  List<String> _getAlphabetElements() {
+    final aCode = 'A'.codeUnitAt(0);
+    final zCode = 'Z'.codeUnitAt(0);
+    final alphabetElements = List<String>.generate(
+      zCode - aCode + 1,
+      (index) => String.fromCharCode(aCode + index),
+    );
+    alphabetElements.insert(0, '#');
+    return alphabetElements;
   }
 
   List<Widget> _buildSelectableChips() {
