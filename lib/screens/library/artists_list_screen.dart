@@ -16,6 +16,7 @@ import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/screens/library/search_bar_overlay_mixin.dart';
 
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -26,7 +27,7 @@ class ArtistsListScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _ArtistsListScreenState();
 }
 
-class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
+class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, SearchBarOverlayMixin {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
@@ -34,6 +35,9 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
   OverlayEntry? _filterDisplayOverlay;
+
+  @override
+  String searchBarHintText = 'Search artist';
 
   @override
   void didChangeDependencies() {
@@ -76,7 +80,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
     return BlocConsumer<ArtistsListBloc, ArtistsListState>(
-        listener: (context, state) => _checkFilterModalAndOverlayState(context, state, bloc),
+        listener: (context, state) => _checkFilterModalsAndOverlaysState(context, state, bloc),
         builder: (context, state) {
           return LoadedDataDisplayWrapper<ArtistsList>(
               loadedData: state.loadedDataFilteredArtists,
@@ -96,9 +100,18 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
         });
   }
 
-  void _checkFilterModalAndOverlayState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
+  void _checkFilterModalsAndOverlaysState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
+    _checkSearchBarOverlayState(context, state);
     _checkFilterModalState(context, state, bloc);
     _checkFilterDisplayOverlayState(context, state);
+  }
+
+  void _checkSearchBarOverlayState(BuildContext context, ArtistsListState state) {
+    if (state.displaySearchBar && !searchBarOverlayVisible) {
+      showSearchBarOverlay(context);
+    } else if (!state.displaySearchBar && searchBarOverlayVisible) {
+      hideSearchBarOverlay();
+    }
   }
 
   void _checkFilterModalState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) async {
@@ -116,7 +129,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
     if (state.filterDisplayOverlayState == OverlayVisibility.on && !_filterDisplayOverlayVisible) {
       _showFilterDisplayOverlay(context, state.filterTags);
     } else if (state.filterDisplayOverlayState != OverlayVisibility.on && _filterDisplayOverlayVisible) {
-      _hideFilterDisplayOverlay(context);
+      _hideFilterDisplayOverlay();
     }
   }
 
@@ -146,7 +159,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
     });
   }
 
-  void _hideFilterDisplayOverlay(BuildContext context) {
+  void _hideFilterDisplayOverlay() {
     _filterDisplayOverlayVisible = false;
     _filterDisplayOverlay?.remove();
   }
@@ -216,4 +229,17 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   Map<TagData, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>
       Map<TagData, bool>.fromIterable(allTagsList,
           key: (tagData) => tagData, value: (tagData) => filterTags.contains(tagData.tag));
+
+  @override
+  void onSearchBarTextChanged(String searchItem) {
+    final bloc = context.read<ArtistsListBloc>();
+    bloc.add(ChangeSearchItem(searchItem));
+  }
+
+  @override
+  void onSearchBarClearPressed() {
+    final bloc = context.read<ArtistsListBloc>();
+    bloc.add(ClearSearchItem());
+    super.onSearchBarClearPressed();
+  }
 }

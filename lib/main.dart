@@ -60,6 +60,8 @@ class _AppState extends State<MoodtagApp> {
                 child: MaterialApp(
                   title: MoodtagApp.appTitle,
                   theme: baseTheme.copyWith(
+                      colorScheme: baseTheme.colorScheme
+                          .copyWith(tertiary: Color.fromRGBO(255, 200, 200, 1), onTertiary: Colors.black),
                       chipTheme: ChipThemeData(backgroundColor: baseTheme.colorScheme.primaryContainer),
                       appBarTheme: const AppBarTheme(
                         color: mainColor,

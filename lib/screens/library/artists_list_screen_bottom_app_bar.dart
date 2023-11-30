@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/events/artist_events.dart';
+import 'package:moodtag/model/events/library_events.dart';
 
 class ArtistsListScreenBottomAppBar extends StatelessWidget {
   final searchBarController = TextEditingController();
@@ -15,18 +16,11 @@ class ArtistsListScreenBottomAppBar extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   state.displaySearchBar
-                      ? SizedBox(
-                          width: 180,
-                          child: TextField(
-                              controller: searchBarController..text = state.searchItem,
-                              onChanged: (searchItem) => bloc.add(ChangeSearchItem(searchItem)),
-                              autofocus: true,
-                              decoration: InputDecoration(
-                                  hintText: "Search",
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))),
-                                  suffixIcon: IconButton(
-                                      icon: Icon(Icons.cancel, color: Colors.grey),
-                                      onPressed: () => bloc.add(ToggleSearchBar())))))
+                      ? IconButton(
+                          tooltip: 'Close search',
+                          icon: const Icon(Icons.search_off),
+                          onPressed: () => bloc.add(ToggleSearchBar()),
+                        )
                       : IconButton(
                           tooltip: 'Search',
                           icon: const Icon(Icons.search),
