@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class FilterSelectionModal<T extends DataClassWithEntityName> extends StatefulWidget {
   final Map<T, bool> entitiesWithInitialSelection;
@@ -18,16 +19,22 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
 
   late final Map<T, bool> _selectionsState;
   bool _isClosingAfterButtonClick = false;
-  late final List<String> _alphabetElements;
+  late final Map<String, int> _alphabetElementsWithNearestIndices;
+  late final AutoScrollController _chipsAutoScrollController;
+
+  final charCodeA = 'A'.codeUnitAt(0);
+  final charCodeZ = 'Z'.codeUnitAt(0);
 
   _FilterSelectionModalState() {
-    this._alphabetElements = _getAlphabetElements();
+    // 48 is just a guess
+    this._chipsAutoScrollController = AutoScrollController(axis: Axis.vertical, suggestedRowHeight: 48);
   }
 
   @override
   void initState() {
     super.initState();
     _initializeSelectionsState();
+    this._alphabetElementsWithNearestIndices = _getAlphabetElementsWithNearestIndices();
   }
 
   @override
@@ -96,6 +103,7 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
         SizedBox(
             width: 375,
             child: ListView(
+              controller: _chipsAutoScrollController,
               padding: EdgeInsets.zero,
               children: [Wrap(spacing: 8.0, runSpacing: 2.0, children: _buildSelectableChips())],
             )),
@@ -104,44 +112,41 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
     );
   }
 
-  Column _buildAlphabetColumn() => Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: _alphabetElements
-            .map((element) => SizedBox(
-                width: 18,
-                height: 12,
-                child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
-                    child: Text(element, style: TextStyle(fontSize: 8)))))
-            .toList(),
-      );
-
-  List<String> _getAlphabetElements() {
-    final aCode = 'A'.codeUnitAt(0);
-    final zCode = 'Z'.codeUnitAt(0);
-    final alphabetElements = List<String>.generate(
-      zCode - aCode + 1,
-      (index) => String.fromCharCode(aCode + index),
-    );
-    alphabetElements.insert(0, '#');
-    return alphabetElements;
-  }
-
   List<Widget> _buildSelectableChips() {
-    return this
-        ._selectionsState
-        .entries
-        .map((MapEntry<T, bool> entityWithState) => InputChip(
-              label: Text(entityWithState.key.name),
-              selected: entityWithState.value,
-              onPressed: () => _updateLocalState(entityWithState.key),
-            ))
-        .toList();
+    String lastInitialLetter = '';
+    return this._selectionsState.entries.map((MapEntry<T, bool> entityWithState) {
+      final currentInitialLetter = _getInitialLetterForWord(entityWithState.key.name);
+      if (currentInitialLetter != lastInitialLetter) {
+        final currentAlphabetIndex = _getIndexForInitialLetter(currentInitialLetter);
+        lastInitialLetter = currentInitialLetter;
+        return AutoScrollTag(
+            key: ValueKey(currentInitialLetter),
+            controller: _chipsAutoScrollController,
+            index: currentAlphabetIndex,
+            child: _buildSingleChip(entityWithState.key.name, entityWithState.key, entityWithState.value));
+      } else {
+        return _buildSingleChip(entityWithState.key.name, entityWithState.key, entityWithState.value);
+      }
+    }).toList();
   }
+
+  InputChip _buildSingleChip(String text, T entity, bool selected) =>
+      InputChip(label: Text(text), selected: selected, onPressed: () => _updateLocalState(entity));
+
+  Column _buildAlphabetColumn() => Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: _alphabetElementsWithNearestIndices.entries
+          .map((elementWithNearestIndex) => SizedBox(
+              width: 18,
+              height: 12,
+              child: OutlinedButton(
+                  onPressed: () => _chipsAutoScrollController.scrollToIndex(elementWithNearestIndex.value,
+                      preferPosition: AutoScrollPosition.begin),
+                  style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+                  child: Text(elementWithNearestIndex.key, style: TextStyle(fontSize: 8)))))
+          .toList());
 
   void _closeModal(BuildContext context) {
     if (widget.onCloseModal != null) {
@@ -170,4 +175,42 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
 
   Set<T> _getSelectedSet() =>
       this._selectionsState.entries.where((element) => element.value == true).map((e) => e.key).toSet();
+
+  //
+  // Helpers for alphabet column
+  //
+  String _getInitialLetterForWord(String word) {
+    final initialLetter = word.toUpperCase().substring(0, 1);
+    if (initialLetter.codeUnitAt(0) >= charCodeA && initialLetter.codeUnitAt(0) <= charCodeZ) {
+      return initialLetter;
+    } else {
+      return '#';
+    }
+  }
+
+  Map<String, int> _getAlphabetElementsWithNearestIndices() {
+    final alphabetElements = List<String>.generate(
+      charCodeZ - charCodeA + 1,
+      (index) => String.fromCharCode(charCodeA + index),
+    );
+    alphabetElements.insert(0, '#');
+
+    final uniqueInitialLetters = _getUniqueInitialLetters(_selectionsState.keys.map((entity) => entity.name).toList());
+    int lastOccurringIndex = 0;
+    return Map.fromEntries(alphabetElements.map((element) {
+      if (uniqueInitialLetters.contains(element)) {
+        lastOccurringIndex = _getIndexForInitialLetter(element);
+      }
+      return MapEntry<String, int>(element, lastOccurringIndex);
+    }));
+  }
+
+  Set<String> _getUniqueInitialLetters(List<String> words) {
+    final uniqueInitialLetters = Set<String>();
+    words.forEach((word) => uniqueInitialLetters.add(_getInitialLetterForWord(word)));
+    return uniqueInitialLetters;
+  }
+
+  int _getIndexForInitialLetter(String letter) =>
+      letter == '#' ? 0 : letter.toUpperCase().codeUnitAt(0) - charCodeA + 1;
 }
