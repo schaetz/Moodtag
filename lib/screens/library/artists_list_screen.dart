@@ -82,8 +82,9 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
               loadedData: state.loadedDataFilteredArtists,
               additionalCheckData: state.loadedDataAllTags,
               captionForError: 'Artists could not be loaded',
-              captionForEmptyData:
-                  state.filterTags.isEmpty ? 'No artists yet' : 'No artists match the selected filters',
+              captionForEmptyData: state.filterTags.isEmpty && state.searchItem == ''
+                  ? 'No artists yet'
+                  : 'No artists match the selected filters',
               buildOnSuccess: (filteredArtistsList) => ListView.separated(
                     separatorBuilder: (context, _) => Divider(),
                     padding: EdgeInsets.all(16.0),
