@@ -53,9 +53,9 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     super.close();
   }
 
-  void _requestArtistsFromRepository({Set<Tag> filterTags = const {}}) {
+  void _requestArtistsFromRepository({Set<Tag>? filterTags, String? searchItem = null}) {
     _filteredArtistsListStreamSubscription = _repository
-        .getArtistsDataList(filterTags: filterTags)
+        .getArtistsDataList(filterTags: filterTags ?? state.filterTags, searchItem: searchItem ?? state.searchItem)
         .handleError((error) => add(DataUpdated<ArtistsList>(error: error)))
         .listen((artistsListFromStream) => add(DataUpdated<ArtistsList>(data: artistsListFromStream)));
   }
@@ -76,8 +76,7 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
 
   void _handleChangeArtistsListFilters(ChangeArtistsListFilters event, Emitter<ArtistsListState> emit) async {
     if (event.filterTags != state.filterTags) {
-      await _filteredArtistsListStreamSubscription.cancel();
-      _requestArtistsFromRepository(filterTags: event.filterTags);
+      reloadDataAfterFilterChange(filterTags: event.filterTags);
       emit(state.copyWith(filterTags: event.filterTags, loadedDataFilteredArtists: LoadedData.loading()));
     }
   }
@@ -97,11 +96,19 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
   }
 
   void _handleToggleSearchBarEvent(ToggleSearchBar event, Emitter<ArtistsListState> emit) {
-    emit(state.copyWith(displaySearchBar: !state.displaySearchBar));
+    if (state.displaySearchBar) {
+      reloadDataAfterFilterChange(searchItem: '');
+      emit(state.copyWith(displaySearchBar: false, searchItem: ''));
+    } else {
+      emit(state.copyWith(displaySearchBar: true));
+    }
   }
 
-  void _handleChangeSearchItemEvent(ChangeSearchItem event, Emitter<ArtistsListState> emit) {
-    //emit(state.copyWith(searchItem: event.searchItem, loadedDataFilteredArtists: LoadedData.loading()));
+  void _handleChangeSearchItemEvent(ChangeSearchItem event, Emitter<ArtistsListState> emit) async {
+    if (event.searchItem != state.searchItem) {
+      reloadDataAfterFilterChange(searchItem: event.searchItem);
+      emit(state.copyWith(searchItem: event.searchItem, loadedDataFilteredArtists: LoadedData.loading()));
+    }
   }
 
   void _handleToggleTagSubtitlesEvent(ToggleTagSubtitles event, Emitter<ArtistsListState> emit) {
@@ -145,5 +152,10 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     } else if (state.filterTags.isNotEmpty) {
       emit(state.copyWith(filterDisplayOverlayState: OverlayVisibility.suspended));
     }
+  }
+
+  void reloadDataAfterFilterChange({Set<Tag>? filterTags, String? searchItem}) async {
+    await _filteredArtistsListStreamSubscription.cancel();
+    _requestArtistsFromRepository(filterTags: filterTags, searchItem: searchItem);
   }
 }

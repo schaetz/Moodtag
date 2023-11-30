@@ -24,8 +24,8 @@ class Repository {
   //
   // Artists
   //
-  Stream<List<ArtistData>> getArtistsDataList({Set<Tag> filterTags = const {}}) {
-    return db.getArtistsDataList(filterTags);
+  Stream<List<ArtistData>> getArtistsDataList({Set<Tag> filterTags = const {}, String? searchItem = null}) {
+    return db.getArtistsDataList(filterTags, searchItem: searchItem);
   }
 
   Stream<List<ArtistData>> getArtistsDataHavingTag(Tag tag) {

@@ -5,6 +5,8 @@ import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 
 class ArtistsListScreenBottomAppBar extends StatelessWidget {
+  final searchBarController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
@@ -12,21 +14,24 @@ class ArtistsListScreenBottomAppBar extends StatelessWidget {
         builder: (context, state) => BottomAppBar(
               child: Row(
                 children: <Widget>[
-                  IconButton(
-                    tooltip: 'Search',
-                    icon: const Icon(Icons.search),
-                    onPressed: () => bloc.add(ToggleSearchBar()),
-                  ),
                   state.displaySearchBar
                       ? SizedBox(
                           width: 180,
                           child: TextField(
+                              controller: searchBarController..text = state.searchItem,
                               onChanged: (searchItem) => bloc.add(ChangeSearchItem(searchItem)),
                               autofocus: true,
                               decoration: InputDecoration(
                                   hintText: "Search",
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))))))
-                      : SizedBox(),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))),
+                                  suffixIcon: IconButton(
+                                      icon: Icon(Icons.cancel, color: Colors.grey),
+                                      onPressed: () => bloc.add(ToggleSearchBar())))))
+                      : IconButton(
+                          tooltip: 'Search',
+                          icon: const Icon(Icons.search),
+                          onPressed: () => bloc.add(ToggleSearchBar()),
+                        ),
                   IconButton(
                     tooltip: 'Filter',
                     icon: const Icon(Icons.filter_list),

@@ -39,8 +39,12 @@ class MoodtagDB extends _$MoodtagDB {
 
   // GET Artists
 
-  Stream<List<ArtistData>> getArtistsDataList(Set<Tag> filterTags) {
-    final query = select(artists).join(joinTagsForArtist(this))..orderBy([OrderingTerm.asc(artists.orderingName)]);
+  Stream<List<ArtistData>> getArtistsDataList(Set<Tag> filterTags, {String? searchItem = null}) {
+    final JoinedSelectStatement query = select(artists).join(joinTagsForArtist(this));
+    if (searchItem != null && searchItem.isNotEmpty) {
+      query..where(artists.name.like('$searchItem%'));
+    }
+    query..orderBy([OrderingTerm.asc(artists.orderingName)]);
     final typedResultStream = query.watch();
     return typedResultStream.transform(ArtistsWithTagTransformer<ArtistsList>(this, filterTags: filterTags));
   }
