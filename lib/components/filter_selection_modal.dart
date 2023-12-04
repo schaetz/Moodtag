@@ -16,9 +16,12 @@ class FilterSelectionModal<T extends DataClassWithEntityName> extends StatefulWi
 
 class _FilterSelectionModalState<T extends DataClassWithEntityName> extends State<FilterSelectionModal<T>> {
   static const headlineLabelStyle = TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
+  static const modalHeight = 500.0;
+  static const tagCloudContainerHeight = 350.0;
 
   late final Map<T, bool> _selectionsState;
   bool _isClosingAfterButtonClick = false;
+
   late final Map<String, int> _alphabetElementsWithNearestIndices;
   late final AutoScrollController _chipsAutoScrollController;
 
@@ -51,7 +54,7 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 500,
+      height: modalHeight,
       child: Padding(
           padding: EdgeInsets.all(12.0),
           child: Column(
@@ -90,7 +93,7 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
 
   Widget _buildChipsCloud(BuildContext context) {
     return Container(
-      height: 350,
+      height: tagCloudContainerHeight,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.background.withOpacity(0.4),
         border: Border.all(
@@ -101,15 +104,31 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
       padding: EdgeInsets.all(4),
       child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         SizedBox(
-            width: 375,
+            width: 310,
             child: ListView(
               controller: _chipsAutoScrollController,
-              padding: EdgeInsets.zero,
+              padding: EdgeInsets.all(2),
               children: [Wrap(spacing: 8.0, runSpacing: 2.0, children: _buildSelectableChips())],
             )),
-        _buildAlphabetColumn()
+        GestureDetector(
+            onVerticalDragDown: (dragDownDetails) => _scrollAccordingToAlphabetDrag(dragDownDetails.localPosition.dy),
+            // onVerticalDragUpdate: !_chipsAutoScrollController.isAutoScrolling
+            //     ? (dragUpdateDetails) => _scrollAccordingToAlphabetDrag(dragUpdateDetails.localPosition.dy,
+            //         duration: Duration(milliseconds: 100))
+            //     : null,
+            child: _buildAlphabetColumn()),
       ]),
     );
+  }
+
+  void _scrollAccordingToAlphabetDrag(double pixelPosition, {Duration? duration}) async {
+    final alphabetIndex = (pixelPosition * 27 / tagCloudContainerHeight).round();
+    if (duration != null) {
+      _chipsAutoScrollController.scrollToIndex(alphabetIndex,
+          preferPosition: AutoScrollPosition.begin, duration: duration);
+    } else {
+      _chipsAutoScrollController.scrollToIndex(alphabetIndex, preferPosition: AutoScrollPosition.begin);
+    }
   }
 
   List<Widget> _buildSelectableChips() {
@@ -137,15 +156,12 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: _alphabetElementsWithNearestIndices.entries
-          .map((elementWithNearestIndex) => SizedBox(
-              width: 18,
+          .map((elementWithNearestIndex) => Container(
+              alignment: Alignment.center,
+              width: 24,
               height: 12,
-              child: OutlinedButton(
-                  onPressed: () => _chipsAutoScrollController.scrollToIndex(elementWithNearestIndex.value,
-                      preferPosition: AutoScrollPosition.begin),
-                  style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
-                  child: Text(elementWithNearestIndex.key, style: TextStyle(fontSize: 8)))))
+              color: Colors.black12,
+              child: Text(elementWithNearestIndex.key, style: TextStyle(fontSize: 8))))
           .toList());
 
   void _closeModal(BuildContext context) {
