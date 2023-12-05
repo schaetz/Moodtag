@@ -32,6 +32,10 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
   late final RouteObserver _routeObserver;
+  GlobalKey listViewKey = GlobalKey();
+  double? searchBarWidth;
+  Offset? searchBarPos;
+
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
   OverlayEntry? _filterDisplayOverlay;
@@ -90,6 +94,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
                   ? 'No artists yet'
                   : 'No artists match the selected filters',
               buildOnSuccess: (filteredArtistsList) => ListView.separated(
+                    key: listViewKey,
                     separatorBuilder: (context, _) => Divider(),
                     padding: EdgeInsets.all(16.0),
                     itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
@@ -108,7 +113,10 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
 
   void _checkSearchBarOverlayState(BuildContext context, ArtistsListState state) {
     if (state.displaySearchBar && !searchBarOverlayVisible) {
-      showSearchBarOverlay(context);
+      if (searchBarWidth == null || searchBarPos == null) {
+        _initSearchBarPosition();
+      }
+      showSearchBarOverlay(context, searchBarWidth!, searchBarPos!);
     } else if (!state.displaySearchBar && searchBarOverlayVisible) {
       hideSearchBarOverlay();
     }
@@ -131,6 +139,14 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
     } else if (state.filterDisplayOverlayState != OverlayVisibility.on && _filterDisplayOverlayVisible) {
       _hideFilterDisplayOverlay();
     }
+  }
+
+  void _initSearchBarPosition() {
+    final listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
+    Offset listViewPos = listViewRenderBox.localToGlobal(Offset.zero);
+    this.searchBarPos =
+        listViewPos.translate(listViewRenderBox.size.width * 0.225, listViewRenderBox.size.height * 0.025);
+    this.searchBarWidth = listViewRenderBox.size.width * 0.75;
   }
 
   void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags) {
@@ -243,9 +259,9 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
   }
 
   @override
-  void onSearchBarClearPressed() {
+  void onSearchBarClosePressed() {
     final bloc = context.read<ArtistsListBloc>();
-    bloc.add(ClearSearchItem());
-    super.onSearchBarClearPressed();
+    bloc.add(ToggleSearchBar());
+    super.onSearchBarClosePressed();
   }
 }

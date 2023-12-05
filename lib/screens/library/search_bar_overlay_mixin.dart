@@ -8,17 +8,17 @@ mixin SearchBarOverlayMixin {
   bool searchBarOverlayVisible = false;
   OverlayEntry? _searchBarOverlay;
 
-  void showSearchBarOverlay(BuildContext context) {
+  void showSearchBarOverlay(BuildContext context, double width, Offset position) {
     searchBarOverlayVisible = true;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _searchBarOverlay = OverlayEntry(builder: (context) {
         return Positioned(
-          right: MediaQuery.of(context).size.width * 0.1,
-          bottom: MediaQuery.of(context).size.height * 0.14,
+          left: position.dx,
+          top: position.dy,
           child: Material(
               color: Colors.transparent,
               child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
+                  width: width,
                   child: TextField(
                       controller: searchBarController..text = '',
                       onChanged: (searchItem) => onSearchBarTextChanged(searchItem),
@@ -31,7 +31,7 @@ mixin SearchBarOverlayMixin {
                           border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))),
                           suffixIcon: IconButton(
                               icon: Icon(Icons.cancel, color: Colors.grey),
-                              onPressed: () => onSearchBarClearPressed()))))),
+                              onPressed: () => onSearchBarClosePressed()))))),
         );
       });
       Overlay.of(context).insert(_searchBarOverlay!);
@@ -45,7 +45,7 @@ mixin SearchBarOverlayMixin {
 
   void onSearchBarTextChanged(String searchItem);
 
-  void onSearchBarClearPressed() {
-    searchBarController.text = '';
+  void onSearchBarClosePressed() {
+    hideSearchBarOverlay();
   }
 }
