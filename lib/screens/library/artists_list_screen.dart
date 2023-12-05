@@ -6,6 +6,7 @@ import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
+import 'package:moodtag/components/search_bar_container.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
@@ -16,7 +17,6 @@ import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/library/search_bar_overlay_mixin.dart';
 
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -27,7 +27,7 @@ class ArtistsListScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _ArtistsListScreenState();
 }
 
-class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, SearchBarOverlayMixin {
+class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
@@ -39,9 +39,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
   OverlayEntry? _filterDisplayOverlay;
-
-  @override
-  String searchBarHintText = 'Search artist';
 
   @override
   void didChangeDependencies() {
@@ -86,40 +83,35 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
     return BlocConsumer<ArtistsListBloc, ArtistsListState>(
         listener: (context, state) => _checkFilterModalsAndOverlaysState(context, state, bloc),
         builder: (context, state) {
-          return LoadedDataDisplayWrapper<ArtistsList>(
-              loadedData: state.loadedDataFilteredArtists,
-              additionalCheckData: state.loadedDataAllTags,
-              captionForError: 'Artists could not be loaded',
-              captionForEmptyData: state.filterTags.isEmpty && state.searchItem == ''
-                  ? 'No artists yet'
-                  : 'No artists match the selected filters',
-              buildOnSuccess: (filteredArtistsList) => ListView.separated(
-                    key: listViewKey,
-                    separatorBuilder: (context, _) => Divider(),
-                    padding: EdgeInsets.all(16.0),
-                    itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
-                    itemBuilder: (context, i) {
-                      return _buildArtistRow(context, filteredArtistsList[i], bloc);
-                    },
-                  ));
+          return SearchBarContainer(
+            listViewKey: listViewKey,
+            searchBarHintText: 'Search artist',
+            contentWidget: LoadedDataDisplayWrapper<ArtistsList>(
+                loadedData: state.loadedDataFilteredArtists,
+                additionalCheckData: state.loadedDataAllTags,
+                captionForError: 'Artists could not be loaded',
+                captionForEmptyData: state.filterTags.isEmpty && state.searchItem == ''
+                    ? 'No artists yet'
+                    : 'No artists match the selected filters',
+                buildOnSuccess: (filteredArtistsList) => ListView.separated(
+                      key: listViewKey,
+                      separatorBuilder: (context, _) => Divider(),
+                      padding: EdgeInsets.all(16.0),
+                      itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
+                      itemBuilder: (context, i) {
+                        return _buildArtistRow(context, filteredArtistsList[i], bloc);
+                      },
+                    )),
+            searchBarVisible: state.displaySearchBar,
+            onSearchBarTextChanged: (value) => _onSearchBarTextChanged(value, bloc),
+            onSearchBarClosed: () => _onSearchBarClosed(bloc),
+          );
         });
   }
 
   void _checkFilterModalsAndOverlaysState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
-    _checkSearchBarOverlayState(context, state);
     _checkFilterModalState(context, state, bloc);
     _checkFilterDisplayOverlayState(context, state);
-  }
-
-  void _checkSearchBarOverlayState(BuildContext context, ArtistsListState state) {
-    if (state.displaySearchBar && !searchBarOverlayVisible) {
-      if (searchBarWidth == null || searchBarPos == null) {
-        _initSearchBarPosition();
-      }
-      showSearchBarOverlay(context, searchBarWidth!, searchBarPos!);
-    } else if (!state.displaySearchBar && searchBarOverlayVisible) {
-      hideSearchBarOverlay();
-    }
   }
 
   void _checkFilterModalState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) async {
@@ -139,14 +131,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
     } else if (state.filterDisplayOverlayState != OverlayVisibility.on && _filterDisplayOverlayVisible) {
       _hideFilterDisplayOverlay();
     }
-  }
-
-  void _initSearchBarPosition() {
-    final listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
-    Offset listViewPos = listViewRenderBox.localToGlobal(Offset.zero);
-    this.searchBarPos =
-        listViewPos.translate(listViewRenderBox.size.width * 0.225, listViewRenderBox.size.height * 0.025);
-    this.searchBarWidth = listViewRenderBox.size.width * 0.75;
   }
 
   void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags) {
@@ -252,16 +236,11 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
       Map<TagData, bool>.fromIterable(allTagsList,
           key: (tagData) => tagData, value: (tagData) => filterTags.contains(tagData.tag));
 
-  @override
-  void onSearchBarTextChanged(String searchItem) {
-    final bloc = context.read<ArtistsListBloc>();
+  void _onSearchBarTextChanged(String searchItem, ArtistsListBloc bloc) {
     bloc.add(ChangeSearchItem(searchItem));
   }
 
-  @override
-  void onSearchBarClosePressed() {
-    final bloc = context.read<ArtistsListBloc>();
+  void _onSearchBarClosed(ArtistsListBloc bloc) {
     bloc.add(ToggleSearchBar());
-    super.onSearchBarClosePressed();
   }
 }

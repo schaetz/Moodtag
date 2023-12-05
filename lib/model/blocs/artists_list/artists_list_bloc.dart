@@ -56,7 +56,7 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
 
   void _requestArtistsFromRepository({Set<Tag>? filterTags, String? searchItem = null}) {
     _filteredArtistsListStreamSubscription = _repository
-        .getArtistsDataList(filterTags: filterTags ?? state.filterTags, searchItem: searchItem ?? state.searchItem)
+        .getArtistsDataList(filterTags: filterTags ?? state.filterTags, searchItem: searchItem)
         .handleError((error) => add(DataUpdated<ArtistsList>(error: error)))
         .listen((artistsListFromStream) => add(DataUpdated<ArtistsList>(data: artistsListFromStream)));
   }
@@ -97,12 +97,9 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
   }
 
   void _handleToggleSearchBarEvent(ToggleSearchBar event, Emitter<ArtistsListState> emit) {
-    if (state.displaySearchBar) {
-      reloadDataAfterFilterChange(searchItem: '');
-      emit(state.copyWith(displaySearchBar: false, searchItem: ''));
-    } else {
-      emit(state.copyWith(displaySearchBar: true));
-    }
+    final newSearchBarVisibility = !state.displaySearchBar;
+    reloadDataAfterFilterChange(searchItem: newSearchBarVisibility ? state.searchItem : null);
+    emit(state.copyWith(displaySearchBar: newSearchBarVisibility));
   }
 
   void _handleChangeSearchItemEvent(ChangeSearchItem event, Emitter<ArtistsListState> emit) {
