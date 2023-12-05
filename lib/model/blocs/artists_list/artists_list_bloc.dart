@@ -31,15 +31,16 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
             useAllTagsStream: true) {
     on<StartedLoading<ArtistsList>>(_handleStartedLoadingArtistsList);
     on<DataUpdated<ArtistsList>>(_handleArtistsListUpdated);
-    on<ChangeArtistsListFilters>(_handleChangeArtistsListFilters);
     on<CreateArtists>(_handleCreateArtistsEvent);
     on<DeleteArtist>(_handleDeleteArtistEvent);
     on<ToggleSearchBar>(_handleToggleSearchBarEvent);
     on<ChangeSearchItem>(_handleChangeSearchItemEvent);
     on<ClearSearchItem>(_handleClearSearchItemEvent);
     on<ToggleTagSubtitles>(_handleToggleTagSubtitlesEvent);
-    on<ToggleFilterSelectionModal>(_handleToggleFilterOverlayEvent);
+    on<ToggleFilterSelectionModal>(_handleToggleFilterSelectionModalEvent);
     on<FilterSelectionModalStateChanged>(_handleFilterSelectionModalStateChangedEvent);
+    on<ChangeArtistsListFilters>(_handleChangeArtistsListFilters);
+    on<RemoveArtistsListFilters>(_handleRemoveArtistsListFiltersEvent);
     on<ActiveScreenChanged>(_handleActiveScreenChangedEvent);
 
     _requestArtistsFromRepository();
@@ -72,13 +73,6 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
       emit(state.copyWith(loadedDataFilteredArtists: LoadedData.success(event.data)));
     } else {
       emit(state.copyWith(loadedDataFilteredArtists: const LoadedData.error()));
-    }
-  }
-
-  void _handleChangeArtistsListFilters(ChangeArtistsListFilters event, Emitter<ArtistsListState> emit) async {
-    if (event.filterTags != state.filterTags) {
-      reloadDataAfterFilterChange(filterTags: event.filterTags);
-      emit(state.copyWith(filterTags: event.filterTags, loadedDataFilteredArtists: LoadedData.loading()));
     }
   }
 
@@ -120,7 +114,7 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     emit(state.copyWith(displayTagSubtitles: !state.displayTagSubtitles));
   }
 
-  void _handleToggleFilterOverlayEvent(ToggleFilterSelectionModal event, Emitter<ArtistsListState> emit) {
+  void _handleToggleFilterSelectionModalEvent(ToggleFilterSelectionModal event, Emitter<ArtistsListState> emit) {
     if (!state.filterSelectionModalState.isInTransition) {
       if (event.wantedOpen == null) {
         if (state.filterSelectionModalState == ModalState.open) {
@@ -148,6 +142,20 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
             filterDisplayOverlayState: state.filterTags.isNotEmpty ? OverlayVisibility.on : OverlayVisibility.off));
       }
     }
+  }
+
+  void _handleChangeArtistsListFilters(ChangeArtistsListFilters event, Emitter<ArtistsListState> emit) async {
+    if (event.filterTags != state.filterTags) {
+      reloadDataAfterFilterChange(filterTags: event.filterTags);
+      emit(state.copyWith(filterTags: event.filterTags, loadedDataFilteredArtists: LoadedData.loading()));
+    }
+  }
+
+  void _handleRemoveArtistsListFiltersEvent(RemoveArtistsListFilters event, Emitter<ArtistsListState> emit) {
+    if (state.filterTags != {}) {
+      reloadDataAfterFilterChange(filterTags: {});
+    }
+    emit(state.copyWith(filterTags: {}, filterDisplayOverlayState: OverlayVisibility.off));
   }
 
   void _handleActiveScreenChangedEvent(ActiveScreenChanged event, Emitter<ArtistsListState> emit) {

@@ -136,7 +136,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
 
   void _checkFilterModalsAndOverlaysState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
     _checkFilterModalState(context, state, bloc);
-    _checkFilterDisplayOverlayState(context, state);
+    _checkFilterDisplayOverlayState(context, state, bloc);
   }
 
   void _checkFilterModalState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) async {
@@ -150,38 +150,58 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
     }
   }
 
-  void _checkFilterDisplayOverlayState(BuildContext context, ArtistsListState state) {
+  void _checkFilterDisplayOverlayState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
     if (state.filterDisplayOverlayState == OverlayVisibility.on && !_filterDisplayOverlayVisible) {
-      _showFilterDisplayOverlay(context, state.filterTags);
+      _showFilterDisplayOverlay(context, state.filterTags, bloc);
     } else if (state.filterDisplayOverlayState != OverlayVisibility.on && _filterDisplayOverlayVisible) {
       _hideFilterDisplayOverlay();
     }
   }
 
-  void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags) {
+  void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags, ArtistsListBloc bloc) {
+    final RenderBox listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
+    final Offset listViewLowerLeftCorner = listViewRenderBox.localToGlobal(Offset(0, listViewRenderBox.size.height));
+
     _filterDisplayOverlayVisible = true;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _filterDisplayOverlay = OverlayEntry(builder: (context) {
-        final overlayWidth = MediaQuery.of(context).size.width * 0.75;
+        final overlayWidth = MediaQuery.of(context).size.width * 0.9;
         final overlayHeight = MediaQuery.of(context).size.height * 0.20;
-        return Positioned(
-          left: MediaQuery.of(context).size.width * 0.05,
-          bottom: MediaQuery.of(context).size.height * 0.13,
-          child: Material(
-              color: Colors.transparent,
-              child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  child: ChipCloud<String>(
-                      data: filterTags.map((tag) => tag.name).toList(),
-                      constraints: Size(overlayWidth, overlayHeight),
-                      options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: false)))),
-        );
+        final iconClose = Icon(Icons.close);
+        final iconSize = 45;
+
+        return Stack(children: [
+          Positioned(
+            left: listViewLowerLeftCorner.dx + (listViewRenderBox.size.width - overlayWidth) / 2,
+            top: listViewLowerLeftCorner.dy - overlayHeight * 1.1,
+            child: _buildFilterDisplayChipCloud(filterTags, overlayWidth, overlayHeight),
+          ),
+          Positioned(
+              right: (listViewRenderBox.size.width - overlayWidth) / 2 - iconSize / 2,
+              top: listViewLowerLeftCorner.dy - overlayHeight * 1.1 - iconSize / 2,
+              child: IconButton.filled(
+                icon: iconClose,
+                style: IconButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.secondary),
+                onPressed: () => bloc.add(RemoveArtistsListFilters()),
+              )),
+        ]);
       });
       Overlay.of(context).insert(_filterDisplayOverlay!);
     });
+  }
+
+  Material _buildFilterDisplayChipCloud(Set<Tag> filterTags, double overlayWidth, double overlayHeight) {
+    return Material(
+        color: Colors.transparent,
+        child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: ChipCloud<String>(
+                data: filterTags.map((tag) => tag.name).toList(),
+                constraints: Size(overlayWidth, overlayHeight),
+                options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: false))));
   }
 
   void _hideFilterDisplayOverlay() {

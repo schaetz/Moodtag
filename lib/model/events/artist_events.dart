@@ -6,15 +6,6 @@ abstract class ArtistEvent extends LibraryEvent {
   const ArtistEvent();
 }
 
-class ChangeArtistsListFilters extends ArtistEvent {
-  final Set<Tag> filterTags;
-
-  const ChangeArtistsListFilters({required this.filterTags});
-
-  @override
-  List<Object> get props => [filterTags];
-}
-
 class CreateArtists extends ArtistEvent {
   final String input;
 
@@ -79,4 +70,20 @@ class FilterSelectionModalStateChanged extends ArtistEvent {
 
   @override
   List<Object> get props => [open];
+}
+
+class ChangeArtistsListFilters extends ArtistEvent {
+  final Set<Tag> filterTags;
+
+  const ChangeArtistsListFilters({required this.filterTags});
+
+  @override
+  List<Object> get props => [filterTags];
+}
+
+class RemoveArtistsListFilters extends ArtistEvent {
+  const RemoveArtistsListFilters();
+
+  @override
+  List<Object> get props => [];
 }
