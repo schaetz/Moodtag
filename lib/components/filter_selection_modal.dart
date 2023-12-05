@@ -16,6 +16,7 @@ class FilterSelectionModal<T extends DataClassWithEntityName> extends StatefulWi
 
 class _FilterSelectionModalState<T extends DataClassWithEntityName> extends State<FilterSelectionModal<T>> {
   static const headlineLabelStyle = TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
+  static const tagCloudOuterPadding = 8.0;
   static const modalHeight = 500.0;
   static const tagCloudContainerHeight = 350.0;
 
@@ -56,7 +57,7 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
     return SizedBox(
       height: modalHeight,
       child: Padding(
-          padding: EdgeInsets.all(12.0),
+          padding: EdgeInsets.all(tagCloudOuterPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -104,7 +105,7 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
       padding: EdgeInsets.all(4),
       child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         SizedBox(
-            width: 310,
+            width: (MediaQuery.of(context).size.width - tagCloudOuterPadding * 2) * 0.85,
             child: ListView(
               controller: _chipsAutoScrollController,
               padding: EdgeInsets.all(2),
@@ -157,8 +158,9 @@ class _FilterSelectionModalState<T extends DataClassWithEntityName> extends Stat
       crossAxisAlignment: CrossAxisAlignment.center,
       children: _alphabetElementsWithNearestIndices.entries
           .map((elementWithNearestIndex) => Container(
+              padding: EdgeInsets.only(left: 2.0, right: 2.0),
               alignment: Alignment.center,
-              width: 24,
+              width: (MediaQuery.of(context).size.width - tagCloudOuterPadding * 2) * 0.10,
               height: 12,
               color: Colors.black12,
               child: Text(elementWithNearestIndex.key, style: TextStyle(fontSize: 8))))
