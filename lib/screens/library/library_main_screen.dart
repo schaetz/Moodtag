@@ -48,10 +48,13 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
   Widget build(BuildContext context) {
     return MtMainScaffold(
         scaffoldKey: _scaffoldKey,
-        tabController: _tabController,
+        tabController: _tabController..addListener(() {}),
         pageWidget: TabBarView(
           controller: _tabController,
-          children: [ArtistsListScreen(_scaffoldKey), TagsListScreen(_scaffoldKey)],
+          children: [
+            ArtistsListScreen(_scaffoldKey, parentTabController: _tabController, parentTabViewIndex: 0),
+            TagsListScreen(_scaffoldKey)
+          ],
         ),
         bottomNavigationBar:
             isArtistsListScreenSelected ? ArtistsListScreenBottomAppBar() : TagsListScreenBottomAppBar(),

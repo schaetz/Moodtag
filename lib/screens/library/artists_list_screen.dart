@@ -7,6 +7,7 @@ import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/search_bar_container.dart';
+import 'package:moodtag/components/tab_aware.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
@@ -20,14 +21,16 @@ import 'package:moodtag/navigation/routes.dart';
 
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
+  final TabController parentTabController;
+  final int parentTabViewIndex;
 
-  const ArtistsListScreen(this.scaffoldKey);
+  const ArtistsListScreen(this.scaffoldKey, {required this.parentTabController, required this.parentTabViewIndex});
 
   @override
   State<StatefulWidget> createState() => _ArtistsListScreenState();
 }
 
-class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
+class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, TabAware {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
@@ -39,6 +42,12 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
   OverlayEntry? _filterDisplayOverlay;
+
+  @override
+  void initState() {
+    super.initState();
+    registerAsTabControllerListener(widget.parentTabController, widget.parentTabViewIndex);
+  }
 
   @override
   void didChangeDependencies() {
@@ -75,6 +84,22 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware {
   void didPushNext() {
     final bloc = context.read<ArtistsListBloc>();
     bloc.add(ActiveScreenChanged(false));
+  }
+
+  @override
+  void didBecomeActiveTab() {
+    if (mounted) {
+      final bloc = context.read<ArtistsListBloc>();
+      bloc.add(ActiveScreenChanged(true));
+    }
+  }
+
+  @override
+  void didBecomeInactiveTab() {
+    if (mounted) {
+      final bloc = context.read<ArtistsListBloc>();
+      bloc.add(ActiveScreenChanged(false));
+    }
   }
 
   @override
