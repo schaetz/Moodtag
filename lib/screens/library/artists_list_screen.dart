@@ -6,6 +6,7 @@ import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
+import 'package:moodtag/components/screen_extensions/list_screen_mixin.dart';
 import 'package:moodtag/components/screen_extensions/searchable_list_screen_mixin.dart';
 import 'package:moodtag/components/screen_extensions/tab_aware.dart';
 import 'package:moodtag/components/search_bar_container.dart';
@@ -34,13 +35,13 @@ class ArtistsListScreen extends StatefulWidget {
 }
 
 class _ArtistsListScreenState extends State<ArtistsListScreen>
-    with RouteObserverScreen<ArtistsListScreen, ArtistsListBloc>, TabAware, SearchableListScreenMixin<ArtistsListBloc> {
+    with
+        RouteObserverScreen<ArtistsListScreen, ArtistsListBloc>,
+        TabAware,
+        ListViewConstraintsUser,
+        SearchableListScreenMixin<ArtistsListBloc> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
-
-  final GlobalKey listViewKey = GlobalKey();
-  Offset? listViewLowerLeftCorner;
-  RenderBox? listViewRenderBox;
 
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
@@ -52,7 +53,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
 
     registerAsTabControllerListener(widget.parentTabController, widget.parentTabViewIndex);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _setListViewConstraints();
+      setListViewConstraints();
     });
   }
 
@@ -70,11 +71,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
       final bloc = context.read<ArtistsListBloc>();
       bloc.add(ActiveScreenChanged(false));
     }
-  }
-
-  void _setListViewConstraints() {
-    listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
-    listViewLowerLeftCorner = listViewRenderBox!.localToGlobal(Offset(0, listViewRenderBox!.size.height));
   }
 
   @override
@@ -134,7 +130,9 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
   }
 
   void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags, ArtistsListBloc bloc) {
-    if (listViewLowerLeftCorner == null || listViewRenderBox == null) {
+    if (!canUseListScreenConstraints) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Error: Cannot display the filter overlay.')));
       return;
     }
 
