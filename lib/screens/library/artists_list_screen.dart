@@ -111,11 +111,14 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
           return SearchBarContainer(
             listViewKey: listViewKey,
             searchBarHintText: 'Search artist',
+            searchBarVisible: state.displaySearchBar,
+            onSearchBarTextChanged: (value) => _onSearchBarTextChanged(value, bloc),
+            onSearchBarClosed: () => _onSearchBarClosed(bloc),
             contentWidget: LoadedDataDisplayWrapper<ArtistsList>(
                 loadedData: state.loadedDataFilteredArtists,
                 additionalCheckData: state.loadedDataAllTags,
                 captionForError: 'Artists could not be loaded',
-                captionForEmptyData: state.filterTags.isEmpty && state.searchItem == ''
+                captionForEmptyData: state.filterTags.isEmpty && (!state.displaySearchBar || state.searchItem.isEmpty)
                     ? 'No artists yet'
                     : 'No artists match the selected filters',
                 buildOnSuccess: (filteredArtistsList) => ListView.separated(
@@ -127,9 +130,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
                         return _buildArtistRow(context, filteredArtistsList[i], bloc);
                       },
                     )),
-            searchBarVisible: state.displaySearchBar,
-            onSearchBarTextChanged: (value) => _onSearchBarTextChanged(value, bloc),
-            onSearchBarClosed: () => _onSearchBarClosed(bloc),
           );
         });
   }
