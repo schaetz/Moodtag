@@ -20,6 +20,8 @@ import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
 
+import '../../components/screen_extensions/route_observer_screen.dart';
+
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final TabController parentTabController;
@@ -32,12 +34,13 @@ class ArtistsListScreen extends StatefulWidget {
 }
 
 class _ArtistsListScreenState extends State<ArtistsListScreen>
-    with RouteAware, TabAware, SearchableListScreenMixin<ArtistsListBloc> {
+    with RouteObserverScreen<ArtistsListScreen, ArtistsListBloc>, TabAware, SearchableListScreenMixin<ArtistsListBloc> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
-  late final RouteObserver _routeObserver;
   final GlobalKey listViewKey = GlobalKey();
+  Offset? listViewLowerLeftCorner;
+  RenderBox? listViewRenderBox;
 
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
@@ -46,44 +49,11 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
   @override
   void initState() {
     super.initState();
+
     registerAsTabControllerListener(widget.parentTabController, widget.parentTabViewIndex);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _routeObserver = context.read<RouteObserver>();
-    _routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
-  }
-
-  @override
-  void dispose() {
-    _routeObserver.unsubscribe(this);
-    super.dispose();
-  }
-
-  @override
-  void didPush() {
-    final bloc = context.read<ArtistsListBloc>();
-    bloc.add(ActiveScreenChanged(true));
-  }
-
-  @override
-  void didPopNext() {
-    final bloc = context.read<ArtistsListBloc>();
-    bloc.add(ActiveScreenChanged(true));
-  }
-
-  @override
-  void didPop() {
-    final bloc = context.read<ArtistsListBloc>();
-    bloc.add(ActiveScreenChanged(false));
-  }
-
-  @override
-  void didPushNext() {
-    final bloc = context.read<ArtistsListBloc>();
-    bloc.add(ActiveScreenChanged(false));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setListViewConstraints();
+    });
   }
 
   @override
@@ -100,6 +70,11 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
       final bloc = context.read<ArtistsListBloc>();
       bloc.add(ActiveScreenChanged(false));
     }
+  }
+
+  void _setListViewConstraints() {
+    listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
+    listViewLowerLeftCorner = listViewRenderBox!.localToGlobal(Offset(0, listViewRenderBox!.size.height));
   }
 
   @override
@@ -159,8 +134,12 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
   }
 
   void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags, ArtistsListBloc bloc) {
-    final RenderBox listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
-    final Offset listViewLowerLeftCorner = listViewRenderBox.localToGlobal(Offset(0, listViewRenderBox.size.height));
+    if (listViewLowerLeftCorner == null || listViewRenderBox == null) {
+      return;
+    }
+
+    final lowerLeftCorner = listViewLowerLeftCorner!;
+    final renderBox = listViewRenderBox!;
 
     _filterDisplayOverlayVisible = true;
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -172,13 +151,13 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
 
         return Stack(children: [
           Positioned(
-            left: listViewLowerLeftCorner.dx + (listViewRenderBox.size.width - overlayWidth) / 2,
-            top: listViewLowerLeftCorner.dy - overlayHeight * 1.1,
+            left: lowerLeftCorner.dx + (renderBox.size.width - overlayWidth) / 2,
+            top: lowerLeftCorner.dy - overlayHeight * 1.1,
             child: _buildFilterDisplayChipCloud(filterTags, overlayWidth, overlayHeight),
           ),
           Positioned(
-              right: (listViewRenderBox.size.width - overlayWidth) / 2 - iconSize / 2,
-              top: listViewLowerLeftCorner.dy - overlayHeight * 1.1 - iconSize / 2,
+              right: (renderBox.size.width - overlayWidth) / 2 - iconSize / 2,
+              top: lowerLeftCorner.dy - overlayHeight * 1.1 - iconSize / 2,
               child: IconButton.filled(
                 icon: iconClose,
                 style: IconButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.secondary),

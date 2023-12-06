@@ -1,9 +1,9 @@
-import 'package:equatable/equatable.dart';
+import 'package:moodtag/model/blocs/abstract_bloc_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 
-abstract class AbstractEntityUserState extends Equatable {
+abstract class AbstractEntityUserState extends AbstractBlocState {
   final LoadedData<ArtistsList> loadedDataAllArtists;
   final LoadedData<TagsList> loadedDataAllTags;
 

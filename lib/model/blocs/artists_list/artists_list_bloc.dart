@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/components/screen_extensions/route_observer_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_bloc.dart';
@@ -19,7 +20,8 @@ import '../../events/artist_events.dart';
 import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
-class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with ErrorStreamHandling {
+class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState>
+    with RouteObserverBloc<ArtistsListState>, ErrorStreamHandling {
   late final Repository _repository;
   late StreamSubscription _filteredArtistsListStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
