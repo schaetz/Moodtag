@@ -10,7 +10,7 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/navigation/routes.dart';
 
-import 'searchable_list_screen_mixin.dart';
+import '../../components/screen_extensions/searchable_list_screen_mixin.dart';
 
 class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<TagsListBloc> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);

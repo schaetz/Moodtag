@@ -6,8 +6,9 @@ import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
+import 'package:moodtag/components/screen_extensions/searchable_list_screen_mixin.dart';
+import 'package:moodtag/components/screen_extensions/tab_aware.dart';
 import 'package:moodtag/components/search_bar_container.dart';
-import 'package:moodtag/components/tab_aware.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_state.dart';
@@ -18,7 +19,6 @@ import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/library/searchable_list_screen_mixin.dart';
 
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
