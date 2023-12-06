@@ -72,9 +72,12 @@ class MoodtagDB extends _$MoodtagDB {
 
   // GET Tags
 
-  Stream<List<TagData>> getTagsDataList() {
-    final query = select(tags).join(joinAssignedTagsForTag(this))
-      ..addColumns([assignedTags.artist.count()])
+  Stream<List<TagData>> getTagsDataList({String? searchItem = null}) {
+    final query = select(tags).join(joinAssignedTagsForTag(this))..addColumns([assignedTags.artist.count()]);
+    if (searchItem != null && searchItem.isNotEmpty) {
+      query..where(tags.name.like('$searchItem%'));
+    }
+    query
       ..groupBy([tags.id])
       ..orderBy([OrderingTerm.asc(tags.name)]);
     final typedResultStream = query.watch();

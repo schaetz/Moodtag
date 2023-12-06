@@ -59,7 +59,7 @@ class _ImportConfigFormState extends State<ImportConfigForm> {
 
   void _initializeSelectionsState() {
     this._selectionsState = {};
-    widget.configItemsWithCaption.entries.forEach((keyAndCaption) =>
-        {this._selectionsState[keyAndCaption.key] = widget.initialConfig[keyAndCaption.key] ?? false});
+    widget.configItemsWithCaption.entries.forEach(
+        (keyAndCaption) => this._selectionsState[keyAndCaption.key] = widget.initialConfig[keyAndCaption.key] ?? false);
   }
 }

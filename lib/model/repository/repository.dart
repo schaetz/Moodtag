@@ -79,8 +79,8 @@ class Repository {
   //
   // Tags
   //
-  Stream<List<TagData>> getTagsDataList() {
-    return db.getTagsDataList();
+  Stream<List<TagData>> getTagsDataList({String? searchItem = null}) {
+    return db.getTagsDataList(searchItem: searchItem);
   }
 
   Stream<TagData?> getTagDataById(int id) {

@@ -27,7 +27,7 @@ class ArtistDetailsState extends AbstractEntityUserState {
       LoadedData<ArtistData>? loadedArtistData,
       bool? tagEditMode}) {
     return ArtistDetailsState(
-        loadedDataAllTags: loadedDataAllTags ?? this.loadedDataAllTags!,
+        loadedDataAllTags: loadedDataAllTags ?? this.loadedDataAllTags,
         artistId: artistId ?? this.artistId,
         loadedArtistData: loadedArtistData ?? this.loadedArtistData,
         tagEditMode: tagEditMode ?? this.tagEditMode);

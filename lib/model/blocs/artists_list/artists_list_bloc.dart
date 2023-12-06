@@ -92,20 +92,20 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
 
   void _handleToggleSearchBarEvent(ToggleSearchBar event, Emitter<ArtistsListState> emit) {
     final newSearchBarVisibility = !state.displaySearchBar;
-    reloadDataAfterFilterChange(searchItem: newSearchBarVisibility ? state.searchItem : null);
+    _reloadDataAfterFilterChange(searchItem: newSearchBarVisibility ? state.searchItem : null);
     emit(state.copyWith(displaySearchBar: newSearchBarVisibility));
   }
 
   void _handleChangeSearchItemEvent(ChangeSearchItem event, Emitter<ArtistsListState> emit) {
     if (event.searchItem != state.searchItem) {
-      reloadDataAfterFilterChange(searchItem: event.searchItem);
+      _reloadDataAfterFilterChange(searchItem: event.searchItem);
       emit(state.copyWith(searchItem: event.searchItem, loadedDataFilteredArtists: LoadedData.loading()));
     }
   }
 
   void _handleClearSearchItemEvent(ClearSearchItem event, Emitter<ArtistsListState> emit) {
     if (state.searchItem != '') {
-      reloadDataAfterFilterChange(searchItem: '');
+      _reloadDataAfterFilterChange(searchItem: '');
       emit(state.copyWith(searchItem: '', loadedDataFilteredArtists: LoadedData.loading()));
     }
   }
@@ -146,14 +146,14 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
 
   void _handleChangeArtistsListFilters(ChangeArtistsListFilters event, Emitter<ArtistsListState> emit) async {
     if (event.filterTags != state.filterTags) {
-      reloadDataAfterFilterChange(filterTags: event.filterTags);
+      _reloadDataAfterFilterChange(filterTags: event.filterTags);
       emit(state.copyWith(filterTags: event.filterTags, loadedDataFilteredArtists: LoadedData.loading()));
     }
   }
 
   void _handleRemoveArtistsListFiltersEvent(RemoveArtistsListFilters event, Emitter<ArtistsListState> emit) {
     if (state.filterTags != {}) {
-      reloadDataAfterFilterChange(filterTags: {});
+      _reloadDataAfterFilterChange(filterTags: {});
     }
     emit(state.copyWith(filterTags: {}, filterDisplayOverlayState: OverlayVisibility.off));
   }
@@ -167,7 +167,7 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState> with Erro
     }
   }
 
-  void reloadDataAfterFilterChange({Set<Tag>? filterTags, String? searchItem}) async {
+  void _reloadDataAfterFilterChange({Set<Tag>? filterTags, String? searchItem}) async {
     await _filteredArtistsListStreamSubscription.cancel();
     _requestArtistsFromRepository(filterTags: filterTags, searchItem: searchItem);
   }

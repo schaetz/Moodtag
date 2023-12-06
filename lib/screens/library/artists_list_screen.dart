@@ -18,6 +18,7 @@ import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/screens/library/searchable_list_screen_mixin.dart';
 
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -30,14 +31,13 @@ class ArtistsListScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _ArtistsListScreenState();
 }
 
-class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, TabAware {
+class _ArtistsListScreenState extends State<ArtistsListScreen>
+    with RouteAware, TabAware, SearchableListScreenMixin<ArtistsListBloc> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
   late final RouteObserver _routeObserver;
-  GlobalKey listViewKey = GlobalKey();
-  double? searchBarWidth;
-  Offset? searchBarPos;
+  final GlobalKey listViewKey = GlobalKey();
 
   FilterSelectionModal? _filterSelectionModal;
   bool _filterDisplayOverlayVisible = false;
@@ -112,8 +112,8 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
             listViewKey: listViewKey,
             searchBarHintText: 'Search artist',
             searchBarVisible: state.displaySearchBar,
-            onSearchBarTextChanged: (value) => _onSearchBarTextChanged(value, bloc),
-            onSearchBarClosed: () => _onSearchBarClosed(bloc),
+            onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
+            onSearchBarClosed: () => onSearchBarClosed(bloc),
             contentWidget: LoadedDataDisplayWrapper<ArtistsList>(
                 loadedData: state.loadedDataFilteredArtists,
                 additionalCheckData: state.loadedDataAllTags,
@@ -280,12 +280,4 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with RouteAware, 
   Map<TagData, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>
       Map<TagData, bool>.fromIterable(allTagsList,
           key: (tagData) => tagData, value: (tagData) => filterTags.contains(tagData.tag));
-
-  void _onSearchBarTextChanged(String searchItem, ArtistsListBloc bloc) {
-    bloc.add(ChangeSearchItem(searchItem));
-  }
-
-  void _onSearchBarClosed(ArtistsListBloc bloc) {
-    bloc.add(ToggleSearchBar());
-  }
 }
