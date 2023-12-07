@@ -1,3 +1,4 @@
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 
@@ -20,11 +21,10 @@ class DataUpdated<T> extends DataLoadingEvent {
   List<Object?> get props => [data, error];
 }
 
-class EntityLoaderStatusChanged<T> extends DataLoadingEvent {
-  final LoadedData<T> loadedData;
+class AllArtistsUpdated extends DataUpdated<LoadedData<ArtistsList>> {
+  const AllArtistsUpdated({LoadedData<ArtistsList>? data, Object? error}) : super(data: data, error: error);
+}
 
-  const EntityLoaderStatusChanged(this.loadedData);
-
-  @override
-  List<Object?> get props => [loadedData];
+class AllTagsUpdated extends DataUpdated<LoadedData<TagsList>> {
+  const AllTagsUpdated({LoadedData<TagsList>? data, Object? error}) : super(data: data, error: error);
 }

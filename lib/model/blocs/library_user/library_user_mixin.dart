@@ -1,19 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/blocs/ILibraryUserState.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/model/repository/repository.dart';
+
+import 'library_user_state_interface.dart';
 
 mixin LibraryUserMixin<S extends ILibraryUserState> on Bloc<LibraryEvent, S> {
-  void handleLibraryUpdates() {
-    // TODO Resolve interference between different streams of the same type in one bloc
-    on<DataUpdated<LoadedData<ArtistsList>>>(_handleArtistsListUpdated);
-    on<DataUpdated<LoadedData<TagsList>>>(_handleTagsListUpdated);
+  StreamSubscription? _allArtistsStreamSubscription;
+  StreamSubscription? _allTagsStreamSubscription;
+
+  void useLibrary(Repository repository, {bool doUseAllArtists = true, bool doUseAllTags = true}) {
+    if (doUseAllArtists) useAllArtists(repository);
+    if (doUseAllTags) useAllTags(repository);
   }
 
-  void _handleArtistsListUpdated(DataUpdated<LoadedData<ArtistsList>> event, Emitter<S> emit) {
+  void useAllArtists(Repository repository) {
+    on<AllArtistsUpdated>(_handleArtistsListUpdated);
+    _allArtistsStreamSubscription = repository.loadedDataAllArtists.stream.listen((loadedDataValue) {
+      add(AllArtistsUpdated(data: loadedDataValue));
+    });
+  }
+
+  void useAllTags(Repository repository) {
+    on<AllTagsUpdated>(_handleTagsListUpdated);
+    _allTagsStreamSubscription = repository.loadedDataAllTags.stream.listen((loadedDataValue) {
+      add(AllTagsUpdated(data: loadedDataValue));
+    });
+  }
+
+  void closeLibraryStreams() {
+    _allArtistsStreamSubscription?.cancel();
+    _allTagsStreamSubscription?.cancel();
+  }
+
+  void _handleArtistsListUpdated(AllArtistsUpdated event, Emitter<S> emit) {
     if (this.state.allArtistsData == null) return;
 
     if (_hasLoadingStatusChanged(event, this.state.allArtistsData!) ||
@@ -22,7 +46,7 @@ mixin LibraryUserMixin<S extends ILibraryUserState> on Bloc<LibraryEvent, S> {
     }
   }
 
-  void _handleTagsListUpdated(DataUpdated<LoadedData<TagsList>> event, Emitter<S> emit) {
+  void _handleTagsListUpdated(AllTagsUpdated event, Emitter<S> emit) {
     if (this.state.allTagsData == null) return;
 
     if (_hasLoadingStatusChanged(event, this.state.allTagsData!) ||

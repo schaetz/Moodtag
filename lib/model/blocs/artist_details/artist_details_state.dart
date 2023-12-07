@@ -1,13 +1,20 @@
 import 'package:equatable/equatable.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_state_interface.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 
-class ArtistDetailsState extends Equatable {
+class ArtistDetailsState extends Equatable implements ILibraryUserState {
   final int artistId;
   final LoadedData<ArtistData> loadedArtistData;
   final LoadedData<TagsList> loadedDataAllTags;
   final bool tagEditMode;
+
+  @override
+  LoadedData<ArtistsList>? get allArtistsData => null;
+
+  @override
+  LoadedData<TagsList>? get allTagsData => loadedDataAllTags;
 
   ArtistDetailsState(
       {required this.artistId,
@@ -23,6 +30,7 @@ class ArtistDetailsState extends Equatable {
   ArtistDetailsState copyWith(
       {int? artistId,
       LoadedData<ArtistData>? loadedArtistData,
+      LoadedData<ArtistsList>? loadedDataAllArtists, // not used
       LoadedData<TagsList>? loadedDataAllTags,
       bool? tagEditMode}) {
     return ArtistDetailsState(

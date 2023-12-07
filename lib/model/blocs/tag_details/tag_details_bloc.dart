@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_mixin.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
@@ -15,24 +16,19 @@ import 'package:moodtag/model/repository/repository.dart';
 
 import 'tag_details_state.dart';
 
-class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStreamHandling {
+class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUserMixin, ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _tagStreamSubscription;
-  late final StreamSubscription _allArtistsStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
+    useAllArtists(_repository);
     on<StartedLoading<TagData>>(_handleStartedLoadingTagData);
     on<DataUpdated<TagData>>(_handleTagDataUpdated);
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);
     on<ToggleArtistsForTagChecklist>(_handleToggleArtistsForTagChecklistEvent);
     on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
-
-    _allArtistsStreamSubscription = this._repository.loadedDataAllArtists.stream.listen((loadedDataValue) {
-      // TODO Add an event instead
-      emit(state.copyWith(loadedDataAllArtists: loadedDataValue));
-    });
 
     _tagStreamSubscription = _repository
         .getTagDataById(tagId)
@@ -46,7 +42,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStrea
   @override
   Future<void> close() async {
     _tagStreamSubscription.cancel();
-    _allArtistsStreamSubscription.cancel();
+    closeLibraryStreams();
     super.close();
   }
 

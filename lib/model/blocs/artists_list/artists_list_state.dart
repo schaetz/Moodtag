@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_state_interface.dart';
 import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 
-class ArtistsListState extends Equatable {
+class ArtistsListState extends Equatable implements ILibraryUserState {
   final LoadedData<ArtistsList> loadedDataFilteredArtists;
   final LoadedData<TagsList> loadedDataAllTags;
   final bool displaySearchBar;
@@ -13,6 +14,12 @@ class ArtistsListState extends Equatable {
   final ModalState filterSelectionModalState;
   final Set<Tag> filterTags;
   final OverlayVisibility filterDisplayOverlayState;
+
+  @override
+  LoadedData<ArtistsList>? get allArtistsData => null;
+
+  @override
+  LoadedData<TagsList>? get allTagsData => loadedDataAllTags;
 
   const ArtistsListState(
       {this.loadedDataFilteredArtists = const LoadedData.initial(),
@@ -36,6 +43,7 @@ class ArtistsListState extends Equatable {
       ];
 
   ArtistsListState copyWith({
+    LoadedData<ArtistsList>? loadedDataAllArtists, // not used
     LoadedData<TagsList>? loadedDataAllTags,
     LoadedData<ArtistsList>? loadedDataFilteredArtists,
     bool? displaySearchBar,

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/screen_extensions/route_observer_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_mixin.dart';
 import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
@@ -19,13 +20,13 @@ import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
 class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
-    with RouteObserverBloc<ArtistsListState>, ErrorStreamHandling {
+    with LibraryUserMixin, RouteObserverBloc<ArtistsListState>, ErrorStreamHandling {
   late final Repository _repository;
-  late final StreamSubscription _filteredArtistsListStreamSubscription;
-  late final StreamSubscription _allTagsStreamSubscription;
+  late StreamSubscription _filteredArtistsListStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
+    useAllTags(_repository);
     on<StartedLoading<ArtistsList>>(_handleStartedLoadingArtistsList);
     on<DataUpdated<ArtistsList>>(_handleArtistsListUpdated);
     on<CreateArtists>(_handleCreateArtistsEvent);
@@ -40,11 +41,6 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
     on<RemoveArtistsListFilters>(_handleRemoveArtistsListFiltersEvent);
     on<ActiveScreenChanged>(_handleActiveScreenChangedEvent);
 
-    _allTagsStreamSubscription = this._repository.loadedDataAllTags.stream.listen((loadedDataValue) {
-      // TODO Add an event instead
-      emit(state.copyWith(loadedDataAllTags: loadedDataValue));
-    });
-
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
 
@@ -54,7 +50,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
   @override
   Future<void> close() async {
     _filteredArtistsListStreamSubscription.cancel();
-    _allTagsStreamSubscription.cancel();
+    closeLibraryStreams();
     super.close();
   }
 

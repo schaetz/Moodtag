@@ -15,8 +15,10 @@ mixin ListViewConstraintsUser {
   /// the ListView was built.
   void setListViewConstraints() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
-      listViewLowerLeftCorner = listViewRenderBox!.localToGlobal(Offset(0, listViewRenderBox!.size.height));
+      if (listViewKey.currentContext != null) {
+        listViewRenderBox = listViewKey.currentContext?.findRenderObject() as RenderBox;
+        listViewLowerLeftCorner = listViewRenderBox!.localToGlobal(Offset(0, listViewRenderBox!.size.height));
+      }
     });
   }
 }

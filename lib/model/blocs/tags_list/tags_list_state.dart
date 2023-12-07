@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/blocs/ILibraryUserState.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_state_interface.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 
@@ -25,7 +25,9 @@ class TagsListState extends Equatable implements ILibraryUserState {
   @override
   List<Object> get props => [loadedDataAllTags, loadedDataFilteredTags, displaySearchBar, searchItem];
 
+  @override
   TagsListState copyWith({
+    LoadedData<ArtistsList>? loadedDataAllArtists, // not used
     LoadedData<TagsList>? loadedDataAllTags,
     LoadedData<TagsList>? loadedDataFilteredTags,
     bool? displaySearchBar,
