@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
@@ -6,19 +8,50 @@ import 'package:moodtag/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/utils/helpers.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../database/moodtag_db.dart';
+import 'loaded_data.dart';
+import 'loading_status.dart';
 
 class Repository {
   final MoodtagDB db;
   late final RepositoryHelper helper;
 
+  final loadedDataAllArtists = BehaviorSubject<LoadedData<ArtistsList>>();
+  final loadedDataAllTags = BehaviorSubject<LoadedData<TagsList>>();
+
+  LoadedData<ArtistsList> get allArtists => loadedDataAllArtists.value;
+  LoadedData<TagsList> get allTags => loadedDataAllTags.value;
+
+  late StreamSubscription _artistsStreamSubscription;
+  late StreamSubscription _tagsStreamSubscription;
+
   Repository() : db = MoodtagDB() {
     helper = RepositoryHelper(db);
+    setupStreamSubscriptions();
   }
 
   void close() {
+    _artistsStreamSubscription.cancel();
+    _tagsStreamSubscription.cancel();
     db.close();
+  }
+
+  void setupStreamSubscriptions() {
+    loadedDataAllArtists.add(LoadedData.loading());
+    _artistsStreamSubscription = getArtistsDataList()
+        .handleError((errorMessage) => loadedDataAllArtists
+            .add(loadedDataAllArtists.value.copyWith(loadingStatus: LoadingStatus.error, errorMessage: errorMessage)))
+        .listen((artistsListFromStream) => loadedDataAllArtists.add(
+            loadedDataAllArtists.value.copyWith(loadingStatus: LoadingStatus.success, data: artistsListFromStream)));
+
+    loadedDataAllTags.add(LoadedData.loading());
+    _tagsStreamSubscription = getTagsDataList()
+        .handleError((errorMessage) => loadedDataAllTags
+            .add(loadedDataAllTags.value.copyWith(loadingStatus: LoadingStatus.error, errorMessage: errorMessage)))
+        .listen((tagsListFromStream) => loadedDataAllTags
+            .add(loadedDataAllTags.value.copyWith(loadingStatus: LoadingStatus.success, data: tagsListFromStream)));
   }
 
   //

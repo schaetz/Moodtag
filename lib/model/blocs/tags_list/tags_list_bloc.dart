@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
@@ -13,20 +12,16 @@ import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 import '../../events/tag_events.dart';
-import '../entity_loader/abstract_entity_user_bloc.dart';
 import '../error_stream_handling.dart';
 import 'tags_list_state.dart';
 
-class TagsListBloc extends AbstractEntityUserBloc<TagsListState> with ErrorStreamHandling {
+class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with ErrorStreamHandling {
   final Repository _repository;
-  late StreamSubscription _filteredTagsListStreamSubscription;
+  late final StreamSubscription _filteredTagsListStreamSubscription;
+  late final StreamSubscription _allTagsStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
-  TagsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc)
-      : super(
-            initialState: TagsListState(loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags),
-            entityLoaderBloc: entityLoaderBloc,
-            useAllTagsStream: true) {
+  TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
     on<StartedLoading<TagsList>>(_handleStartedLoadingTagsList);
     on<DataUpdated<TagsList>>(_handleTagsListUpdated);
     on<CreateTags>(_handleCreateTagsEvent);
@@ -34,6 +29,12 @@ class TagsListBloc extends AbstractEntityUserBloc<TagsListState> with ErrorStrea
     on<ToggleSearchBar>(_handleToggleSearchBarEvent);
     on<ChangeSearchItem>(_handleChangeSearchItemEvent);
     on<ClearSearchItem>(_handleClearSearchItemEvent);
+
+    _allTagsStreamSubscription = this._repository.loadedDataAllTags.stream.listen((loadedDataValue) {
+      // TODO Add an event instead
+      // add(DataUpdated<TagsList>());
+      emit(state.copyWith(loadedDataAllTags: loadedDataValue));
+    });
 
     _requestTagsFromRepository();
     add(StartedLoading<TagsList>());
@@ -44,6 +45,7 @@ class TagsListBloc extends AbstractEntityUserBloc<TagsListState> with ErrorStrea
   @override
   Future<void> close() async {
     _filteredTagsListStreamSubscription.cancel();
+    _allTagsStreamSubscription.cancel();
     super.close();
   }
 
@@ -64,7 +66,7 @@ class TagsListBloc extends AbstractEntityUserBloc<TagsListState> with ErrorStrea
     if (event.data != null) {
       emit(state.copyWith(loadedDataFilteredTags: LoadedData.success(event.data)));
     } else {
-      emit(state.copyWith(loadedDataFilteredTags: const LoadedData.error()));
+      emit(state.copyWith(loadedDataFilteredTags: const LoadedData.error('List of tags could not be loaded')));
     }
   }
 

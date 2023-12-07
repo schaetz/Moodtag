@@ -1,24 +1,31 @@
-import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_state.dart';
+import 'package:equatable/equatable.dart';
+import 'package:moodtag/model/blocs/ILibraryUserState.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 
-class TagsListState extends AbstractEntityUserState {
+class TagsListState extends Equatable implements ILibraryUserState {
+  final LoadedData<TagsList> loadedDataAllTags;
   final LoadedData<TagsList> loadedDataFilteredTags;
   final bool displaySearchBar;
   final String searchItem;
 
+  @override
+  LoadedData<ArtistsList>? get allArtistsData => null;
+
+  @override
+  LoadedData<TagsList>? get allTagsData => loadedDataAllTags;
+
   const TagsListState({
-    required LoadedData<TagsList> loadedDataAllTags,
+    this.loadedDataAllTags = const LoadedData.initial(),
     this.loadedDataFilteredTags = const LoadedData.initial(),
     this.displaySearchBar = false,
     this.searchItem = '',
-  }) : super(loadedDataAllTags: loadedDataAllTags);
+  });
 
   @override
   List<Object> get props => [loadedDataAllTags, loadedDataFilteredTags, displaySearchBar, searchItem];
 
   TagsListState copyWith({
-    LoadedData<ArtistsList>? loadedDataAllArtists, // not used, but required by interface
     LoadedData<TagsList>? loadedDataAllTags,
     LoadedData<TagsList>? loadedDataFilteredTags,
     bool? displaySearchBar,

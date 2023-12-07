@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
-import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_account_management/lastfm_account_management_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
@@ -45,23 +44,19 @@ class Routes {
     return {
       libraryMainScreen: (context) => MultiBlocProvider(providers: [
             BlocProvider(
-              create: (_) => ArtistsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
+              create: (_) => ArtistsListBloc(context.read<Repository>(), context),
             ),
             BlocProvider(
-              create: (_) => TagsListBloc(context.read<Repository>(), context, context.read<EntityLoaderBloc>()),
+              create: (_) => TagsListBloc(context.read<Repository>(), context),
             ),
           ], child: LibraryMainScreen()),
       artistsDetails: (context) => BlocProvider(
-          create: (_) => ArtistDetailsBloc(
-              context.read<Repository>(),
-              context,
-              ModalRoute.of(context)?.settings.arguments as int,
-              context.read<EntityLoaderBloc>(),
-              context.read<SpotifyAuthBloc>()),
+          create: (_) => ArtistDetailsBloc(context.read<Repository>(), context,
+              ModalRoute.of(context)?.settings.arguments as int, context.read<SpotifyAuthBloc>()),
           child: ArtistDetailsScreen()),
       tagsDetails: (context) => BlocProvider(
-          create: (_) => TagDetailsBloc(context.read<Repository>(), context,
-              ModalRoute.of(context)?.settings.arguments as int, context.read<EntityLoaderBloc>()),
+          create: (_) =>
+              TagDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),
           child: TagDetailsScreen()),
       lastFmAccountManagement: (context) => BlocProvider(
           create: (_) => LastFmAccountManagementBloc(context.read<Repository>(), context),

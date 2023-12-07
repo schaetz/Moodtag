@@ -114,7 +114,8 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
     if (_filterSelectionModal == null) {
       if (state.filterSelectionModalState == ModalState.opening && state.loadedDataAllTags.loadingStatus.isSuccess) {
         bloc.add(FilterSelectionModalStateChanged(open: true));
-        _filterSelectionModal = await _displayFilterBottomSheet(context, state.allTags!, state.filterTags, bloc);
+        _filterSelectionModal =
+            await _displayFilterBottomSheet(context, state.loadedDataAllTags.data!, state.filterTags, bloc);
       } else if (state.filterSelectionModalState == ModalState.closing) {
         bloc.add(FilterSelectionModalStateChanged(open: false));
       }

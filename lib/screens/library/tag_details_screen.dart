@@ -47,12 +47,13 @@ class TagDetailsScreen extends StatelessWidget {
                           buildOnSuccess: (artistsWithThisTagOnly) => ListView.separated(
                             separatorBuilder: (context, _) => Divider(),
                             padding: EdgeInsets.all(4.0),
-                            itemCount:
-                                state.checklistMode ? state.allArtistsWithTags!.length : artistsWithThisTagOnly.length,
+                            itemCount: state.checklistMode
+                                ? state.loadedDataAllArtists.data!.length
+                                : artistsWithThisTagOnly.length,
                             itemBuilder: (context, i) {
                               return state.checklistMode
                                   ? _buildRowForArtistSelection(
-                                      context, tagData.tag, state.allArtistsWithTags![i], bloc)
+                                      context, tagData.tag, state.loadedDataAllArtists.data![i], bloc)
                                   : _buildRowForAssociatedArtist(
                                       context, tagData.tag, artistsWithThisTagOnly[i].artist, bloc);
                             },

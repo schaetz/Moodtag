@@ -3,12 +3,11 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_bloc.dart';
-import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
+import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
@@ -16,23 +15,24 @@ import 'package:moodtag/model/repository/repository.dart';
 
 import 'tag_details_state.dart';
 
-class TagDetailsBloc extends AbstractEntityUserBloc<TagDetailsState> with ErrorStreamHandling {
+class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _tagStreamSubscription;
+  late final StreamSubscription _allArtistsStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
-  TagDetailsBloc(this._repository, BuildContext mainContext, int tagId, EntityLoaderBloc entityLoaderBloc)
-      : super(
-            initialState: TagDetailsState(
-                tagId: tagId, checklistMode: false, loadedDataAllArtists: entityLoaderBloc.state.loadedDataAllArtists),
-            entityLoaderBloc: entityLoaderBloc,
-            useAllArtistsStream: true) {
+  TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
     on<StartedLoading<TagData>>(_handleStartedLoadingTagData);
     on<DataUpdated<TagData>>(_handleTagDataUpdated);
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);
     on<ToggleArtistsForTagChecklist>(_handleToggleArtistsForTagChecklistEvent);
     on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
+
+    _allArtistsStreamSubscription = this._repository.loadedDataAllArtists.stream.listen((loadedDataValue) {
+      // TODO Add an event instead
+      emit(state.copyWith(loadedDataAllArtists: loadedDataValue));
+    });
 
     _tagStreamSubscription = _repository
         .getTagDataById(tagId)
@@ -46,6 +46,7 @@ class TagDetailsBloc extends AbstractEntityUserBloc<TagDetailsState> with ErrorS
   @override
   Future<void> close() async {
     _tagStreamSubscription.cancel();
+    _allArtistsStreamSubscription.cancel();
     super.close();
   }
 
@@ -59,7 +60,7 @@ class TagDetailsBloc extends AbstractEntityUserBloc<TagDetailsState> with ErrorS
     if (event.data != null) {
       emit(state.copyWith(loadedTagData: LoadedData.success(event.data)));
     } else {
-      emit(state.copyWith(loadedTagData: LoadedData.error()));
+      emit(state.copyWith(loadedTagData: LoadedData.error('Tag data could not be loaded')));
     }
   }
 

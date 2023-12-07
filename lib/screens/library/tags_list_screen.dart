@@ -8,6 +8,7 @@ import 'package:moodtag/model/blocs/tags_list/tags_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 import '../../components/screen_extensions/searchable_list_screen_mixin.dart';
@@ -27,7 +28,8 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
   Widget build(BuildContext context) {
     final bloc = context.read<TagsListBloc>();
     return BlocBuilder<TagsListBloc, TagsListState>(
-        buildWhen: (previous, current) => current.isTagsListLoaded, // TODO Show loading or error symbols
+        buildWhen: (previous, current) =>
+            current.loadedDataAllTags.loadingStatus == LoadingStatus.success, // TODO Show loading or error symbols
         builder: (context, state) {
           return SearchBarContainer(
               listViewKey: listViewKey,

@@ -5,8 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/screen_extensions/route_observer_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/model/blocs/entity_loader/abstract_entity_user_bloc.dart';
-import 'package:moodtag/model/blocs/entity_loader/entity_loader_bloc.dart';
 import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
@@ -20,17 +18,14 @@ import '../../events/artist_events.dart';
 import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
-class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState>
+class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
     with RouteObserverBloc<ArtistsListState>, ErrorStreamHandling {
   late final Repository _repository;
-  late StreamSubscription _filteredArtistsListStreamSubscription;
+  late final StreamSubscription _filteredArtistsListStreamSubscription;
+  late final StreamSubscription _allTagsStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
-  ArtistsListBloc(this._repository, BuildContext mainContext, EntityLoaderBloc entityLoaderBloc)
-      : super(
-            initialState: ArtistsListState(loadedDataAllTags: entityLoaderBloc.state.loadedDataAllTags),
-            entityLoaderBloc: entityLoaderBloc,
-            useAllTagsStream: true) {
+  ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
     on<StartedLoading<ArtistsList>>(_handleStartedLoadingArtistsList);
     on<DataUpdated<ArtistsList>>(_handleArtistsListUpdated);
     on<CreateArtists>(_handleCreateArtistsEvent);
@@ -45,6 +40,11 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState>
     on<RemoveArtistsListFilters>(_handleRemoveArtistsListFiltersEvent);
     on<ActiveScreenChanged>(_handleActiveScreenChangedEvent);
 
+    _allTagsStreamSubscription = this._repository.loadedDataAllTags.stream.listen((loadedDataValue) {
+      // TODO Add an event instead
+      emit(state.copyWith(loadedDataAllTags: loadedDataValue));
+    });
+
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
 
@@ -54,6 +54,7 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState>
   @override
   Future<void> close() async {
     _filteredArtistsListStreamSubscription.cancel();
+    _allTagsStreamSubscription.cancel();
     super.close();
   }
 
@@ -74,7 +75,7 @@ class ArtistsListBloc extends AbstractEntityUserBloc<ArtistsListState>
     if (event.data != null) {
       emit(state.copyWith(loadedDataFilteredArtists: LoadedData.success(event.data)));
     } else {
-      emit(state.copyWith(loadedDataFilteredArtists: const LoadedData.error()));
+      emit(state.copyWith(loadedDataFilteredArtists: const LoadedData.error('List of artists could not be loaded')));
     }
   }
 
