@@ -13,7 +13,7 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
   final bool displayTagSubtitles;
   final ModalState filterSelectionModalState;
   final Set<Tag> filterTags;
-  final OverlayVisibility filterDisplayOverlayState;
+  final bool displayFilterDisplayOverlay;
 
   @override
   LoadedData<ArtistsList>? get allArtistsData => null;
@@ -29,7 +29,7 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
       this.displayTagSubtitles = false,
       this.filterSelectionModalState = ModalState.closed,
       this.filterTags = const {},
-      this.filterDisplayOverlayState = OverlayVisibility.off});
+      this.displayFilterDisplayOverlay = false});
 
   List<Object> get props => [
         loadedDataFilteredArtists,
@@ -39,7 +39,7 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
         displayTagSubtitles,
         filterSelectionModalState,
         filterTags,
-        filterDisplayOverlayState
+        displayFilterDisplayOverlay
       ];
 
   ArtistsListState copyWith({
@@ -51,7 +51,7 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
     bool? displayTagSubtitles,
     ModalState? filterSelectionModalState,
     Set<Tag>? filterTags,
-    OverlayVisibility? filterDisplayOverlayState,
+    bool? displayFilterDisplayOverlay,
   }) {
     return ArtistsListState(
         loadedDataAllTags: loadedDataAllTags ?? this.loadedDataAllTags,
@@ -61,7 +61,7 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
         displayTagSubtitles: displayTagSubtitles ?? this.displayTagSubtitles,
         filterSelectionModalState: filterSelectionModalState ?? this.filterSelectionModalState,
         filterTags: filterTags != null ? filterTags : this.filterTags, // filterTags can be overridden by an empty set
-        filterDisplayOverlayState:
-            filterDisplayOverlayState != null ? filterDisplayOverlayState : this.filterDisplayOverlayState);
+        displayFilterDisplayOverlay:
+            displayFilterDisplayOverlay != null ? displayFilterDisplayOverlay : this.displayFilterDisplayOverlay);
   }
 }

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
-import 'package:moodtag/components/screen_extensions/list_screen_mixin.dart';
 import 'package:moodtag/components/screen_extensions/searchable_list_screen_mixin.dart';
-import 'package:moodtag/components/screen_extensions/tab_aware.dart';
 import 'package:moodtag/components/search_bar_container.dart';
 import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
@@ -17,11 +14,8 @@ import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
-
-import '../../components/screen_extensions/route_observer_screen.dart';
 
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -34,80 +28,48 @@ class ArtistsListScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _ArtistsListScreenState();
 }
 
-class _ArtistsListScreenState extends State<ArtistsListScreen>
-    with
-        RouteObserverScreen<ArtistsListScreen, ArtistsListBloc>,
-        TabAware,
-        ListViewConstraintsUser,
-        SearchableListScreenMixin<ArtistsListBloc> {
+class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableListScreenMixin<ArtistsListBloc> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
+  final GlobalKey listViewKey = GlobalKey();
+
   FilterSelectionModal? _filterSelectionModal;
-  bool _filterDisplayOverlayVisible = false;
-  OverlayEntry? _filterDisplayOverlay;
-
-  @override
-  void initState() {
-    super.initState();
-
-    registerAsTabControllerListener(widget.parentTabController, widget.parentTabViewIndex);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setListViewConstraints();
-    });
-  }
-
-  @override
-  void didBecomeActiveTab() {
-    if (mounted) {
-      final bloc = context.read<ArtistsListBloc>();
-      bloc.add(ActiveScreenChanged(true));
-    }
-  }
-
-  @override
-  void didBecomeInactiveTab() {
-    if (mounted) {
-      final bloc = context.read<ArtistsListBloc>();
-      bloc.add(ActiveScreenChanged(false));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
     return BlocConsumer<ArtistsListBloc, ArtistsListState>(
-        listener: (context, state) => _checkFilterModalsAndOverlaysState(context, state, bloc),
+        listener: (context, state) => _checkFilterModalState(context, state, bloc),
         builder: (context, state) {
           return SearchBarContainer(
-            listViewKey: listViewKey,
             searchBarHintText: 'Search artist',
             searchBarVisible: state.displaySearchBar,
             onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
             onSearchBarClosed: () => onSearchBarClosed(bloc),
-            contentWidget: LoadedDataDisplayWrapper<ArtistsList>(
-                loadedData: state.loadedDataFilteredArtists,
-                additionalCheckData: state.loadedDataAllTags,
-                captionForError: 'Artists could not be loaded',
-                captionForEmptyData: state.filterTags.isEmpty && (!state.displaySearchBar || state.searchItem.isEmpty)
-                    ? 'No artists yet'
-                    : 'No artists match the selected filters',
-                buildOnSuccess: (filteredArtistsList) => ListView.separated(
-                      key: listViewKey,
-                      separatorBuilder: (context, _) => Divider(),
-                      padding: EdgeInsets.all(16.0),
-                      itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
-                      itemBuilder: (context, i) {
-                        return _buildArtistRow(context, filteredArtistsList[i], bloc);
-                      },
-                    )),
+            contentWidget: Stack(children: [
+              LoadedDataDisplayWrapper<ArtistsList>(
+                  loadedData: state.loadedDataFilteredArtists,
+                  additionalCheckData: state.loadedDataAllTags,
+                  captionForError: 'Artists could not be loaded',
+                  captionForEmptyData: state.filterTags.isEmpty && (!state.displaySearchBar || state.searchItem.isEmpty)
+                      ? 'No artists yet'
+                      : 'No artists match the selected filters',
+                  buildOnSuccess: (filteredArtistsList) => ListView.separated(
+                        separatorBuilder: (context, _) => Divider(),
+                        padding: EdgeInsets.all(16.0),
+                        itemCount: filteredArtistsList.isNotEmpty ? filteredArtistsList.length : 0,
+                        itemBuilder: (context, i) {
+                          return _buildArtistRow(context, filteredArtistsList[i], bloc);
+                        },
+                      )),
+              state.displayFilterDisplayOverlay
+                  ? _buildFilterDisplayOverlay(context, state.filterTags, bloc)
+                  : Container()
+            ]),
+            listViewKey: listViewKey,
           );
         });
-  }
-
-  void _checkFilterModalsAndOverlaysState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
-    _checkFilterModalState(context, state, bloc);
-    _checkFilterDisplayOverlayState(context, state, bloc);
   }
 
   void _checkFilterModalState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) async {
@@ -122,50 +84,27 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
     }
   }
 
-  void _checkFilterDisplayOverlayState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) {
-    if (state.filterDisplayOverlayState == OverlayVisibility.on && !_filterDisplayOverlayVisible) {
-      _showFilterDisplayOverlay(context, state.filterTags, bloc);
-    } else if (state.filterDisplayOverlayState != OverlayVisibility.on && _filterDisplayOverlayVisible) {
-      _hideFilterDisplayOverlay();
-    }
-  }
+  Widget _buildFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags, ArtistsListBloc bloc) {
+    final screenSize = MediaQuery.of(context).size;
+    final overlaySize = Size(screenSize.width * 0.9, screenSize.height * 0.2);
+    final iconClose = Icon(Icons.close);
+    final iconSize = 45;
 
-  void _showFilterDisplayOverlay(BuildContext context, Set<Tag> filterTags, ArtistsListBloc bloc) {
-    if (!canUseListScreenConstraints) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Error: Cannot display the filter overlay.')));
-      return;
-    }
-
-    final lowerLeftCorner = listViewLowerLeftCorner!;
-    final renderBox = listViewRenderBox!;
-
-    _filterDisplayOverlayVisible = true;
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      _filterDisplayOverlay = OverlayEntry(builder: (context) {
-        final overlayWidth = MediaQuery.of(context).size.width * 0.9;
-        final overlayHeight = MediaQuery.of(context).size.height * 0.20;
-        final iconClose = Icon(Icons.close);
-        final iconSize = 45;
-
-        return Stack(children: [
-          Positioned(
-            left: lowerLeftCorner.dx + (renderBox.size.width - overlayWidth) / 2,
-            top: lowerLeftCorner.dy - overlayHeight * 1.1,
-            child: _buildFilterDisplayChipCloud(filterTags, overlayWidth, overlayHeight),
-          ),
-          Positioned(
-              right: (renderBox.size.width - overlayWidth) / 2 - iconSize / 2,
-              top: lowerLeftCorner.dy - overlayHeight * 1.1 - iconSize / 2,
-              child: IconButton.filled(
-                icon: iconClose,
-                style: IconButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.secondary),
-                onPressed: () => bloc.add(RemoveArtistsListFilters()),
-              )),
-        ]);
-      });
-      Overlay.of(context).insert(_filterDisplayOverlay!);
-    });
+    return Stack(children: [
+      Positioned(
+        right: (screenSize.width - overlaySize.width) / 2,
+        bottom: overlaySize.height * 0.1,
+        child: _buildFilterDisplayChipCloud(filterTags, overlaySize.width, overlaySize.height),
+      ),
+      Positioned(
+          right: (screenSize.width - overlaySize.width) / 2 - iconSize / 2,
+          bottom: overlaySize.height * 1.1 - iconSize / 2,
+          child: IconButton.filled(
+            icon: iconClose,
+            style: IconButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.secondary),
+            onPressed: () => bloc.add(RemoveArtistsListFilters()),
+          )),
+    ]);
   }
 
   Material _buildFilterDisplayChipCloud(Set<Tag> filterTags, double overlayWidth, double overlayHeight) {
@@ -180,11 +119,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen>
                 data: filterTags.map((tag) => tag.name).toList(),
                 constraints: Size(overlayWidth, overlayHeight),
                 options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: false))));
-  }
-
-  void _hideFilterDisplayOverlay() {
-    _filterDisplayOverlayVisible = false;
-    _filterDisplayOverlay?.remove();
   }
 
   Widget _buildArtistRow(BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc) {

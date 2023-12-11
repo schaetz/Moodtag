@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/screen_extensions/route_observer_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/library_user/library_user_mixin.dart';
@@ -19,8 +18,7 @@ import '../../events/artist_events.dart';
 import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
-class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
-    with LibraryUserMixin, RouteObserverBloc<ArtistsListState>, ErrorStreamHandling {
+class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryUserMixin, ErrorStreamHandling {
   late final Repository _repository;
   late StreamSubscription _filteredArtistsListStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
@@ -39,7 +37,6 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
     on<FilterSelectionModalStateChanged>(_handleFilterSelectionModalStateChangedEvent);
     on<ChangeArtistsListFilters>(_handleChangeArtistsListFilters);
     on<RemoveArtistsListFilters>(_handleRemoveArtistsListFiltersEvent);
-    on<ActiveScreenChanged>(_handleActiveScreenChangedEvent);
 
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
@@ -133,12 +130,10 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
       FilterSelectionModalStateChanged event, Emitter<ArtistsListState> emit) {
     if (state.filterSelectionModalState.isInTransition) {
       if (event.open) {
-        emit(state.copyWith(
-            filterSelectionModalState: ModalState.open, filterDisplayOverlayState: OverlayVisibility.off));
+        emit(state.copyWith(filterSelectionModalState: ModalState.open, displayFilterDisplayOverlay: false));
       } else {
         emit(state.copyWith(
-            filterSelectionModalState: ModalState.closed,
-            filterDisplayOverlayState: state.filterTags.isNotEmpty ? OverlayVisibility.on : OverlayVisibility.off));
+            filterSelectionModalState: ModalState.closed, displayFilterDisplayOverlay: state.filterTags.isNotEmpty));
       }
     }
   }
@@ -154,16 +149,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState>
     if (state.filterTags != {}) {
       _reloadDataAfterFilterChange(filterTags: {});
     }
-    emit(state.copyWith(filterTags: {}, filterDisplayOverlayState: OverlayVisibility.off));
-  }
-
-  void _handleActiveScreenChangedEvent(ActiveScreenChanged event, Emitter<ArtistsListState> emit) {
-    if (event.isActive) {
-      emit(state.copyWith(
-          filterDisplayOverlayState: state.filterTags.isNotEmpty ? OverlayVisibility.on : OverlayVisibility.off));
-    } else if (state.filterTags.isNotEmpty) {
-      emit(state.copyWith(filterDisplayOverlayState: OverlayVisibility.suspended));
-    }
+    emit(state.copyWith(filterTags: {}, displayFilterDisplayOverlay: false));
   }
 
   void _reloadDataAfterFilterChange({Set<Tag>? filterTags, String? searchItem}) async {
