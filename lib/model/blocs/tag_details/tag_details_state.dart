@@ -9,9 +9,6 @@ class TagDetailsState extends Equatable with LibrarySubscriberStateMixin {
   final LibrarySubscriptionSubState librarySubscription;
   final LoadedData<TagData> loadedTagData;
   final bool checklistMode;
-
-  // deduced properties
-  // TODO Where do we get this from?
   late final LoadedData<List<ArtistData>> artistsWithThisTagOnly;
 
   @override
@@ -25,17 +22,19 @@ class TagDetailsState extends Equatable with LibrarySubscriberStateMixin {
       this.artistsWithThisTagOnly = const LoadedData.initial()});
 
   @override
-  List<Object> get props => [tagId, librarySubscription, loadedTagData, checklistMode];
+  List<Object> get props => [tagId, librarySubscription, loadedTagData, checklistMode, artistsWithThisTagOnly];
 
   TagDetailsState copyWith(
       {int? tagId,
       LibrarySubscriptionSubState? librarySubscription,
       LoadedData<TagData>? loadedTagData,
-      bool? checklistMode}) {
+      bool? checklistMode,
+      LoadedData<ArtistsList>? artistsWithThisTagOnly}) {
     return TagDetailsState(
         tagId: tagId ?? this.tagId,
         librarySubscription: librarySubscription ?? this.librarySubscription,
         loadedTagData: loadedTagData ?? this.loadedTagData,
-        checklistMode: checklistMode ?? this.checklistMode);
+        checklistMode: checklistMode ?? this.checklistMode,
+        artistsWithThisTagOnly: artistsWithThisTagOnly ?? this.artistsWithThisTagOnly);
   }
 }
