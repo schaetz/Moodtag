@@ -90,7 +90,8 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
 
   void _handleToggleSearchBarEvent(ToggleSearchBar event, Emitter<ArtistsListState> emit) {
     final newSearchBarVisibility = !state.displaySearchBar;
-    _reloadDataAfterFilterChange(searchItem: newSearchBarVisibility ? state.searchItem : null);
+    _reloadDataAfterFilterChange(
+        searchItem: newSearchBarVisibility ? state.searchItem : null, displaySearchBar: newSearchBarVisibility);
     emit(state.copyWith(displaySearchBar: newSearchBarVisibility));
   }
 
@@ -154,8 +155,12 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
     emit(state.copyWith(filterTags: {}, displayFilterDisplayOverlay: false));
   }
 
-  void _reloadDataAfterFilterChange({Set<Tag>? filterTags, String? searchItem}) async {
+  void _reloadDataAfterFilterChange({Set<Tag>? filterTags, bool? displaySearchBar, String? searchItem}) async {
     await _filteredArtistsListStreamSubscription.cancel();
-    _requestArtistsFromRepository(filterTags: filterTags, searchItem: searchItem);
+    final applySearchItem = displaySearchBar != null ? displaySearchBar : state.displaySearchBar;
+    final newSearchItem = searchItem != null ? searchItem : state.searchItem;
+    _requestArtistsFromRepository(
+        filterTags: filterTags != null ? filterTags : state.filterTags,
+        searchItem: !applySearchItem ? null : newSearchItem);
   }
 }
