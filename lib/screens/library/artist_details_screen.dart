@@ -69,7 +69,7 @@ class ArtistDetailsScreen extends StatelessWidget {
 
   Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state) {
     if (state.tagEditMode) {
-      if (state.loadedDataAllTags.loadingStatus.isError || state.loadedDataAllTags.data == null) {
+      if (state.allTags.loadingStatus.isError || state.allTags.data == null) {
         return ChipsRowInfoLabel('Error loading the tags');
       } else if (state.loadedArtistData.data == null) {
         return ChipsRowInfoLabel('Something went wrong');
@@ -86,7 +86,7 @@ class ArtistDetailsScreen extends StatelessWidget {
 
     final ArtistData artistData = state.loadedArtistData.data!;
     List<Tag> tagsToDisplay =
-        state.tagEditMode ? _convertTagDataListToTagList(state.loadedDataAllTags.data!) : artistData.tags.toList();
+        state.tagEditMode ? _convertTagDataListToTagList(state.allTags.data!) : artistData.tags.toList();
 
     List<Widget> chipsList =
         tagsToDisplay.map((tag) => _buildTagChip(context, state.tagEditMode, artistData, tag, (_value) {})).toList();

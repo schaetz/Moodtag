@@ -29,7 +29,7 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
     final bloc = context.read<TagsListBloc>();
     return BlocBuilder<TagsListBloc, TagsListState>(
         buildWhen: (previous, current) =>
-            current.loadedDataAllTags.loadingStatus == LoadingStatus.success, // TODO Show loading or error symbols
+            current.allTags.loadingStatus == LoadingStatus.success, // TODO Show loading or error symbols
         builder: (context, state) {
           return SearchBarContainer(
               listViewKey: listViewKey,

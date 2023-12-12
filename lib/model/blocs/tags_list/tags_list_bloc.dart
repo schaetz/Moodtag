@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/model/blocs/library_user/library_user_mixin.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
@@ -16,14 +16,14 @@ import '../../events/tag_events.dart';
 import '../error_stream_handling.dart';
 import 'tags_list_state.dart';
 
-class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserMixin, ErrorStreamHandling {
+class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlocMixin, ErrorStreamHandling {
   final Repository _repository;
   late StreamSubscription _filteredTagsListStreamSubscription;
 
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
-    useAllTags(_repository);
+    useLibrary(_repository);
     on<StartedLoading<TagsList>>(_handleStartedLoadingTagsList);
     on<DataUpdated<TagsList>>(_handleTagsListUpdated);
     on<CreateTags>(_handleCreateTagsEvent);
@@ -31,6 +31,8 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserMix
     on<ToggleSearchBar>(_handleToggleSearchBarEvent);
     on<ChangeSearchItem>(_handleChangeSearchItemEvent);
     on<ClearSearchItem>(_handleClearSearchItemEvent);
+
+    add(RequestSubscription<TagsList>());
 
     _requestTagsFromRepository();
     add(StartedLoading<TagsList>());
@@ -41,7 +43,6 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserMix
   @override
   Future<void> close() async {
     _filteredTagsListStreamSubscription.cancel();
-    closeLibraryStreams();
     super.close();
   }
 
@@ -62,7 +63,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserMix
     if (event.data != null) {
       emit(state.copyWith(loadedDataFilteredTags: LoadedData.success(event.data)));
     } else {
-      emit(state.copyWith(loadedDataFilteredTags: const LoadedData.error('List of tags could not be loaded')));
+      emit(state.copyWith(loadedDataFilteredTags: const LoadedData.error(message: 'List of tags could not be loaded')));
     }
   }
 

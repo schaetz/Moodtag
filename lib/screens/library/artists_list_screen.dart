@@ -50,7 +50,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
             contentWidget: Stack(children: [
               LoadedDataDisplayWrapper<ArtistsList>(
                   loadedData: state.loadedDataFilteredArtists,
-                  additionalCheckData: state.loadedDataAllTags,
+                  additionalCheckData: state.allTags,
                   captionForError: 'Artists could not be loaded',
                   captionForEmptyData: state.filterTags.isEmpty && (!state.displaySearchBar || state.searchItem.isEmpty)
                       ? 'No artists yet'
@@ -74,10 +74,9 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
 
   void _checkFilterModalState(BuildContext context, ArtistsListState state, ArtistsListBloc bloc) async {
     if (_filterSelectionModal == null) {
-      if (state.filterSelectionModalState == ModalState.opening && state.loadedDataAllTags.loadingStatus.isSuccess) {
+      if (state.filterSelectionModalState == ModalState.opening && state.allTags.loadingStatus.isSuccess) {
         bloc.add(FilterSelectionModalStateChanged(open: true));
-        _filterSelectionModal =
-            await _displayFilterBottomSheet(context, state.loadedDataAllTags.data!, state.filterTags, bloc);
+        _filterSelectionModal = await _displayFilterBottomSheet(context, state.allTags.data!, state.filterTags, bloc);
       } else if (state.filterSelectionModalState == ModalState.closing) {
         bloc.add(FilterSelectionModalStateChanged(open: false));
       }

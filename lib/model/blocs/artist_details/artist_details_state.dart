@@ -1,42 +1,39 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/blocs/library_user/library_user_state_interface.dart';
+import 'package:moodtag/model/blocs/library_user/library_subscriber_state_mixin.dart';
+import 'package:moodtag/model/blocs/library_user/library_subscription_sub_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 
-class ArtistDetailsState extends Equatable implements ILibraryUserState {
+class ArtistDetailsState extends Equatable with LibrarySubscriberStateMixin {
   final int artistId;
+  final LibrarySubscriptionSubState librarySubscription;
   final LoadedData<ArtistData> loadedArtistData;
-  final LoadedData<TagsList> loadedDataAllTags;
   final bool tagEditMode;
 
   @override
-  LoadedData<ArtistsList>? get allArtistsData => null;
-
-  @override
-  LoadedData<TagsList>? get allTagsData => loadedDataAllTags;
+  LibrarySubscriptionSubState get librarySubscriptionSubState => this.librarySubscription;
 
   ArtistDetailsState(
       {required this.artistId,
+      this.librarySubscription = const LibrarySubscriptionSubState(),
       this.loadedArtistData = const LoadedData.initial(),
-      this.loadedDataAllTags = const LoadedData.initial(),
       this.tagEditMode = false});
 
   bool get isArtistLoaded => loadedArtistData.loadingStatus == LoadingStatus.success;
 
   @override
-  List<Object> get props => [artistId, loadedArtistData, loadedDataAllTags, tagEditMode];
+  List<Object> get props => [artistId, librarySubscription, loadedArtistData, tagEditMode];
 
   ArtistDetailsState copyWith(
       {int? artistId,
+      LibrarySubscriptionSubState? librarySubscription,
       LoadedData<ArtistData>? loadedArtistData,
-      LoadedData<ArtistsList>? loadedDataAllArtists, // not used
-      LoadedData<TagsList>? loadedDataAllTags,
       bool? tagEditMode}) {
     return ArtistDetailsState(
         artistId: artistId ?? this.artistId,
+        librarySubscription: librarySubscription ?? this.librarySubscription,
         loadedArtistData: loadedArtistData ?? this.loadedArtistData,
-        loadedDataAllTags: loadedDataAllTags ?? this.loadedDataAllTags,
         tagEditMode: tagEditMode ?? this.tagEditMode);
   }
 }

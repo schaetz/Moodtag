@@ -1,13 +1,14 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/blocs/library_user/library_user_state_interface.dart';
+import 'package:moodtag/model/blocs/library_user/library_subscriber_state_mixin.dart';
+import 'package:moodtag/model/blocs/library_user/library_subscription_sub_state.dart';
 import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 
-class ArtistsListState extends Equatable implements ILibraryUserState {
+class ArtistsListState extends Equatable with LibrarySubscriberStateMixin {
+  final LibrarySubscriptionSubState librarySubscription;
   final LoadedData<ArtistsList> loadedDataFilteredArtists;
-  final LoadedData<TagsList> loadedDataAllTags;
   final bool displaySearchBar;
   final String searchItem;
   final bool displayTagSubtitles;
@@ -16,14 +17,11 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
   final bool displayFilterDisplayOverlay;
 
   @override
-  LoadedData<ArtistsList>? get allArtistsData => null;
-
-  @override
-  LoadedData<TagsList>? get allTagsData => loadedDataAllTags;
+  LibrarySubscriptionSubState get librarySubscriptionSubState => this.librarySubscription;
 
   const ArtistsListState(
-      {this.loadedDataFilteredArtists = const LoadedData.initial(),
-      this.loadedDataAllTags = const LoadedData.initial(),
+      {this.librarySubscription = const LibrarySubscriptionSubState(),
+      this.loadedDataFilteredArtists = const LoadedData.initial(),
       this.displaySearchBar = false,
       this.searchItem = '',
       this.displayTagSubtitles = false,
@@ -32,8 +30,8 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
       this.displayFilterDisplayOverlay = false});
 
   List<Object> get props => [
+        librarySubscription,
         loadedDataFilteredArtists,
-        loadedDataAllTags,
         displaySearchBar,
         searchItem,
         displayTagSubtitles,
@@ -43,8 +41,7 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
       ];
 
   ArtistsListState copyWith({
-    LoadedData<ArtistsList>? loadedDataAllArtists, // not used
-    LoadedData<TagsList>? loadedDataAllTags,
+    LibrarySubscriptionSubState? librarySubscription,
     LoadedData<ArtistsList>? loadedDataFilteredArtists,
     bool? displaySearchBar,
     String? searchItem,
@@ -54,7 +51,7 @@ class ArtistsListState extends Equatable implements ILibraryUserState {
     bool? displayFilterDisplayOverlay,
   }) {
     return ArtistsListState(
-        loadedDataAllTags: loadedDataAllTags ?? this.loadedDataAllTags,
+        librarySubscription: librarySubscription ?? this.librarySubscription,
         loadedDataFilteredArtists: loadedDataFilteredArtists ?? this.loadedDataFilteredArtists,
         displaySearchBar: displaySearchBar ?? this.displaySearchBar,
         searchItem: searchItem ?? this.searchItem,

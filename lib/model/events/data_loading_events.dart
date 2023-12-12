@@ -6,6 +6,11 @@ abstract class DataLoadingEvent extends LibraryEvent {
   const DataLoadingEvent();
 }
 
+class RequestSubscription<T> extends DataLoadingEvent {
+  @override
+  List<Object?> get props => [];
+}
+
 class StartedLoading<T> extends DataLoadingEvent {
   @override
   List<Object?> get props => [];

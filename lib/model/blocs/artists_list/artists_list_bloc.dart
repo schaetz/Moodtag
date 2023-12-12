@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/model/blocs/library_user/library_user_mixin.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/model/blocs/types.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
@@ -18,13 +18,13 @@ import '../../events/artist_events.dart';
 import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
-class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryUserMixin, ErrorStreamHandling {
+class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryUserBlocMixin, ErrorStreamHandling {
   late final Repository _repository;
   late StreamSubscription _filteredArtistsListStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
-    useAllTags(_repository);
+    useLibrary(_repository);
     on<StartedLoading<ArtistsList>>(_handleStartedLoadingArtistsList);
     on<DataUpdated<ArtistsList>>(_handleArtistsListUpdated);
     on<CreateArtists>(_handleCreateArtistsEvent);
@@ -38,6 +38,8 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
     on<ChangeArtistsListFilters>(_handleChangeArtistsListFilters);
     on<RemoveArtistsListFilters>(_handleRemoveArtistsListFiltersEvent);
 
+    add(RequestSubscription<TagsList>());
+
     _requestArtistsFromRepository();
     add(StartedLoading<ArtistsList>());
 
@@ -47,7 +49,6 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
   @override
   Future<void> close() async {
     _filteredArtistsListStreamSubscription.cancel();
-    closeLibraryStreams();
     super.close();
   }
 
@@ -68,7 +69,8 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
     if (event.data != null) {
       emit(state.copyWith(loadedDataFilteredArtists: LoadedData.success(event.data)));
     } else {
-      emit(state.copyWith(loadedDataFilteredArtists: const LoadedData.error('List of artists could not be loaded')));
+      emit(state.copyWith(
+          loadedDataFilteredArtists: const LoadedData.error(message: 'List of artists could not be loaded')));
     }
   }
 

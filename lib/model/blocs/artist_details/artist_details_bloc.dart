@@ -8,7 +8,7 @@ import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
-import 'package:moodtag/model/blocs/library_user/library_user_mixin.dart';
+import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/artist_events.dart';
@@ -23,7 +23,7 @@ import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 
 import 'artist_details_state.dart';
 
-class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with LibraryUserMixin, ErrorStreamHandling {
+class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with LibraryUserBlocMixin, ErrorStreamHandling {
   final Repository _repository;
   late final StreamSubscription _artistStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
@@ -32,13 +32,15 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
 
   ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId, this._accessTokenProvider)
       : super(ArtistDetailsState(artistId: artistId)) {
-    useAllTags(_repository);
+    useLibrary(_repository);
     on<StartedLoading<ArtistData>>(_handleStartedLoadingArtistData);
     on<DataUpdated<ArtistData>>(_handleArtistDataUpdated);
     on<ToggleTagEditMode>(_handleToggleTagEditModeEvent);
     on<CreateTags>(_handleCreateTagsEvent);
     on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
     on<PlayArtist>(_handlePlayArtistEvent);
+
+    add(RequestSubscription<TagsList>());
 
     _artistStreamSubscription = _repository
         .getArtistDataById(artistId)
@@ -52,7 +54,6 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
   @override
   Future<void> close() async {
     _artistStreamSubscription.cancel();
-    closeLibraryStreams();
     super.close();
   }
 
@@ -66,7 +67,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
     if (event.data != null) {
       emit(state.copyWith(loadedArtistData: LoadedData.success(event.data)));
     } else {
-      emit(state.copyWith(loadedArtistData: LoadedData.error('Artist data could not be loaded')));
+      emit(state.copyWith(loadedArtistData: LoadedData.error(message: 'Artist data could not be loaded')));
     }
   }
 

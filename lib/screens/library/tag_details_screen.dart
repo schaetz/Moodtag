@@ -43,17 +43,15 @@ class TagDetailsScreen extends StatelessWidget {
                           loadedData: state.artistsWithThisTagOnly,
                           captionForError: 'Artists with this tag could not be loaded',
                           captionForEmptyData: 'No artists with this tag',
-                          additionalCheckData: state.loadedDataAllArtists,
+                          additionalCheckData: state.allArtists,
                           buildOnSuccess: (artistsWithThisTagOnly) => ListView.separated(
                             separatorBuilder: (context, _) => Divider(),
                             padding: EdgeInsets.all(4.0),
-                            itemCount: state.checklistMode
-                                ? state.loadedDataAllArtists.data!.length
-                                : artistsWithThisTagOnly.length,
+                            itemCount:
+                                state.checklistMode ? state.allArtists.data!.length : artistsWithThisTagOnly.length,
                             itemBuilder: (context, i) {
                               return state.checklistMode
-                                  ? _buildRowForArtistSelection(
-                                      context, tagData.tag, state.loadedDataAllArtists.data![i], bloc)
+                                  ? _buildRowForArtistSelection(context, tagData.tag, state.allArtists.data![i], bloc)
                                   : _buildRowForAssociatedArtist(
                                       context, tagData.tag, artistsWithThisTagOnly[i].artist, bloc);
                             },
@@ -65,7 +63,7 @@ class TagDetailsScreen extends StatelessWidget {
       floatingActionButton: BlocBuilder<TagDetailsBloc, TagDetailsState>(builder: (context, state) {
         return LoadedDataDisplayWrapper<TagData>(
             loadedData: state.loadedTagData,
-            additionalCheckData: state.loadedDataAllArtists,
+            additionalCheckData: state.allArtists,
             showPlaceholders: false,
             buildOnSuccess: (tagData) => _buildFloatingActionButtons(context, state.loadedTagData.data!.tag, bloc));
       }),

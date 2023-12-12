@@ -21,6 +21,16 @@ class Repository {
   final loadedDataAllArtists = BehaviorSubject<LoadedData<ArtistsList>>();
   final loadedDataAllTags = BehaviorSubject<LoadedData<TagsList>>();
 
+  BehaviorSubject<LoadedData<T>>? getLibraryDataStream<T extends List<DataClassWithEntityName>>() {
+    switch (T) {
+      case ArtistsList:
+        return loadedDataAllArtists as BehaviorSubject<LoadedData<T>>;
+      case TagsList:
+        return loadedDataAllTags as BehaviorSubject<LoadedData<T>>;
+    }
+    return null;
+  }
+
   LoadedData<ArtistsList> get allArtists => loadedDataAllArtists.value;
   LoadedData<TagsList> get allTags => loadedDataAllTags.value;
 

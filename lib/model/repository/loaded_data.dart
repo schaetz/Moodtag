@@ -23,10 +23,10 @@ class LoadedData<T> extends Equatable {
       : this.loadingStatus = LoadingStatus.success,
         this.errorMessage = null;
 
-  const LoadedData.error(errorMessage)
+  const LoadedData.error({String? message})
       : this.data = null,
         this.loadingStatus = LoadingStatus.error,
-        this.errorMessage = errorMessage;
+        this.errorMessage = message;
 
   @override
   List<Object?> get props => [data, loadingStatus, errorMessage];
