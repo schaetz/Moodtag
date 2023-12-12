@@ -12,7 +12,6 @@ import 'package:rxdart/rxdart.dart';
 
 import '../database/moodtag_db.dart';
 import 'loaded_data.dart';
-import 'loading_status.dart';
 
 class Repository {
   final MoodtagDB db;
@@ -51,17 +50,13 @@ class Repository {
   void setupStreamSubscriptions() {
     loadedDataAllArtists.add(LoadedData.loading());
     _artistsStreamSubscription = getArtistsDataList()
-        .handleError((errorMessage) => loadedDataAllArtists
-            .add(loadedDataAllArtists.value.copyWith(loadingStatus: LoadingStatus.error, errorMessage: errorMessage)))
-        .listen((artistsListFromStream) => loadedDataAllArtists.add(
-            loadedDataAllArtists.value.copyWith(loadingStatus: LoadingStatus.success, data: artistsListFromStream)));
+        .handleError((errorMessage) => loadedDataAllArtists.add(LoadedData.error(message: errorMessage)))
+        .listen((artistsListFromStream) => loadedDataAllArtists.add(LoadedData.success(artistsListFromStream)));
 
     loadedDataAllTags.add(LoadedData.loading());
     _tagsStreamSubscription = getTagsDataList()
-        .handleError((errorMessage) => loadedDataAllTags
-            .add(loadedDataAllTags.value.copyWith(loadingStatus: LoadingStatus.error, errorMessage: errorMessage)))
-        .listen((tagsListFromStream) => loadedDataAllTags
-            .add(loadedDataAllTags.value.copyWith(loadingStatus: LoadingStatus.success, data: tagsListFromStream)));
+        .handleError((errorMessage) => loadedDataAllTags.add(LoadedData.error(message: errorMessage)))
+        .listen((tagsListFromStream) => loadedDataAllTags.add(LoadedData.success(tagsListFromStream)));
   }
 
   //
