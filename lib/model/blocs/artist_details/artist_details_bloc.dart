@@ -11,21 +11,24 @@ import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/library_query_filter.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/model/repository/subscription_config.dart';
 import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 
 import 'artist_details_state.dart';
 
 class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with LibraryUserBlocMixin, ErrorStreamHandling {
+  static const artistByIdSubscriptionName = 'artist_by_id';
+
   final Repository _repository;
-  late final StreamSubscription _artistStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
   final SpotifyAccessTokenProvider _accessTokenProvider;
   StreamController<UserReadableException> errorStreamController = StreamController<UserReadableException>();
@@ -33,41 +36,31 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
   ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId, this._accessTokenProvider)
       : super(ArtistDetailsState(artistId: artistId)) {
     useLibrary(_repository);
-    on<StartedLoading<ArtistData>>(_handleStartedLoadingArtistData);
-    on<DataUpdated<ArtistData>>(_handleArtistDataUpdated);
+    add(RequestSubscription(Artist, name: artistByIdSubscriptionName, filter: LibraryQueryFilter(id: artistId)));
+    add(RequestSubscription(TagsList));
+
     on<ToggleTagEditMode>(_handleToggleTagEditModeEvent);
     on<CreateTags>(_handleCreateTagsEvent);
     on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
     on<PlayArtist>(_handlePlayArtistEvent);
 
-    add(RequestSubscription<TagsList>());
-
-    _artistStreamSubscription = _repository
-        .getArtistDataById(artistId)
-        .handleError((error) => add(DataUpdated<ArtistData>(error: error)))
-        .listen((artistFromStream) => add(DataUpdated<ArtistData>(data: artistFromStream)));
-    add(StartedLoading<ArtistData>());
-
     setupErrorHandler(mainContext);
   }
 
   @override
-  Future<void> close() async {
-    _artistStreamSubscription.cancel();
-    super.close();
-  }
-
-  void _handleStartedLoadingArtistData(StartedLoading<ArtistData> event, Emitter<ArtistDetailsState> emit) {
-    if (state.loadedArtistData.loadingStatus == LoadingStatus.initial) {
-      emit(state.copyWith(loadedArtistData: LoadedData.loading()));
+  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<ArtistDetailsState> emit) {
+    super.onDataReceived(subscriptionConfig, loadedData, emit);
+    if (subscriptionConfig.name == artistByIdSubscriptionName) {
+      emit(state.copyWith(loadedArtistData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
     }
   }
 
-  void _handleArtistDataUpdated(DataUpdated<ArtistData> event, Emitter<ArtistDetailsState> emit) {
-    if (event.data != null) {
-      emit(state.copyWith(loadedArtistData: LoadedData.success(event.data)));
-    } else {
-      emit(state.copyWith(loadedArtistData: LoadedData.error(message: 'Artist data could not be loaded')));
+  @override
+  void onStreamSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<ArtistDetailsState> emit) {
+    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+    if (subscriptionConfig.name == artistByIdSubscriptionName) {
+      emit(state.copyWith(loadedArtistData: LoadedData.error()));
     }
   }
 

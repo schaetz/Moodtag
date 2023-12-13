@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/model/repository/subscription_config.dart';
 
 import 'library_subscriber_state_mixin.dart';
 
@@ -15,30 +15,42 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   /// the event handlers for RequestSubscription
   void useLibrary(Repository repository) {
     this._repository = repository;
-    on<RequestSubscription<ArtistsList>>(_handleLibrarySubscriptionRequested<ArtistsList>);
-    on<RequestSubscription<TagsList>>(_handleLibrarySubscriptionRequested<TagsList>);
+    on<RequestSubscription>(_handleLibrarySubscriptionRequested);
+    on<UpdateSubscriptionFilter>(_handleUpdateSubscriptionFilter);
   }
 
-  void _handleLibrarySubscriptionRequested<T extends List<DataClassWithEntityName>>(
-      RequestSubscription event, Emitter<S> emit) async {
-    emit(state.updateLibrarySubscription<T>(LoadedData.loading()) as S);
+  void _handleLibrarySubscriptionRequested(RequestSubscription event, Emitter<S> emit) async {
+    emit(state.updateLibrarySubscription(event.subscriptionConfig, LoadedData.loading()) as S);
+    await _repository?.cancelStreamSubscription(event.subscriptionConfig);
+    _listenToStream(event.subscriptionConfig, emit);
+  }
 
-    final behaviorSubject = _repository?.getLibraryDataStream<T>() ?? null;
+  // TODO Remove code duplication
+  void _handleUpdateSubscriptionFilter(UpdateSubscriptionFilter event, Emitter<S> emit) async {
+    emit(state.updateLibrarySubscription(event.subscriptionConfig, LoadedData.loading()) as S);
+    await _repository?.cancelStreamSubscription(event.subscriptionConfig);
+    _listenToStream(event.subscriptionConfig, emit);
+  }
+
+  void _listenToStream(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
+    final behaviorSubject = await _repository?.getLibraryDataStream(subscriptionConfig) ?? null;
     if (behaviorSubject != null) {
-      await emit.forEach<LoadedData<T>>(
-        behaviorSubject,
-        onData: (loadedData) => _onDataReceived(loadedData),
-        onError: (obj, stackTrace) => _onStreamSubscriptionError(obj, stackTrace),
-      );
+      await emit.forEach<LoadedData>(behaviorSubject, onData: (loadedData) {
+        onDataReceived(subscriptionConfig, loadedData, emit);
+        return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
+      }, onError: (obj, stackTrace) {
+        onStreamSubscriptionError(subscriptionConfig, obj, stackTrace, emit);
+        return state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
+      });
     }
   }
 
   /// Can be overridden to run additional logic when a new instance of the dataset is loaded
-  S _onDataReceived<T extends List<DataClassWithEntityName>>(LoadedData<T> loadedData) =>
-      state.updateLibrarySubscription<T>(loadedData) as S;
+  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<S> emit) => ();
 
-  /// Can be overridden to run additional logic when a subscription error occurrs
+  /// Can be overridden to run additional logic when a subscription error occurs
   /// (note: this is NOT fired when LoadingStatus is ERROR, e.g. because of database errors)
-  S _onStreamSubscriptionError<T extends List<DataClassWithEntityName>>(Object object, StackTrace stackTrace) =>
-      state.updateLibrarySubscription<T>(LoadedData.error()) as S;
+  void onStreamSubscriptionError(
+          SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<S> emit) =>
+      ();
 }

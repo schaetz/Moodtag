@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
@@ -11,84 +9,57 @@ import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
+import 'package:moodtag/model/repository/library_query_filter.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/model/repository/subscription_config.dart';
 
 import 'tag_details_state.dart';
 
 class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUserBlocMixin, ErrorStreamHandling {
+  static const tagByIdSubscriptionName = 'tag_by_id';
+  static const artistsWithTagSubscriptionName = 'artists_with_tag';
+
   final Repository _repository;
-  late final StreamSubscription _tagStreamSubscription;
-  StreamSubscription? _artistsWithThisTagOnlyStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
     useLibrary(_repository);
-    on<StartedLoading<TagData>>(_handleStartedLoadingTagData);
-    on<DataUpdated<TagData>>(_handleTagDataUpdated);
-    on<StartedLoading<ArtistsList>>(_handleStartedLoadingArtistsWithThisTagOnly);
-    on<DataUpdated<ArtistsList>>(_handleArtistsWithThisTagOnlyDataUpdated);
+    add(RequestSubscription(Tag, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(id: tagId)));
+
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);
     on<ToggleArtistsForTagChecklist>(_handleToggleArtistsForTagChecklistEvent);
     on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
 
-    add(RequestSubscription<ArtistsList>());
-
-    _tagStreamSubscription = _repository
-        .getTagDataById(tagId)
-        .handleError((error) => add(DataUpdated<TagData>(error: error)))
-        .listen((tagFromStream) => add(DataUpdated<TagData>(data: tagFromStream)));
-    add(StartedLoading<TagData>());
-
     setupErrorHandler(mainContext);
   }
 
   @override
-  Future<void> close() async {
-    _tagStreamSubscription.cancel();
-    _artistsWithThisTagOnlyStreamSubscription?.cancel();
-    super.close();
-  }
-
-  void _handleStartedLoadingTagData(StartedLoading<TagData> event, Emitter<TagDetailsState> emit) {
-    if (state.loadedTagData.loadingStatus == LoadingStatus.initial) {
-      emit(state.copyWith(loadedTagData: LoadedData.loading()));
-    }
-  }
-
-  void _handleTagDataUpdated(DataUpdated<TagData> event, Emitter<TagDetailsState> emit) {
-    if (event.data != null) {
-      emit(state.copyWith(loadedTagData: LoadedData.success(event.data)));
-      if (_artistsWithThisTagOnlyStreamSubscription == null && event.data?.tag != null) {
-        _requestArtistsWithThisTagOnlyFromRepository(event.data!.tag);
-        add(StartedLoading<ArtistsList>());
+  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagDetailsState> emit) {
+    super.onDataReceived(subscriptionConfig, loadedData, emit);
+    if (subscriptionConfig.name == tagByIdSubscriptionName) {
+      emit(state.copyWith(loadedTagData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+      if (loadedData.loadingStatus.isSuccess && state.artistsWithThisTagOnly.loadingStatus.isInitial) {
+        final tagData = loadedData.data as TagData;
+        add(RequestSubscription(ArtistsList,
+            name: artistsWithTagSubscriptionName, filter: LibraryQueryFilter(entityFilters: {tagData.tag})));
       }
-    } else {
-      emit(state.copyWith(loadedTagData: LoadedData.error(message: 'Tag data could not be loaded')));
+    } else if (subscriptionConfig.name == artistsWithTagSubscriptionName) {
+      emit(
+          state.copyWith(artistsWithThisTagOnly: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
     }
   }
 
-  void _requestArtistsWithThisTagOnlyFromRepository(Tag tag) {
-    _artistsWithThisTagOnlyStreamSubscription = _repository
-        .getArtistsDataList(filterTags: Set.of([tag]))
-        .handleError((error) => add(DataUpdated<ArtistsList>(error: error)))
-        .listen((artistsListFromStream) => add(DataUpdated<ArtistsList>(data: artistsListFromStream)));
-  }
-
-  void _handleStartedLoadingArtistsWithThisTagOnly(StartedLoading<ArtistsList> event, Emitter<TagDetailsState> emit) {
-    if (state.artistsWithThisTagOnly.loadingStatus == LoadingStatus.initial) {
-      emit(state.copyWith(artistsWithThisTagOnly: LoadedData.loading()));
-    }
-  }
-
-  void _handleArtistsWithThisTagOnlyDataUpdated(DataUpdated<ArtistsList> event, Emitter<TagDetailsState> emit) {
-    if (event.data != null) {
-      emit(state.copyWith(artistsWithThisTagOnly: LoadedData.success(event.data)));
-    } else {
-      emit(state.copyWith(
-          artistsWithThisTagOnly: LoadedData.error(message: 'Artists with this tag could not be loaded')));
+  @override
+  void onStreamSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<TagDetailsState> emit) {
+    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+    if (subscriptionConfig.name == tagByIdSubscriptionName) {
+      emit(state.copyWith(loadedTagData: LoadedData.error()));
+    } else if (subscriptionConfig.name == artistsWithTagSubscriptionName) {
+      emit(state.copyWith(artistsWithThisTagOnly: LoadedData.error()));
     }
   }
 

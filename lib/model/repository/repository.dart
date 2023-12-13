@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:drift/drift.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/exceptions/internal/internal_exception.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/repository_helper.dart';
 import 'package:moodtag/structs/imported_entities/imported_artist.dart';
@@ -12,51 +13,81 @@ import 'package:rxdart/rxdart.dart';
 
 import '../database/moodtag_db.dart';
 import 'loaded_data.dart';
+import 'subscription_config.dart';
 
 class Repository {
   final MoodtagDB db;
   late final RepositoryHelper helper;
 
-  final loadedDataAllArtists = BehaviorSubject<LoadedData<ArtistsList>>();
-  final loadedDataAllTags = BehaviorSubject<LoadedData<TagsList>>();
+  final Map<SubscriptionConfig, StreamSubscription> subscriptions = {};
 
-  BehaviorSubject<LoadedData<T>>? getLibraryDataStream<T extends List<DataClassWithEntityName>>() {
-    switch (T) {
+  Future<BehaviorSubject<LoadedData>?> getLibraryDataStream(SubscriptionConfig subscriptionConfig) async {
+    Stream Function() streamReference;
+    switch (subscriptionConfig.dataType) {
       case ArtistsList:
-        return loadedDataAllArtists as BehaviorSubject<LoadedData<T>>;
+        Set<Tag> filterTags = _getSetOfFilterEntities<Tag>(subscriptionConfig.filter.entityFilters);
+        streamReference =
+            () => this.getArtistsDataList(filterTags: filterTags, searchItem: subscriptionConfig.filter.searchItem);
+        break;
       case TagsList:
-        return loadedDataAllTags as BehaviorSubject<LoadedData<T>>;
+        if (subscriptionConfig.filter.entityFilters != null) {
+          throw InternalException('Cannot apply entity filters to TagsList subscription');
+        }
+        streamReference = () => this.getTagsDataList(searchItem: subscriptionConfig.filter.searchItem);
+        break;
+      case Artist:
+        if (subscriptionConfig.filter.id == null) {
+          throw InternalException('No artist Id supplied for Artist subscription');
+        } else if (subscriptionConfig.filter.entityFilters != null) {
+          throw InternalException('Cannot apply entity filters to Artist subscription');
+        }
+        streamReference = () => this.getArtistDataById(subscriptionConfig.filter.id!);
+        break;
+      case Tag:
+        if (subscriptionConfig.filter.id == null) {
+          throw InternalException('No tag Id supplied for Tag subscription');
+        } else if (subscriptionConfig.filter.entityFilters != null) {
+          throw InternalException('Cannot apply entity filters to Tag subscription');
+        }
+        streamReference = () => this.getTagDataById(subscriptionConfig.filter.id!);
+        break;
+      default:
+        throw InternalException('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
     }
-    return null;
+    return await setupStreamSubscription(subscriptionConfig, streamReference);
   }
-
-  LoadedData<ArtistsList> get allArtists => loadedDataAllArtists.value;
-  LoadedData<TagsList> get allTags => loadedDataAllTags.value;
-
-  late StreamSubscription _artistsStreamSubscription;
-  late StreamSubscription _tagsStreamSubscription;
 
   Repository() : db = MoodtagDB() {
     helper = RepositoryHelper(db);
-    setupStreamSubscriptions();
+  }
+
+  Set<T> _getSetOfFilterEntities<T extends DataClass>(Set<DataClass>? entityFilters) {
+    if (entityFilters != null && entityFilters.isNotEmpty && entityFilters is Set<T>) {
+      return entityFilters;
+    }
+    return {};
   }
 
   void close() {
-    _artistsStreamSubscription.cancel();
-    _tagsStreamSubscription.cancel();
+    subscriptions.values.forEach((streamSubscription) => streamSubscription.cancel());
     db.close();
   }
 
-  void setupStreamSubscriptions() {
-    loadedDataAllArtists.add(LoadedData.loading());
-    _artistsStreamSubscription = getArtistsDataList()
-        .handleError((errorMessage) => loadedDataAllArtists.add(LoadedData.error(message: errorMessage)))
-        .listen((artistsListFromStream) => loadedDataAllArtists.add(LoadedData.success(artistsListFromStream)));
+  Future<BehaviorSubject<LoadedData>> setupStreamSubscription(
+      SubscriptionConfig subscriptionConfig, Stream Function() streamReference) async {
+    final behaviorSubject = BehaviorSubject<LoadedData>();
+    behaviorSubject.add(LoadedData.loading());
 
-    loadedDataAllTags.add(LoadedData.loading());
-    _tagsStreamSubscription = getTagsDataList()
-        .handleError((errorMessage) => loadedDataAllTags.add(LoadedData.error(message: errorMessage)))
-        .listen((tagsListFromStream) => loadedDataAllTags.add(LoadedData.success(tagsListFromStream)));
+    final streamSubscription = await streamReference()
+        .handleError((errorMessage) => behaviorSubject.add(LoadedData.error(message: errorMessage)))
+        .listen((dataFromStream) => behaviorSubject.add(LoadedData.success(dataFromStream)));
+    subscriptions.putIfAbsent(subscriptionConfig, () => streamSubscription);
+
+    return behaviorSubject;
+  }
+
+  Future<void> cancelStreamSubscription(SubscriptionConfig subscriptionConfig) async {
+    return await subscriptions[subscriptionConfig]?.cancel();
   }
 
   //

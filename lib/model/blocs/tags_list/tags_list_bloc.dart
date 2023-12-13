@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
@@ -8,62 +6,53 @@ import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/model/repository/library_query_filter.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/model/repository/subscription_config.dart';
 
 import '../../events/tag_events.dart';
 import '../error_stream_handling.dart';
 import 'tags_list_state.dart';
 
 class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlocMixin, ErrorStreamHandling {
+  static const filteredTagsSubscriptionName = 'filtered_tags_list';
+
   final Repository _repository;
-  late StreamSubscription _filteredTagsListStreamSubscription;
 
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
     useLibrary(_repository);
-    on<StartedLoading<TagsList>>(_handleStartedLoadingTagsList);
-    on<DataUpdated<TagsList>>(_handleTagsListUpdated);
+
+    add(RequestSubscription(TagsList));
+    add(RequestSubscription(TagsList,
+        name: filteredTagsSubscriptionName, filter: LibraryQueryFilter(searchItem: state.searchItem)));
+
     on<CreateTags>(_handleCreateTagsEvent);
     on<DeleteTag>(_handleDeleteTagEvent);
     on<ToggleSearchBar>(_handleToggleSearchBarEvent);
     on<ChangeSearchItem>(_handleChangeSearchItemEvent);
     on<ClearSearchItem>(_handleClearSearchItemEvent);
 
-    add(RequestSubscription<TagsList>());
-
-    _requestTagsFromRepository();
-    add(StartedLoading<TagsList>());
-
     setupErrorHandler(mainContext);
   }
 
   @override
-  Future<void> close() async {
-    _filteredTagsListStreamSubscription.cancel();
-    super.close();
-  }
-
-  void _requestTagsFromRepository({String? searchItem = null}) {
-    _filteredTagsListStreamSubscription = _repository
-        .getTagsDataList(searchItem: searchItem)
-        .handleError((error) => add(DataUpdated<TagsList>(error: error)))
-        .listen((tagsListFromStream) => add(DataUpdated<TagsList>(data: tagsListFromStream)));
-  }
-
-  void _handleStartedLoadingTagsList(StartedLoading<TagsList> event, Emitter<TagsListState> emit) {
-    if (state.loadedDataFilteredTags.loadingStatus == LoadingStatus.initial) {
-      emit(state.copyWith(loadedDataFilteredTags: const LoadedData.loading()));
+  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagsListState> emit) {
+    super.onDataReceived(subscriptionConfig, loadedData, emit);
+    if (subscriptionConfig.name == filteredTagsSubscriptionName) {
+      emit(
+          state.copyWith(loadedDataFilteredTags: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
     }
   }
 
-  void _handleTagsListUpdated(DataUpdated<TagsList> event, Emitter<TagsListState> emit) {
-    if (event.data != null) {
-      emit(state.copyWith(loadedDataFilteredTags: LoadedData.success(event.data)));
-    } else {
-      emit(state.copyWith(loadedDataFilteredTags: const LoadedData.error(message: 'List of tags could not be loaded')));
+  @override
+  void onStreamSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<TagsListState> emit) {
+    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+    if (subscriptionConfig.name == filteredTagsSubscriptionName) {
+      emit(state.copyWith(loadedDataFilteredTags: LoadedData.error()));
     }
   }
 
@@ -83,7 +72,8 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
 
   void _handleToggleSearchBarEvent(ToggleSearchBar event, Emitter<TagsListState> emit) {
     final newSearchBarVisibility = !state.displaySearchBar;
-    _reloadDataAfterFilterChange(searchItem: newSearchBarVisibility ? state.searchItem : null);
+    _reloadDataAfterFilterChange(
+        searchItem: newSearchBarVisibility ? state.searchItem : null, displaySearchBar: newSearchBarVisibility);
     emit(state.copyWith(displaySearchBar: newSearchBarVisibility));
   }
 
@@ -101,8 +91,11 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
     }
   }
 
-  void _reloadDataAfterFilterChange({String? searchItem}) async {
-    await _filteredTagsListStreamSubscription.cancel();
-    _requestTagsFromRepository(searchItem: searchItem);
+  void _reloadDataAfterFilterChange({bool? displaySearchBar, String? searchItem}) async {
+    final applySearchItem = displaySearchBar != null ? displaySearchBar : state.displaySearchBar;
+    final newSearchItem = searchItem != null ? searchItem : state.searchItem;
+    final newFilter = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : null);
+
+    add(UpdateSubscriptionFilter(TagsList, name: filteredTagsSubscriptionName, filter: newFilter));
   }
 }

@@ -1,14 +1,35 @@
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/model/repository/library_query_filter.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
+import 'package:moodtag/model/repository/subscription_config.dart';
 
 abstract class DataLoadingEvent extends LibraryEvent {
   const DataLoadingEvent();
 }
 
-class RequestSubscription<T> extends DataLoadingEvent {
+class RequestSubscription extends DataLoadingEvent {
+  final SubscriptionConfig subscriptionConfig;
+
+  RequestSubscription(Type dataType, {String? name, LibraryQueryFilter filter = const LibraryQueryFilter.none()})
+      : this.subscriptionConfig = SubscriptionConfig(dataType, name: name, filter: filter);
+
+  const RequestSubscription.withConfig(this.subscriptionConfig);
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [subscriptionConfig];
+}
+
+class UpdateSubscriptionFilter extends DataLoadingEvent {
+  final SubscriptionConfig subscriptionConfig;
+
+  UpdateSubscriptionFilter(Type dataType, {String? name, LibraryQueryFilter filter = const LibraryQueryFilter.none()})
+      : this.subscriptionConfig = SubscriptionConfig(dataType, name: name, filter: filter);
+
+  const UpdateSubscriptionFilter.withConfig(this.subscriptionConfig);
+
+  @override
+  List<Object?> get props => [subscriptionConfig];
 }
 
 class StartedLoading<T> extends DataLoadingEvent {

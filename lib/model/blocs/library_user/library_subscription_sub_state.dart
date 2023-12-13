@@ -1,35 +1,20 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/exceptions/internal/internal_exception.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
+import 'package:moodtag/model/repository/subscription_config.dart';
 
-/// Property of Bloc states for blocs that are subscribed to the library
+/// Property of Bloc states for blocs that are subscribed to the library;
+/// holds the subscriptions to library entity streams
 class LibrarySubscriptionSubState extends Equatable {
-  final LoadedData<ArtistsList> loadedDataAllArtists;
-  final LoadedData<TagsList> loadedDataAllTags;
+  final Map<SubscriptionConfig, LoadedData> subscriptions;
 
-  const LibrarySubscriptionSubState(
-      {this.loadedDataAllArtists = const LoadedData.initial(), this.loadedDataAllTags = const LoadedData.initial()});
+  const LibrarySubscriptionSubState({this.subscriptions = const {}});
 
   @override
-  List<Object?> get props => [loadedDataAllArtists, loadedDataAllTags];
+  List<Object?> get props => [subscriptions];
 
-  LibrarySubscriptionSubState copyWith({
-    LoadedData<ArtistsList>? loadedDataAllArtists,
-    LoadedData<TagsList>? loadedDataAllTags,
-  }) {
-    return LibrarySubscriptionSubState(
-        loadedDataAllArtists: loadedDataAllArtists ?? this.loadedDataAllArtists,
-        loadedDataAllTags: loadedDataAllTags ?? this.loadedDataAllTags);
-  }
-
-  LibrarySubscriptionSubState update<T extends List<DataClassWithEntityName>>(LoadedData<T> loadedData) {
-    switch (T) {
-      case ArtistsList:
-        return this.copyWith(loadedDataAllArtists: loadedData as LoadedData<ArtistsList>);
-      case TagsList:
-        return this.copyWith(loadedDataAllTags: loadedData as LoadedData<TagsList>);
-    }
-    throw InternalException('The generic parameter to determine the type of the dataset to be updated is unknown');
+  LibrarySubscriptionSubState update(SubscriptionConfig subscriptionConfig, LoadedData loadedData) {
+    final newSubscriptions = Map<SubscriptionConfig, LoadedData>.from(subscriptions);
+    newSubscriptions[subscriptionConfig] = loadedData;
+    return LibrarySubscriptionSubState(subscriptions: newSubscriptions);
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
@@ -10,23 +8,28 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/model/repository/library_query_filter.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/model/repository/subscription_config.dart';
 
 import '../../events/artist_events.dart';
 import '../error_stream_handling.dart';
 import 'artists_list_state.dart';
 
 class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryUserBlocMixin, ErrorStreamHandling {
+  static const filteredArtistsSubscriptionName = 'filtered_artists_list';
+
   late final Repository _repository;
-  late StreamSubscription _filteredArtistsListStreamSubscription;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
     useLibrary(_repository);
-    on<StartedLoading<ArtistsList>>(_handleStartedLoadingArtistsList);
-    on<DataUpdated<ArtistsList>>(_handleArtistsListUpdated);
+    add(RequestSubscription(ArtistsList,
+        name: filteredArtistsSubscriptionName,
+        filter: LibraryQueryFilter(searchItem: state.searchItem, entityFilters: state.filterTags)));
+    add(RequestSubscription(TagsList));
+
     on<CreateArtists>(_handleCreateArtistsEvent);
     on<DeleteArtist>(_handleDeleteArtistEvent);
     on<ToggleSearchBar>(_handleToggleSearchBarEvent);
@@ -38,39 +41,24 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
     on<ChangeArtistsListFilters>(_handleChangeArtistsListFilters);
     on<RemoveArtistsListFilters>(_handleRemoveArtistsListFiltersEvent);
 
-    add(RequestSubscription<TagsList>());
-
-    _requestArtistsFromRepository();
-    add(StartedLoading<ArtistsList>());
-
     setupErrorHandler(mainContext);
   }
 
   @override
-  Future<void> close() async {
-    _filteredArtistsListStreamSubscription.cancel();
-    super.close();
-  }
-
-  void _requestArtistsFromRepository({Set<Tag>? filterTags, String? searchItem = null}) {
-    _filteredArtistsListStreamSubscription = _repository
-        .getArtistsDataList(filterTags: filterTags ?? state.filterTags, searchItem: searchItem)
-        .handleError((error) => add(DataUpdated<ArtistsList>(error: error)))
-        .listen((artistsListFromStream) => add(DataUpdated<ArtistsList>(data: artistsListFromStream)));
-  }
-
-  void _handleStartedLoadingArtistsList(StartedLoading<ArtistsList> event, Emitter<ArtistsListState> emit) {
-    if (state.loadedDataFilteredArtists.loadingStatus == LoadingStatus.initial) {
-      emit(state.copyWith(loadedDataFilteredArtists: const LoadedData.loading()));
+  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<ArtistsListState> emit) {
+    super.onDataReceived(subscriptionConfig, loadedData, emit);
+    if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
+      emit(state.copyWith(
+          loadedDataFilteredArtists: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
     }
   }
 
-  void _handleArtistsListUpdated(DataUpdated<ArtistsList> event, Emitter<ArtistsListState> emit) {
-    if (event.data != null) {
-      emit(state.copyWith(loadedDataFilteredArtists: LoadedData.success(event.data)));
-    } else {
-      emit(state.copyWith(
-          loadedDataFilteredArtists: const LoadedData.error(message: 'List of artists could not be loaded')));
+  @override
+  void onStreamSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<ArtistsListState> emit) {
+    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+    if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
+      emit(state.copyWith(loadedDataFilteredArtists: LoadedData.error()));
     }
   }
 
@@ -156,11 +144,12 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
   }
 
   void _reloadDataAfterFilterChange({Set<Tag>? filterTags, bool? displaySearchBar, String? searchItem}) async {
-    await _filteredArtistsListStreamSubscription.cancel();
     final applySearchItem = displaySearchBar != null ? displaySearchBar : state.displaySearchBar;
     final newSearchItem = searchItem != null ? searchItem : state.searchItem;
-    _requestArtistsFromRepository(
-        filterTags: filterTags != null ? filterTags : state.filterTags,
-        searchItem: !applySearchItem ? null : newSearchItem);
+    final newFilter = LibraryQueryFilter(
+        entityFilters: filterTags != null ? filterTags : state.filterTags,
+        searchItem: applySearchItem ? newSearchItem : null);
+
+    add(UpdateSubscriptionFilter(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilter));
   }
 }
