@@ -4,7 +4,6 @@ import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
@@ -26,7 +25,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
     useLibrary(_repository);
-    add(RequestSubscription(Tag, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(id: tagId)));
+    add(RequestSubscription(TagData, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(id: tagId)));
 
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);

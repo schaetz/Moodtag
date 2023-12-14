@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+import 'package:logging/logging.dart';
 import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/exceptions/internal/internal_exception.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
@@ -16,6 +17,8 @@ import 'loaded_data.dart';
 import 'subscription_config.dart';
 
 class Repository {
+  final log = Logger('Repository');
+
   final MoodtagDB db;
   late final RepositoryHelper helper;
 
@@ -31,27 +34,33 @@ class Repository {
         break;
       case TagsList:
         if (subscriptionConfig.filter.entityFilters != null) {
+          log.warning('Cannot apply entity filters to TagsList subscription');
           throw InternalException('Cannot apply entity filters to TagsList subscription');
         }
         streamReference = () => this.getTagsDataList(searchItem: subscriptionConfig.filter.searchItem);
         break;
-      case Artist:
+      case ArtistData:
         if (subscriptionConfig.filter.id == null) {
-          throw InternalException('No artist Id supplied for Artist subscription');
+          log.warning('No artist Id supplied for ArtistData subscription');
+          throw InternalException('No artist Id supplied for ArtistData subscription');
         } else if (subscriptionConfig.filter.entityFilters != null) {
-          throw InternalException('Cannot apply entity filters to Artist subscription');
+          log.warning('Cannot apply entity filters to ArtistData subscription');
+          throw InternalException('Cannot apply entity filters to ArtistData subscription');
         }
         streamReference = () => this.getArtistDataById(subscriptionConfig.filter.id!);
         break;
-      case Tag:
+      case TagData:
         if (subscriptionConfig.filter.id == null) {
+          log.warning('No tag Id supplied for TagData subscription');
           throw InternalException('No tag Id supplied for Tag subscription');
         } else if (subscriptionConfig.filter.entityFilters != null) {
+          log.warning('Cannot apply entity filters to TagData subscription');
           throw InternalException('Cannot apply entity filters to Tag subscription');
         }
         streamReference = () => this.getTagDataById(subscriptionConfig.filter.id!);
         break;
       default:
+        log.warning('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
         throw InternalException('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
     }
     return await setupStreamSubscription(subscriptionConfig, streamReference);
@@ -75,12 +84,18 @@ class Repository {
 
   Future<BehaviorSubject<LoadedData>> setupStreamSubscription(
       SubscriptionConfig subscriptionConfig, Stream Function() streamReference) async {
+    log.fine('Setup $subscriptionConfig');
+
     final behaviorSubject = BehaviorSubject<LoadedData>();
     behaviorSubject.add(LoadedData.loading());
 
-    final streamSubscription = await streamReference()
-        .handleError((errorMessage) => behaviorSubject.add(LoadedData.error(message: errorMessage)))
-        .listen((dataFromStream) => behaviorSubject.add(LoadedData.success(dataFromStream)));
+    final streamSubscription = await streamReference().handleError((errorMessage) {
+      log.warning('Update BehaviorSubject with error from stream for $subscriptionConfig: ', errorMessage);
+      return behaviorSubject.add(LoadedData.error(message: errorMessage));
+    }).listen((dataFromStream) {
+      log.finer('Update BehaviorSubject for $subscriptionConfig');
+      return behaviorSubject.add(LoadedData.success(dataFromStream));
+    });
     subscriptions.putIfAbsent(subscriptionConfig, () => streamSubscription);
 
     return behaviorSubject;

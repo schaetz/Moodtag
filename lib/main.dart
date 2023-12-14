@@ -16,6 +16,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logging/logging.dart';
 import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -29,7 +30,12 @@ void main() {
 class MoodtagApp extends StatefulWidget {
   static const appTitle = 'Moodtag';
 
-  MoodtagApp({Key? key}) : super(key: key);
+  MoodtagApp({Key? key}) : super(key: key) {
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((record) {
+      print('${record.level.name}: ${record.time}: ${record.message}');
+    });
+  }
 
   @override
   _AppState createState() => _AppState();

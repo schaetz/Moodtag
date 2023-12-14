@@ -11,7 +11,6 @@ import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
@@ -36,7 +35,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
   ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId, this._accessTokenProvider)
       : super(ArtistDetailsState(artistId: artistId)) {
     useLibrary(_repository);
-    add(RequestSubscription(Artist, name: artistByIdSubscriptionName, filter: LibraryQueryFilter(id: artistId)));
+    add(RequestSubscription(ArtistData, name: artistByIdSubscriptionName, filter: LibraryQueryFilter(id: artistId)));
     add(RequestSubscription(TagsList));
 
     on<ToggleTagEditMode>(_handleToggleTagEditModeEvent);

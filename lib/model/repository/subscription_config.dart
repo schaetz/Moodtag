@@ -30,4 +30,15 @@ class SubscriptionConfig extends Equatable {
   int get hashCode => name != null
       ? runtimeType.hashCode ^ mapPropsToHashCode([name])
       : runtimeType.hashCode ^ mapPropsToHashCode(props);
+
+  @override
+  String toString() {
+    if (name != null) {
+      return '$name subscription';
+    } else if (filter.includesAll) {
+      return '$dataType [ALL] subscription';
+    } else {
+      return '$dataType [filtered] subscription';
+    }
+  }
 }

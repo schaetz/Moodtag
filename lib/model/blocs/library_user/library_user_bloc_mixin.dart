@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logging/logging.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/data_loading_events.dart';
 import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
@@ -11,6 +13,8 @@ import 'library_subscriber_state_mixin.dart';
 mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<LibraryEvent, S> {
   Repository? _repository;
 
+  final log = Logger('LibraryUserBlocMixin');
+
   /// Needs to be called in the constructor of the bloc to set up
   /// the event handlers for RequestSubscription
   void useLibrary(Repository repository) {
@@ -22,7 +26,20 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   void _handleLibrarySubscriptionRequested(RequestSubscription event, Emitter<S> emit) async {
     emit(state.updateLibrarySubscription(event.subscriptionConfig, LoadedData.loading()) as S);
     await _repository?.cancelStreamSubscription(event.subscriptionConfig);
-    _listenToStream(event.subscriptionConfig, emit);
+    switch (event.subscriptionConfig.dataType) {
+      case ArtistsList:
+        _listenToStream(event.subscriptionConfig, emit);
+        break;
+      case TagsList:
+        _listenToStream(event.subscriptionConfig, emit);
+        break;
+      case ArtistData:
+        _listenToStream(event.subscriptionConfig, emit);
+        break;
+      case TagData:
+        _listenToStream(event.subscriptionConfig, emit);
+        break;
+    }
   }
 
   // TODO Remove code duplication
@@ -33,12 +50,16 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   }
 
   void _listenToStream(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
+    log.fine('Start listening to stream for $subscriptionConfig');
+
     final behaviorSubject = await _repository?.getLibraryDataStream(subscriptionConfig) ?? null;
     if (behaviorSubject != null) {
       await emit.forEach<LoadedData>(behaviorSubject, onData: (loadedData) {
+        log.finer('Bloc received library data for $subscriptionConfig', loadedData);
         onDataReceived(subscriptionConfig, loadedData, emit);
         return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
       }, onError: (obj, stackTrace) {
+        log.warning('Received error for $subscriptionConfig', obj, stackTrace);
         onStreamSubscriptionError(subscriptionConfig, obj, stackTrace, emit);
         return state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
       });
