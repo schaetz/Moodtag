@@ -26,25 +26,19 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
     await _repository?.cancelStreamSubscription(event.subscriptionConfig);
     switch (event.subscriptionConfig.dataType) {
       case ArtistsList:
-        await _listenToStream<ArtistsList>(event.subscriptionConfig, emit);
-        break;
       case TagsList:
-        await _listenToStream<TagsList>(event.subscriptionConfig, emit);
-        break;
       case ArtistData:
-        await _listenToStream<ArtistData>(event.subscriptionConfig, emit);
-        break;
       case TagData:
-        await _listenToStream<TagData>(event.subscriptionConfig, emit);
+        await _listenToStream(event.subscriptionConfig, emit);
         break;
     }
     emit(state.updateLibrarySubscription(event.subscriptionConfig, LoadedData.loading()) as S);
   }
 
-  Future<void> _listenToStream<T>(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
+  Future<void> _listenToStream(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
     log.fine('Start listening to stream for $subscriptionConfig');
 
-    final behaviorSubject = await _repository?.getLibraryDataStream<T>(subscriptionConfig) ?? null;
+    final behaviorSubject = await _repository?.getLibraryDataStream(subscriptionConfig) ?? null;
     if (behaviorSubject == null) {
       log.warning('Behavior subject for $subscriptionConfig could not be obtained');
     } else {
