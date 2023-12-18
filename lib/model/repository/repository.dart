@@ -71,8 +71,12 @@ class Repository {
   }
 
   Set<T> _getSetOfFilterEntities<T extends DataClass>(Set<DataClass>? entityFilters) {
-    if (entityFilters != null && entityFilters.isNotEmpty && entityFilters is Set<T>) {
-      return entityFilters;
+    if (entityFilters != null && entityFilters.isNotEmpty) {
+      try {
+        return Set<T>.from(entityFilters);
+      } catch (e) {
+        throw InternalException('Invalid type for set of filter entities: $entityFilters');
+      }
     }
     return {};
   }
