@@ -25,8 +25,8 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
   TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
     useLibrary(_repository);
 
-    add(RequestSubscription(TagsList));
-    add(RequestSubscription(TagsList,
+    add(RequestOrUpdateSubscription(TagsList));
+    add(RequestOrUpdateSubscription(TagsList,
         name: filteredTagsSubscriptionName, filter: LibraryQueryFilter(searchItem: state.searchItem)));
 
     on<CreateTags>(_handleCreateTagsEvent);
@@ -96,6 +96,6 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
     final newSearchItem = searchItem != null ? searchItem : state.searchItem;
     final newFilter = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : null);
 
-    add(UpdateSubscriptionFilter(TagsList, name: filteredTagsSubscriptionName, filter: newFilter));
+    add(RequestOrUpdateSubscription(TagsList, name: filteredTagsSubscriptionName, filter: newFilter));
   }
 }

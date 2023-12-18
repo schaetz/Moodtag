@@ -25,10 +25,10 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
 
   ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
     useLibrary(_repository);
-    add(RequestSubscription(ArtistsList,
+    add(RequestOrUpdateSubscription(ArtistsList,
         name: filteredArtistsSubscriptionName,
         filter: LibraryQueryFilter(searchItem: state.searchItem, entityFilters: state.filterTags)));
-    add(RequestSubscription(TagsList));
+    add(RequestOrUpdateSubscription(TagsList));
 
     on<CreateArtists>(_handleCreateArtistsEvent);
     on<DeleteArtist>(_handleDeleteArtistEvent);
@@ -150,6 +150,6 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
         entityFilters: filterTags != null ? filterTags : state.filterTags,
         searchItem: applySearchItem ? newSearchItem : null);
 
-    add(UpdateSubscriptionFilter(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilter));
+    add(RequestOrUpdateSubscription(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilter));
   }
 }

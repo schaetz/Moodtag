@@ -24,7 +24,7 @@ class Repository {
 
   final Map<SubscriptionConfig, StreamSubscription> subscriptions = {};
 
-  Future<BehaviorSubject<LoadedData>?> getLibraryDataStream(SubscriptionConfig subscriptionConfig) async {
+  Future<BehaviorSubject<LoadedData<T>>?> getLibraryDataStream<T>(SubscriptionConfig subscriptionConfig) async {
     Stream Function() streamReference;
     switch (subscriptionConfig.dataType) {
       case ArtistsList:
@@ -63,7 +63,7 @@ class Repository {
         log.warning('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
         throw InternalException('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
     }
-    return await setupStreamSubscription(subscriptionConfig, streamReference);
+    return await setupStreamSubscription<T>(subscriptionConfig, streamReference);
   }
 
   Repository() : db = MoodtagDB() {
@@ -82,19 +82,19 @@ class Repository {
     db.close();
   }
 
-  Future<BehaviorSubject<LoadedData>> setupStreamSubscription(
+  Future<BehaviorSubject<LoadedData<T>>> setupStreamSubscription<T>(
       SubscriptionConfig subscriptionConfig, Stream Function() streamReference) async {
     log.fine('Setup $subscriptionConfig');
 
-    final behaviorSubject = BehaviorSubject<LoadedData>();
+    final behaviorSubject = BehaviorSubject<LoadedData<T>>();
     behaviorSubject.add(LoadedData.loading());
 
     final streamSubscription = await streamReference().handleError((errorMessage) {
       log.warning('Update BehaviorSubject with error from stream for $subscriptionConfig: ', errorMessage);
-      return behaviorSubject.add(LoadedData.error(message: errorMessage));
+      behaviorSubject.add(LoadedData.error(message: errorMessage));
     }).listen((dataFromStream) {
       log.finer('Update BehaviorSubject for $subscriptionConfig');
-      return behaviorSubject.add(LoadedData.success(dataFromStream));
+      behaviorSubject.add(LoadedData.success(dataFromStream));
     });
     subscriptions.putIfAbsent(subscriptionConfig, () => streamSubscription);
 

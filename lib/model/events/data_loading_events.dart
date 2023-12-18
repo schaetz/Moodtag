@@ -8,25 +8,14 @@ abstract class DataLoadingEvent extends LibraryEvent {
   const DataLoadingEvent();
 }
 
-class RequestSubscription extends DataLoadingEvent {
+class RequestOrUpdateSubscription extends DataLoadingEvent {
   final SubscriptionConfig subscriptionConfig;
 
-  RequestSubscription(Type dataType, {String? name, LibraryQueryFilter filter = const LibraryQueryFilter.none()})
+  RequestOrUpdateSubscription(Type dataType,
+      {String? name, LibraryQueryFilter filter = const LibraryQueryFilter.none()})
       : this.subscriptionConfig = SubscriptionConfig(dataType, name: name, filter: filter);
 
-  const RequestSubscription.withConfig(this.subscriptionConfig);
-
-  @override
-  List<Object?> get props => [subscriptionConfig];
-}
-
-class UpdateSubscriptionFilter extends DataLoadingEvent {
-  final SubscriptionConfig subscriptionConfig;
-
-  UpdateSubscriptionFilter(Type dataType, {String? name, LibraryQueryFilter filter = const LibraryQueryFilter.none()})
-      : this.subscriptionConfig = SubscriptionConfig(dataType, name: name, filter: filter);
-
-  const UpdateSubscriptionFilter.withConfig(this.subscriptionConfig);
+  const RequestOrUpdateSubscription.withConfig(this.subscriptionConfig);
 
   @override
   List<Object?> get props => [subscriptionConfig];

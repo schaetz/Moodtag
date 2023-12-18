@@ -19,42 +19,36 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   /// the event handlers for RequestSubscription
   void useLibrary(Repository repository) {
     this._repository = repository;
-    on<RequestSubscription>(_handleLibrarySubscriptionRequested);
-    on<UpdateSubscriptionFilter>(_handleUpdateSubscriptionFilter);
+    on<RequestOrUpdateSubscription>(_handleLibrarySubscriptionRequestOrUpdate);
   }
 
-  void _handleLibrarySubscriptionRequested(RequestSubscription event, Emitter<S> emit) async {
-    emit(state.updateLibrarySubscription(event.subscriptionConfig, LoadedData.loading()) as S);
+  void _handleLibrarySubscriptionRequestOrUpdate(RequestOrUpdateSubscription event, Emitter<S> emit) async {
     await _repository?.cancelStreamSubscription(event.subscriptionConfig);
     switch (event.subscriptionConfig.dataType) {
       case ArtistsList:
-        _listenToStream(event.subscriptionConfig, emit);
+        await _listenToStream<ArtistsList>(event.subscriptionConfig, emit);
         break;
       case TagsList:
-        _listenToStream(event.subscriptionConfig, emit);
+        await _listenToStream<TagsList>(event.subscriptionConfig, emit);
         break;
       case ArtistData:
-        _listenToStream(event.subscriptionConfig, emit);
+        await _listenToStream<ArtistData>(event.subscriptionConfig, emit);
         break;
       case TagData:
-        _listenToStream(event.subscriptionConfig, emit);
+        await _listenToStream<TagData>(event.subscriptionConfig, emit);
         break;
     }
-  }
-
-  // TODO Remove code duplication
-  void _handleUpdateSubscriptionFilter(UpdateSubscriptionFilter event, Emitter<S> emit) async {
     emit(state.updateLibrarySubscription(event.subscriptionConfig, LoadedData.loading()) as S);
-    await _repository?.cancelStreamSubscription(event.subscriptionConfig);
-    _listenToStream(event.subscriptionConfig, emit);
   }
 
-  void _listenToStream(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
+  Future<void> _listenToStream<T>(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
     log.fine('Start listening to stream for $subscriptionConfig');
 
-    final behaviorSubject = await _repository?.getLibraryDataStream(subscriptionConfig) ?? null;
-    if (behaviorSubject != null) {
-      await emit.forEach<LoadedData>(behaviorSubject, onData: (loadedData) {
+    final behaviorSubject = await _repository?.getLibraryDataStream<T>(subscriptionConfig) ?? null;
+    if (behaviorSubject == null) {
+      log.warning('Behavior subject for $subscriptionConfig could not be obtained');
+    } else {
+      await emit.forEach(behaviorSubject, onData: (LoadedData loadedData) {
         log.finer('Bloc received library data for $subscriptionConfig', loadedData);
         onDataReceived(subscriptionConfig, loadedData, emit);
         return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
@@ -67,11 +61,18 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   }
 
   /// Can be overridden to run additional logic when a new instance of the dataset is loaded
-  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<S> emit) => ();
+  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<S> emit) {
+    if (subscriptionConfig.name == null && subscriptionConfig.filter.includesAll) {
+      state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
+    }
+  }
 
   /// Can be overridden to run additional logic when a subscription error occurs
   /// (note: this is NOT fired when LoadingStatus is ERROR, e.g. because of database errors)
   void onStreamSubscriptionError(
-          SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<S> emit) =>
-      ();
+      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<S> emit) {
+    if (subscriptionConfig.name == null && subscriptionConfig.filter.includesAll) {
+      state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
+    }
+  }
 }

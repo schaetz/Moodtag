@@ -25,7 +25,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
     useLibrary(_repository);
-    add(RequestSubscription(TagData, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(id: tagId)));
+    add(RequestOrUpdateSubscription(TagData, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(id: tagId)));
 
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);
@@ -42,7 +42,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
       emit(state.copyWith(loadedTagData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
       if (loadedData.loadingStatus.isSuccess && state.artistsWithThisTagOnly.loadingStatus.isInitial) {
         final tagData = loadedData.data as TagData;
-        add(RequestSubscription(ArtistsList,
+        add(RequestOrUpdateSubscription(ArtistsList,
             name: artistsWithTagSubscriptionName, filter: LibraryQueryFilter(entityFilters: {tagData.tag})));
       }
     } else if (subscriptionConfig.name == artistsWithTagSubscriptionName) {
