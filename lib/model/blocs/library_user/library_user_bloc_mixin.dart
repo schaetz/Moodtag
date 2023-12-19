@@ -38,7 +38,7 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   Future<void> _listenToStream(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
     log.fine('Start listening to stream for $subscriptionConfig');
 
-    final behaviorSubject = await _repository?.getLibraryDataStream(subscriptionConfig) ?? null;
+    final behaviorSubject = await _repository?.getLibraryDataStream(_repository!, subscriptionConfig) ?? null;
     if (behaviorSubject == null) {
       log.warning('Behavior subject for $subscriptionConfig could not be obtained');
     } else {
