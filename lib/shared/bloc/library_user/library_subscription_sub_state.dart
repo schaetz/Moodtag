@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/repository/loaded_data.dart';
-import 'package:moodtag/model/repository/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 
 /// Property of Bloc states for blocs that are subscribed to the library;
 /// holds the subscriptions to library entity streams

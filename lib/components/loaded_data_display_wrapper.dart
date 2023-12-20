@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/repository/loaded_data.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 
 class LoadedDataDisplayWrapper<T> extends StatelessWidget {
   static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);

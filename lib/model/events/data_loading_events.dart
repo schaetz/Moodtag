@@ -1,8 +1,8 @@
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/events/library_events.dart';
-import 'package:moodtag/model/repository/library_query_filter.dart';
-import 'package:moodtag/model/repository/loaded_data.dart';
-import 'package:moodtag/model/repository/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 
 abstract class DataLoadingEvent extends LibraryEvent {
   const DataLoadingEvent();

@@ -9,7 +9,7 @@ import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.d
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/tag_events.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
 
 class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<TagsListBloc> {

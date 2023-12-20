@@ -5,7 +5,7 @@ import 'package:moodtag/dialogs/add_lastfm_account_dialog.dart';
 import 'package:moodtag/features/import/lastfm_account_management/lastfm_account_management_bloc.dart';
 import 'package:moodtag/features/import/lastfm_account_management/lastfm_account_management_state.dart';
 import 'package:moodtag/model/events/lastfm_events.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 
 class LastFmAccountManagementState extends Equatable {
   final LastFmAccount? lastFmAccount;

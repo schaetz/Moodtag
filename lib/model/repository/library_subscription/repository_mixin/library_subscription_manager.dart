@@ -8,8 +8,8 @@ import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'loaded_data.dart';
-import 'subscription_config.dart';
+import '../config/subscription_config.dart';
+import '../data_wrapper/loaded_data.dart';
 
 mixin LibrarySubscriptionManager {
   final log = Logger('LibrarySubscriptionManager');

@@ -11,7 +11,7 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
-import 'package:moodtag/model/repository/loading_status.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 
 class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
