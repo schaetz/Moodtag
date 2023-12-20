@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/structs/named_entity.dart';
+import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import 'row_builder_strategy.dart';
 import 'selection_list_config.dart';

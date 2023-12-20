@@ -1,5 +1,5 @@
-import 'package:moodtag/structs/imported_entities/import_entity.dart';
-import 'package:moodtag/structs/unique_named_entity_set.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/import_entity.dart';
+import 'package:moodtag/shared/models/structs/unique_named_entity_set.dart';
 
 import 'imported_artist.dart';
 

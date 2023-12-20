@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/components/simple_text_input_dialog_base.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/utils/i10n.dart';
+import 'package:moodtag/shared/utils/i10n.dart';
 
 import 'abstract_dialog.dart';
 

@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:moodtag/exceptions/internal/internal_exception.dart';
-import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
-import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
-import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
-import 'package:moodtag/utils/helpers.dart';
-import 'package:moodtag/utils/random_helper.dart';
+import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
+import 'package:moodtag/shared/utils/helpers.dart';
+import 'package:moodtag/shared/utils/random_helper.dart';
 
 // TODO Store these constants in a config file
 const spotifyAccountsBaseUrl = 'accounts.spotify.com';

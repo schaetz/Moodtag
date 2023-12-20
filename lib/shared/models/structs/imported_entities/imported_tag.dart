@@ -1,4 +1,4 @@
-import 'package:moodtag/structs/imported_entities/import_entity.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/import_entity.dart';
 
 class ImportedTag extends ImportEntity {
   final String _name;

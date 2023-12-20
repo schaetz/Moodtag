@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
-import 'package:moodtag/exceptions/db_request_response.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/library_subscription_manager.dart';
 import 'package:moodtag/model/repository/repository_helper.dart';
-import 'package:moodtag/structs/imported_entities/imported_artist.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
-import 'package:moodtag/utils/helpers.dart';
+import 'package:moodtag/shared/exceptions/db_request_response.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
+import 'package:moodtag/shared/utils/helpers.dart';
 
 import '../database/moodtag_db.dart';
 

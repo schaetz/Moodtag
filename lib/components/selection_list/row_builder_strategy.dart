@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/structs/named_entity.dart';
+import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 class RowBuilderStrategy<E extends NamedEntity> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);

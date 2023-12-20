@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_state.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
-import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
-import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
 
 import '../flow/lastfm_import_flow_step.dart';
 

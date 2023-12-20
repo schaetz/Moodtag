@@ -1,5 +1,5 @@
-import 'package:moodtag/structs/imported_entities/import_entity.dart';
-import 'package:moodtag/utils/helpers.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/import_entity.dart';
+import 'package:moodtag/shared/utils/helpers.dart';
 
 class ImportedArtist extends ImportEntity {
   final String _name;

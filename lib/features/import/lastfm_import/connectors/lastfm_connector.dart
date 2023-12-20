@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
-import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
-import 'package:moodtag/utils/helpers.dart';
+import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
+import 'package:moodtag/shared/utils/helpers.dart';
 
 // TODO Store these constants in a config file
 const lastFmApiBaseUrl = 'ws.audioscrobbler.com';

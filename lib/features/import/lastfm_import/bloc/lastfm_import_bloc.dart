@@ -1,8 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
-import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.dart';
-import 'package:moodtag/exceptions/user_readable/user_info.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_bloc.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_state.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
@@ -13,8 +10,11 @@ import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/error_handling/error_stream_handling.dart';
-import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
-import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
+import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/user_info.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
 
 import '../connectors/lastfm_connector.dart';
 import '../connectors/lastfm_import_processor.dart';

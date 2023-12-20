@@ -9,9 +9,9 @@ import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_state
 import 'package:moodtag/features/import/spotify_import/flow/spotify_import_flow_step.dart';
 import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
-import 'package:moodtag/utils/i10n.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
+import 'package:moodtag/shared/utils/i10n.dart';
 import 'package:provider/provider.dart';
 
 import '../steps/spotify_import_config_screen.dart';

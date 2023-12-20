@@ -1,7 +1,7 @@
-import 'package:moodtag/exceptions/db_request_response.dart';
-import 'package:moodtag/exceptions/internal/invalid_argument_exception.dart';
-import 'package:moodtag/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/shared/exceptions/db_request_response.dart';
+import 'package:moodtag/shared/exceptions/internal/invalid_argument_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 
 class RepositoryHelper {
   final MoodtagDB _db;

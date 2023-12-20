@@ -1,5 +1,5 @@
 import 'package:moodtag/features/import/abstract_import_flow/flow/abstract_import_flow.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 
 import 'library_events.dart';
 

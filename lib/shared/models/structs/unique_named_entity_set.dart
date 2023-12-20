@@ -2,7 +2,7 @@
  * Defines a set of named entities with unique identifiers that can be passed
  * as an argument to a SelectionList
  */
-import 'package:moodtag/structs/named_entity.dart';
+import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 class UniqueNamedEntitySet<T extends NamedEntity> {
   late final Map<String, T> _entitiesByName;

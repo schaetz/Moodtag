@@ -1,4 +1,4 @@
-import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
 
 import 'import_events.dart';
 

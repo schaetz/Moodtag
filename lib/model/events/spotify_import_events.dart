@@ -1,6 +1,6 @@
 import 'package:moodtag/model/events/import_events.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
 
 abstract class SpotifyImportEvent extends ImportEvent {
   const SpotifyImportEvent();

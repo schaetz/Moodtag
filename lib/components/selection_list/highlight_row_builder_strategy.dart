@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/components/selection_list/row_builder_strategy.dart';
-import 'package:moodtag/structs/named_entity.dart';
+import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 class HighlightRowBuilderStrategy<E extends NamedEntity> extends RowBuilderStrategy<E> {
   static const normalEntityColor = Colors.black;

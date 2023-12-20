@@ -1,4 +1,4 @@
-import 'package:moodtag/exceptions/db_request_response.dart';
+import 'package:moodtag/shared/exceptions/db_request_response.dart';
 
 class DbRequestSuccessCounter {
   int _totalCount = 0;

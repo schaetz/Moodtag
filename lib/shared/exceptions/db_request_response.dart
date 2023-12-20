@@ -1,8 +1,8 @@
 import 'package:drift/native.dart';
-import 'package:moodtag/exceptions/user_readable/database_error.dart';
-import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
-import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
-import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
+import 'package:moodtag/shared/exceptions/user_readable/name_already_taken_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
 
 class DbRequestResponse<E> {
   late final E? changedEntity;

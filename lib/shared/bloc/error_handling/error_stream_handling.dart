@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
 
 mixin ErrorStreamHandling {
   StreamController<UserReadableException> _errorStreamController = StreamController<UserReadableException>();

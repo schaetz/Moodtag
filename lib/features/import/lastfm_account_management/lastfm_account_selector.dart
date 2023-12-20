@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:moodtag/exceptions/internal/internal_exception.dart';
+import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 
 class LastFmAccountSelector extends StatelessWidget {
   final DateFormat formatter = DateFormat('MM-dd-yyyy');

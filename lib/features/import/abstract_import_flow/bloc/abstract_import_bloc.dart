@@ -3,10 +3,10 @@ import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_impor
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/structs/imported_entities/imported_artist.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
-import 'package:moodtag/utils/db_request_success_counter.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_artist.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
+import 'package:moodtag/shared/utils/db_request_success_counter.dart';
 
 import 'import_sub_process.dart';
 

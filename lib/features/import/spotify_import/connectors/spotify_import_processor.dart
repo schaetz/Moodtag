@@ -1,8 +1,8 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/structs/imported_entities/imported_tag.dart';
-import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
-import 'package:moodtag/utils/db_request_success_counter.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
+import 'package:moodtag/shared/utils/db_request_success_counter.dart';
 
 class SpotifyImportProcessor {
   final Map<SpotifyArtist, Artist> createdArtistsByEntity = Map();
