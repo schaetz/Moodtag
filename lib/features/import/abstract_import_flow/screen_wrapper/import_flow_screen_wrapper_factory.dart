@@ -1,5 +1,5 @@
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
+import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 
 import 'import_flow_screen_wrapper.dart';
 

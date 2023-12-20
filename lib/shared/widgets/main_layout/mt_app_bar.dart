@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/app/main.dart';
 import 'package:moodtag/app/navigation/routes.dart';
-import 'package:moodtag/components/app_bar_context_data.dart';
-import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
+import 'package:moodtag/shared/dialogs/delete_dialog.dart';
+import 'package:moodtag/shared/widgets/main_layout/app_bar_context_data.dart';
 
 import 'colored_tab_bar.dart';
 

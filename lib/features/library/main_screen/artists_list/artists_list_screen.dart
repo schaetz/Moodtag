@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:moodtag/app/navigation/routes.dart';
-import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
-import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
-import 'package:moodtag/components/filter_selection_modal.dart';
-import 'package:moodtag/components/loaded_data_display_wrapper.dart';
-import 'package:moodtag/components/screen_extensions/searchable_list_screen_mixin.dart';
-import 'package:moodtag/components/search_bar_container.dart';
-import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
+import 'package:moodtag/shared/dialogs/delete_dialog.dart';
 import 'package:moodtag/shared/models/modal_and_overlay_types.dart';
+import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud.dart';
+import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_options.dart';
+import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
+import 'package:moodtag/shared/widgets/modals/filter_selection_modal.dart';
+import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
+import 'package:moodtag/shared/widgets/text_input/search_bar_container.dart';
 
 class ArtistsListScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;

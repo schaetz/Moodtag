@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
+import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_options.dart';
 
 import 'chip_cloud_delegate.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:moodtag/components/simple_text_input_dialog_base.dart';
+import 'package:moodtag/shared/widgets/text_input/simple_text_input_dialog_base.dart';
 
 import 'abstract_dialog.dart';
 

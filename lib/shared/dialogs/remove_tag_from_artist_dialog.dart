@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/shared/dialogs/delete_dialog.dart';
 
 class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
   static void openNew(BuildContext context, Tag tag, Artist artist, Function() removeTagHandler) {

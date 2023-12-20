@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/chips_row_info_label.dart';
-import 'package:moodtag/components/loaded_data_display_wrapper.dart';
-import 'package:moodtag/components/mt_main_scaffold.dart';
-import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/features/library/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/features/library/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
@@ -12,6 +8,10 @@ import 'package:moodtag/model/repository/library_subscription/data_wrapper/loadi
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
+import 'package:moodtag/shared/dialogs/add_entity_dialog.dart';
+import 'package:moodtag/shared/widgets/data_display/chips_row_info_label.dart';
+import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
+import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 
 class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);

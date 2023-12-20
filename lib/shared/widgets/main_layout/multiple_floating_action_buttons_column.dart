@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+/// Deprecated - No longer in use
 class MultipleFloatingActionButtonsColumn extends StatelessWidget {
   static const gapElement = SizedBox(
     height: 16,

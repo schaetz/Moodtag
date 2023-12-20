@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/components/mt_main_scaffold.dart';
-import 'package:moodtag/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
+import 'package:moodtag/shared/dialogs/add_entity_dialog.dart';
+import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 
 import 'artists_list/artists_list_screen.dart';
 import 'artists_list/artists_list_screen_bottom_app_bar.dart';

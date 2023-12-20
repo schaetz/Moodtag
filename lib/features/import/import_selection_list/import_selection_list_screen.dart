@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
-import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
-import 'package:moodtag/components/selection_list/highlight_row_builder_strategy.dart';
-import 'package:moodtag/components/selection_list/selection_list_config.dart';
-import 'package:moodtag/components/selection_list/selection_list_screen.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/import_entity.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
+import 'package:moodtag/shared/widgets/data_display/selection_list/highlight_row_builder_strategy.dart';
+import 'package:moodtag/shared/widgets/data_display/selection_list/selection_list_config.dart';
+import 'package:moodtag/shared/widgets/data_display/selection_list/selection_list_screen.dart';
+import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
+import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
 
 // Wrapper for the SelectionListScreen that allows handling imports of ImportEntity´s
 class ImportSelectionListScreen<E extends ImportEntity> extends StatelessWidget {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_connector.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
+import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
 
 // Webview that displays the Spotify authorization page in a WebviewScaffold;
 // after a successful login, the obtained authorization code and access token

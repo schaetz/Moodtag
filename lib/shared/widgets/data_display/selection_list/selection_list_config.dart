@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
-import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 import 'package:moodtag/shared/models/structs/unique_named_entity_set.dart';
+import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 
 class SelectionListConfig<E extends NamedEntity> extends Equatable {
   final UniqueNamedEntitySet<E> namedEntitySet;

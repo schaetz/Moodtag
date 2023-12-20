@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
-import 'package:moodtag/components/chip_cloud/chip_cloud_cursor.dart';
-import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
+import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_cursor.dart';
+import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_options.dart';
 
 //
 // FLowDelegate class taking care of painting the elements for the ChipCloud widget.

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper.dart';
+import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper.dart';
 
 class ImportFlowScreenWrapper extends ScaffoldBodyWrapper {
   static const captionStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
+import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_options.dart';
 
 //
 // Represents a state in the algorithm to determine which elements fit in a row

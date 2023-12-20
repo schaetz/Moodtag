@@ -2,7 +2,6 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/app/navigation/routes.dart';
-import 'package:moodtag/components/app_bar_context_data.dart';
 import 'package:moodtag/features/import/abstract_import_flow/flow/abstract_import_flow.dart';
 import 'package:moodtag/features/import/import_selection_list/import_selection_list_screen.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_bloc.dart';
@@ -12,6 +11,7 @@ import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow_st
 import 'package:moodtag/shared/bloc/events/lastfm_import_events.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/shared/utils/i10n.dart';
+import 'package:moodtag/shared/widgets/main_layout/app_bar_context_data.dart';
 import 'package:provider/provider.dart';
 
 import '../steps/lastfm_import_config_screen.dart';
