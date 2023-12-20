@@ -12,9 +12,9 @@ import 'package:moodtag/features/library/main_screen/artists_list/artists_list_b
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/models/modal_and_overlay_types.dart';
 
 class ArtistsListScreen extends StatefulWidget {

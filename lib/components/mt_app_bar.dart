@@ -5,9 +5,9 @@ import 'package:moodtag/dialogs/delete_dialog.dart';
 import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/main.dart';
-import 'package:moodtag/model/events/library_events.dart';
-import 'package:moodtag/model/events/spotify_events.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
+import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 
 import 'colored_tab_bar.dart';
 

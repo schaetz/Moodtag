@@ -1,5 +1,5 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
 
 abstract class LastFmEvent extends LibraryEvent {
   const LastFmEvent();

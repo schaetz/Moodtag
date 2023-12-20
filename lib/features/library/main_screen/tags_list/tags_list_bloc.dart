@@ -1,18 +1,18 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/events/data_loading_events.dart';
-import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
+import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/shared/bloc/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/shared/exceptions/user_readable/name_already_taken_exception.dart';
 
-import '../../../../model/events/tag_events.dart';
-import '../../../../shared/bloc/error_handling/error_stream_handling.dart';
+import '../../../../shared/bloc/events/tag_events.dart';
+import '../../../../shared/bloc/extensions/error_handling/error_stream_handling.dart';
 import 'tags_list_state.dart';
 
 class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlocMixin, ErrorStreamHandling {

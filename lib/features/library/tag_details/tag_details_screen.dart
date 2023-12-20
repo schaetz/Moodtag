@@ -8,9 +8,9 @@ import 'package:moodtag/features/library/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/features/library/tag_details/tag_details_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/shared/bloc/events/artist_events.dart';
+import 'package:moodtag/shared/bloc/events/tag_events.dart';
 
 class TagDetailsScreen extends StatelessWidget {
   static const tagNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);

@@ -1,8 +1,8 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/helpers/entity_processing_helper.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/events/artist_events.dart';
+import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/exceptions/db_request_response.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';

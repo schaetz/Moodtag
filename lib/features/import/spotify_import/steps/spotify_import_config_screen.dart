@@ -5,7 +5,7 @@ import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_state.dart';
-import 'package:moodtag/model/events/import_events.dart';
+import 'package:moodtag/shared/bloc/events/import_events.dart';
 
 import '../config/spotify_import_option.dart';
 

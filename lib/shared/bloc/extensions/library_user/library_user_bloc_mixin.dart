@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/events/data_loading_events.dart';
-import 'package:moodtag/model/events/library_events.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
 
 import 'library_subscriber_state_mixin.dart';
 

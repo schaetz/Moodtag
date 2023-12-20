@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
 
 /// Mixin to make a screen (i.e. the state of a StatefulWidget) observe the router
 /// and fire ActiveScreenChanged events on changes

@@ -5,7 +5,7 @@ import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_f
 import 'package:moodtag/features/import/abstract_import_flow/steps/abstract_import_confirmation_screen.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_state.dart';
-import 'package:moodtag/model/events/spotify_import_events.dart';
+import 'package:moodtag/shared/bloc/events/spotify_import_events.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 
 class SpotifyImportConfirmationScreen extends AbstractImportConfirmationScreen {

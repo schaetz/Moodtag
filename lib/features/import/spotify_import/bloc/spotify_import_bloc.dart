@@ -7,10 +7,10 @@ import 'package:moodtag/features/import/spotify_import/auth/spotify_access_token
 import 'package:moodtag/features/import/spotify_import/config/spotify_import_option.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_connector.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_import_processor.dart';
-import 'package:moodtag/model/events/import_events.dart';
-import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/shared/bloc/error_handling/error_stream_handling.dart';
+import 'package:moodtag/shared/bloc/events/import_events.dart';
+import 'package:moodtag/shared/bloc/events/spotify_import_events.dart';
+import 'package:moodtag/shared/bloc/extensions/error_handling/error_stream_handling.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';

@@ -7,8 +7,8 @@ import 'package:moodtag/features/import/import_selection_list/import_selection_l
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_state.dart';
 import 'package:moodtag/features/import/spotify_import/flow/spotify_import_flow_step.dart';
-import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/shared/bloc/events/spotify_import_events.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/shared/utils/i10n.dart';

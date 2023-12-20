@@ -6,10 +6,10 @@ import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_optio
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow_step.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/events/import_events.dart';
-import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/shared/bloc/error_handling/error_stream_handling.dart';
+import 'package:moodtag/shared/bloc/events/import_events.dart';
+import 'package:moodtag/shared/bloc/events/lastfm_import_events.dart';
+import 'package:moodtag/shared/bloc/extensions/error_handling/error_stream_handling.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_info.dart';

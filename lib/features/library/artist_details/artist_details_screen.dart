@@ -8,10 +8,10 @@ import 'package:moodtag/features/library/artist_details/artist_details_bloc.dart
 import 'package:moodtag/features/library/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/spotify_events.dart';
-import 'package:moodtag/model/events/tag_events.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
+import 'package:moodtag/shared/bloc/events/artist_events.dart';
+import 'package:moodtag/shared/bloc/events/spotify_events.dart';
+import 'package:moodtag/shared/bloc/events/tag_events.dart';
 
 class ArtistDetailsScreen extends StatelessWidget {
   static const artistNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_state.dart';
-import 'package:moodtag/model/events/artist_events.dart';
-import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/shared/bloc/events/artist_events.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
 
 class ArtistsListScreenBottomAppBar extends StatelessWidget {
   final searchBarController = TextEditingController();

@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_state.dart';
-import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/events/import_events.dart';
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';

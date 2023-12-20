@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.dart';
-import 'package:moodtag/model/events/library_events.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
 
 class TagsListScreenBottomAppBar extends StatelessWidget {
   @override

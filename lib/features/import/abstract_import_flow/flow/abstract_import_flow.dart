@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_bloc.dart';
-import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/shared/bloc/events/import_events.dart';
 
 import '../screen_wrapper/import_flow_screen_wrapper_factory.dart';
 

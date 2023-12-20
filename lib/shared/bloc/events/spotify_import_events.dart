@@ -1,4 +1,4 @@
-import 'package:moodtag/model/events/import_events.dart';
+import 'package:moodtag/shared/bloc/events/import_events.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
 

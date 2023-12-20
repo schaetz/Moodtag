@@ -8,8 +8,8 @@ import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_bloc.da
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_state.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow_step.dart';
-import 'package:moodtag/model/events/lastfm_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
+import 'package:moodtag/shared/bloc/events/lastfm_import_events.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/shared/utils/i10n.dart';
 import 'package:provider/provider.dart';
