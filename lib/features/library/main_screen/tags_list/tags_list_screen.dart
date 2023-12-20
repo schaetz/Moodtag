@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/components/loaded_data_display_wrapper.dart';
 import 'package:moodtag/components/screen_extensions/searchable_list_screen_mixin.dart';
 import 'package:moodtag/components/search_bar_container.dart';
@@ -9,7 +10,6 @@ import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.d
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
-import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 
 class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<TagsListBloc> {

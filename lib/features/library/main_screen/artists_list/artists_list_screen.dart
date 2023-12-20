@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/components/chip_cloud/chip_cloud_options.dart';
 import 'package:moodtag/components/filter_selection_modal.dart';
@@ -13,7 +14,6 @@ import 'package:moodtag/features/library/main_screen/artists_list/artists_list_s
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
-import 'package:moodtag/navigation/routes.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/models/modal_and_overlay_types.dart';
 
