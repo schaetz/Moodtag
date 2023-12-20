@@ -1,5 +1,5 @@
+import 'package:moodtag/features/import/import_flow/abstract_import_flow_state.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_flow_step.dart';
-import 'package:moodtag/screens/import_flow/abstract_import_flow_state.dart';
 
 class SpotifyImportFlowState extends AbstractImportFlowState {
   final SpotifyImportFlowStep step;

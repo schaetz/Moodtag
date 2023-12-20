@@ -6,6 +6,7 @@ import 'package:moodtag/exceptions/user_readable/external_service_query_exceptio
 import 'package:moodtag/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable/user_info.dart';
+import 'package:moodtag/features/import/spotify_import/spotify_connector.dart';
 import 'package:moodtag/model/blocs/abstract_import/abstract_import_bloc.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
@@ -14,7 +15,6 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_processor.dart
 import 'package:moodtag/model/events/import_events.dart';
 import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';

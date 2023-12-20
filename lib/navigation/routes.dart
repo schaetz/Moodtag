@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/features/import/lastfm_account_management/lastfm_account_management_screen.dart';
+import 'package:moodtag/features/import/lastfm_import/lastfm_import_flow.dart';
+import 'package:moodtag/features/import/spotify_import/spotify_import_flow.dart';
+import 'package:moodtag/features/import/spotify_import/spotify_login_webview.dart';
+import 'package:moodtag/features/library/artist_details/artist_details_screen.dart';
+import 'package:moodtag/features/library/main_screen/library_main_screen.dart';
+import 'package:moodtag/features/library/tag_details/tag_details_screen.dart';
 import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_account_management/lastfm_account_management_bloc.dart';
@@ -9,13 +16,6 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/screens/lastfm_account_management/lastfm_account_management_screen.dart';
-import 'package:moodtag/screens/lastfm_import/lastfm_import_flow.dart';
-import 'package:moodtag/screens/library/artist_details_screen.dart';
-import 'package:moodtag/screens/library/library_main_screen.dart';
-import 'package:moodtag/screens/library/tag_details_screen.dart';
-import 'package:moodtag/screens/spotify_import/spotify_import_flow.dart';
-import 'package:moodtag/screens/spotify_import/spotify_login_webview.dart';
 
 class Routes {
   static const libraryMainScreen = '/library';

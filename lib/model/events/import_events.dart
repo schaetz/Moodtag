@@ -1,4 +1,4 @@
-import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
+import 'package:moodtag/features/import/import_flow/abstract_import_flow.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 
 import 'library_events.dart';

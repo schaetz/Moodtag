@@ -7,7 +7,7 @@ import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/import_events.dart';
 
-import '../../model/blocs/spotify_import/spotify_import_option.dart';
+import '../../../model/blocs/spotify_import/spotify_import_option.dart';
 
 class SpotifyImportConfigScreen extends StatelessWidget {
   final ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory;

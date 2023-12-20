@@ -6,6 +6,7 @@ import 'package:moodtag/exceptions/user_readable/external_service_query_exceptio
 import 'package:moodtag/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
+import 'package:moodtag/features/import/spotify_import/spotify_connector.dart';
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/library_user/library_user_bloc_mixin.dart';
@@ -20,7 +21,6 @@ import 'package:moodtag/model/repository/library_query_filter.dart';
 import 'package:moodtag/model/repository/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/model/repository/subscription_config.dart';
-import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 
 import 'artist_details_state.dart';
 

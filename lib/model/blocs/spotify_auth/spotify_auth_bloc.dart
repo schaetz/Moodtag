@@ -4,12 +4,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/features/import/spotify_import/spotify_connector.dart' as connector;
+import 'package:moodtag/features/import/spotify_import/spotify_connector.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_access_token_provider.dart';
 import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_state.dart';
 import 'package:moodtag/model/events/spotify_events.dart';
-import 'package:moodtag/screens/spotify_import/spotify_connector.dart' as connector;
-import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
 
 class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
     with ErrorStreamHandling

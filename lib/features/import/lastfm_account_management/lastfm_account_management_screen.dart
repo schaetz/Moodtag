@@ -8,7 +8,8 @@ import 'package:moodtag/model/blocs/lastfm_account_management/lastfm_account_man
 import 'package:moodtag/model/events/lastfm_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/lastfm_account_management/lastfm_account_selector.dart';
+
+import 'lastfm_account_selector.dart';
 
 class LastFmAccountManagementScreen extends StatelessWidget {
   final String serviceName = 'Last.fm';

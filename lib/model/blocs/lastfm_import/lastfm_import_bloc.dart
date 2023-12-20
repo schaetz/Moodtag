@@ -17,7 +17,7 @@ import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/structs/imported_entities/unique_import_entity_set.dart';
 
-import '../../../screens/lastfm_import/lastfm_connector.dart';
+import '../../../features/import/lastfm_import/lastfm_connector.dart';
 
 class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorStreamHandling {
   final LastFmImportProcessor _lastFmImportProcessor = LastFmImportProcessor();

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/screens/spotify_import/spotify_connector.dart';
+import 'package:moodtag/features/import/spotify_import/spotify_connector.dart';
 
 class SpotifyAuthState extends Equatable {
   final String? spotifyAuthCode;

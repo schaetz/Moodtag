@@ -6,10 +6,11 @@ import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
-import 'package:moodtag/screens/library/artists_list_screen.dart';
-import 'package:moodtag/screens/library/artists_list_screen_bottom_app_bar.dart';
-import 'package:moodtag/screens/library/tags_list_screen.dart';
-import 'package:moodtag/screens/library/tags_list_screen_bottom_app_bar.dart';
+
+import 'artists_list/artists_list_screen.dart';
+import 'artists_list/artists_list_screen_bottom_app_bar.dart';
+import 'tags_list/tags_list_screen.dart';
+import 'tags_list/tags_list_screen_bottom_app_bar.dart';
 
 class LibraryMainScreen extends StatefulWidget {
   final bool startOnArtistsList = true;

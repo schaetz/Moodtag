@@ -2,21 +2,21 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/app_bar_context_data.dart';
+import 'package:moodtag/features/import/import_flow/abstract_import_flow.dart';
+import 'package:moodtag/features/import/import_selection_list/import_selection_list_screen.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_flow_step.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_import_events.dart';
 import 'package:moodtag/navigation/routes.dart';
-import 'package:moodtag/screens/import_flow/abstract_import_flow.dart';
-import 'package:moodtag/screens/import_selection_list/import_selection_list_screen.dart';
 import 'package:moodtag/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/utils/i10n.dart';
 import 'package:provider/provider.dart';
 
-import '../spotify_import/spotify_import_flow_state.dart';
 import 'spotify_import_config_screen.dart';
 import 'spotify_import_confirmation_screen.dart';
+import 'spotify_import_flow_state.dart';
 
 class SpotifyImportFlow extends AbstractImportFlow {
   SpotifyImportFlow() : super('Spotify Import', SpotifyImportFlowStep.values.length);

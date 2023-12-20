@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_app_bar.dart';
 import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/features/import/import_flow/abstract_import_confirmation_screen.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
 import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_state.dart';
 import 'package:moodtag/model/events/lastfm_import_events.dart';
-import 'package:moodtag/screens/import_flow/abstract_import_confirmation_screen.dart';
 
 class LastFmImportConfirmationScreen extends AbstractImportConfirmationScreen {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();

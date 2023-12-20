@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/components/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/features/import/import_flow/abstract_import_confirmation_screen.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
 import 'package:moodtag/model/blocs/spotify_import/spotify_import_state.dart';
 import 'package:moodtag/model/events/spotify_import_events.dart';
-import 'package:moodtag/screens/import_flow/abstract_import_confirmation_screen.dart';
 
 class SpotifyImportConfirmationScreen extends AbstractImportConfirmationScreen {
   SpotifyImportConfirmationScreen({Key? key, required ScaffoldBodyWrapperFactory scaffoldBodyWrapperFactory})

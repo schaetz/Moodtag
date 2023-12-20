@@ -5,13 +5,13 @@ import 'package:flutter/widgets.dart';
 import 'package:moodtag/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/exceptions/user_readable/user_readable_exception.dart';
+import 'package:moodtag/features/import/lastfm_import/lastfm_connector.dart' as LastFmConnector;
 import 'package:moodtag/model/bloc_helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/model/blocs/error_stream_handling.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/events/lastfm_events.dart';
 import 'package:moodtag/model/repository/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/screens/lastfm_import/lastfm_connector.dart' as LastFmConnector;
 
 import 'lastfm_account_management_state.dart';
 
