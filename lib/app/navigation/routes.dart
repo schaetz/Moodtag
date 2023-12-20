@@ -8,13 +8,13 @@ import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.da
 import 'package:moodtag/features/import/spotify_import/auth/spotify_login_webview.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/flow/spotify_import_flow.dart';
-import 'package:moodtag/features/library/artist_details/artist_details_bloc.dart';
-import 'package:moodtag/features/library/artist_details/artist_details_screen.dart';
+import 'package:moodtag/features/library/details_screens/artist_details/artist_details_bloc.dart';
+import 'package:moodtag/features/library/details_screens/artist_details/artist_details_screen.dart';
+import 'package:moodtag/features/library/details_screens/tag_details/tag_details_bloc.dart';
+import 'package:moodtag/features/library/details_screens/tag_details/tag_details_screen.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/library_main_screen.dart';
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
-import 'package:moodtag/features/library/tag_details/tag_details_bloc.dart';
-import 'package:moodtag/features/library/tag_details/tag_details_screen.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 class Routes {

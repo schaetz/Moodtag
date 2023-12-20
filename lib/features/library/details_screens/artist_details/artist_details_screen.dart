@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/features/library/artist_details/artist_details_bloc.dart';
-import 'package:moodtag/features/library/artist_details/artist_details_state.dart';
+import 'package:moodtag/features/library/details_screens/artist_details/artist_details_bloc.dart';
+import 'package:moodtag/features/library/details_screens/artist_details/artist_details_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
