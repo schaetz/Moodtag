@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/features/import/lastfm_account_management/lastfm_account_management_bloc.dart';
 import 'package:moodtag/features/import/lastfm_account_management/lastfm_account_management_screen.dart';
-import 'package:moodtag/features/import/lastfm_import/lastfm_import_flow.dart';
-import 'package:moodtag/features/import/spotify_import/spotify_import_flow.dart';
-import 'package:moodtag/features/import/spotify_import/spotify_login_webview.dart';
+import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_bloc.dart';
+import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow.dart';
+import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
+import 'package:moodtag/features/import/spotify_import/auth/spotify_login_webview.dart';
+import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_bloc.dart';
+import 'package:moodtag/features/import/spotify_import/flow/spotify_import_flow.dart';
+import 'package:moodtag/features/library/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/features/library/artist_details/artist_details_screen.dart';
+import 'package:moodtag/features/library/main_screen/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/library_main_screen.dart';
+import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
+import 'package:moodtag/features/library/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/features/library/tag_details/tag_details_screen.dart';
-import 'package:moodtag/model/blocs/artist_details/artist_details_bloc.dart';
-import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
-import 'package:moodtag/model/blocs/lastfm_account_management/lastfm_account_management_bloc.dart';
-import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_bloc.dart';
-import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
-import 'package:moodtag/model/blocs/spotify_import/spotify_import_bloc.dart';
-import 'package:moodtag/model/blocs/tag_details/tag_details_bloc.dart';
-import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 
 class Routes {

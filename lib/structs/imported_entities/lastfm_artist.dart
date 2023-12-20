@@ -1,4 +1,4 @@
-import 'package:moodtag/model/blocs/lastfm_import/lastfm_import_period.dart';
+import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 
 import 'imported_artist.dart';
 

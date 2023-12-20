@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/components/mt_main_scaffold.dart';
 import 'package:moodtag/dialogs/add_entity_dialog.dart';
-import 'package:moodtag/model/blocs/artists_list/artists_list_bloc.dart';
-import 'package:moodtag/model/blocs/tags_list/tags_list_bloc.dart';
+import 'package:moodtag/features/library/main_screen/artists_list/artists_list_bloc.dart';
+import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/events/artist_events.dart';
 import 'package:moodtag/model/events/tag_events.dart';
 

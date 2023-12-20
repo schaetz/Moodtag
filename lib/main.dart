@@ -17,8 +17,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:moodtag/model/blocs/app_bar/app_bar_bloc.dart';
-import 'package:moodtag/model/blocs/spotify_auth/spotify_auth_bloc.dart';
+import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
+import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/navigation/routes.dart';
 import 'package:provider/provider.dart';
