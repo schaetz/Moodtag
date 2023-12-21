@@ -90,7 +90,8 @@ mixin LibrarySubscriptionManager {
   }
 
   Future<void> cancelStreamSubscription(SubscriptionConfig subscriptionConfig) async {
-    return await _subscriptions[subscriptionConfig]?.cancel();
+    await _subscriptions[subscriptionConfig]?.cancel();
+    _subscriptions.remove(subscriptionConfig);
   }
 
   void cancelAllStreamSubscriptions() async {
