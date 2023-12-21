@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/features/library/details_screens/tag_details/tag_details_bloc.dart';
+import 'package:moodtag/features/library/details_screens/tag_details/tag_details_screen_bottom_app_bar.dart';
 import 'package:moodtag/features/library/details_screens/tag_details/tag_details_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
@@ -11,12 +12,15 @@ import 'package:moodtag/shared/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/shared/dialogs/remove_tag_from_artist_dialog.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
+import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
+import 'package:moodtag/shared/widgets/text_input/search_bar_container.dart';
 
-class TagDetailsScreen extends StatelessWidget {
+class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<TagDetailsBloc> {
   static const tagNameStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 28);
   static const listEntryStyle = TextStyle(fontSize: 18.0);
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final GlobalKey listViewKey = GlobalKey();
 
   TagDetailsScreen();
 
@@ -36,63 +40,57 @@ class TagDetailsScreen extends StatelessWidget {
                   buildOnSuccess: (tagData) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Padding(
                           padding: EdgeInsets.only(bottom: 12.0),
-                          child: _buildHeadline(tagData.tag, state.artistsWithThisTagOnly.data),
+                          child: Text(state.loadedTagData.data?.name ?? 'Unknown tag', style: tagNameStyle),
                         ),
                         Expanded(
-                            child: LoadedDataDisplayWrapper<ArtistsList>(
-                          loadedData: state.artistsWithThisTagOnly,
-                          captionForError: 'Artists with this tag could not be loaded',
-                          captionForEmptyData: 'No artists with this tag',
-                          additionalCheckData: state.allArtists,
-                          buildOnSuccess: (artistsWithThisTagOnly) => ListView.separated(
-                            separatorBuilder: (context, _) => Divider(),
-                            padding: EdgeInsets.all(4.0),
-                            itemCount:
-                                state.checklistMode ? state.allArtists.data!.length : artistsWithThisTagOnly.length,
-                            itemBuilder: (context, i) {
-                              return state.checklistMode
-                                  ? _buildRowForArtistSelection(context, tagData.tag, state.allArtists.data![i], bloc)
-                                  : _buildRowForAssociatedArtist(
-                                      context, tagData.tag, artistsWithThisTagOnly[i].artist, bloc);
-                            },
-                          ),
+                            child: SearchBarContainer(
+                          searchBarHintText: 'Search artist',
+                          searchBarVisible: state.displaySearchBar,
+                          onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
+                          onSearchBarClosed: () => onSearchBarClosed(bloc),
+                          contentWidget: Stack(children: [
+                            LoadedDataDisplayWrapper<ArtistsList>(
+                              loadedData: state.checklistMode
+                                  ? state.loadedDataFilteredArtists
+                                  : state.loadedDataFilteredArtistsWithTag,
+                              captionForError: 'Artists with this tag could not be loaded',
+                              captionForEmptyData: 'No artists with this tag',
+                              additionalCheckData: state.checklistMode
+                                  ? state.loadedDataFilteredArtistsWithTag
+                                  : state.loadedDataFilteredArtists,
+                              buildOnSuccess: (artistsWithThisTagOnly) => ListView.separated(
+                                separatorBuilder: (context, _) => Divider(),
+                                padding: EdgeInsets.all(4.0),
+                                itemCount: state.checklistMode
+                                    ? state.loadedDataFilteredArtists.data!.length
+                                    : state.loadedDataFilteredArtistsWithTag.data!.length,
+                                itemBuilder: (context, i) {
+                                  return state.checklistMode
+                                      ? _buildRowForArtistSelection(
+                                          context, tagData.tag, state.loadedDataFilteredArtists.data![i], bloc)
+                                      : _buildRowForAssociatedArtist(context, tagData.tag,
+                                          state.loadedDataFilteredArtistsWithTag.data![i].artist, bloc);
+                                },
+                              ),
+                            )
+                          ]),
+                          listViewKey: listViewKey,
                         )),
                       ])));
         },
       ),
+      bottomNavigationBar: TagDetailsScreenBottomAppBar(),
       floatingActionButton: BlocBuilder<TagDetailsBloc, TagDetailsState>(builder: (context, state) {
         return LoadedDataDisplayWrapper<TagData>(
             loadedData: state.loadedTagData,
-            additionalCheckData: state.allArtists,
+            additionalCheckData: state.loadedDataFilteredArtists,
             showPlaceholders: false,
-            buildOnSuccess: (tagData) => _buildFloatingActionButtons(context, state.loadedTagData.data!.tag, bloc));
+            buildOnSuccess: (tagData) => FloatingActionButton(
+                onPressed: () => AddEntityDialog.openAddArtistDialog(context,
+                    preselectedTag: tagData.tag,
+                    onSendInput: (input) => bloc.add(AddArtistsForTag(input, tagData.tag))),
+                child: const Icon(Icons.library_add)));
       }),
-    );
-  }
-
-  Widget _buildHeadline(Tag tag, ArtistsList? artistsWithThisTagOnly) {
-    String headlineText =
-        artistsWithThisTagOnly == null ? tag.name : '${tag.name} (${artistsWithThisTagOnly.length.toString()})';
-    return Text(headlineText, style: tagNameStyle);
-  }
-
-  Widget _buildFloatingActionButtons(BuildContext context, Tag tag, TagDetailsBloc bloc) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FloatingActionButton(
-            onPressed: () => bloc.add(ToggleArtistsForTagChecklist()),
-            child: const Icon(Icons.ballot),
-            heroTag: 'fab_checklist_mode'),
-        SizedBox(
-          height: 16,
-        ),
-        FloatingActionButton(
-          onPressed: () => AddEntityDialog.openAddArtistDialog(context,
-              preselectedTag: tag, onSendInput: (input) => bloc.add(AddArtistsForTag(input, tag))),
-          child: const Icon(Icons.add),
-        ),
-      ],
     );
   }
 

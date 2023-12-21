@@ -8,33 +8,57 @@ class TagDetailsState extends Equatable with LibrarySubscriberStateMixin {
   final int tagId;
   final LibrarySubscriptionSubState librarySubscription;
   final LoadedData<TagData> loadedTagData;
+  late final LoadedData<List<ArtistData>> loadedDataFilteredArtists;
+  late final LoadedData<List<ArtistData>> loadedDataFilteredArtistsWithTag;
   final bool checklistMode;
-  late final LoadedData<List<ArtistData>> artistsWithThisTagOnly;
+  final bool displaySearchBar;
+  final String searchItem;
 
   @override
   LibrarySubscriptionSubState get librarySubscriptionSubState => this.librarySubscription;
 
-  TagDetailsState(
-      {required this.tagId,
-      this.librarySubscription = const LibrarySubscriptionSubState(),
-      this.loadedTagData = const LoadedData.initial(),
-      this.checklistMode = false,
-      this.artistsWithThisTagOnly = const LoadedData.initial()});
+  TagDetailsState({
+    required this.tagId,
+    this.librarySubscription = const LibrarySubscriptionSubState(),
+    this.loadedTagData = const LoadedData.initial(),
+    this.loadedDataFilteredArtists = const LoadedData.initial(),
+    this.loadedDataFilteredArtistsWithTag = const LoadedData.initial(),
+    this.checklistMode = false,
+    this.displaySearchBar = false,
+    this.searchItem = '',
+  });
 
   @override
-  List<Object> get props => [tagId, librarySubscription, loadedTagData, checklistMode, artistsWithThisTagOnly];
+  List<Object> get props => [
+        tagId,
+        librarySubscription,
+        loadedTagData,
+        loadedDataFilteredArtists,
+        loadedDataFilteredArtistsWithTag,
+        checklistMode,
+        displaySearchBar,
+        searchItem
+      ];
 
-  TagDetailsState copyWith(
-      {int? tagId,
-      LibrarySubscriptionSubState? librarySubscription,
-      LoadedData<TagData>? loadedTagData,
-      bool? checklistMode,
-      LoadedData<ArtistsList>? artistsWithThisTagOnly}) {
+  TagDetailsState copyWith({
+    int? tagId,
+    LibrarySubscriptionSubState? librarySubscription,
+    LoadedData<TagData>? loadedTagData,
+    LoadedData<ArtistsList>? loadedDataFilteredArtists,
+    LoadedData<ArtistsList>? loadedDataFilteredArtistsWithTag,
+    bool? checklistMode,
+    bool? displaySearchBar,
+    String? searchItem,
+  }) {
     return TagDetailsState(
-        tagId: tagId ?? this.tagId,
-        librarySubscription: librarySubscription ?? this.librarySubscription,
-        loadedTagData: loadedTagData ?? this.loadedTagData,
-        checklistMode: checklistMode ?? this.checklistMode,
-        artistsWithThisTagOnly: artistsWithThisTagOnly ?? this.artistsWithThisTagOnly);
+      tagId: tagId ?? this.tagId,
+      librarySubscription: librarySubscription ?? this.librarySubscription,
+      loadedTagData: loadedTagData ?? this.loadedTagData,
+      loadedDataFilteredArtists: loadedDataFilteredArtists ?? this.loadedDataFilteredArtists,
+      loadedDataFilteredArtistsWithTag: loadedDataFilteredArtistsWithTag ?? this.loadedDataFilteredArtistsWithTag,
+      checklistMode: checklistMode ?? this.checklistMode,
+      displaySearchBar: displaySearchBar ?? this.displaySearchBar,
+      searchItem: searchItem ?? this.searchItem,
+    );
   }
 }

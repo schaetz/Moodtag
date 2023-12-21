@@ -18,7 +18,8 @@ import 'tag_details_state.dart';
 
 class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUserBlocMixin, ErrorStreamHandling {
   static const tagByIdSubscriptionName = 'tag_by_id';
-  static const artistsWithTagSubscriptionName = 'artists_with_tag';
+  static const filteredArtistsSubscriptionName = 'filtered_artists_list';
+  static const filteredArtistsWithTagSubscriptionName = 'filtered_artists_with_tag';
 
   final Repository _repository;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
@@ -26,11 +27,15 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
     useLibrary(_repository);
     add(RequestOrUpdateSubscription(TagData, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(id: tagId)));
-    add(RequestOrUpdateSubscription(ArtistsList));
+    add(RequestOrUpdateSubscription(ArtistsList,
+        name: filteredArtistsSubscriptionName, filter: LibraryQueryFilter(searchItem: state.searchItem)));
 
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);
-    on<ToggleArtistsForTagChecklist>(_handleToggleArtistsForTagChecklistEvent);
+    on<ToggleSearchBar>(_handleToggleSearchBarEvent);
+    on<ChangeSearchItem>(_handleChangeSearchItemEvent);
+    on<ClearSearchItem>(_handleClearSearchItemEvent);
+    on<ToggleChecklistMode>(_handleToggleChecklistModeEvent);
     on<ToggleTagForArtist>(_handleToggleTagForArtistEvent);
 
     setupErrorHandler(mainContext);
@@ -41,14 +46,18 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
     super.onDataReceived(subscriptionConfig, loadedData, emit);
     if (subscriptionConfig.name == tagByIdSubscriptionName) {
       emit(state.copyWith(loadedTagData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
-      if (loadedData.loadingStatus.isSuccess && state.artistsWithThisTagOnly.loadingStatus.isInitial) {
+      if (loadedData.loadingStatus.isSuccess && state.loadedDataFilteredArtistsWithTag.loadingStatus.isInitial) {
         final tagData = loadedData.data as TagData;
         add(RequestOrUpdateSubscription(ArtistsList,
-            name: artistsWithTagSubscriptionName, filter: LibraryQueryFilter(entityFilters: {tagData.tag})));
+            name: filteredArtistsWithTagSubscriptionName,
+            filter: LibraryQueryFilter(searchItem: state.searchItem, entityFilters: {tagData.tag})));
       }
-    } else if (subscriptionConfig.name == artistsWithTagSubscriptionName) {
-      emit(
-          state.copyWith(artistsWithThisTagOnly: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+    } else if (subscriptionConfig.name == filteredArtistsWithTagSubscriptionName) {
+      emit(state.copyWith(
+          loadedDataFilteredArtistsWithTag: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+    } else if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
+      emit(state.copyWith(
+          loadedDataFilteredArtists: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
     }
   }
 
@@ -58,8 +67,10 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
     super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
     if (subscriptionConfig.name == tagByIdSubscriptionName) {
       emit(state.copyWith(loadedTagData: LoadedData.error()));
-    } else if (subscriptionConfig.name == artistsWithTagSubscriptionName) {
-      emit(state.copyWith(artistsWithThisTagOnly: LoadedData.error()));
+    } else if (subscriptionConfig.name == filteredArtistsWithTagSubscriptionName) {
+      emit(state.copyWith(loadedDataFilteredArtistsWithTag: LoadedData.error()));
+    } else if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
+      emit(state.copyWith(loadedDataFilteredArtists: LoadedData.error()));
     }
   }
 
@@ -77,8 +88,34 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
     }
   }
 
-  void _handleToggleArtistsForTagChecklistEvent(
-      ToggleArtistsForTagChecklist event, Emitter<TagDetailsState> emit) async {
+  void _handleToggleSearchBarEvent(ToggleSearchBar event, Emitter<TagDetailsState> emit) {
+    final newSearchBarVisibility = !state.displaySearchBar;
+    _reloadDataAfterFilterChange(
+        searchItem: newSearchBarVisibility ? state.searchItem : null, displaySearchBar: newSearchBarVisibility);
+    emit(state.copyWith(displaySearchBar: newSearchBarVisibility));
+  }
+
+  void _handleChangeSearchItemEvent(ChangeSearchItem event, Emitter<TagDetailsState> emit) {
+    if (event.searchItem != state.searchItem) {
+      _reloadDataAfterFilterChange(searchItem: event.searchItem);
+      emit(state.copyWith(
+          searchItem: event.searchItem,
+          loadedDataFilteredArtists: LoadedData.loading(),
+          loadedDataFilteredArtistsWithTag: LoadedData.loading()));
+    }
+  }
+
+  void _handleClearSearchItemEvent(ClearSearchItem event, Emitter<TagDetailsState> emit) {
+    if (state.searchItem != '') {
+      _reloadDataAfterFilterChange(searchItem: '');
+      emit(state.copyWith(
+          searchItem: '',
+          loadedDataFilteredArtists: LoadedData.loading(),
+          loadedDataFilteredArtistsWithTag: LoadedData.loading()));
+    }
+  }
+
+  void _handleToggleChecklistModeEvent(ToggleChecklistMode event, Emitter<TagDetailsState> emit) async {
     emit(state.copyWith(checklistMode: !state.checklistMode));
   }
 
@@ -87,5 +124,21 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
     if (exception != null) {
       errorStreamController.add(exception);
     }
+  }
+
+  void _reloadDataAfterFilterChange({bool? displaySearchBar, String? searchItem}) async {
+    final applySearchItem = displaySearchBar != null ? displaySearchBar : state.displaySearchBar;
+    final newSearchItem = searchItem != null ? searchItem : state.searchItem;
+    final newFilterForAll = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : null);
+
+    // TODO Problem: If the tag has not been loaded before this method is called the first time,
+    //  we cannot load the artists with tag here
+    final tagData = state.loadedTagData.data as TagData;
+    final newFilterWithTag =
+        LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : null, entityFilters: {tagData.tag});
+
+    add(RequestOrUpdateSubscription(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilterForAll));
+    add(RequestOrUpdateSubscription(ArtistsList,
+        name: filteredArtistsWithTagSubscriptionName, filter: newFilterWithTag));
   }
 }
