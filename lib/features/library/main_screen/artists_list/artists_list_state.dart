@@ -54,7 +54,7 @@ class ArtistsListState extends Equatable with LibrarySubscriberStateMixin {
         librarySubscription: librarySubscription ?? this.librarySubscription,
         loadedDataFilteredArtists: loadedDataFilteredArtists ?? this.loadedDataFilteredArtists,
         displaySearchBar: displaySearchBar ?? this.displaySearchBar,
-        searchItem: searchItem ?? this.searchItem,
+        searchItem: searchItem != null ? searchItem : this.searchItem,
         displayTagSubtitles: displayTagSubtitles ?? this.displayTagSubtitles,
         filterSelectionModalState: filterSelectionModalState ?? this.filterSelectionModalState,
         filterTags: filterTags != null ? filterTags : this.filterTags, // filterTags can be overridden by an empty set

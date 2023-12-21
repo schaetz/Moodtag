@@ -58,7 +58,7 @@ class TagDetailsState extends Equatable with LibrarySubscriberStateMixin {
       loadedDataFilteredArtistsWithTag: loadedDataFilteredArtistsWithTag ?? this.loadedDataFilteredArtistsWithTag,
       checklistMode: checklistMode ?? this.checklistMode,
       displaySearchBar: displaySearchBar ?? this.displaySearchBar,
-      searchItem: searchItem ?? this.searchItem,
+      searchItem: searchItem != null ? searchItem : this.searchItem,
     );
   }
 }

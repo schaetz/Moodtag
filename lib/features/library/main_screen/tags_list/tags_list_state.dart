@@ -34,7 +34,7 @@ class TagsListState extends Equatable with LibrarySubscriberStateMixin {
       librarySubscription: librarySubscription ?? this.librarySubscription,
       loadedDataFilteredTags: loadedDataFilteredTags ?? this.loadedDataFilteredTags,
       displaySearchBar: displaySearchBar ?? this.displaySearchBar,
-      searchItem: searchItem ?? this.searchItem,
+      searchItem: searchItem != null ? searchItem : this.searchItem,
     );
   }
 }
