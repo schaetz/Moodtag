@@ -1,7 +1,9 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-abstract class DataClassWithEntityName {
+abstract class DataClassWithEntityName extends NamedEntity {
   String get name;
+  String get orderingName;
 }
 
 class ArtistData implements DataClassWithEntityName {
@@ -14,6 +16,9 @@ class ArtistData implements DataClassWithEntityName {
 
   @override
   String get name => artist.name;
+
+  @override
+  String get orderingName => artist.orderingName;
 }
 
 typedef ArtistsList = List<ArtistData>;
@@ -26,6 +31,9 @@ class TagData implements DataClassWithEntityName {
 
   @override
   String get name => tag.name;
+
+  @override
+  String get orderingName => tag.name.toLowerCase();
 }
 
 typedef TagsList = List<TagData>;

@@ -11,7 +11,7 @@ class AddExternalAccountDialog<T> extends AbstractDialog<String> {
       : super(context, onTerminate: onTerminate);
 
   @override
-  StatelessWidget buildDialog(BuildContext context) {
+  Widget buildDialog(BuildContext context) {
     return SimpleTextInputDialogBase(
       message: 'Enter your ${serviceName} account name:',
       confirmationButtonLabel: 'OK',

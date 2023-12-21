@@ -81,12 +81,13 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
       floatingActionButton: BlocBuilder<TagDetailsBloc, TagDetailsState>(builder: (context, state) {
         return LoadedDataDisplayWrapper<TagData>(
             loadedData: state.loadedTagData,
-            additionalCheckData: state.loadedDataFilteredArtists,
+            additionalCheckData: state.allArtists,
             showPlaceholders: false,
             buildOnSuccess: (tagData) => FloatingActionButton(
                 onPressed: () => AddEntityDialog.openAddArtistDialog(context,
                     preselectedTag: tagData.tag,
-                    onSendInput: (input) => bloc.add(AddArtistsForTag(input, tagData.tag))),
+                    onSendInput: (input) => bloc.add(AddArtistsForTag(input, tagData.tag)),
+                    suggestedEntities: state.allArtists.data),
                 child: const Icon(Icons.library_add)));
       }),
     );

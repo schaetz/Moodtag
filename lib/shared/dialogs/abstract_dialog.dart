@@ -25,7 +25,7 @@ abstract class AbstractDialog<T> {
 
   // Should be protected, but upgrading the meta package to ^1.7.0
   // to be able to use @protected collides with "flutter_test"
-  StatelessWidget buildDialog(BuildContext context);
+  Widget buildDialog(BuildContext context);
 
   void closeDialog(BuildContext context, {T? result}) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
