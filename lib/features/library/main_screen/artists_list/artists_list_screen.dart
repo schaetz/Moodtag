@@ -166,7 +166,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
       context: context,
       expand: false,
       enableDrag: false,
-      backgroundColor: Theme.of(context).colorScheme.background.withOpacity(0.8),
+      backgroundColor: Theme.of(context).colorScheme.background,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
         topLeft: Radius.circular(12),
