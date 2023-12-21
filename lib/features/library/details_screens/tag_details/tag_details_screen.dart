@@ -40,7 +40,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                   buildOnSuccess: (tagData) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Padding(
                           padding: EdgeInsets.only(bottom: 12.0),
-                          child: Text(state.loadedTagData.data?.name ?? 'Unknown tag', style: tagNameStyle),
+                          child: _buildHeadline(context, state),
                         ),
                         Expanded(
                             child: SearchBarContainer(
@@ -93,6 +93,22 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
       }),
     );
   }
+
+  Widget _buildHeadline(BuildContext context, TagDetailsState state) => RichText(
+        text: TextSpan(
+          children: [
+            WidgetSpan(
+              child: Icon(Icons.label),
+            ),
+            WidgetSpan(
+              child: SizedBox(width: 4),
+            ),
+            TextSpan(
+                text: state.loadedTagData.data?.name ?? 'Unknown tag',
+                style: tagNameStyle.copyWith(color: Theme.of(context).colorScheme.onBackground)),
+          ],
+        ),
+      );
 
   Widget _buildRowForArtistSelection(BuildContext context, Tag tag, ArtistData artistData, TagDetailsBloc bloc) {
     return CheckboxListTile(

@@ -36,7 +36,7 @@ class ArtistDetailsScreen extends StatelessWidget {
                   buildOnSuccess: (artistData) => ListView(children: [
                         Padding(
                           padding: EdgeInsets.only(bottom: 12.0),
-                          child: Text(artistData.artist.name, style: ArtistDetailsScreen.artistNameStyle),
+                          child: _buildHeadline(context, state),
                         ),
                         if (artistData.artist.spotifyId != null)
                           Padding(
@@ -62,6 +62,22 @@ class ArtistDetailsScreen extends StatelessWidget {
           ),
         ));
   }
+
+  Widget _buildHeadline(BuildContext context, ArtistDetailsState state) => RichText(
+        text: TextSpan(
+          children: [
+            WidgetSpan(
+              child: Icon(Icons.library_music),
+            ),
+            WidgetSpan(
+              child: SizedBox(width: 4),
+            ),
+            TextSpan(
+                text: state.loadedArtistData.data?.name ?? 'Unknown tag',
+                style: artistNameStyle.copyWith(color: Theme.of(context).colorScheme.onBackground)),
+          ],
+        ),
+      );
 
   void _toggleEditMode(BuildContext context) {
     context.read<ArtistDetailsBloc>().add(ToggleTagEditMode());
