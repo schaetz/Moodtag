@@ -61,7 +61,7 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
             isArtistsListScreenSelected ? ArtistsListScreenBottomAppBar() : TagsListScreenBottomAppBar(),
         floatingActionButton: FloatingActionButton(
           onPressed: () => handleAddButtonPressed(context),
-          child: const Icon(Icons.add),
+          child: isArtistsListScreenSelected ? const Icon(Icons.library_add) : const Icon(Icons.new_label),
         ));
   }
 
