@@ -49,7 +49,7 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
   Widget build(BuildContext context) {
     return MtMainScaffold(
         scaffoldKey: _scaffoldKey,
-        tabController: _tabController..addListener(() {}),
+        tabController: _tabController,
         pageWidget: TabBarView(
           controller: _tabController,
           children: [

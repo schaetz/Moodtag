@@ -5,7 +5,6 @@ import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.da
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/delete_dialog.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
@@ -26,32 +25,28 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagsListBloc>();
-    return BlocBuilder<TagsListBloc, TagsListState>(
-        buildWhen: (previous, current) =>
-            current.allTags.loadingStatus == LoadingStatus.success, // TODO Show loading or error symbols
-        builder: (context, state) {
-          return SearchBarContainer(
-              listViewKey: listViewKey,
-              searchBarHintText: 'Search tag',
-              searchBarVisible: state.displaySearchBar,
-              onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
-              onSearchBarClosed: () => onSearchBarClosed(bloc),
-              contentWidget: LoadedDataDisplayWrapper<TagsList>(
-                  loadedData: state.loadedDataFilteredTags,
-                  //additionalCheckData: state.loadedDataAllArtists,
-                  captionForError: 'Tags could not be loaded',
-                  captionForEmptyData: !state.displaySearchBar || state.searchItem.isEmpty
-                      ? 'No tags yet'
-                      : 'No tags match the selected filters',
-                  buildOnSuccess: (filteredTagsList) => ListView.separated(
-                        separatorBuilder: (context, _) => Divider(),
-                        padding: EdgeInsets.all(16.0),
-                        itemCount: filteredTagsList.isNotEmpty ? filteredTagsList.length : 0,
-                        itemBuilder: (context, i) {
-                          return _buildTagRow(context, filteredTagsList[i], bloc);
-                        },
-                      )));
-        });
+    return BlocBuilder<TagsListBloc, TagsListState>(builder: (context, state) {
+      return SearchBarContainer(
+          listViewKey: listViewKey,
+          searchBarHintText: 'Search tag',
+          searchBarVisible: state.displaySearchBar,
+          onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
+          onSearchBarClosed: () => onSearchBarClosed(bloc),
+          contentWidget: LoadedDataDisplayWrapper<TagsList>(
+              loadedData: state.loadedDataFilteredTags,
+              captionForError: 'Tags could not be loaded',
+              captionForEmptyData: !state.displaySearchBar || state.searchItem.isEmpty
+                  ? 'No tags yet'
+                  : 'No tags match the selected filters',
+              buildOnSuccess: (filteredTagsList) => ListView.separated(
+                    separatorBuilder: (context, _) => Divider(),
+                    padding: EdgeInsets.all(16.0),
+                    itemCount: filteredTagsList.isNotEmpty ? filteredTagsList.length : 0,
+                    itemBuilder: (context, i) {
+                      return _buildTagRow(context, filteredTagsList[i], bloc);
+                    },
+                  )));
+    });
   }
 
   Widget _buildTagRow(BuildContext context, TagData tagData, TagsListBloc bloc) {
