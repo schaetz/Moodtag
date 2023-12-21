@@ -48,32 +48,30 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                           searchBarVisible: state.displaySearchBar,
                           onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
                           onSearchBarClosed: () => onSearchBarClosed(bloc),
-                          contentWidget: Stack(children: [
-                            LoadedDataDisplayWrapper<ArtistsList>(
-                              loadedData: state.checklistMode
-                                  ? state.loadedDataFilteredArtists
-                                  : state.loadedDataFilteredArtistsWithTag,
-                              captionForError: 'Artists with this tag could not be loaded',
-                              captionForEmptyData: 'No artists with this tag',
-                              additionalCheckData: state.checklistMode
-                                  ? state.loadedDataFilteredArtistsWithTag
-                                  : state.loadedDataFilteredArtists,
-                              buildOnSuccess: (artistsWithThisTagOnly) => ListView.separated(
-                                separatorBuilder: (context, _) => Divider(),
-                                padding: EdgeInsets.all(4.0),
-                                itemCount: state.checklistMode
-                                    ? state.loadedDataFilteredArtists.data!.length
-                                    : state.loadedDataFilteredArtistsWithTag.data!.length,
-                                itemBuilder: (context, i) {
-                                  return state.checklistMode
-                                      ? _buildRowForArtistSelection(
-                                          context, tagData.tag, state.loadedDataFilteredArtists.data![i], bloc)
-                                      : _buildRowForAssociatedArtist(context, tagData.tag,
-                                          state.loadedDataFilteredArtistsWithTag.data![i].artist, bloc);
-                                },
-                              ),
-                            )
-                          ]),
+                          contentWidget: LoadedDataDisplayWrapper<ArtistsList>(
+                            loadedData: state.checklistMode
+                                ? state.loadedDataFilteredArtists
+                                : state.loadedDataFilteredArtistsWithTag,
+                            captionForError: 'Artists with this tag could not be loaded',
+                            captionForEmptyData: 'No artists with this tag',
+                            additionalCheckData: state.checklistMode
+                                ? state.loadedDataFilteredArtistsWithTag
+                                : state.loadedDataFilteredArtists,
+                            buildOnSuccess: (artistsWithThisTagOnly) => ListView.separated(
+                              separatorBuilder: (context, _) => Divider(),
+                              padding: EdgeInsets.all(4.0),
+                              itemCount: state.checklistMode
+                                  ? state.loadedDataFilteredArtists.data!.length
+                                  : state.loadedDataFilteredArtistsWithTag.data!.length,
+                              itemBuilder: (context, i) {
+                                return state.checklistMode
+                                    ? _buildRowForArtistSelection(
+                                        context, tagData.tag, state.loadedDataFilteredArtists.data![i], bloc)
+                                    : _buildRowForAssociatedArtist(context, tagData.tag,
+                                        state.loadedDataFilteredArtistsWithTag.data![i].artist, bloc);
+                              },
+                            ),
+                          ),
                           listViewKey: listViewKey,
                         )),
                       ])));
