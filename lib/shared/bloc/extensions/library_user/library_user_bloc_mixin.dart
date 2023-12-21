@@ -36,14 +36,14 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   }
 
   Future<void> _listenToStream(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
-    log.fine('Start listening to stream for $subscriptionConfig');
+    log.fine('Start listening to stream for ${subscriptionConfig.toStringVerbose()}');
 
     final behaviorSubject = await _repository?.getLibraryDataStream(_repository!, subscriptionConfig) ?? null;
     if (behaviorSubject == null) {
       log.warning('Behavior subject for $subscriptionConfig could not be obtained');
     } else {
       await emit.forEach(behaviorSubject, onData: (LoadedData loadedData) {
-        log.finer('Bloc received library data for $subscriptionConfig', loadedData);
+        log.finer('${this.toString()} received library data for $subscriptionConfig: ${loadedData.loadingStatus}');
         onDataReceived(subscriptionConfig, loadedData, emit);
         return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
       }, onError: (obj, stackTrace) {

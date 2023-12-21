@@ -72,7 +72,7 @@ mixin LibrarySubscriptionManager {
 
   Future<BehaviorSubject<LoadedData>> setupStreamSubscription(
       SubscriptionConfig subscriptionConfig, Stream Function() streamReference) async {
-    log.fine('Setup $subscriptionConfig');
+    log.fine('Setup ${subscriptionConfig.toStringVerbose()}');
 
     final behaviorSubject = BehaviorSubject<LoadedData>();
     behaviorSubject.add(LoadedData.loading());
@@ -81,7 +81,7 @@ mixin LibrarySubscriptionManager {
       log.warning('Update BehaviorSubject with error from stream for $subscriptionConfig: ', errorMessage);
       behaviorSubject.add(LoadedData.error(message: errorMessage));
     }).listen((dataFromStream) {
-      log.finer('Update BehaviorSubject for $subscriptionConfig');
+      log.finer('Update BehaviorSubject for ${subscriptionConfig.toStringVerbose()}');
       behaviorSubject.add(LoadedData.success(dataFromStream));
     });
     _subscriptions.putIfAbsent(subscriptionConfig, () => streamSubscription);
