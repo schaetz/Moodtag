@@ -20,6 +20,11 @@ mixin ErrorStreamHandling {
     });
   }
 
+  /// Needs to be called in close() method of bloc
+  void closeErrorStreamController() {
+    _errorStreamController.close();
+  }
+
   Function _snackbarErrorHandlerFactory = (context) => (UserReadableException exception) {
         SchedulerBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(exception.message)));

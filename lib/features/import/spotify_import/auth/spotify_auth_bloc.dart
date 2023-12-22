@@ -24,6 +24,12 @@ class SpotifyAuthBloc extends Bloc<SpotifyEvent, SpotifyAuthState>
     setupErrorHandler(mainContext);
   }
 
+  @override
+  Future<void> close() async {
+    super.close();
+    closeErrorStreamController();
+  }
+
   Future<SpotifyAccessToken?> getAccessToken() async {
     SpotifyAccessToken? accessToken = state.spotifyAccessToken;
     if (accessToken == null || accessToken.hasExpired()) {

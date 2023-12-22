@@ -45,6 +45,12 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
   }
 
   @override
+  Future<void> close() async {
+    super.close();
+    closeErrorStreamController();
+  }
+
+  @override
   void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<ArtistsListState> emit) {
     super.onDataReceived(subscriptionConfig, loadedData, emit);
     if (subscriptionConfig.name == filteredArtistsSubscriptionName) {

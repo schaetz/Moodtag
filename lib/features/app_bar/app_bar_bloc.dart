@@ -16,6 +16,12 @@ class AppBarBloc extends Bloc<LibraryEvent, AppBarState> with ErrorStreamHandlin
     setupErrorHandler(mainContext);
   }
 
+  @override
+  Future<void> close() async {
+    super.close();
+    closeErrorStreamController();
+  }
+
   void _handleResetLibraryEvent(ResetLibrary event, Emitter<AppBarState> emit) {
     _repository.deleteAllTags();
     _repository.deleteAllArtists();

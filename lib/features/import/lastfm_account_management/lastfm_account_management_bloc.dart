@@ -37,9 +37,10 @@ class LastFmAccountManagementBloc extends Bloc<LastFmEvent, LastFmAccountManagem
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
+    super.close();
     _accountStreamSubscription.cancel();
-    return super.close();
+    closeErrorStreamController();
   }
 
   void _handleLastFmAccountUpdatedEvent(LastFmAccountUpdated event, Emitter<LastFmAccountManagementState> emit) async {

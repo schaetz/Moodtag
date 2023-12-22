@@ -40,6 +40,12 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     setupErrorHandler(mainContext);
   }
 
+  @override
+  Future<void> close() async {
+    super.close();
+    closeErrorStreamController();
+  }
+
   static Map<SpotifyImportOption, bool> _getInitialImportConfig() {
     Map<SpotifyImportOption, bool> initialConfig = {};
     SpotifyImportOption.values.forEach((option) {

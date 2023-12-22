@@ -43,6 +43,12 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
   }
 
   @override
+  Future<void> close() async {
+    super.close();
+    closeErrorStreamController();
+  }
+
+  @override
   void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagDetailsState> emit) {
     super.onDataReceived(subscriptionConfig, loadedData, emit);
     if (subscriptionConfig.name == tagByIdSubscriptionName) {

@@ -35,6 +35,12 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     setupErrorHandler(mainContext);
   }
 
+  @override
+  Future<void> close() async {
+    super.close();
+    closeErrorStreamController();
+  }
+
   static Map<LastFmImportOption, bool> _getInitialImportConfig() {
     Map<LastFmImportOption, bool> initialConfig = {};
     LastFmImportOption.values.forEach((option) {

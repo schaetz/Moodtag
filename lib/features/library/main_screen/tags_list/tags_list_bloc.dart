@@ -39,6 +39,12 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
   }
 
   @override
+  Future<void> close() async {
+    super.close();
+    closeErrorStreamController();
+  }
+
+  @override
   void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagsListState> emit) {
     super.onDataReceived(subscriptionConfig, loadedData, emit);
     if (subscriptionConfig.name == filteredTagsSubscriptionName) {
