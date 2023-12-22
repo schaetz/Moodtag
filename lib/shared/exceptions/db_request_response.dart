@@ -1,10 +1,15 @@
 import 'package:drift/native.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
 
 class DbRequestResponse<E> {
+  // Sqlite extended result codes: see https://www.sqlite.org/rescode.html
+  static final int sqliteConstraintPrimaryKey = 1555;
+  static final int sqliteConstraintUnique = 2067;
+
   late final E? changedEntity;
   late final List<Object>? parameters;
   late final Exception? exception;
@@ -25,6 +30,10 @@ class DbRequestResponse<E> {
     return exception != null && exception is SqliteException;
   }
 
+  bool isSqliteExceptionWithErrorCode(int extendedResultCode) {
+    return getSqliteException()?.extendedResultCode == extendedResultCode;
+  }
+
   SqliteException? getSqliteException() {
     if (isSqliteException()) {
       return exception as SqliteException;
@@ -34,12 +43,17 @@ class DbRequestResponse<E> {
 
   UserReadableException getUserFeedbackException() {
     if (isSqliteException()) {
-      final sqliteException = getSqliteException();
-      if (sqliteException?.extendedResultCode == 2067) {
+      if (isSqliteExceptionWithErrorCode(sqliteConstraintUnique)) {
         String? alreadyExistingName = _getStringParameter(0);
+        String anEntityDenotation = 'an entity';
+        if (E == Artist) {
+          anEntityDenotation = 'an artist';
+        } else if (E == Tag) {
+          anEntityDenotation = 'a tag';
+        }
         final message = alreadyExistingName != null
-            ? 'There is already an entity with the name $alreadyExistingName.'
-            : 'There is already an entity with the same name.';
+            ? 'There is already $anEntityDenotation with the name "$alreadyExistingName".'
+            : 'There is already $anEntityDenotation with the same name.';
         return new NameAlreadyTakenException(message, cause: exception);
       }
       return new DatabaseError('A database error occurred.', cause: exception);

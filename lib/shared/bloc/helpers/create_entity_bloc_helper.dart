@@ -4,6 +4,7 @@ import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/exceptions/db_request_response.dart';
+import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
 import 'package:moodtag/shared/utils/helpers.dart';
@@ -48,6 +49,7 @@ class CreateEntityBlocHelper {
     final artistNameToObjectMap = await getMapFromArtistNameToObject(repository);
 
     for (String artistName in inputElements) {
+      // create artist if not existing
       if (!artistNameToObjectMap.containsKey(artistName)) {
         final DbRequestResponse<Artist> createArtistResponse = await repository.createArtist(artistName);
         if (createArtistResponse.didSucceed()) {
@@ -56,10 +58,17 @@ class CreateEntityBlocHelper {
         if (createArtistResponse.didFail()) exceptions.add(createArtistResponse.getUserFeedbackException());
       }
 
+      // assign artist to tag
       if (artistNameToObjectMap.containsKey(artistName)) {
         final assignTagToArtistResponse =
             await repository.assignTagToArtist(artistNameToObjectMap[artistName]!, event.tag);
-        if (assignTagToArtistResponse.didFail()) exceptions.add(assignTagToArtistResponse.getUserFeedbackException());
+        if (assignTagToArtistResponse.didFail()) {
+          if (assignTagToArtistResponse.isSqliteExceptionWithErrorCode(DbRequestResponse.sqliteConstraintPrimaryKey)) {
+            return InvalidUserInputException(
+                'The tag "${event.tag.name}" is already assigned to the artist "${artistName}".');
+          }
+          return assignTagToArtistResponse.getUserFeedbackException();
+        }
       } else {
         exceptions.add(UnknownError("The tag could not be assigned to the artist ${artistName}."));
       }
@@ -110,6 +119,9 @@ class CreateEntityBlocHelper {
   Future<UserReadableException?> _addTagToArtist(Artist artist, Tag tag, Repository repository) async {
     final assignTagResponse = await repository.assignTagToArtist(artist, tag);
     if (assignTagResponse.didFail()) {
+      if (assignTagResponse.isSqliteExceptionWithErrorCode(DbRequestResponse.sqliteConstraintPrimaryKey)) {
+        return InvalidUserInputException('The artist "${artist.name}" already has the tag ${tag.name}.');
+      }
       return assignTagResponse.getUserFeedbackException();
     }
 
