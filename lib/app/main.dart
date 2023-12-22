@@ -21,6 +21,7 @@ import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/logging/mt_bloc_observer.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -35,6 +36,7 @@ class MoodtagApp extends StatefulWidget {
     Logger.root.onRecord.listen((record) {
       print('${record.level.name}: ${record.time}: ${record.message}');
     });
+    Bloc.observer = MtBlocObserver();
   }
 
   @override
