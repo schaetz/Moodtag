@@ -57,30 +57,39 @@ class SimpleTextInputDialogBaseState extends State<SimpleTextInputDialogBase> {
   }
 
   Widget _buildTextInput(BuildContext context) {
-    if (widget.suggestedEntities != null) {
-      print(widget.suggestedEntities!.map((e) => e.name));
-      return Autocomplete<String>(
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          if (textEditingValue.text == '') {
-            return const Iterable<String>.empty();
-          }
-
-          final trimmedTextEditingValue = textEditingValue.text.toLowerCase().trim();
-          return widget.suggestedEntities!.where((NamedEntity option) {
-            final optionName = option.name.toLowerCase();
-            final optionOrderingName = option is DataClassWithEntityName ? option.orderingName : optionName;
-            return optionName.startsWith(trimmedTextEditingValue) ||
-                optionOrderingName.startsWith(trimmedTextEditingValue);
-          }).map((matchingEntity) => matchingEntity.name);
-        },
-      );
+    if (widget.suggestedEntities == null) {
+      return _buildTextField(null, null);
     }
 
-    return TextField(
-        maxLines: null,
-        maxLength: 255,
-        onChanged: (value) => setState(() {
-              _currentInput = value.trim();
-            }));
+    return Autocomplete<String>(
+      fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode,
+              VoidCallback onFieldSubmitted) =>
+          _buildTextField(textEditingController, focusNode),
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return const Iterable<String>.empty();
+        }
+
+        final trimmedTextEditingValue = textEditingValue.text.toLowerCase().trim();
+        return widget.suggestedEntities!.where((NamedEntity option) {
+          final optionName = option.name.toLowerCase();
+          final optionOrderingName = option is DataClassWithEntityName ? option.orderingName : optionName;
+          return optionName.startsWith(trimmedTextEditingValue) ||
+              optionOrderingName.startsWith(trimmedTextEditingValue);
+        }).map((matchingEntity) => matchingEntity.name);
+      },
+      onSelected: (selectedValue) => _updateCurrentInput(selectedValue),
+    );
   }
+
+  Widget _buildTextField(TextEditingController? textEditingController, FocusNode? focusNode) => TextField(
+      controller: textEditingController,
+      focusNode: focusNode,
+      maxLines: null,
+      maxLength: 255,
+      onChanged: (value) => _updateCurrentInput(value));
+
+  void _updateCurrentInput(String value) => setState(() {
+        _currentInput = value.trim();
+      });
 }
