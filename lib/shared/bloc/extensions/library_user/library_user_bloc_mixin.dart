@@ -43,14 +43,15 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
       log.warning('Behavior subject for $subscriptionConfig could not be obtained');
     } else {
       await emit.forEach(behaviorSubject, onData: (LoadedData loadedData) {
-        log.finer('${this.toString()} received library data for $subscriptionConfig: ${loadedData.loadingStatus}');
+        log.finer('${this.runtimeType} received library data for $subscriptionConfig: ${loadedData.loadingStatus}');
         onDataReceived(subscriptionConfig, loadedData, emit);
         return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
       }, onError: (obj, stackTrace) {
-        log.warning('Received error for $subscriptionConfig', obj, stackTrace);
+        log.warning('${this.runtimeType} received error for $subscriptionConfig', obj, stackTrace);
         onStreamSubscriptionError(subscriptionConfig, obj, stackTrace, emit);
         return state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
       });
+      log.fine('emit.forEach in ${this.runtimeType} for $subscriptionConfig was finished');
     }
   }
 

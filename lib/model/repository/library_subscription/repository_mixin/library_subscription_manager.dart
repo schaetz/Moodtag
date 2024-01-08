@@ -15,23 +15,31 @@ mixin LibrarySubscriptionManager {
   final log = Logger('LibrarySubscriptionManager');
 
   final Map<SubscriptionConfig, StreamSubscription> _subscriptions = {};
+  final Map<SubscriptionConfig, BehaviorSubject<LoadedData>> _loadedDataBehaviorSubjects = {};
 
   Future<BehaviorSubject<LoadedData>?> getLibraryDataStream(
       Repository repository, SubscriptionConfig subscriptionConfig) async {
-    Stream Function() streamReference;
+    if (!_loadedDataBehaviorSubjects.containsKey(subscriptionConfig)) {
+      Stream Function() streamReference = getRepositoryStream(subscriptionConfig, repository);
+      final createdBehaviorSubject = await setupStreamSubscription(subscriptionConfig, streamReference);
+      _loadedDataBehaviorSubjects.putIfAbsent(subscriptionConfig, () => createdBehaviorSubject);
+    }
+
+    return _loadedDataBehaviorSubjects[subscriptionConfig];
+  }
+
+  Stream Function() getRepositoryStream(SubscriptionConfig subscriptionConfig, Repository repository) {
     switch (subscriptionConfig.dataType) {
       case ArtistsList:
         Set<Tag> filterTags = _getSetOfFilterEntities<Tag>(subscriptionConfig.filter.entityFilters);
-        streamReference = () =>
+        return () =>
             repository.getArtistsDataList(filterTags: filterTags, searchItem: subscriptionConfig.filter.searchItem);
-        break;
       case TagsList:
         if (subscriptionConfig.filter.entityFilters != null) {
           log.warning('Cannot apply entity filters to TagsList subscription');
           throw InternalException('Cannot apply entity filters to TagsList subscription');
         }
-        streamReference = () => repository.getTagsDataList(searchItem: subscriptionConfig.filter.searchItem);
-        break;
+        return () => repository.getTagsDataList(searchItem: subscriptionConfig.filter.searchItem);
       case ArtistData:
         if (subscriptionConfig.filter.id == null) {
           log.warning('No artist Id supplied for ArtistData subscription');
@@ -40,8 +48,7 @@ mixin LibrarySubscriptionManager {
           log.warning('Cannot apply entity filters to ArtistData subscription');
           throw InternalException('Cannot apply entity filters to ArtistData subscription');
         }
-        streamReference = () => repository.getArtistDataById(subscriptionConfig.filter.id!);
-        break;
+        return () => repository.getArtistDataById(subscriptionConfig.filter.id!);
       case TagData:
         if (subscriptionConfig.filter.id == null) {
           log.warning('No tag Id supplied for TagData subscription');
@@ -50,13 +57,11 @@ mixin LibrarySubscriptionManager {
           log.warning('Cannot apply entity filters to TagData subscription');
           throw InternalException('Cannot apply entity filters to Tag subscription');
         }
-        streamReference = () => repository.getTagDataById(subscriptionConfig.filter.id!);
-        break;
+        return () => repository.getTagDataById(subscriptionConfig.filter.id!);
       default:
         log.warning('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
         throw InternalException('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
     }
-    return await setupStreamSubscription(subscriptionConfig, streamReference);
   }
 
   Set<T> _getSetOfFilterEntities<T extends DataClass>(Set<DataClass>? entityFilters) {
@@ -81,7 +86,7 @@ mixin LibrarySubscriptionManager {
       log.warning('Update BehaviorSubject with error from stream for $subscriptionConfig: ', errorMessage);
       behaviorSubject.add(LoadedData.error(message: errorMessage));
     }).listen((dataFromStream) {
-      log.finer('Update BehaviorSubject for ${subscriptionConfig.toStringVerbose()}');
+      log.finer('Update BehaviorSubject for ${subscriptionConfig.toString()}');
       behaviorSubject.add(LoadedData.success(dataFromStream));
     });
     _subscriptions.putIfAbsent(subscriptionConfig, () => streamSubscription);

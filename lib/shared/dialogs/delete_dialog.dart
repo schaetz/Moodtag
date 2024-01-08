@@ -64,7 +64,6 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) async {
     final repository = context.read<Repository>();
 
-    print(resetLibrary);
     if (resetLibrary) {
       return 'Are you sure that you want to reset the library and delete all artists and tags?';
     } else if (entityToDelete is Artist) {
