@@ -73,20 +73,17 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
       Tag tag = entityToDelete as Tag;
       final mainMessage = 'Are you sure that you want to delete the tag "${tag.name}"?';
       String appendix = '';
-      final artistsWithTagStream = await repository.getArtistsDataHavingTag(tag);
-      if (await artistsWithTagStream.isEmpty) {
+      await repository.getArtistsDataHavingTag(tag).first.then((artistsWithTag) {
+        if (artistsWithTag.length == 0) {
+          appendix = ' It is currently not assigned to any artist.';
+        } else if (artistsWithTag.length == 1) {
+          appendix = ' There is currently 1 artist which uses this tag.';
+        } else {
+          appendix = ' There are currently ${artistsWithTag.length} artists which use this tag.';
+        }
+      }).onError((error, stackTrace) {
         appendix = ' It is currently not assigned to any artist.';
-      } else {
-        await artistsWithTagStream.first.then((artistsWithTag) {
-          if (artistsWithTag.length == 0) {
-            appendix = ' It is currently not assigned to any artist.';
-          } else if (artistsWithTag.length == 1) {
-            appendix = ' There is currently 1 artist which uses this tag.';
-          } else {
-            appendix = ' There are currently ${artistsWithTag.length} artists which use this tag.';
-          }
-        });
-      }
+      });
       return mainMessage + appendix;
     } else {
       return 'Error: Invalid entity';
