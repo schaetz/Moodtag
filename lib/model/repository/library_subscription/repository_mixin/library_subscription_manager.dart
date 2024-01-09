@@ -77,7 +77,7 @@ mixin LibrarySubscriptionManager {
 
   Future<BehaviorSubject<LoadedData>> setupStreamSubscription(
       SubscriptionConfig subscriptionConfig, Stream Function() streamReference) async {
-    log.fine('Setup ${subscriptionConfig.toStringVerbose()}');
+    log.fine('${this.runtimeType} | Setup stream subscription | ${subscriptionConfig.toStringVerbose()}');
 
     final behaviorSubject = BehaviorSubject<LoadedData>();
     behaviorSubject.add(LoadedData.loading());

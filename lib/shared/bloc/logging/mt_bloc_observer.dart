@@ -7,6 +7,6 @@ class MtBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
-    log.fine('$bloc received event: $event');
+    log.fine('${bloc.runtimeType} | received event | $event');
   }
 }

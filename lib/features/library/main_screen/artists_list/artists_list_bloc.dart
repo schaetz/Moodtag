@@ -154,7 +154,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
     final newSearchItem = searchItem != null ? searchItem : state.searchItem;
     final newFilter = LibraryQueryFilter(
         entityFilters: filterTags != null ? filterTags : state.filterTags,
-        searchItem: applySearchItem ? newSearchItem : null);
+        searchItem: applySearchItem ? newSearchItem : '');
 
     add(RequestOrUpdateSubscription(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilter));
   }

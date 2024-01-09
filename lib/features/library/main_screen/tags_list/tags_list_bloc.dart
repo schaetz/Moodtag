@@ -100,7 +100,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
   void _reloadDataAfterFilterChange({bool? displaySearchBar, String? searchItem}) async {
     final applySearchItem = displaySearchBar != null ? displaySearchBar : state.displaySearchBar;
     final newSearchItem = searchItem != null ? searchItem : state.searchItem;
-    final newFilter = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : null);
+    final newFilter = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : '');
 
     add(RequestOrUpdateSubscription(TagsList, name: filteredTagsSubscriptionName, filter: newFilter));
   }

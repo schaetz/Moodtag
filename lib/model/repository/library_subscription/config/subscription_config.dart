@@ -34,25 +34,17 @@ class SubscriptionConfig extends Equatable {
   @override
   String toString() {
     if (name != null) {
-      return '[$name] subscription';
+      return '[$name]';
     } else if (filter.includesAll) {
-      return '[$dataType ALL] subscription';
+      return '[$dataType ALL]';
     } else {
-      return '[$dataType filtered] subscription';
+      return '[$dataType filtered]';
     }
   }
 
   String toStringVerbose() {
-    final identifier = toString();
-    if (filter.searchItem != null && filter.searchItem!.isNotEmpty) {
-      if (filter.entityFilters != null) {
-        return '$identifier with searchItem="${filter.searchItem}" and entity filters';
-      } else {
-        return '$identifier with searchItem="${filter.searchItem}"';
-      }
-    } else if (filter.entityFilters != null) {
-      return '$identifier with entity filters';
-    }
-    return identifier;
+    final dataTypeString = 'dataType: $dataType';
+    String filterString = filter.includesAll ? 'ALL' : filter.getQueryFilterString();
+    return '[$dataTypeString; $filterString]';
   }
 }

@@ -36,22 +36,24 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   }
 
   Future<void> _listenToStream(SubscriptionConfig subscriptionConfig, Emitter<S> emit) async {
-    log.fine('Start listening to stream for ${subscriptionConfig.toStringVerbose()}');
+    log.fine('${this.runtimeType} | Start listening to subscription stream | ${subscriptionConfig.toStringVerbose()}');
 
     final behaviorSubject = await _repository?.getLibraryDataStream(_repository!, subscriptionConfig) ?? null;
     if (behaviorSubject == null) {
-      log.warning('Behavior subject for $subscriptionConfig could not be obtained');
+      log.warning(
+          '${this.runtimeType} | Behavior subject could not be obtained | ${subscriptionConfig.toStringVerbose()}');
     } else {
       await emit.forEach(behaviorSubject, onData: (LoadedData loadedData) {
-        log.finer('${this.runtimeType} received library data for $subscriptionConfig: ${loadedData.loadingStatus}');
+        log.finer(
+            '${this.runtimeType} | Received library data | ${subscriptionConfig.toStringVerbose()} | ${loadedData.loadingStatus}');
         onDataReceived(subscriptionConfig, loadedData, emit);
         return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
       }, onError: (obj, stackTrace) {
-        log.warning('${this.runtimeType} received error for $subscriptionConfig', obj, stackTrace);
+        log.warning('${this.runtimeType} | Received error | ${subscriptionConfig.toStringVerbose()}', obj, stackTrace);
         onStreamSubscriptionError(subscriptionConfig, obj, stackTrace, emit);
         return state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
       });
-      log.fine('emit.forEach in ${this.runtimeType} for $subscriptionConfig was finished');
+      log.fine('${this.runtimeType} | emit.forEach was finished | ${subscriptionConfig.toStringVerbose()}');
     }
   }
 

@@ -136,13 +136,13 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
   void _reloadDataAfterFilterChange({bool? displaySearchBar, String? searchItem}) async {
     final applySearchItem = displaySearchBar != null ? displaySearchBar : state.displaySearchBar;
     final newSearchItem = searchItem != null ? searchItem : state.searchItem;
-    final newFilterForAll = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : null);
+    final newFilterForAll = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : '');
 
     // TODO Problem: If the tag has not been loaded before this method is called the first time,
     //  we cannot load the artists with tag here
     final tagData = state.loadedTagData.data as TagData;
     final newFilterWithTag =
-        LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : null, entityFilters: {tagData.tag});
+        LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : '', entityFilters: {tagData.tag});
 
     add(RequestOrUpdateSubscription(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilterForAll));
     add(RequestOrUpdateSubscription(ArtistsList,
