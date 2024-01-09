@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:moodtag/app/logging/log_emoji_transformer.dart';
 import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
@@ -34,7 +35,8 @@ class MoodtagApp extends StatefulWidget {
   MoodtagApp({Key? key}) : super(key: key) {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((record) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
+      print(
+          '${record.level.name}: ${record.time.hour}:${record.time.minute}:${record.time.second}: ${insertEmojisIntoLogStatement(record.message)}');
     });
     Bloc.observer = MtBlocObserver();
   }
