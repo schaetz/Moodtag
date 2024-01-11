@@ -12,8 +12,30 @@ void main() {
     expect(config1 == config2, true);
   });
 
+  test('Subscription configs should be equal if they have identical data types, names and query filters', () async {
+    final filter1 =
+        LibraryQueryFilter(searchId: 123, searchItem: 'some item', entityFilters: {Tag(id: 234, name: 'tag234')});
+    final config1 = SubscriptionConfig(ArtistsList, name: 'config1', filter: filter1);
+
+    final filter2 =
+        LibraryQueryFilter(searchId: 123, searchItem: 'some item', entityFilters: {Tag(id: 234, name: 'tag234')});
+    final config2 = SubscriptionConfig(ArtistsList, name: 'config1', filter: filter2);
+
+    expect(config1 == config2, true);
+
+    final configMap = Map<SubscriptionConfig, bool>()..putIfAbsent(config1, () => true);
+    expect(configMap.containsKey(config2), true);
+  });
+
+  test('Subscription configs should NOT be equal if one is immutable and the other isn\'t', () async {
+    final config1 = SubscriptionConfig(ArtistsList, name: 'config1');
+    final config2 = SubscriptionConfig.immutable('config1', ArtistsList);
+
+    expect(config1 == config2, false);
+  });
+
   test('Subscription configs should NOT be equal if they have different names', () async {
-    final config1 = SubscriptionConfig(ArtistsList);
+    final config1 = SubscriptionConfig(ArtistsList, name: 'config1');
     final config2 = SubscriptionConfig(ArtistsList, name: 'config2');
 
     expect(config1 == config2, false);
@@ -24,49 +46,6 @@ void main() {
     final config2 = SubscriptionConfig(TagsList);
 
     expect(config1 == config2, false);
-  });
-
-  test(
-      'Subscription configs should be equal if they are declared as unique and have the same name (even if filters differ)',
-      () async {
-    final filter1 =
-        LibraryQueryFilter(searchId: 123, searchItem: 'some item', entityFilters: {Tag(id: 234, name: 'tag234')});
-    final config1 = SubscriptionConfig.unique('config1', ArtistsList, filter: filter1);
-
-    final config2 = SubscriptionConfig.unique('config1', ArtistsList);
-
-    expect(config1 == config2, true);
-
-    final configMap = Map<SubscriptionConfig, bool>()..putIfAbsent(config1, () => true);
-    expect(configMap.containsKey(config2), true);
-  });
-
-  test('Subscription configs should NOT be equal if they are declared as unique and have different names', () async {
-    final filter1 =
-        LibraryQueryFilter(searchId: 123, searchItem: 'some item', entityFilters: {Tag(id: 234, name: 'tag234')});
-    final config1 = SubscriptionConfig.unique('config1', ArtistsList, filter: filter1);
-
-    final config2 = SubscriptionConfig.unique('config2', ArtistsList);
-
-    expect(config1 == config2, false);
-
-    final configMap = Map<SubscriptionConfig, bool>()..putIfAbsent(config1, () => true);
-    expect(configMap.containsKey(config2), false);
-  });
-
-  test('Subscription configs should be equal if they have identical query filters', () async {
-    final filter1 =
-        LibraryQueryFilter(searchId: 123, searchItem: 'some item', entityFilters: {Tag(id: 234, name: 'tag234')});
-    final config1 = SubscriptionConfig(ArtistsList, filter: filter1);
-
-    final filter2 =
-        LibraryQueryFilter(searchId: 123, searchItem: 'some item', entityFilters: {Tag(id: 234, name: 'tag234')});
-    final config2 = SubscriptionConfig(ArtistsList, filter: filter2);
-
-    expect(config1 == config2, true);
-
-    final configMap = Map<SubscriptionConfig, bool>()..putIfAbsent(config1, () => true);
-    expect(configMap.containsKey(config2), true);
   });
 
   test('Subscription configs should NOT be equal if they have different search IDs', () async {

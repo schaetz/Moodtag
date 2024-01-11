@@ -15,23 +15,23 @@ class SubscriptionConfigFactory {
   static const tagByIdSubscriptionName = 'tag_by_id';
 
   static SubscriptionConfig getAllArtistsListConfig() =>
-      SubscriptionConfig.unique(allArtistsSubscriptionName, ArtistsList, filter: LibraryQueryFilter.none());
+      SubscriptionConfig.immutable(allArtistsSubscriptionName, ArtistsList, filter: LibraryQueryFilter.none());
 
   static SubscriptionConfig getAllTagsListConfig() =>
-      SubscriptionConfig.unique(allTagsSubscriptionName, TagsList, filter: LibraryQueryFilter.none());
+      SubscriptionConfig.immutable(allTagsSubscriptionName, TagsList, filter: LibraryQueryFilter.none());
 
   static SubscriptionConfig getFilteredArtistsListConfig(LibraryQueryFilter filter) =>
-      SubscriptionConfig.notUnique(ArtistsList, name: filteredArtistsSubscriptionName, filter: filter);
+      SubscriptionConfig(ArtistsList, name: filteredArtistsSubscriptionName, filter: filter);
 
   static SubscriptionConfig getFilteredArtistsWithTagListConfig(LibraryQueryFilter filter) =>
-      SubscriptionConfig.notUnique(ArtistsList, name: filteredArtistsWithTagSubscriptionName, filter: filter);
+      SubscriptionConfig(ArtistsList, name: filteredArtistsWithTagSubscriptionName, filter: filter);
 
   static SubscriptionConfig getFilteredTagsListConfig(LibraryQueryFilter filter) =>
-      SubscriptionConfig.notUnique(TagsList, name: filteredTagsSubscriptionName, filter: filter);
+      SubscriptionConfig(TagsList, name: filteredTagsSubscriptionName, filter: filter);
 
-  static SubscriptionConfig getArtistByIdConfig(int id) => SubscriptionConfig.notUnique(ArtistData,
-      name: artistByIdSubscriptionName, filter: LibraryQueryFilter(searchId: id));
+  static SubscriptionConfig getArtistByIdConfig(int id) =>
+      SubscriptionConfig(ArtistData, name: artistByIdSubscriptionName, filter: LibraryQueryFilter(searchId: id));
 
   static SubscriptionConfig getTagByIdConfig(int id) =>
-      SubscriptionConfig.notUnique(TagData, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(searchId: id));
+      SubscriptionConfig(TagData, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(searchId: id));
 }

@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -14,21 +15,53 @@ import '../data_wrapper/loaded_data.dart';
 mixin LibrarySubscriptionManager {
   final log = Logger('LibrarySubscriptionManager');
 
+  final Map<SubscriptionConfig, Set<LibraryUserBlocMixin>> _subscriptionUsers = Map();
   final Map<SubscriptionConfig, StreamSubscription> _subscriptions = {};
   final Map<SubscriptionConfig, BehaviorSubject<LoadedData>> _loadedDataBehaviorSubjects = {};
 
   Future<BehaviorSubject<LoadedData>?> getLibraryDataStream(
-      Repository repository, SubscriptionConfig subscriptionConfig) async {
-    if (!_loadedDataBehaviorSubjects.containsKey(subscriptionConfig)) {
-      Stream Function() streamReference = getRepositoryStream(subscriptionConfig, repository);
-      final createdBehaviorSubject = await setupStreamSubscription(subscriptionConfig, streamReference);
-      _loadedDataBehaviorSubjects.putIfAbsent(subscriptionConfig, () => createdBehaviorSubject);
+      Repository repository, LibraryUserBlocMixin userBloc, SubscriptionConfig subscriptionConfig) async {
+    if (_loadedDataBehaviorSubjects.containsKey(subscriptionConfig)) {
+      return _loadedDataBehaviorSubjects[subscriptionConfig];
     }
 
-    return _loadedDataBehaviorSubjects[subscriptionConfig];
+    Stream Function() streamReference = _getRepositoryStream(subscriptionConfig, repository);
+    final createdBehaviorSubject = await _setupStreamSubscription(subscriptionConfig, streamReference);
+    _addSubscription(userBloc, subscriptionConfig, createdBehaviorSubject);
+    return createdBehaviorSubject;
   }
 
-  Stream Function() getRepositoryStream(SubscriptionConfig subscriptionConfig, Repository repository) {
+  void _addSubscription(LibraryUserBlocMixin userBloc, SubscriptionConfig subscriptionConfig,
+      BehaviorSubject<LoadedData> createdBehaviorSubject) {
+    _loadedDataBehaviorSubjects.putIfAbsent(subscriptionConfig, () => createdBehaviorSubject);
+
+    final Set<LibraryUserBlocMixin> currentUserBlocs =
+        _subscriptionUsers.containsKey(subscriptionConfig) ? _subscriptionUsers[subscriptionConfig]! : {};
+    _subscriptionUsers.putIfAbsent(subscriptionConfig, () => currentUserBlocs..add(userBloc));
+  }
+
+  Future<void> cancelLibraryDataStream(LibraryUserBlocMixin userBloc, SubscriptionConfig subscriptionConfig) async {
+    _subscriptionUsers[subscriptionConfig]?.remove(userBloc);
+
+    if (_subscriptionUsers[subscriptionConfig] == null || _subscriptionUsers[subscriptionConfig]!.isEmpty) {
+      await _loadedDataBehaviorSubjects[subscriptionConfig]?.close();
+      _loadedDataBehaviorSubjects.remove(subscriptionConfig);
+
+      await _subscriptions[subscriptionConfig]?.cancel();
+      _subscriptions.remove(subscriptionConfig);
+
+      _subscriptionUsers.remove(subscriptionConfig);
+    }
+  }
+
+  void cancelAllStreamSubscriptions() async {
+    _subscriptionUsers.clear();
+    _loadedDataBehaviorSubjects.clear();
+    _subscriptions.values.forEach((streamSubscription) => streamSubscription.cancel());
+    _subscriptions.clear();
+  }
+
+  Stream Function() _getRepositoryStream(SubscriptionConfig subscriptionConfig, Repository repository) {
     switch (subscriptionConfig.dataType) {
       case ArtistsList:
         Set<Tag> filterTags = _getSetOfFilterEntities<Tag>(subscriptionConfig.filter.entityFilters);
@@ -75,7 +108,7 @@ mixin LibrarySubscriptionManager {
     return {};
   }
 
-  Future<BehaviorSubject<LoadedData>> setupStreamSubscription(
+  Future<BehaviorSubject<LoadedData>> _setupStreamSubscription(
       SubscriptionConfig subscriptionConfig, Stream Function() streamReference) async {
     log.fine('LibrarySubscriptionManager | Setup stream subscription | ${subscriptionConfig.toStringVerbose()}');
 
@@ -92,14 +125,5 @@ mixin LibrarySubscriptionManager {
     _subscriptions.putIfAbsent(subscriptionConfig, () => streamSubscription);
 
     return behaviorSubject;
-  }
-
-  Future<void> cancelStreamSubscription(SubscriptionConfig subscriptionConfig) async {
-    await _subscriptions[subscriptionConfig]?.cancel();
-    _subscriptions.remove(subscriptionConfig);
-  }
-
-  void cancelAllStreamSubscriptions() async {
-    _subscriptions.values.forEach((streamSubscription) => streamSubscription.cancel());
   }
 }
