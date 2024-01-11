@@ -4,9 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_access_token_provider.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_connector.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
@@ -25,7 +24,7 @@ import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.
 import 'artist_details_state.dart';
 
 class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with LibraryUserBlocMixin, ErrorStreamHandling {
-  static const artistByIdSubscriptionName = 'artist_by_id';
+  final artistByIdSubscriptionName = SubscriptionConfigFactory.artistByIdSubscriptionName;
 
   final Repository _repository;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
@@ -35,9 +34,9 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
   ArtistDetailsBloc(this._repository, BuildContext mainContext, int artistId, this._accessTokenProvider)
       : super(ArtistDetailsState(artistId: artistId)) {
     useLibrary(_repository);
-    add(RequestOrUpdateSubscription(ArtistData,
-        name: artistByIdSubscriptionName, filter: LibraryQueryFilter(searchId: artistId)));
-    add(RequestOrUpdateSubscription(TagsList));
+
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getArtistByIdConfig(artistId)));
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllTagsListConfig()));
 
     on<ToggleTagEditMode>(_handleToggleTagEditModeEvent);
     on<CreateTags>(_handleCreateTagsEvent);

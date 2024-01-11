@@ -52,6 +52,7 @@ String _replaceFilterString(String? filterString) {
   }
 
   String result = filterString;
-  result = result.replaceAllMapped(RegExp(r'\bid: (\d+)\b'), (match) => '#️⃣id: ${match.group(1)}');
+  result = result.replaceAllMapped(RegExp(r'\bsearchId: (\d+)'), (match) => '#️⃣searchId: ${match.group(1)}');
+  result = result.replaceAllMapped(RegExp(r'\bsearchItem: ("\w*")'), (match) => '🔎searchItem: ${match.group(1)}');
   return result;
 }

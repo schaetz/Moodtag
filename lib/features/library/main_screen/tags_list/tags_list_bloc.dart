@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
@@ -16,7 +17,7 @@ import '../../../../shared/bloc/extensions/error_handling/error_stream_handling.
 import 'tags_list_state.dart';
 
 class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlocMixin, ErrorStreamHandling {
-  static const filteredTagsSubscriptionName = 'filtered_tags_list';
+  final filteredTagsSubscriptionName = SubscriptionConfigFactory.filteredTagsSubscriptionName;
 
   final Repository _repository;
 
@@ -25,9 +26,9 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
   TagsListBloc(this._repository, BuildContext mainContext) : super(TagsListState()) {
     useLibrary(_repository);
 
-    add(RequestOrUpdateSubscription(TagsList));
-    add(RequestOrUpdateSubscription(TagsList,
-        name: filteredTagsSubscriptionName, filter: LibraryQueryFilter(searchItem: state.searchItem)));
+    final tagsListFilter = LibraryQueryFilter(searchItem: state.searchItem);
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getFilteredTagsListConfig(tagsListFilter)));
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllTagsListConfig()));
 
     on<CreateTags>(_handleCreateTagsEvent);
     on<DeleteTag>(_handleDeleteTagEvent);

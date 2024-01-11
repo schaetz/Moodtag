@@ -5,15 +5,15 @@ import 'package:moodtag/model/database/data_class_extension.dart';
 
 class LibraryQueryFilter extends Equatable {
   final int? searchId;
-  final String searchItem;
+  final String? searchItem;
   final Set<DataClass>? entityFilters;
 
-  bool get includesAll => searchId == null && searchItem.isEmpty && (entityFilters == null || entityFilters!.isEmpty);
+  bool get includesAll => searchId == null && searchItem == null && (entityFilters == null || entityFilters!.isEmpty);
 
   const LibraryQueryFilter({this.searchId, this.searchItem = '', this.entityFilters});
   const LibraryQueryFilter.none()
       : this.searchId = null,
-        this.searchItem = '',
+        this.searchItem = null,
         this.entityFilters = null;
 
   @override
@@ -21,7 +21,7 @@ class LibraryQueryFilter extends Equatable {
 
   String getQueryFilterString() {
     final idString = (searchId == null) ? null : 'searchId: $searchId';
-    final searchItemString = searchItem.isEmpty ? null : 'searchItem: ${searchItem}';
+    final searchItemString = (searchItem == null) ? null : 'searchItem: "${searchItem}"';
 
     final entityFiltersString = (entityFilters == null || entityFilters!.isEmpty)
         ? null

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
@@ -57,18 +58,20 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
     }
   }
 
-  /// Can be overridden to run additional logic when a new instance of the dataset is loaded
+  /// Can be overridden to update the state when other datasets change
   void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<S> emit) {
-    if (subscriptionConfig.name == null && subscriptionConfig.filter.includesAll) {
+    if (subscriptionConfig.name == SubscriptionConfigFactory.allArtistsSubscriptionName ||
+        subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName) {
       state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
     }
   }
 
-  /// Can be overridden to run additional logic when a subscription error occurs
+  /// Can be overridden to update the state when an error occurs in another subscription
   /// (note: this is NOT fired when LoadingStatus is ERROR, e.g. because of database errors)
   void onStreamSubscriptionError(
       SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<S> emit) {
-    if (subscriptionConfig.name == null && subscriptionConfig.filter.includesAll) {
+    if (subscriptionConfig.name == SubscriptionConfigFactory.allArtistsSubscriptionName ||
+        subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName) {
       state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
     }
   }

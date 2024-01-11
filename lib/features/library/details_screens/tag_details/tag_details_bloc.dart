@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -17,20 +18,21 @@ import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'tag_details_state.dart';
 
 class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUserBlocMixin, ErrorStreamHandling {
-  static const tagByIdSubscriptionName = 'tag_by_id';
-  static const filteredArtistsSubscriptionName = 'filtered_artists_list';
-  static const filteredArtistsWithTagSubscriptionName = 'filtered_artists_with_tag';
+  final tagByIdSubscriptionName = SubscriptionConfigFactory.tagByIdSubscriptionName;
+  final filteredArtistsSubscriptionName = SubscriptionConfigFactory.filteredArtistsSubscriptionName;
+  final filteredArtistsWithTagSubscriptionName = SubscriptionConfigFactory.filteredArtistsWithTagSubscriptionName;
 
   final Repository _repository;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
     useLibrary(_repository);
-    add(RequestOrUpdateSubscription(TagData,
-        name: tagByIdSubscriptionName, filter: LibraryQueryFilter(searchId: tagId)));
-    add(RequestOrUpdateSubscription(ArtistsList));
-    add(RequestOrUpdateSubscription(ArtistsList,
-        name: filteredArtistsSubscriptionName, filter: LibraryQueryFilter(searchItem: state.searchItem)));
+
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getTagByIdConfig(tagId)));
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllArtistsListConfig()));
+    final artistsListFilter = LibraryQueryFilter(searchItem: state.searchItem);
+    add(RequestOrUpdateSubscription.withConfig(
+        SubscriptionConfigFactory.getFilteredArtistsListConfig(artistsListFilter)));
 
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);

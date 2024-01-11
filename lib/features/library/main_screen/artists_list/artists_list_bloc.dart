@@ -4,6 +4,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
@@ -18,17 +19,18 @@ import '../../../../shared/bloc/extensions/error_handling/error_stream_handling.
 import 'artists_list_state.dart';
 
 class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryUserBlocMixin, ErrorStreamHandling {
-  static const filteredArtistsSubscriptionName = 'filtered_artists_list';
+  final filteredArtistsSubscriptionName = SubscriptionConfigFactory.filteredArtistsSubscriptionName;
 
   late final Repository _repository;
   final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
 
   ArtistsListBloc(this._repository, BuildContext mainContext) : super(ArtistsListState()) {
     useLibrary(_repository);
-    add(RequestOrUpdateSubscription(ArtistsList,
-        name: filteredArtistsSubscriptionName,
-        filter: LibraryQueryFilter(searchItem: state.searchItem, entityFilters: state.filterTags)));
-    add(RequestOrUpdateSubscription(TagsList));
+
+    final artistsListFilter = LibraryQueryFilter(searchItem: state.searchItem, entityFilters: state.filterTags);
+    add(RequestOrUpdateSubscription.withConfig(
+        SubscriptionConfigFactory.getFilteredArtistsListConfig(artistsListFilter)));
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllTagsListConfig()));
 
     on<CreateArtists>(_handleCreateArtistsEvent);
     on<DeleteArtist>(_handleDeleteArtistEvent);
