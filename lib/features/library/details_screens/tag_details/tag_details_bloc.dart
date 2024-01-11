@@ -26,7 +26,8 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
 
   TagDetailsBloc(this._repository, BuildContext mainContext, int tagId) : super(TagDetailsState(tagId: tagId)) {
     useLibrary(_repository);
-    add(RequestOrUpdateSubscription(TagData, name: tagByIdSubscriptionName, filter: LibraryQueryFilter(id: tagId)));
+    add(RequestOrUpdateSubscription(TagData,
+        name: tagByIdSubscriptionName, filter: LibraryQueryFilter(searchId: tagId)));
     add(RequestOrUpdateSubscription(ArtistsList));
     add(RequestOrUpdateSubscription(ArtistsList,
         name: filteredArtistsSubscriptionName, filter: LibraryQueryFilter(searchItem: state.searchItem)));

@@ -41,23 +41,23 @@ mixin LibrarySubscriptionManager {
         }
         return () => repository.getTagsDataList(searchItem: subscriptionConfig.filter.searchItem);
       case ArtistData:
-        if (subscriptionConfig.filter.id == null) {
+        if (subscriptionConfig.filter.searchId == null) {
           log.warning('No artist Id supplied for ArtistData subscription');
           throw InternalException('No artist Id supplied for ArtistData subscription');
         } else if (subscriptionConfig.filter.entityFilters != null) {
           log.warning('Cannot apply entity filters to ArtistData subscription');
           throw InternalException('Cannot apply entity filters to ArtistData subscription');
         }
-        return () => repository.getArtistDataById(subscriptionConfig.filter.id!);
+        return () => repository.getArtistDataById(subscriptionConfig.filter.searchId!);
       case TagData:
-        if (subscriptionConfig.filter.id == null) {
+        if (subscriptionConfig.filter.searchId == null) {
           log.warning('No tag Id supplied for TagData subscription');
           throw InternalException('No tag Id supplied for Tag subscription');
         } else if (subscriptionConfig.filter.entityFilters != null) {
           log.warning('Cannot apply entity filters to TagData subscription');
           throw InternalException('Cannot apply entity filters to Tag subscription');
         }
-        return () => repository.getTagDataById(subscriptionConfig.filter.id!);
+        return () => repository.getTagDataById(subscriptionConfig.filter.searchId!);
       default:
         log.warning('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
         throw InternalException('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');

@@ -36,7 +36,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
       : super(ArtistDetailsState(artistId: artistId)) {
     useLibrary(_repository);
     add(RequestOrUpdateSubscription(ArtistData,
-        name: artistByIdSubscriptionName, filter: LibraryQueryFilter(id: artistId)));
+        name: artistByIdSubscriptionName, filter: LibraryQueryFilter(searchId: artistId)));
     add(RequestOrUpdateSubscription(TagsList));
 
     on<ToggleTagEditMode>(_handleToggleTagEditModeEvent);
