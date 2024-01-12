@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/app/main.dart';
 import 'package:moodtag/app/navigation/routes.dart';
-import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
-import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
-import 'package:moodtag/shared/bloc/events/library_events.dart';
-import 'package:moodtag/shared/bloc/events/spotify_events.dart';
-import 'package:moodtag/shared/dialogs/delete_dialog.dart';
 import 'package:moodtag/shared/widgets/main_layout/app_bar_context_data.dart';
 
 import 'colored_tab_bar.dart';
@@ -14,10 +9,6 @@ import 'colored_tab_bar.dart';
 class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const titleLabelStyle = TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold);
 
-  static const menuItemSpotifyImport = 'Spotify Import';
-  static const menuItemLastFm = 'Last.fm';
-  static const menuItemResetLibrary = 'Reset library';
-  static const popupMenuItems = [menuItemSpotifyImport, menuItemLastFm, menuItemResetLibrary];
   static const double heightWithTabBar = 120;
   static const double heightWithoutTabBar = 46;
 
@@ -32,18 +23,12 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<AppBarBloc>();
     final appBarContextData = context.read<AppBarContextData?>();
     final onBackButtonPressed = appBarContextData?.onBackButtonPressed ?? null;
     return AppBar(
       title: _buildTitle(context),
       actions: <Widget>[
-        PopupMenuButton<String>(
-          itemBuilder: (BuildContext itemBuilderContext) {
-            return popupMenuItems.map((choice) => _buildPopupMenuItem(context, choice)).toList();
-          },
-          onSelected: (value) => _handlePopupMenuItemTap(context, value, bloc),
-        ),
+        IconButton(icon: Icon(Icons.settings), onPressed: () => Navigator.of(context).pushNamed(Routes.appSettings))
       ],
       automaticallyImplyLeading: onBackButtonPressed == null,
       leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed()) : null,
@@ -81,38 +66,5 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
             text: 'Tags',
           ),
         ]));
-  }
-
-  static PopupMenuItem<String> _buildPopupMenuItem(BuildContext context, String choice) {
-    return PopupMenuItem<String>(
-      value: choice,
-      child: Text(choice),
-    );
-  }
-
-  static void _handlePopupMenuItemTap(BuildContext context, String value, AppBarBloc bloc) {
-    final handleResetLibrary = () {
-      bloc.add(ResetLibrary());
-    };
-    switch (value) {
-      case menuItemSpotifyImport:
-        if (context.read<SpotifyAuthBloc>().state.spotifyAuthCode == null) {
-          Function redirectAfterAuth = () {
-            Navigator.pop(context);
-            Navigator.pushNamed(context, Routes.spotifyImport);
-          };
-          context.read<SpotifyAuthBloc>().add(RequestUserAuthorization(redirectAfterAuth: redirectAfterAuth));
-          Navigator.of(context).pushNamed(Routes.spotifyAuth);
-        } else {
-          Navigator.of(context).pushNamed(Routes.spotifyImport);
-        }
-        break;
-      case menuItemLastFm:
-        Navigator.of(context).pushNamed(Routes.lastFmAccountManagement);
-        break;
-      case menuItemResetLibrary:
-        DeleteDialog.openNew(context, deleteHandler: handleResetLibrary, entityToDelete: null, resetLibrary: true);
-        break;
-    }
   }
 }

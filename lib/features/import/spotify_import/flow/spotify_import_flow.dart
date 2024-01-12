@@ -26,7 +26,7 @@ class SpotifyImportFlow extends AbstractImportFlow {
     final bloc = context.read<SpotifyImportBloc>();
     return BlocConsumer<SpotifyImportBloc, SpotifyImportState>(listener: (context, state) {
       if (state.isFinished) {
-        returnToLibraryScreens(context);
+        returnToAppSettingsScreen(context);
       }
     }, builder: (context, state) {
       return Provider(

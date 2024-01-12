@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/features/import/lastfm_account_management/lastfm_account_management_bloc.dart';
-import 'package:moodtag/features/import/lastfm_account_management/lastfm_account_management_screen.dart';
+import 'package:moodtag/features/app_settings/app_settings_bloc.dart';
+import 'package:moodtag/features/app_settings/app_settings_screen.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_bloc.dart';
 import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
@@ -21,7 +21,7 @@ class Routes {
   static const libraryMainScreen = '/library';
   static const artistsDetails = '/artists/details';
   static const tagsDetails = '/tags/details';
-  static const lastFmAccountManagement = '/lastFmAccountManagement';
+  static const appSettings = '/appSettings';
   static const lastFmImport = '/lastFmImport';
   static const spotifyAuth = '/spotifyAuth';
   static const spotifyImport = '/spotifyImport';
@@ -58,9 +58,8 @@ class Routes {
           create: (_) =>
               TagDetailsBloc(context.read<Repository>(), context, ModalRoute.of(context)?.settings.arguments as int),
           child: TagDetailsScreen()),
-      lastFmAccountManagement: (context) => BlocProvider(
-          create: (_) => LastFmAccountManagementBloc(context.read<Repository>(), context),
-          child: LastFmAccountManagementScreen()),
+      appSettings: (context) =>
+          BlocProvider(create: (_) => AppSettingsBloc(context.read<Repository>(), context), child: AppSettingsScreen()),
       lastFmImport: (context) =>
           BlocProvider(create: (_) => LastFmImportBloc(context.read<Repository>(), context), child: LastFmImportFlow()),
       spotifyAuth: (context) => SpotifyLoginWebview(),

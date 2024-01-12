@@ -26,7 +26,7 @@ class LastFmImportFlow extends AbstractImportFlow {
     final bloc = context.read<LastFmImportBloc>();
     return BlocConsumer<LastFmImportBloc, LastFmImportState>(listener: (context, state) {
       if (state.isFinished) {
-        returnToLibraryScreens(context);
+        returnToAppSettingsScreen(context);
       }
     }, builder: (context, state) {
       return Provider(

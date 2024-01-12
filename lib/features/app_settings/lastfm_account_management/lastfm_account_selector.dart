@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 
 class LastFmAccountSelector extends StatelessWidget {
+  static const accountNameTextStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 18);
   final DateFormat formatter = DateFormat('MM-dd-yyyy');
 
   final String serviceName;
@@ -38,22 +39,21 @@ class LastFmAccountSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO Maybe replace by Card?
-    return Container(
-      alignment: Alignment.center,
+    return Center(
+        child: Card(
       color: Theme.of(context).colorScheme.secondary, // TODO The color should not have to be specified here
-      padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.all(32.0),
-      child: Column(children: [
-        hasAccountName
-            ? Text(accountName!, style: TextStyle(fontWeight: FontWeight.bold))
-            : Text('No associated ${serviceName} account', style: TextStyle(fontStyle: FontStyle.italic)),
-        SizedBox(height: 16),
-        ..._accountInfo(),
-        _accountChangeButton(),
-        if (hasAccountName) _updateAccountInfoButton(),
-      ]),
-    );
+      child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(children: [
+            hasAccountName
+                ? Text(accountName!, style: accountNameTextStyle)
+                : Text('No associated ${serviceName} account', style: TextStyle(fontStyle: FontStyle.italic)),
+            SizedBox(height: 16),
+            ..._accountInfo(),
+            _accountChangeButton(),
+            if (hasAccountName) _updateAccountInfoButton(),
+          ])),
+    ));
   }
 
   Widget _accountChangeButton() {

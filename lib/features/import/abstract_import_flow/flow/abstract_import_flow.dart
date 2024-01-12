@@ -17,14 +17,14 @@ abstract class AbstractImportFlow extends StatelessWidget {
 
   void onBackButtonPressed(BuildContext context, AbstractImportBloc bloc, int configIndex) {
     if (bloc.state.step.index <= configIndex) {
-      returnToLibraryScreens(context);
+      returnToAppSettingsScreen(context);
     } else {
       bloc.add(ReturnToPreviousImportScreen(this));
     }
   }
 
-  void returnToLibraryScreens(BuildContext context) async {
-    Navigator.of(context).popUntil(ModalRouteExt.withName(Routes.libraryMainScreen));
+  void returnToAppSettingsScreen(BuildContext context) async {
+    Navigator.of(context).popUntil(ModalRouteExt.withName(Routes.appSettings));
   }
 
   ImportFlowScreenWrapperFactory getImportFlowScreenWrapperFactory(int stepIndex) =>
