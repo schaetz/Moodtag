@@ -100,15 +100,14 @@ class Repository with LibrarySubscriptionManager {
     return allTags.map((tag) => tag.name).toSet();
   }
 
-  Future<DbRequestResponse<Tag>> createTag(String name) {
-    Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name));
+  Future<DbRequestResponse<Tag>> createTag(String name, TagCategory tagCategory) {
+    Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name, category: tagCategory.id));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Tag>(createTagFuture, name);
   }
 
   Future<void> createImportedTagsInBatch(List<ImportedTag> importedTags) async {
-    await db.createTagsInBatch(List.from(importedTags.map((tag) => TagsCompanion.insert(
-          name: tag.name,
-        ))));
+    await db.createTagsInBatch(
+        List.from(importedTags.map((tag) => TagsCompanion.insert(name: tag.name, category: tag.category.id))));
   }
 
   Future<DbRequestResponse> deleteTag(Tag tag) {
@@ -137,6 +136,17 @@ class Repository with LibrarySubscriptionManager {
 
   Future<DbRequestResponse> removeTagFromArtist(Artist artist, Tag tag) {
     return helper.wrapExceptionsAndReturnResponse(db.removeTagFromArtist(artist.id, tag.id));
+  }
+
+  //
+  // Tag categories
+  //
+  Future<List<TagCategory>> getTagCategoriesOnce() {
+    return db.getTagCategoriesOnce();
+  }
+
+  Future<TagCategory?> getDefaultTagCategoryOnce() {
+    return db.getDefaultTagCategoryOnce();
   }
 
   //

@@ -121,6 +121,19 @@ class MoodtagDB extends _$MoodtagDB {
     );
   }
 
+  // GET Tag categories
+
+  Future<List<TagCategory>> getTagCategoriesOnce() {
+    return (select(tagCategories)).get();
+  }
+
+  Future<TagCategory?> getDefaultTagCategoryOnce() {
+    return (select(tagCategories)
+          ..orderBy([(t) => OrderingTerm.asc(t.id)])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
   // GET LastFmAccount
 
   Stream<LastFmAccount?> getLastFmAccount() {

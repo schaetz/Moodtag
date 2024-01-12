@@ -4,6 +4,7 @@ import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/exceptions/db_request_response.dart';
+import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
@@ -26,8 +27,14 @@ class CreateEntityBlocHelper {
     List<String> inputElements = processMultilineInput(event.input);
     List<DbRequestResponse> exceptionResponses = [];
 
+    final defaultTagCategory = await repository.getDefaultTagCategoryOnce();
+    if (defaultTagCategory == null) {
+      return DatabaseError('There is no default tag category that can be assigned.');
+    }
+
     for (String newTagName in inputElements) {
-      final createTagResponse = await repository.createTag(newTagName);
+      final tagCategory = event.tagCategory ?? defaultTagCategory;
+      final createTagResponse = await repository.createTag(newTagName, tagCategory);
       if (createTagResponse.didFail()) exceptionResponses.add(createTagResponse);
 
       if (event.preselectedArtist != null &&

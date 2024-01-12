@@ -10,6 +10,10 @@ class Artists extends Table {
 class Tags extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique().withLength(min: 1, max: 255)();
+  IntColumn get category => integer().references(TagCategories, #id)();
+  IntColumn get parentTag => integer().nullable().references(Tags, #id)();
+  IntColumn get colorMode => integer().withDefault(const Constant(0))();
+  IntColumn get color => integer().nullable()();
 }
 
 class AssignedTags extends Table {
@@ -20,8 +24,15 @@ class AssignedTags extends Table {
   Set<Column> get primaryKey => {artist, tag};
 }
 
+@DataClassName('TagCategory')
+class TagCategories extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().unique().withLength(min: 1, max: 255)();
+  IntColumn get color => integer().nullable()();
+}
+
 class LastFmAccounts extends Table {
-  TextColumn get accountName => text().unique().withLength(min: 1, max: 255)();
+  TextColumn get accountName => text().withLength(min: 1, max: 255)();
   TextColumn get realName => text().withLength(max: 255).nullable()();
   IntColumn get playCount => integer().nullable()();
   IntColumn get artistCount => integer().nullable()();

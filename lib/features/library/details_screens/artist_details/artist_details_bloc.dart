@@ -17,7 +17,6 @@ import 'package:moodtag/shared/bloc/extensions/error_handling/error_stream_handl
 import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
-import 'package:moodtag/shared/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
 
@@ -75,7 +74,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
 
   void _handleCreateTagsEvent(CreateTags event, Emitter<ArtistDetailsState> emit) async {
     final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
-    if (exception is NameAlreadyTakenException) {
+    if (exception != null) {
       errorStreamController.add(exception);
     }
   }

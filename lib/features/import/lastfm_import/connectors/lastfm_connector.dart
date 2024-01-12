@@ -5,7 +5,6 @@ import 'package:http/http.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
-import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
 import 'package:moodtag/shared/utils/helpers.dart';
@@ -59,7 +58,7 @@ Future<UniqueImportEntitySet<LastFmArtist>> getTopArtists(String username, LastF
   return UniqueImportEntitySet<LastFmArtist>.from(topArtists);
 }
 
-Future<UniqueImportEntitySet<ImportedTag>> getTags(String artistName, {String? username}) async {
+/*Future<UniqueImportEntitySet<ImportedTag>> getTags(String artistName, {String? username}) async {
   final isUserTagsQuery = username != null;
   final queryParameters = {
     'artist': artistName,
@@ -76,13 +75,13 @@ Future<UniqueImportEntitySet<ImportedTag>> getTags(String artistName, {String? u
   try {
     final jsonTagsHeadNode = isUserTagsQuery ? 'tags' : 'toptags';
     tags = Set<ImportedTag>.from(responseBodyMap[jsonTagsHeadNode]?['tag']?.map((item) =>
-        ImportedTag(item['name'], lastFmCount: !isUserTagsQuery && item['count'] != null ? item['count'] : null)));
+        ImportedTag(item['name'], category: null, lastFmCount: !isUserTagsQuery && item['count'] != null ? item['count'] : null)));
   } catch (error) {
     throw ExternalServiceQueryException('The Last.fm data has an unknown structure.', cause: error);
   }
 
   return UniqueImportEntitySet<ImportedTag>.from(tags);
-}
+}*/
 
 Future<(Response, dynamic)> _sendGetRequest(Map<String, String?> queryParameters) async {
   final uri = Uri.https(lastFmApiBaseUrl, lastFmBaseRoute, queryParameters);

@@ -10,7 +10,6 @@ import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
-import 'package:moodtag/shared/exceptions/user_readable/name_already_taken_exception.dart';
 
 import '../../../../shared/bloc/events/tag_events.dart';
 import '../../../../shared/bloc/extensions/error_handling/error_stream_handling.dart';
@@ -65,7 +64,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
 
   void _handleCreateTagsEvent(CreateTags event, Emitter<TagsListState> emit) async {
     final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
-    if (exception is NameAlreadyTakenException) {
+    if (exception != null) {
       errorStreamController.add(exception);
     }
   }

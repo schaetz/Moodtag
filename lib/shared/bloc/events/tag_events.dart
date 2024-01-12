@@ -8,12 +8,13 @@ abstract class TagEvent extends LibraryEvent {
 
 class CreateTags extends TagEvent {
   final String input;
+  final TagCategory? tagCategory;
   final Artist? preselectedArtist;
 
-  const CreateTags(this.input, {this.preselectedArtist});
+  const CreateTags(this.input, {this.tagCategory, this.preselectedArtist});
 
   @override
-  List<Object> get props => preselectedArtist != null ? [input, preselectedArtist!] : [input];
+  List<Object?> get props => [input, tagCategory, preselectedArtist];
 }
 
 class DeleteTag extends TagEvent {

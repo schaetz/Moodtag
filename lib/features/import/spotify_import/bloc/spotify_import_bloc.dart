@@ -7,10 +7,12 @@ import 'package:moodtag/features/import/spotify_import/auth/spotify_access_token
 import 'package:moodtag/features/import/spotify_import/config/spotify_import_option.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_connector.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_import_processor.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_import_events.dart';
 import 'package:moodtag/shared/bloc/extensions/error_handling/error_stream_handling.dart';
+import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
@@ -124,7 +126,14 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {
-      final availableGenresForSelectedArtists = await _getAvailableTagsForSelectedArtists(event.selectedArtists);
+      final defaultTagCategory = await repository.getDefaultTagCategoryOnce();
+      if (defaultTagCategory == null) {
+        errorStreamController.add(DatabaseError('There is no default tag category that can be assigned.'));
+        return;
+      }
+
+      final availableGenresForSelectedArtists =
+          await _getAvailableTagsForSelectedArtists(event.selectedArtists, defaultTagCategory);
 
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
@@ -134,10 +143,10 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
   }
 
   Future<UniqueImportEntitySet<ImportedTag>> _getAvailableTagsForSelectedArtists(
-      List<SpotifyArtist> selectedArtists) async {
+      List<SpotifyArtist> selectedArtists, TagCategory tagCategory) async {
     final UniqueImportEntitySet<ImportedTag> tagsForSelectedArtists = UniqueImportEntitySet();
     selectedArtists.forEach((artist) {
-      List<ImportedTag> tagsList = artist.tags.map((tagName) => ImportedTag(tagName)).toList();
+      List<ImportedTag> tagsList = artist.tags.map((tagName) => ImportedTag(tagName, category: tagCategory)).toList();
       tagsList.forEach((genreEntity) => tagsForSelectedArtists.add(genreEntity));
     });
 
