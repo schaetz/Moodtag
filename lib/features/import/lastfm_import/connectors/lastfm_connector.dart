@@ -116,7 +116,8 @@ LastFmAccount _extractLastFmAccountFromUserInfoResults(dynamic responseBodyJSON)
       artistCount: _parseNumberFromJson(userJSON, 'artist_count'),
       trackCount: _parseNumberFromJson(userJSON, 'track_count'),
       albumCount: _parseNumberFromJson(userJSON, 'album_count'),
-      lastAccountUpdate: DateTime.now().millisecondsSinceEpoch.toDouble());
+      lastAccountUpdate: DateTime.now(),
+      lastTopArtistsUpdate: DateTime.now());
 }
 
 int? _parseNumberFromJson(dynamic userJSON, String attribute) {

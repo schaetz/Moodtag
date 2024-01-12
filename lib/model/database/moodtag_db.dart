@@ -7,11 +7,12 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
+import 'database.dart';
 import 'transformers/artists_with_tag_transformer.dart';
 
 part 'moodtag_db.g.dart';
 
-@DriftDatabase(include: {'queries.drift'})
+@DriftDatabase(tables: [Artists, Tags, AssignedTags, LastFmAccounts])
 class MoodtagDB extends _$MoodtagDB {
   MoodtagDB() : super(_openConnection());
   MoodtagDB.InMemory() : super(NativeDatabase.memory());

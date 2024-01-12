@@ -31,8 +31,8 @@ class LastFmAccountManagementScreen extends StatelessWidget {
                       accountName: state.lastFmAccount?.accountName,
                       artistCount: state.lastFmAccount?.artistCount,
                       playCount: state.lastFmAccount?.playCount,
-                      lastAccountUpdate: _getDateTimeFromTimestamp(state.lastFmAccount?.lastAccountUpdate),
-                      lastTopArtistsUpdate: _getDateTimeFromTimestamp(state.lastFmAccount?.lastTopArtistsUpdate),
+                      lastAccountUpdate: state.lastFmAccount?.lastAccountUpdate,
+                      lastTopArtistsUpdate: state.lastFmAccount?.lastTopArtistsUpdate,
                       onAddAccountClick: () => _openSetAccountNameDialog(context, bloc),
                       onRemoveAccountClick: () => bloc.add(RemoveLastFmAccount()),
                       onUpdateAccountInfoClick: () => bloc.add(UpdateLastFmAccountInfo()),
@@ -48,13 +48,6 @@ class LastFmAccountManagementScreen extends StatelessWidget {
   }
 
   void _showImportFlowScreen(BuildContext context) => Navigator.of(context).pushNamed(Routes.lastFmImport);
-
-  DateTime? _getDateTimeFromTimestamp(double? timestamp) {
-    if (timestamp == null) {
-      return null;
-    }
-    return DateTime.fromMillisecondsSinceEpoch(timestamp.round(), isUtc: true);
-  }
 
   void _openSetAccountNameDialog(BuildContext context, LastFmAccountManagementBloc bloc) async {
     AddExternalAccountDialog(context, serviceName, onTerminate: (newAccountName) {
