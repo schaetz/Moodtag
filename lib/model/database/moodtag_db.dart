@@ -207,8 +207,18 @@ class MoodtagDB extends _$MoodtagDB {
     return delete(artists).go();
   }
 
-  Future deleteAllTags() {
+  Future deleteAllTags() async {
+    await deleteAllAssignedTags(); // Assigned tags cannot exist without tags
     return delete(tags).go();
+  }
+
+  Future deleteAllAssignedTags() {
+    return delete(assignedTags).go();
+  }
+
+  Future deleteAllTagCategories() async {
+    await deleteAllTags(); // Tags cannot exist without tag categories
+    return delete(tagCategories).go();
   }
 
   Future<int> deleteAllLastFmAccounts() {

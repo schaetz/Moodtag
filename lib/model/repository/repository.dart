@@ -149,6 +149,10 @@ class Repository with LibrarySubscriptionManager {
     return db.getDefaultTagCategoryOnce();
   }
 
+  Future deleteAllTagCategories() {
+    return db.deleteAllTagCategories();
+  }
+
   //
   // Last.fm accounts
   //
