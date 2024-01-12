@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/helpers/repository_helper.dart';
 import 'package:moodtag/model/repository/library_subscription/repository_mixin/library_subscription_manager.dart';
@@ -18,6 +19,7 @@ class Repository with LibrarySubscriptionManager {
 
   Repository() : db = MoodtagDB() {
     helper = RepositoryHelper(db);
+    initializeLibraryIfNecessary();
   }
 
   void close() {
@@ -25,10 +27,24 @@ class Repository with LibrarySubscriptionManager {
     db.close();
   }
 
+  Future initializeLibraryIfNecessary() async {
+    List<TagCategory> tagCategories = await getTagCategoriesOnce();
+    if (tagCategories.isEmpty) {
+      _initializeLibrary();
+    }
+  }
+
+  Future _initializeLibrary() async {
+    await createTagCategory('Genre', color: Colors.blue.value);
+    await createTagCategory('Mood', color: Colors.green.value);
+    await createTagCategory('Source', color: Colors.yellow.value);
+  }
+
   Future resetLibrary() async {
     await deleteAllTags();
     await deleteAllArtists();
     await deleteAllTagCategories();
+    await _initializeLibrary();
   }
 
   //
@@ -147,6 +163,12 @@ class Repository with LibrarySubscriptionManager {
   //
   // Tag categories
   //
+  Future<DbRequestResponse<TagCategory>> createTagCategory(String name, {int? color}) {
+    Future<int> createTagCategoryFuture =
+        db.createTagCategory(TagCategoriesCompanion.insert(name: name, color: Value.ofNullable(color)));
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<TagCategory>(createTagCategoryFuture, name);
+  }
+
   Future<List<TagCategory>> getTagCategoriesOnce() {
     return db.getTagCategoriesOnce();
   }

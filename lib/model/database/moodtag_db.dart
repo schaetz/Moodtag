@@ -178,6 +178,10 @@ class MoodtagDB extends _$MoodtagDB {
     });
   }
 
+  Future<int> createTagCategory(TagCategoriesCompanion tagCategory) {
+    return into(tagCategories).insert(tagCategory);
+  }
+
   Future<int> createOrUpdateLastFmAccount(LastFmAccount lastFmAccount) {
     return into(lastFmAccounts).insertOnConflictUpdate(lastFmAccount);
   }
