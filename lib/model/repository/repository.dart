@@ -25,6 +25,12 @@ class Repository with LibrarySubscriptionManager {
     db.close();
   }
 
+  Future resetLibrary() async {
+    await deleteAllTags();
+    await deleteAllArtists();
+    await deleteAllTagCategories();
+  }
+
   //
   // Artists
   //
