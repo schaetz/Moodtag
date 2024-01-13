@@ -123,7 +123,11 @@ class MoodtagDB extends _$MoodtagDB {
 
   // GET Tag categories
 
-  Future<List<TagCategory>> getTagCategoriesOnce() {
+  Stream<TagCategoriesList> getTagCategories() {
+    return (select(tagCategories)).watch();
+  }
+
+  Future<TagCategoriesList> getTagCategoriesOnce() {
     return (select(tagCategories)).get();
   }
 

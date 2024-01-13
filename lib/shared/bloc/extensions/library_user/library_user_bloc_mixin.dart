@@ -28,6 +28,7 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
     switch (event.subscriptionConfig.dataType) {
       case ArtistsList:
       case TagsList:
+      case TagCategoriesList:
       case ArtistData:
       case TagData:
         await _listenToStream(event.subscriptionConfig, emit);
@@ -61,7 +62,8 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   /// Can be overridden to update the state when other datasets change
   void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<S> emit) {
     if (subscriptionConfig.name == SubscriptionConfigFactory.allArtistsSubscriptionName ||
-        subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName) {
+        subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName ||
+        subscriptionConfig.name == SubscriptionConfigFactory.allTagCategoriesSubscriptionName) {
       state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
     }
   }
@@ -71,7 +73,8 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
   void onStreamSubscriptionError(
       SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<S> emit) {
     if (subscriptionConfig.name == SubscriptionConfigFactory.allArtistsSubscriptionName ||
-        subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName) {
+        subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName ||
+        subscriptionConfig.name == SubscriptionConfigFactory.allTagCategoriesSubscriptionName) {
       state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
     }
   }

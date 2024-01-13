@@ -73,6 +73,12 @@ mixin LibrarySubscriptionManager {
           throw InternalException('Cannot apply entity filters to TagsList subscription');
         }
         return () => repository.getTagsDataList(searchItem: subscriptionConfig.filter.searchItem);
+      case TagCategoriesList:
+        if (!subscriptionConfig.filter.includesAll) {
+          log.warning('Cannot apply filters to TagCategoriesList subscription');
+          throw InternalException('Cannot apply filters to TagCategoriesList subscription');
+        }
+        return () => repository.getTagCategories();
       case ArtistData:
         if (subscriptionConfig.filter.searchId == null) {
           log.warning('No artist Id supplied for ArtistData subscription');

@@ -5,11 +5,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moodtag/features/import/lastfm_import/connectors/lastfm_connector.dart' as LastFmConnector;
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
 import 'package:moodtag/shared/bloc/events/lastfm_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/extensions/error_handling/error_stream_handling.dart';
+import 'package:moodtag/shared/bloc/extensions/library_user/library_subscriber_state_mixin.dart';
+import 'package:moodtag/shared/bloc/extensions/library_user/library_subscription_sub_state.dart';
+import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
@@ -17,12 +22,15 @@ import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.
 
 part 'app_settings_state.dart';
 
-class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with ErrorStreamHandling {
+class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryUserBlocMixin, ErrorStreamHandling {
   late final Repository _repository;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
   late final StreamSubscription<LastFmAccount?> _accountStreamSubscription;
 
   AppSettingsBloc(this._repository, BuildContext mainContext) : super(AppSettingsState()) {
+    useLibrary(_repository);
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllTagCategoriesListConfig()));
+
     on<LastFmAccountUpdated>(_handleLastFmAccountUpdatedEvent);
     on<AddLastFmAccount>(_handleAddLastFmAccountEvent);
     on<RemoveLastFmAccount>(_handleRemoveLastFmAccountEvent);

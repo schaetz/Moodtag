@@ -1,4 +1,5 @@
 import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 
 import 'library_query_filter.dart';
 import 'subscription_config.dart';
@@ -6,6 +7,7 @@ import 'subscription_config.dart';
 class SubscriptionConfigFactory {
   static const allArtistsSubscriptionName = 'all_artists';
   static const allTagsSubscriptionName = 'all_tags';
+  static const allTagCategoriesSubscriptionName = 'all_tag_categories';
 
   static const filteredArtistsSubscriptionName = 'filtered_artists_list';
   static const filteredArtistsWithTagSubscriptionName = 'filtered_artists_with_tag';
@@ -19,6 +21,10 @@ class SubscriptionConfigFactory {
 
   static SubscriptionConfig getAllTagsListConfig() =>
       SubscriptionConfig.immutable(allTagsSubscriptionName, TagsList, filter: LibraryQueryFilter.none());
+
+  static SubscriptionConfig getAllTagCategoriesListConfig() =>
+      SubscriptionConfig.immutable(allTagCategoriesSubscriptionName, List<TagCategory>,
+          filter: LibraryQueryFilter.none());
 
   static SubscriptionConfig getFilteredArtistsListConfig(LibraryQueryFilter filter) =>
       SubscriptionConfig(ArtistsList, name: filteredArtistsSubscriptionName, filter: filter);

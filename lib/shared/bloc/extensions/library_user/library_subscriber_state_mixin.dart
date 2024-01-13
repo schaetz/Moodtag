@@ -30,6 +30,15 @@ abstract mixin class LibrarySubscriberStateMixin {
     return LoadedData.error(message: 'The TagsList stream is not available.');
   }
 
+  LoadedData<TagCategoriesList> get allTagCategories {
+    final allTagCategoriesListConfig = SubscriptionConfigFactory.getAllTagCategoriesListConfig();
+    final loadedData = librarySubscriptionSubState.getCurrentDataForSubscription(allTagCategoriesListConfig);
+    if (loadedData != null && loadedData.loadingStatus == LoadingStatus.success) {
+      return LoadedData<TagCategoriesList>.success(loadedData.data);
+    }
+    return LoadedData.error(message: 'The TagCategoriesList stream is not available.');
+  }
+
   LibrarySubscriberStateMixin copyWith({LibrarySubscriptionSubState? librarySubscription});
 
   LibrarySubscriberStateMixin updateLibrarySubscription(SubscriptionConfig subscriptionConfig, LoadedData loadedData) {

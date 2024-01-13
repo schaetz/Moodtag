@@ -11,6 +11,7 @@ import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/dialogs/add_lastfm_account_dialog.dart';
 import 'package:moodtag/shared/dialogs/delete_dialog.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
+import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
 
 class AppSettingsScreen extends StatelessWidget {
@@ -29,14 +30,27 @@ class AppSettingsScreen extends StatelessWidget {
               builder: (context, state) {
                 return SingleChildScrollView(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Tag categories', style: headlineTextStyle),
+                  _buildTagCategoriesSection(context, bloc, state),
+                  _buildDividerWithPadding(),
                   Text('Import', style: headlineTextStyle),
                   _buildImportSection(context, bloc, state),
-                  Padding(padding: const EdgeInsets.symmetric(vertical: 16.0), child: Divider()),
+                  _buildDividerWithPadding(),
                   Text('Library', style: headlineTextStyle),
                   _buildLibrarySection(context, bloc),
                 ]));
               }),
         ));
+  }
+
+  Padding _buildDividerWithPadding() => Padding(padding: const EdgeInsets.symmetric(vertical: 16.0), child: Divider());
+
+  Widget _buildTagCategoriesSection(BuildContext context, AppSettingsBloc bloc, AppSettingsState state) {
+    return Card(
+        child: LoadedDataDisplayWrapper(
+            loadedData: state.allTagCategories,
+            buildOnSuccess: (tagCategories) =>
+                Column(children: tagCategories.map((category) => ListTile(title: Text(category.name))).toList())));
   }
 
   Widget _buildImportSection(BuildContext context, AppSettingsBloc bloc, AppSettingsState state) {

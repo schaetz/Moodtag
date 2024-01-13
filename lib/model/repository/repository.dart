@@ -169,7 +169,11 @@ class Repository with LibrarySubscriptionManager {
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<TagCategory>(createTagCategoryFuture, name);
   }
 
-  Future<List<TagCategory>> getTagCategoriesOnce() {
+  Stream<TagCategoriesList> getTagCategories() {
+    return db.getTagCategories();
+  }
+
+  Future<TagCategoriesList> getTagCategoriesOnce() {
     return db.getTagCategoriesOnce();
   }
 

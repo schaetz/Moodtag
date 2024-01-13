@@ -37,3 +37,5 @@ class TagData implements DataClassWithEntityName {
 }
 
 typedef TagsList = List<TagData>;
+
+typedef TagCategoriesList = List<TagCategory>;
