@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:logging/logging.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
@@ -121,8 +122,10 @@ mixin LibrarySubscriptionManager {
     final behaviorSubject = BehaviorSubject<LoadedData>();
     behaviorSubject.add(LoadedData.loading());
 
-    final streamSubscription = await streamReference().handleError((errorMessage) {
-      log.warning('Update BehaviorSubject with error from stream for $subscriptionConfig: ', errorMessage);
+    final streamSubscription = await streamReference().handleError((errorObject) {
+      log.warning('Update BehaviorSubject with error from stream for $subscriptionConfig: ', errorObject);
+      final errorMessage =
+          errorObject is String ? errorObject : (errorObject is SqliteException ? errorObject.message : null);
       behaviorSubject.add(LoadedData.error(message: errorMessage));
     }).listen((dataFromStream) {
       log.finer('Update BehaviorSubject for ${subscriptionConfig.toString()}');

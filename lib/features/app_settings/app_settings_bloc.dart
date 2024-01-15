@@ -18,19 +18,22 @@ import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mi
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
+import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
 
 part 'app_settings_state.dart';
 
 class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryUserBlocMixin, ErrorStreamHandling {
   late final Repository _repository;
-  final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();
+  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
   late final StreamSubscription<LastFmAccount?> _accountStreamSubscription;
 
   AppSettingsBloc(this._repository, BuildContext mainContext) : super(AppSettingsState()) {
     useLibrary(_repository);
     add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllTagCategoriesListConfig()));
 
+    on<CreateTagCategory>(_handleCreateTagCategoryEvent);
+    on<DeleteTagCategory>(_handleDeleteTagCategoryEvent);
     on<LastFmAccountUpdated>(_handleLastFmAccountUpdatedEvent);
     on<AddLastFmAccount>(_handleAddLastFmAccountEvent);
     on<RemoveLastFmAccount>(_handleRemoveLastFmAccountEvent);
@@ -55,6 +58,28 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
     closeErrorStreamController();
   }
 
+  // TODO Is not being used yet
+  void _handleCreateTagCategoryEvent(CreateTagCategory event, Emitter<AppSettingsState> emit) async {
+    final createTagCategoryResponse = await _repository.createTagCategory(event.name, color: event.color.value);
+    if (createTagCategoryResponse.didFail()) {
+      errorStreamController.add(createTagCategoryResponse.getUserFeedbackException());
+    }
+  }
+
+  void _handleDeleteTagCategoryEvent(DeleteTagCategory event, Emitter<AppSettingsState> emit) async {
+    final insertedCategory = event.insertedCategory ?? await _repository.getDefaultTagCategoryOnce();
+    if (insertedCategory == null || insertedCategory.id == event.insertedCategory) {
+      errorStreamController.add(InvalidUserInputException(
+          'Cannot delete the tag category "${event.deletedCategory.name}": No default category obtained.'));
+      return;
+    }
+
+    final deleteTagCategoryResponse = await _repository.deleteTagCategory(event.deletedCategory, insertedCategory);
+    if (deleteTagCategoryResponse.didFail()) {
+      errorStreamController.add(deleteTagCategoryResponse.getUserFeedbackException());
+    }
+  }
+
   void _handleLastFmAccountUpdatedEvent(LastFmAccountUpdated event, Emitter<AppSettingsState> emit) async {
     if (event.error != null) {
       errorStreamController
@@ -76,7 +101,7 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
   }
 
   void _handleRemoveLastFmAccountEvent(RemoveLastFmAccount event, Emitter<AppSettingsState> emit) async {
-    final exception = await createEntityBlocHelper.handleRemoveLastFmAccount(_repository);
+    final exception = await _createEntityBlocHelper.handleRemoveLastFmAccount(_repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }
@@ -98,7 +123,7 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
   Future<LastFmAccount?> _createOrUpdateLastFmAccount(String accountName) async {
     try {
       final userInfo = await LastFmConnector.getUserInfo(accountName);
-      final exception = await createEntityBlocHelper.handleCreateOrUpdateLastFmAccountEvent(userInfo, _repository);
+      final exception = await _createEntityBlocHelper.handleCreateOrUpdateLastFmAccountEvent(userInfo, _repository);
       if (exception != null) {
         errorStreamController.add(exception);
       } else {

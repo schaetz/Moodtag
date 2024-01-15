@@ -4,6 +4,7 @@ import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/features/app_settings/app_settings_bloc.dart';
 import 'package:moodtag/features/app_settings/lastfm_account_management/lastfm_account_selector.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/lastfm_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
@@ -49,8 +50,30 @@ class AppSettingsScreen extends StatelessWidget {
     return Card(
         child: LoadedDataDisplayWrapper(
             loadedData: state.allTagCategories,
-            buildOnSuccess: (tagCategories) =>
-                Column(children: tagCategories.map((category) => ListTile(title: Text(category.name))).toList())));
+            buildOnSuccess: (tagCategories) => Column(
+                    children: tagCategories.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final category = entry.value;
+                  return ListTile(
+                    leading: Icon(
+                      Icons.circle,
+                      color: category.color != null ? Color(category.color!) : Colors.white,
+                    ),
+                    title: Text(entry.value.name),
+                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                      IconButton(icon: Icon(Icons.edit), onPressed: () => {}),
+                      IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () => DeleteDialog.openNew<TagCategory>(context,
+                              entityToDelete: category, deleteHandler: () => bloc.add(DeleteTagCategory(category))))
+                    ]),
+                    shape: index < tagCategories.length - 1
+                        ? Border(
+                            bottom: BorderSide(),
+                          )
+                        : null,
+                  );
+                }).toList())));
   }
 
   Widget _buildImportSection(BuildContext context, AppSettingsBloc bloc, AppSettingsState state) {
@@ -87,7 +110,7 @@ class AppSettingsScreen extends StatelessWidget {
 
   Widget _buildLibrarySection(BuildContext context, AppSettingsBloc bloc) {
     return Padding(
-        padding: const EdgeInsets.only(top: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(children: [
           Center(
               child: FractionallySizedBox(

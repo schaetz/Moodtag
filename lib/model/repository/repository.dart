@@ -109,6 +109,10 @@ class Repository with LibrarySubscriptionManager {
     return db.getTagsDataList(searchItem: searchItem);
   }
 
+  Stream<List<TagData>> getTagsWithCategory(TagCategory tagCategory) {
+    return db.getTagsDataList(tagCategory: tagCategory);
+  }
+
   Stream<TagData?> getTagDataById(int id) {
     return db.getTagDataById(id);
   }
@@ -181,8 +185,14 @@ class Repository with LibrarySubscriptionManager {
     return db.getDefaultTagCategoryOnce();
   }
 
-  Future deleteAllTagCategories() {
-    return db.deleteAllTagCategories();
+  Future<DbRequestResponse> deleteTagCategory(TagCategory deletedCategory, TagCategory insertedCategory) {
+    Future deleteTagCategoryFuture = db.deleteTagCategoryById(deletedCategory.id, insertedCategory.id);
+    return helper.wrapExceptionsAndReturnResponse(deleteTagCategoryFuture);
+  }
+
+  Future<DbRequestResponse> deleteAllTagCategories() {
+    Future deleteAllTagCategoriesFuture = db.deleteAllTagCategories();
+    return helper.wrapExceptionsAndReturnResponse(deleteAllTagCategoriesFuture);
   }
 
   //

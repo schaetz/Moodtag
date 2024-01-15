@@ -72,19 +72,13 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
     } else if (entityToDelete is Tag) {
       Tag tag = entityToDelete as Tag;
       final mainMessage = 'Are you sure that you want to delete the tag "${tag.name}"?';
-      String appendix = '';
-      await repository.getArtistsDataHavingTag(tag).first.then((artistsWithTag) {
-        if (artistsWithTag.length == 0) {
-          appendix = ' It is currently not assigned to any artist.';
-        } else if (artistsWithTag.length == 1) {
-          appendix = ' There is currently 1 artist which uses this tag.';
-        } else {
-          appendix = ' There are currently ${artistsWithTag.length} artists which use this tag.';
-        }
-      }).onError((error, stackTrace) {
-        appendix = ' It is currently not assigned to any artist.';
-      });
-      return mainMessage + appendix;
+      String appendix = await _getRelatedEntitiesMessage(repository);
+      return '$mainMessage $appendix';
+    } else if (entityToDelete is TagCategory) {
+      TagCategory tagCategory = entityToDelete as TagCategory;
+      final mainMessage = 'Are you sure that you want to delete the tag category "${tagCategory.name}"?';
+      String appendix = await _getRelatedEntitiesMessage(repository);
+      return '$mainMessage $appendix';
     } else {
       return 'Error: Invalid entity';
     }
@@ -97,5 +91,33 @@ class DeleteDialog<T> extends AbstractDialog<bool> {
 
     await deleteHandler();
     closeDialog(context);
+  }
+
+  Future<String> _getRelatedEntitiesMessage(Repository repository) async {
+    late final String deletedEntityDenotation;
+    late final String relatedEntityDenotation;
+    late final List relatedEntities;
+    switch (T) {
+      case Tag:
+        deletedEntityDenotation = 'tag';
+        relatedEntityDenotation = 'artist';
+        relatedEntities = await repository.getArtistsDataHavingTag(entityToDelete as Tag).first;
+        break;
+      case TagCategory:
+        deletedEntityDenotation = 'category';
+        relatedEntityDenotation = 'tag';
+        relatedEntities = await repository.getTagsWithCategory(entityToDelete as TagCategory).first;
+        break;
+      default:
+        return '';
+    }
+
+    if (relatedEntities.length == 0) {
+      return 'It is currently not assigned to any $relatedEntityDenotation.';
+    } else if (relatedEntities.length == 1) {
+      return 'There is currently 1 $relatedEntityDenotation which uses this $deletedEntityDenotation.';
+    } else {
+      return 'There are currently ${relatedEntities.length} ${relatedEntityDenotation}s which use this $deletedEntityDenotation.';
+    }
   }
 }

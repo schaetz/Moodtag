@@ -73,10 +73,13 @@ class MoodtagDB extends _$MoodtagDB {
 
   // GET Tags
 
-  Stream<List<TagData>> getTagsDataList({String? searchItem = null}) {
+  Stream<List<TagData>> getTagsDataList({String? searchItem = null, TagCategory? tagCategory}) {
     final query = select(tags).join(joinAssignedTagsForTag(this))..addColumns([assignedTags.artist.count()]);
     if (searchItem != null && searchItem.isNotEmpty) {
       query..where(tags.name.like('$searchItem%'));
+    }
+    if (tagCategory != null) {
+      query..where(tags.category.equals(tagCategory.id));
     }
     query
       ..groupBy([tags.id])
@@ -209,6 +212,14 @@ class MoodtagDB extends _$MoodtagDB {
 
   Future<int> removeTagFromArtist(int artistId, int tagId) {
     return (delete(assignedTags)..where((row) => row.artist.equals(artistId) & row.tag.equals(tagId))).go();
+  }
+
+  Future deleteTagCategoryById(int deletedCategoryId, int insertedCategoryId) {
+    return Future.wait([
+      (update(tags)..where((row) => row.category.equals(deletedCategoryId)))
+          .write(TagsCompanion(category: Value(insertedCategoryId))),
+      (delete(tagCategories)..where((c) => c.id.equals(deletedCategoryId))).go()
+    ]);
   }
 
   Future deleteAllArtists() {

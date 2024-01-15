@@ -2,6 +2,7 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/helpers/entity_processing_helper.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
+import 'package:moodtag/shared/bloc/events/lastfm_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/exceptions/db_request_response.dart';
 import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
@@ -98,6 +99,15 @@ class CreateEntityBlocHelper {
     bool isTagAssignedToArtist = await repository.doesArtistHaveTag(event.artist, event.tag);
     if (isTagAssignedToArtist) {
       return await _removeTagFromArtist(event.artist, event.tag, repository);
+    }
+
+    return Future.value(null);
+  }
+
+  Future<UserReadableException?> handleCreateTagCategoryEvent(CreateTagCategory event, Repository repository) async {
+    final createTagCategoryResponse = await repository.createTagCategory(event.name, color: event.color.value);
+    if (createTagCategoryResponse.didFail()) {
+      return createTagCategoryResponse.getUserFeedbackException();
     }
 
     return Future.value(null);

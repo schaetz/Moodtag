@@ -1,7 +1,43 @@
+import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 
-abstract class LastFmEvent extends LibraryEvent {
+abstract class AppSettingsEvent extends LibraryEvent {
+  const AppSettingsEvent();
+}
+
+class CreateTagCategory extends AppSettingsEvent {
+  final String name;
+  final Color color;
+
+  const CreateTagCategory(this.name, {required this.color});
+
+  @override
+  List<Object> get props => [name, color];
+}
+
+class DeleteTagCategory extends AppSettingsEvent {
+  final TagCategory deletedCategory;
+  final TagCategory? insertedCategory;
+
+  const DeleteTagCategory(this.deletedCategory, {this.insertedCategory});
+
+  @override
+  List<Object?> get props => [deletedCategory, insertedCategory];
+}
+
+class EditTagCategory extends AppSettingsEvent {
+  final TagCategory tagCategory;
+
+  const EditTagCategory(this.tagCategory);
+
+  @override
+  List<Object> get props => [tagCategory];
+}
+
+// Last.fm
+
+abstract class LastFmEvent extends AppSettingsEvent {
   const LastFmEvent();
 }
 
