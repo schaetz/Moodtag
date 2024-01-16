@@ -142,6 +142,10 @@ class MoodtagDB extends _$MoodtagDB {
     return (select(tagCategories)).get();
   }
 
+  Future<TagCategory?> getTagCategoryByIdOnce(int categoryId) {
+    return (select(tagCategories)..where((c) => c.id.equals(categoryId))).getSingleOrNull();
+  }
+
   Future<TagCategory?> getDefaultTagCategoryOnce({int? excludeId}) {
     final selectStatement = select(tagCategories);
     if (excludeId != null) {

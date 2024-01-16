@@ -57,7 +57,6 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
     closeErrorStreamController();
   }
 
-  // TODO Is not being used yet
   void _handleCreateTagCategoryEvent(CreateTagCategory event, Emitter<AppSettingsState> emit) async {
     final createTagCategoryResponse = await _repository.createTagCategory(event.name, color: event.color.value);
     if (createTagCategoryResponse.didFail()) {

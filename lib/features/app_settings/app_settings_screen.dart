@@ -9,6 +9,7 @@ import 'package:moodtag/model/repository/library_subscription/data_wrapper/loadi
 import 'package:moodtag/shared/bloc/events/lastfm_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
+import 'package:moodtag/shared/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/shared/dialogs/add_lastfm_account_dialog.dart';
 import 'package:moodtag/shared/dialogs/delete_dialog.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
@@ -47,33 +48,42 @@ class AppSettingsScreen extends StatelessWidget {
   Padding _buildDividerWithPadding() => Padding(padding: const EdgeInsets.symmetric(vertical: 16.0), child: Divider());
 
   Widget _buildTagCategoriesSection(BuildContext context, AppSettingsBloc bloc, AppSettingsState state) {
-    return Card(
-        child: LoadedDataDisplayWrapper(
-            loadedData: state.allTagCategories,
-            buildOnSuccess: (tagCategories) => Column(
-                    children: tagCategories.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final category = entry.value;
-                  return ListTile(
-                    leading: Icon(
-                      Icons.circle,
-                      color: category.color != null ? Color(category.color!) : Colors.white,
-                    ),
-                    title: Text(entry.value.name),
-                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                      IconButton(icon: Icon(Icons.edit), onPressed: () => {}),
-                      IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () => DeleteDialog.openNew<TagCategory>(context,
-                              entityToDelete: category, deleteHandler: () => bloc.add(DeleteTagCategory(category))))
-                    ]),
-                    shape: index < tagCategories.length - 1
-                        ? Border(
-                            bottom: BorderSide(),
-                          )
-                        : null,
-                  );
-                }).toList())));
+    return Column(children: [
+      Card(
+          child: LoadedDataDisplayWrapper(
+              loadedData: state.allTagCategories,
+              buildOnSuccess: (tagCategories) => Column(
+                      children: tagCategories.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final category = entry.value;
+                    return ListTile(
+                      leading: Icon(
+                        Icons.circle,
+                        color: category.color != null ? Color(category.color!) : Colors.white,
+                      ),
+                      title: Text(entry.value.name),
+                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                        IconButton(icon: Icon(Icons.edit), onPressed: () => {}),
+                        IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () => DeleteDialog.openNew<TagCategory>(context,
+                                entityToDelete: category, deleteHandler: () => bloc.add(DeleteTagCategory(category))))
+                      ]),
+                      shape: index < tagCategories.length - 1
+                          ? Border(
+                              bottom: BorderSide(),
+                            )
+                          : null,
+                    );
+                  }).toList()))),
+      Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: ElevatedButton.icon(
+              icon: Icon(Icons.add),
+              label: Text('Add category'),
+              onPressed: () => AddEntityDialog<TagCategory, Tag>(context,
+                  onSendInput: (nameInput) => bloc.add(CreateTagCategory(nameInput, color: Colors.blue)))))
+    ]);
   }
 
   Widget _buildImportSection(BuildContext context, AppSettingsBloc bloc, AppSettingsState state) {
