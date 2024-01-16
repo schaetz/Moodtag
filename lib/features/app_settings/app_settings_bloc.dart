@@ -18,7 +18,6 @@ import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mi
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
-import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.dart';
 
 part 'app_settings_state.dart';
@@ -67,16 +66,17 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
   }
 
   void _handleDeleteTagCategoryEvent(DeleteTagCategory event, Emitter<AppSettingsState> emit) async {
-    final insertedCategory = event.insertedCategory ?? await _repository.getDefaultTagCategoryOnce();
-    if (insertedCategory == null || insertedCategory.id == event.insertedCategory) {
-      errorStreamController.add(InvalidUserInputException(
-          'Cannot delete the tag category "${event.deletedCategory.name}": No default category obtained.'));
-      return;
-    }
-
-    final deleteTagCategoryResponse = await _repository.deleteTagCategory(event.deletedCategory, insertedCategory);
-    if (deleteTagCategoryResponse.didFail()) {
-      errorStreamController.add(deleteTagCategoryResponse.getUserFeedbackException());
+    try {
+      final deleteTagCategoryResponse =
+          await _repository.removeTagCategory(event.deletedCategory, event.insertedCategory);
+      if (deleteTagCategoryResponse.didFail()) {
+        errorStreamController.add(deleteTagCategoryResponse.getUserFeedbackException());
+      }
+    } catch (exception) {
+      log.warning(exception);
+      if (exception is UserReadableException) {
+        errorStreamController.add(exception);
+      }
     }
   }
 

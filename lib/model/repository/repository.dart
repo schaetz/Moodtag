@@ -6,6 +6,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/helpers/repository_helper.dart';
 import 'package:moodtag/model/repository/library_subscription/repository_mixin/library_subscription_manager.dart';
 import 'package:moodtag/shared/exceptions/db_request_response.dart';
+import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
@@ -181,11 +182,26 @@ class Repository with LibrarySubscriptionManager {
     return db.getTagCategoriesOnce();
   }
 
-  Future<TagCategory?> getDefaultTagCategoryOnce() {
-    return db.getDefaultTagCategoryOnce();
+  Future<TagCategory?> getDefaultTagCategoryOnce({int? excludeId}) {
+    return db.getDefaultTagCategoryOnce(excludeId: excludeId);
   }
 
-  Future<DbRequestResponse> deleteTagCategory(TagCategory deletedCategory, TagCategory insertedCategory) {
+  /** Deletes a tag category, making sure that it is not the last remaining category
+   *  and that there is a replacement for all tags currently using this category */
+  Future<DbRequestResponse> removeTagCategory(TagCategory deletedCategory, TagCategory? insertedCategory) async {
+    if (insertedCategory == null) {
+      insertedCategory = await getDefaultTagCategoryOnce(excludeId: deletedCategory.id);
+      if (insertedCategory == null) {
+        throw DatabaseError('Tag category "${deletedCategory.name}" can not be removed, as there is no replacement.');
+      }
+    }
+
+    return await _deleteTagCategory(deletedCategory, insertedCategory);
+  }
+
+  /** Deletes a tag category WITHOUT making sure that it is not the last remaining category
+   *  and that there is a replacement for all tags currently using this category */
+  Future<DbRequestResponse> _deleteTagCategory(TagCategory deletedCategory, TagCategory insertedCategory) {
     Future deleteTagCategoryFuture = db.deleteTagCategoryById(deletedCategory.id, insertedCategory.id);
     return helper.wrapExceptionsAndReturnResponse(deleteTagCategoryFuture);
   }
