@@ -53,21 +53,22 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
   }
 
   @override
-  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<ArtistsListState> emit) {
-    super.onDataReceived(subscriptionConfig, loadedData, emit);
+  ArtistsListState getNewStateForReceivedData(
+      SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<ArtistsListState> emit) {
     if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
-      emit(state.copyWith(
-          loadedDataFilteredArtists: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+      return state.copyWith(
+          loadedDataFilteredArtists: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus));
     }
+    return super.getNewStateForReceivedData(subscriptionConfig, loadedData, emit);
   }
 
   @override
-  void onStreamSubscriptionError(
-      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<ArtistsListState> emit) {
-    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+  ArtistsListState getNewStateForSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object? object, StackTrace? stackTrace, Emitter<ArtistsListState> emit) {
     if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
-      emit(state.copyWith(loadedDataFilteredArtists: LoadedData.error()));
+      return state.copyWith(loadedDataFilteredArtists: LoadedData.error());
     }
+    return super.getNewStateForSubscriptionError(subscriptionConfig, object, stackTrace, emit);
   }
 
   void _handleCreateArtistsEvent(CreateArtists event, Emitter<ArtistsListState> emit) async {

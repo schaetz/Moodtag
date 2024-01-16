@@ -52,36 +52,39 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
   }
 
   @override
-  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagDetailsState> emit) {
-    super.onDataReceived(subscriptionConfig, loadedData, emit);
+  TagDetailsState getNewStateForReceivedData(
+      SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagDetailsState> emit) {
     if (subscriptionConfig.name == tagByIdSubscriptionName) {
-      emit(state.copyWith(loadedTagData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+      final newState =
+          state.copyWith(loadedTagData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus));
       if (loadedData.loadingStatus.isSuccess && state.loadedDataFilteredArtistsWithTag.loadingStatus.isInitial) {
         final tagData = loadedData.data as TagData;
         add(RequestOrUpdateSubscription(ArtistsList,
             name: filteredArtistsWithTagSubscriptionName,
             filter: LibraryQueryFilter(searchItem: state.searchItem, entityFilters: {tagData.tag})));
       }
+      return newState;
     } else if (subscriptionConfig.name == filteredArtistsWithTagSubscriptionName) {
-      emit(state.copyWith(
-          loadedDataFilteredArtistsWithTag: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+      return state.copyWith(
+          loadedDataFilteredArtistsWithTag: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus));
     } else if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
-      emit(state.copyWith(
-          loadedDataFilteredArtists: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+      return state.copyWith(
+          loadedDataFilteredArtists: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus));
     }
+    return super.getNewStateForReceivedData(subscriptionConfig, loadedData, emit);
   }
 
   @override
-  void onStreamSubscriptionError(
-      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<TagDetailsState> emit) {
-    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+  TagDetailsState getNewStateForSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object? object, StackTrace? stackTrace, Emitter<TagDetailsState> emit) {
     if (subscriptionConfig.name == tagByIdSubscriptionName) {
-      emit(state.copyWith(loadedTagData: LoadedData.error()));
+      return state.copyWith(loadedTagData: LoadedData.error());
     } else if (subscriptionConfig.name == filteredArtistsWithTagSubscriptionName) {
-      emit(state.copyWith(loadedDataFilteredArtistsWithTag: LoadedData.error()));
+      return state.copyWith(loadedDataFilteredArtistsWithTag: LoadedData.error());
     } else if (subscriptionConfig.name == filteredArtistsSubscriptionName) {
-      emit(state.copyWith(loadedDataFilteredArtists: LoadedData.error()));
+      return state.copyWith(loadedDataFilteredArtists: LoadedData.error());
     }
+    return super.getNewStateForSubscriptionError(subscriptionConfig, object, stackTrace, emit);
   }
 
   void _handleAddArtistsForTagEvent(AddArtistsForTag event, Emitter<TagDetailsState> emit) async {

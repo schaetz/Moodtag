@@ -52,20 +52,21 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
   }
 
   @override
-  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<ArtistDetailsState> emit) {
-    super.onDataReceived(subscriptionConfig, loadedData, emit);
+  ArtistDetailsState getNewStateForReceivedData(
+      SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<ArtistDetailsState> emit) {
     if (subscriptionConfig.name == artistByIdSubscriptionName) {
-      emit(state.copyWith(loadedArtistData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+      return state.copyWith(loadedArtistData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus));
     }
+    return super.getNewStateForReceivedData(subscriptionConfig, loadedData, emit);
   }
 
   @override
-  void onStreamSubscriptionError(
-      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<ArtistDetailsState> emit) {
-    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+  ArtistDetailsState getNewStateForSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object? object, StackTrace? stackTrace, Emitter<ArtistDetailsState> emit) {
     if (subscriptionConfig.name == artistByIdSubscriptionName) {
-      emit(state.copyWith(loadedArtistData: LoadedData.error()));
+      return state.copyWith(loadedArtistData: LoadedData.error());
     }
+    return super.getNewStateForSubscriptionError(subscriptionConfig, object, stackTrace, emit);
   }
 
   void _handleToggleTagEditModeEvent(ToggleTagEditMode event, Emitter<ArtistDetailsState> emit) {

@@ -4,6 +4,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/data_loading_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
@@ -48,34 +49,37 @@ mixin LibraryUserBlocMixin<S extends LibrarySubscriberStateMixin> on Bloc<Librar
       await emit.forEach(behaviorSubject, onData: (LoadedData loadedData) {
         log.finer(
             '${this.runtimeType} | Received library data | ${subscriptionConfig.toStringVerbose()} | ${loadedData.loadingStatus}');
-        onDataReceived(subscriptionConfig, loadedData, emit);
-        return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
+        if (loadedData.loadingStatus.isError) {
+          return getNewStateForSubscriptionError(subscriptionConfig, loadedData.errorMessage, null, emit);
+        } else {
+          return getNewStateForReceivedData(subscriptionConfig, loadedData, emit);
+        }
       }, onError: (obj, stackTrace) {
         log.warning('${this.runtimeType} | Received error | ${subscriptionConfig.toStringVerbose()}', obj, stackTrace);
-        onStreamSubscriptionError(subscriptionConfig, obj, stackTrace, emit);
-        return state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
+        return getNewStateForSubscriptionError(subscriptionConfig, obj, stackTrace, emit);
       });
       log.fine('${this.runtimeType} | emit.forEach was finished | ${subscriptionConfig.toStringVerbose()}');
     }
   }
 
   /// Can be overridden to update the state when other datasets change
-  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<S> emit) {
+  S getNewStateForReceivedData(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<S> emit) {
     if (subscriptionConfig.name == SubscriptionConfigFactory.allArtistsSubscriptionName ||
         subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName ||
         subscriptionConfig.name == SubscriptionConfigFactory.allTagCategoriesSubscriptionName) {
-      state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
+      return state.updateLibrarySubscription(subscriptionConfig, loadedData) as S;
     }
+    return state;
   }
 
   /// Can be overridden to update the state when an error occurs in another subscription
-  /// (note: this is NOT fired when LoadingStatus is ERROR, e.g. because of database errors)
-  void onStreamSubscriptionError(
-      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<S> emit) {
+  S getNewStateForSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object? object, StackTrace? stackTrace, Emitter<S> emit) {
     if (subscriptionConfig.name == SubscriptionConfigFactory.allArtistsSubscriptionName ||
         subscriptionConfig.name == SubscriptionConfigFactory.allTagsSubscriptionName ||
         subscriptionConfig.name == SubscriptionConfigFactory.allTagCategoriesSubscriptionName) {
-      state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
+      return state.updateLibrarySubscription(subscriptionConfig, LoadedData.error()) as S;
     }
+    return state;
   }
 }

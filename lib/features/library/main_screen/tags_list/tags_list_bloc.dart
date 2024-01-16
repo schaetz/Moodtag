@@ -1,3 +1,4 @@
+import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
@@ -45,21 +46,24 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
   }
 
   @override
-  void onDataReceived(SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagsListState> emit) {
-    super.onDataReceived(subscriptionConfig, loadedData, emit);
+  TagsListState getNewStateForReceivedData(
+      SubscriptionConfig subscriptionConfig, LoadedData loadedData, Emitter<TagsListState> emit) {
     if (subscriptionConfig.name == filteredTagsSubscriptionName) {
-      emit(
-          state.copyWith(loadedDataFilteredTags: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus)));
+      return state.copyWith(
+          loadedDataFilteredTags: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus));
     }
+    return super.getNewStateForReceivedData(subscriptionConfig, loadedData, emit);
   }
 
   @override
-  void onStreamSubscriptionError(
-      SubscriptionConfig subscriptionConfig, Object object, StackTrace stackTrace, Emitter<TagsListState> emit) {
-    super.onStreamSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+  TagsListState getNewStateForSubscriptionError(
+      SubscriptionConfig subscriptionConfig, Object? object, StackTrace? stackTrace, Emitter<TagsListState> emit) {
     if (subscriptionConfig.name == filteredTagsSubscriptionName) {
-      emit(state.copyWith(loadedDataFilteredTags: LoadedData.error()));
+      final errorMessage = object is String ? object : (object is SqliteException ? object.message : null);
+      log.warning("Stream subscription error in TagsListBloc: $errorMessage", object);
+      return state.copyWith(loadedDataFilteredTags: LoadedData.error(message: errorMessage));
     }
+    return super.getNewStateForSubscriptionError(subscriptionConfig, object, stackTrace, emit);
   }
 
   void _handleCreateTagsEvent(CreateTags event, Emitter<TagsListState> emit) async {
