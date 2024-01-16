@@ -116,9 +116,11 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
     return Row(
       children: [
         Chip(
-          label: Text(state.loadedTagData.data?.category.name ?? 'Unknown category'),
-          avatar: Icon(Icons.category),
-        )
+            label: Text(state.loadedTagData.data?.category.name ?? 'Unknown category'),
+            avatar: Icon(Icons.category, color: Colors.black),
+            backgroundColor: state.loadedTagData.data?.category.color != null
+                ? Color(state.loadedTagData.data!.category.color!)
+                : Theme.of(context).colorScheme.background)
       ],
     );
   }
