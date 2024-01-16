@@ -27,9 +27,12 @@ class MtAppBar extends StatelessWidget implements PreferredSizeWidget {
     final onBackButtonPressed = appBarContextData?.onBackButtonPressed ?? null;
     return AppBar(
       title: _buildTitle(context),
-      actions: <Widget>[
-        IconButton(icon: Icon(Icons.settings), onPressed: () => Navigator.of(context).pushNamed(Routes.appSettings))
-      ],
+      actions: ModalRoute.of(context)?.settings.name == Routes.appSettings
+          ? []
+          : <Widget>[
+              IconButton(
+                  icon: Icon(Icons.settings), onPressed: () => Navigator.of(context).pushNamed(Routes.appSettings))
+            ],
       automaticallyImplyLeading: onBackButtonPressed == null,
       leading: onBackButtonPressed != null ? BackButton(onPressed: () => onBackButtonPressed()) : null,
       bottom: tabController != null ? buildTabBar() : null,
