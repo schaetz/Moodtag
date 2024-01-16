@@ -133,7 +133,7 @@ class AppSettingsScreen extends StatelessWidget {
   void _showLastFmImportScreen(BuildContext context) => Navigator.of(context).pushNamed(Routes.lastFmImport);
 
   void _openSetLastFmAccountNameDialog(BuildContext context, AppSettingsBloc bloc) async {
-    AddExternalAccountDialog(context, serviceName, onTerminate: (newAccountName) {
+    AddLastFmAccountDialog(context, serviceName, onTerminate: (newAccountName) {
       if (newAccountName != null) {
         bloc.add(AddLastFmAccount(newAccountName));
       }
