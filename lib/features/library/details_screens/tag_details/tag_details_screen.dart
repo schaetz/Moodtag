@@ -42,6 +42,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                           padding: EdgeInsets.only(bottom: 12.0),
                           child: _buildHeadline(context, state),
                         ),
+                        _buildChipsRow(context, state),
                         Expanded(
                             child: SearchBarContainer(
                           searchBarHintText: 'Search artist',
@@ -93,21 +94,34 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
     );
   }
 
-  Widget _buildHeadline(BuildContext context, TagDetailsState state) => RichText(
-        text: TextSpan(
-          children: [
-            WidgetSpan(
-              child: Icon(Icons.label),
-            ),
-            WidgetSpan(
-              child: SizedBox(width: 4),
-            ),
-            TextSpan(
-                text: state.loadedTagData.data?.name ?? 'Unknown tag',
-                style: tagNameStyle.copyWith(color: Theme.of(context).colorScheme.onBackground)),
-          ],
-        ),
-      );
+  Widget _buildHeadline(BuildContext context, TagDetailsState state) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          WidgetSpan(
+            child: Icon(Icons.label),
+          ),
+          WidgetSpan(
+            child: SizedBox(width: 4),
+          ),
+          TextSpan(
+              text: state.loadedTagData.data?.name ?? 'Unknown tag',
+              style: tagNameStyle.copyWith(color: Theme.of(context).colorScheme.onBackground)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChipsRow(BuildContext context, TagDetailsState state) {
+    return Row(
+      children: [
+        Chip(
+          label: Text(state.loadedTagData.data?.category.name ?? 'Unknown category'),
+          avatar: Icon(Icons.category),
+        )
+      ],
+    );
+  }
 
   Widget _buildRowForArtistSelection(BuildContext context, Tag tag, ArtistData artistData, TagDetailsBloc bloc) {
     return CheckboxListTile(

@@ -34,6 +34,10 @@ class MoodtagDB extends _$MoodtagDB {
         leftOuterJoin(db.artists, db.assignedTags.artist.equalsExp(db.artists.id)),
       ];
 
+  final joinTagCategoriesForTag = (MoodtagDB db) => [
+        leftOuterJoin(db.tagCategories, db.tagCategories.id.equalsExp(db.tags.category)),
+      ];
+
   //
   // GET
   //
@@ -74,7 +78,9 @@ class MoodtagDB extends _$MoodtagDB {
   // GET Tags
 
   Stream<List<TagData>> getTagsDataList({String? searchItem = null, TagCategory? tagCategory}) {
-    final query = select(tags).join(joinAssignedTagsForTag(this))..addColumns([assignedTags.artist.count()]);
+    final query = select(tags).join(joinAssignedTagsForTag(this)).join(joinTagCategoriesForTag(this))
+      ..addColumns([assignedTags.artist.count()]);
+
     if (searchItem != null && searchItem.isNotEmpty) {
       query..where(tags.name.like('$searchItem%'));
     }
@@ -84,12 +90,13 @@ class MoodtagDB extends _$MoodtagDB {
     query
       ..groupBy([tags.id])
       ..orderBy([OrderingTerm.asc(tags.name)]);
+
     final typedResultStream = query.watch();
     return typedResultStream.map((r) => r.map(_mapTagWithArtistFreqToTagData).toList());
   }
 
   Stream<TagData?> getTagDataById(int tagId) {
-    final query = select(tags).join(joinAssignedTagsForTag(this))
+    final query = select(tags).join(joinAssignedTagsForTag(this)).join(joinTagCategoriesForTag(this))
       ..addColumns([assignedTags.artist.count()])
       ..groupBy([tags.id])
       ..where(tags.id.equals(tagId));
@@ -120,6 +127,7 @@ class MoodtagDB extends _$MoodtagDB {
   TagData _mapTagWithArtistFreqToTagData(TypedResult row) {
     return TagData(
       row.readTable(tags),
+      row.readTable(tagCategories),
       row.read(assignedTags.artist.count()),
     );
   }

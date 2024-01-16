@@ -24,9 +24,10 @@ class ArtistData implements DataClassWithEntityName {
 typedef ArtistsList = List<ArtistData>;
 
 class TagData implements DataClassWithEntityName {
-  TagData(this.tag, this.freq);
+  TagData(this.tag, this.category, this.freq);
 
   final Tag tag;
+  final TagCategory category;
   final int? freq;
 
   @override
