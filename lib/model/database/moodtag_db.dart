@@ -12,7 +12,7 @@ import 'transformers/artists_with_tag_transformer.dart';
 
 part 'moodtag_db.g.dart';
 
-@DriftDatabase(tables: [Artists, Tags, AssignedTags, LastFmAccounts])
+@DriftDatabase(tables: [Artists, Tags, TagCategories, AssignedTags, LastFmAccounts])
 class MoodtagDB extends _$MoodtagDB {
   MoodtagDB() : super(_openConnection());
   MoodtagDB.InMemory() : super(NativeDatabase.memory());
@@ -135,11 +135,11 @@ class MoodtagDB extends _$MoodtagDB {
   // GET Tag categories
 
   Stream<TagCategoriesList> getTagCategories() {
-    return (select(tagCategories)).watch();
+    return (select(tagCategories)).map(_mapTagCategoryToTagCategoryData).watch();
   }
 
   Future<TagCategoriesList> getTagCategoriesOnce() {
-    return (select(tagCategories)).get();
+    return (select(tagCategories)).map(_mapTagCategoryToTagCategoryData).get();
   }
 
   Future<TagCategory?> getTagCategoryByIdOnce(int categoryId) {
@@ -156,6 +156,8 @@ class MoodtagDB extends _$MoodtagDB {
           ..limit(1))
         .getSingleOrNull();
   }
+
+  TagCategoryData _mapTagCategoryToTagCategoryData(TagCategory tagCategory) => TagCategoryData(tagCategory);
 
   // GET LastFmAccount
 

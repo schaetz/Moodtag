@@ -1,5 +1,4 @@
 import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
 
 import 'library_query_filter.dart';
 import 'subscription_config.dart';
@@ -23,7 +22,7 @@ class SubscriptionConfigFactory {
       SubscriptionConfig.immutable(allTagsSubscriptionName, TagsList, filter: LibraryQueryFilter.none());
 
   static SubscriptionConfig getAllTagCategoriesListConfig() =>
-      SubscriptionConfig.immutable(allTagCategoriesSubscriptionName, List<TagCategory>,
+      SubscriptionConfig.immutable(allTagCategoriesSubscriptionName, TagCategoriesList,
           filter: LibraryQueryFilter.none());
 
   static SubscriptionConfig getFilteredArtistsListConfig(LibraryQueryFilter filter) =>

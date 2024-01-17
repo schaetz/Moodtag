@@ -55,11 +55,12 @@ class AppSettingsScreen extends StatelessWidget {
               buildOnSuccess: (tagCategories) => Column(
                       children: tagCategories.asMap().entries.map((entry) {
                     final index = entry.key;
-                    final category = entry.value;
+                    final categoryData = entry.value;
+                    final tagCategory = categoryData.tagCategory;
                     return ListTile(
                       leading: Icon(
                         Icons.circle,
-                        color: Color(category.color),
+                        color: Color(tagCategory.color),
                       ),
                       title: Text(entry.value.name),
                       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -69,15 +70,16 @@ class AppSettingsScreen extends StatelessWidget {
                               context: context,
                               builder: (BuildContext context) => CreateTagCategoryDialogForm(
                                   isEditForm: true,
-                                  initialName: category.name,
-                                  initialColor: Color(category.color),
-                                  onSendInput: (nameInput, colorInput) =>
-                                      bloc.add(EditTagCategory(category, newName: nameInput, newColor: colorInput)))),
+                                  initialName: tagCategory.name,
+                                  initialColor: Color(tagCategory.color),
+                                  onSendInput: (nameInput, colorInput) => bloc
+                                      .add(EditTagCategory(tagCategory, newName: nameInput, newColor: colorInput)))),
                         ),
                         IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () => DeleteDialog.openNew<TagCategory>(context,
-                                entityToDelete: category, deleteHandler: () => bloc.add(DeleteTagCategory(category))))
+                                entityToDelete: tagCategory,
+                                deleteHandler: () => bloc.add(DeleteTagCategory(tagCategory))))
                       ]),
                       shape: index < tagCategories.length - 1
                           ? Border(

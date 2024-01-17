@@ -10,6 +10,8 @@ import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/add_entity_dialog.dart';
 import 'package:moodtag/shared/dialogs/remove_tag_from_artist_dialog.dart';
+import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog.dart';
+import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog_config.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
@@ -115,12 +117,24 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
   Widget _buildChipsRow(BuildContext context, TagDetailsState state) {
     return Row(
       children: [
-        Chip(
+        ActionChip(
             label: Text(state.loadedTagData.data?.category.name ?? 'Unknown category'),
             avatar: Icon(Icons.category, color: Colors.black),
             backgroundColor: state.loadedTagData.data?.category.color != null
                 ? Color(state.loadedTagData.data!.category.color)
-                : Theme.of(context).colorScheme.background)
+                : Theme.of(context).colorScheme.background,
+            onPressed: state.allTagCategories.data == null
+                ? null
+                : () => SelectEntityDialog<TagCategoryData>(
+                      context,
+                      SelectEntityDialogConfig(
+                          title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
+                          availableEntities: state.allTagCategories.data!,
+                          onSendInput: (selectedEntity) {}, // TODO
+                          selectionStyle: EntityDialogSelectionStyle.BOX_OUTLINE_AND_LEADING_ICON,
+                          iconSelector: (categoryData) =>
+                              Icon(Icons.circle, color: Color(categoryData.tagCategory.color))),
+                    ))
       ],
     );
   }

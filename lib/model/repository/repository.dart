@@ -29,7 +29,7 @@ class Repository with LibrarySubscriptionManager {
   }
 
   Future initializeLibraryIfNecessary() async {
-    List<TagCategory> tagCategories = await getTagCategoriesOnce();
+    List<TagCategoryData> tagCategories = await getTagCategoriesOnce();
     if (tagCategories.isEmpty) {
       _initializeLibrary();
     }

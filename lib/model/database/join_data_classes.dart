@@ -7,10 +7,10 @@ abstract class DataClassWithEntityName extends NamedEntity {
 }
 
 class ArtistData implements DataClassWithEntityName {
-  ArtistData(this.artist, this.tags);
-
   final Artist artist;
   final Set<Tag> tags;
+
+  ArtistData(this.artist, this.tags);
 
   bool hasTag(Tag tag) => tags.contains(tag);
 
@@ -24,11 +24,11 @@ class ArtistData implements DataClassWithEntityName {
 typedef ArtistsList = List<ArtistData>;
 
 class TagData implements DataClassWithEntityName {
-  TagData(this.tag, this.category, this.freq);
-
   final Tag tag;
   final TagCategory category;
   final int? freq;
+
+  TagData(this.tag, this.category, this.freq);
 
   @override
   String get name => tag.name;
@@ -39,4 +39,16 @@ class TagData implements DataClassWithEntityName {
 
 typedef TagsList = List<TagData>;
 
-typedef TagCategoriesList = List<TagCategory>;
+class TagCategoryData implements DataClassWithEntityName {
+  final TagCategory tagCategory;
+
+  TagCategoryData(this.tagCategory);
+
+  @override
+  String get name => tagCategory.name;
+
+  @override
+  String get orderingName => tagCategory.name.toLowerCase();
+}
+
+typedef TagCategoriesList = List<TagCategoryData>;

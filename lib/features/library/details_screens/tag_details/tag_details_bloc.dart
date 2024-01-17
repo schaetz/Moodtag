@@ -29,6 +29,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
     useLibrary(_repository);
 
     add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getTagByIdConfig(tagId)));
+    add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllTagCategoriesListConfig()));
     add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllArtistsListConfig()));
     final artistsListFilter = LibraryQueryFilter(searchItem: state.searchItem);
     add(RequestOrUpdateSubscription.withConfig(
