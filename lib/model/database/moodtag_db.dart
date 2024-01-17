@@ -210,6 +210,13 @@ class MoodtagDB extends _$MoodtagDB {
   }
 
   //
+  // UPDATE
+  //
+  Future<int> updateTagCategory(int categoryId, TagCategoriesCompanion newValues) {
+    return (update(tagCategories)..where((row) => row.id.equals(categoryId))).write(newValues);
+  }
+
+  //
   // DELETE
   //
   Future deleteArtistById(int artistId) {

@@ -59,11 +59,21 @@ class AppSettingsScreen extends StatelessWidget {
                     return ListTile(
                       leading: Icon(
                         Icons.circle,
-                        color: category.color != null ? Color(category.color!) : Colors.white,
+                        color: Color(category.color),
                       ),
                       title: Text(entry.value.name),
                       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                        IconButton(icon: Icon(Icons.edit), onPressed: () => {}),
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () => showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => CreateTagCategoryDialogForm(
+                                  isEditForm: true,
+                                  initialName: category.name,
+                                  initialColor: Color(category.color),
+                                  onSendInput: (nameInput, colorInput) =>
+                                      bloc.add(EditTagCategory(category, newName: nameInput, newColor: colorInput)))),
+                        ),
                         IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () => DeleteDialog.openNew<TagCategory>(context,

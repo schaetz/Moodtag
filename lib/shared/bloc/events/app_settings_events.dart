@@ -28,11 +28,13 @@ class DeleteTagCategory extends AppSettingsEvent {
 
 class EditTagCategory extends AppSettingsEvent {
   final TagCategory tagCategory;
+  final String newName;
+  final Color newColor;
 
-  const EditTagCategory(this.tagCategory);
+  const EditTagCategory(this.tagCategory, {required this.newName, required this.newColor});
 
   @override
-  List<Object> get props => [tagCategory];
+  List<Object> get props => [tagCategory, newName, newColor];
 }
 
 // Last.fm

@@ -32,6 +32,7 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
     add(RequestOrUpdateSubscription.withConfig(SubscriptionConfigFactory.getAllTagCategoriesListConfig()));
 
     on<CreateTagCategory>(_handleCreateTagCategoryEvent);
+    on<EditTagCategory>(_handleEditTagCategoryEvent);
     on<DeleteTagCategory>(_handleDeleteTagCategoryEvent);
     on<LastFmAccountUpdated>(_handleLastFmAccountUpdatedEvent);
     on<AddLastFmAccount>(_handleAddLastFmAccountEvent);
@@ -61,6 +62,14 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
     final createTagCategoryResponse = await _repository.createTagCategory(event.name, color: event.color.value);
     if (createTagCategoryResponse.didFail()) {
       errorStreamController.add(createTagCategoryResponse.getUserFeedbackException());
+    }
+  }
+
+  void _handleEditTagCategoryEvent(EditTagCategory event, Emitter<AppSettingsState> emit) async {
+    final editTagCategoryResponse =
+        await _repository.editTagCategory(event.tagCategory, name: event.newName, color: event.newColor.value);
+    if (editTagCategoryResponse.didFail()) {
+      errorStreamController.add(editTagCategoryResponse.getUserFeedbackException());
     }
   }
 

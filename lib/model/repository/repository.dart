@@ -173,6 +173,12 @@ class Repository with LibrarySubscriptionManager {
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<TagCategory>(createTagCategoryFuture, name);
   }
 
+  Future<DbRequestResponse> editTagCategory(TagCategory tagCategory, {required String name, required int color}) {
+    Future<int> updateTagCategoryFuture =
+        db.updateTagCategory(tagCategory.id, TagCategoriesCompanion.insert(name: name, color: color));
+    return helper.wrapExceptionsAndReturnResponse(updateTagCategoryFuture);
+  }
+
   Stream<TagCategoriesList> getTagCategories() {
     return db.getTagCategories();
   }
