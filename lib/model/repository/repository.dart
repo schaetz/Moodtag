@@ -168,9 +168,8 @@ class Repository with LibrarySubscriptionManager {
   //
   // Tag categories
   //
-  Future<DbRequestResponse<TagCategory>> createTagCategory(String name, {int? color}) {
-    Future<int> createTagCategoryFuture =
-        db.createTagCategory(TagCategoriesCompanion.insert(name: name, color: Value.ofNullable(color)));
+  Future<DbRequestResponse<TagCategory>> createTagCategory(String name, {required int color}) {
+    Future<int> createTagCategoryFuture = db.createTagCategory(TagCategoriesCompanion.insert(name: name, color: color));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<TagCategory>(createTagCategoryFuture, name);
   }
 

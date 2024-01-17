@@ -28,7 +28,7 @@ class AssignedTags extends Table {
 class TagCategories extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique().withLength(min: 1, max: 255)();
-  IntColumn get color => integer().nullable()();
+  IntColumn get color => integer()();
 }
 
 class LastFmAccounts extends Table {
