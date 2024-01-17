@@ -44,7 +44,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                           padding: EdgeInsets.only(bottom: 12.0),
                           child: _buildHeadline(context, state),
                         ),
-                        _buildChipsRow(context, state),
+                        _buildChipsRow(context, state, bloc),
                         Expanded(
                             child: SearchBarContainer(
                           searchBarHintText: 'Search artist',
@@ -114,15 +114,19 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
     );
   }
 
-  Widget _buildChipsRow(BuildContext context, TagDetailsState state) {
+  Widget _buildChipsRow(BuildContext context, TagDetailsState state, TagDetailsBloc bloc) {
+    if (state.loadedTagData.data == null) {
+      return Container();
+    }
+    final tag = state.loadedTagData.data!.tag;
+    final category = state.loadedTagData.data!.category;
+    final categoryData = state.allTagCategories.data?.firstWhere((data) => data.tagCategory.id == category.id);
     return Row(
       children: [
         ActionChip(
-            label: Text(state.loadedTagData.data?.category.name ?? 'Unknown category'),
+            label: Text(category.name),
             avatar: Icon(Icons.category, color: Colors.black),
-            backgroundColor: state.loadedTagData.data?.category.color != null
-                ? Color(state.loadedTagData.data!.category.color)
-                : Theme.of(context).colorScheme.background,
+            backgroundColor: Color(category.color),
             onPressed: state.allTagCategories.data == null
                 ? null
                 : () => SelectEntityDialog<TagCategoryData>(
@@ -130,8 +134,10 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                       SelectEntityDialogConfig(
                           title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
                           availableEntities: state.allTagCategories.data!,
-                          onSendInput: (selectedEntity) {}, // TODO
-                          selectionStyle: EntityDialogSelectionStyle.BOX_OUTLINE_AND_LEADING_ICON,
+                          initialSelection: categoryData,
+                          onSendInput: (newCategoryData) =>
+                              bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory)),
+                          selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
                           iconSelector: (categoryData) =>
                               Icon(Icons.circle, color: Color(categoryData.tagCategory.color))),
                     ))

@@ -35,6 +35,7 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
     add(RequestOrUpdateSubscription.withConfig(
         SubscriptionConfigFactory.getFilteredArtistsListConfig(artistsListFilter)));
 
+    on<ChangeCategoryForTag>(_handleChangeCategoryForTagEvent);
     on<AddArtistsForTag>(_handleAddArtistsForTagEvent);
     on<RemoveTagFromArtist>(_handleRemoveTagFromArtistEvent);
     on<ToggleSearchBar>(_handleToggleSearchBarEvent);
@@ -86,6 +87,13 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
       return state.copyWith(loadedDataFilteredArtists: LoadedData.error());
     }
     return super.getNewStateForSubscriptionError(subscriptionConfig, object, stackTrace, emit);
+  }
+
+  void _handleChangeCategoryForTagEvent(ChangeCategoryForTag event, Emitter<TagDetailsState> emit) async {
+    final exception = await _createEntityBlocHelper.handleChangeCategoryForTagEvent(event, _repository);
+    if (exception != null) {
+      errorStreamController.add(exception);
+    }
   }
 
   void _handleAddArtistsForTagEvent(AddArtistsForTag event, Emitter<TagDetailsState> emit) async {

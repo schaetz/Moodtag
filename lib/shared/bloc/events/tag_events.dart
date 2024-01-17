@@ -26,6 +26,16 @@ class DeleteTag extends TagEvent {
   List<Object> get props => [tag];
 }
 
+class ChangeCategoryForTag extends TagEvent {
+  final Tag tag;
+  final TagCategory tagCategory;
+
+  const ChangeCategoryForTag(this.tag, this.tagCategory);
+
+  @override
+  List<Object> get props => [tag, tagCategory];
+}
+
 class AddArtistsForTag extends TagEvent {
   final String input;
   final Tag tag;

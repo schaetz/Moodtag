@@ -47,19 +47,19 @@ class SelectEntityDialogFormState<E extends NamedEntity> extends State<SelectEnt
                           : null,
                       leading: _getLeadingWidgetOnListTile(entity),
                       title: Text(entity.name),
-                      onTap: () => setState(() {
-                            this._selection = entity;
-                          })))
+                      onTap: () => _handleListTileTap(entity)))
                   .toList())),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.pop(context, null),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _selection != null ? () => _onOkayPressed() : null,
-          child: const Text('OK'),
-        ),
+        config.selectionStyle == EntityDialogSelectionStyle.ONE_TAP
+            ? Container()
+            : TextButton(
+                onPressed: _selection != null ? () => _onOkayPressed() : null,
+                child: const Text('OK'),
+              ),
       ],
     );
   }
@@ -67,8 +67,22 @@ class SelectEntityDialogFormState<E extends NamedEntity> extends State<SelectEnt
   Size _getDialogSize() => Size(min(MediaQuery.of(context).size.width * 0.75, 400),
       min(MediaQuery.of(context).size.height * 0.75, config.availableEntities.length * 80));
 
+  void _handleListTileTap(E entity) {
+    setState(() {
+      this._selection = entity;
+    });
+    if (config.selectionStyle == EntityDialogSelectionStyle.ONE_TAP) {
+      _confirmSelection(entity);
+    }
+  }
+
   Widget? _getLeadingWidgetOnListTile(E entity) {
     switch (config.selectionStyle) {
+      case EntityDialogSelectionStyle.ONE_TAP:
+        if (config.iconSelector == null) {
+          return null;
+        }
+        return config.iconSelector!(entity);
       case EntityDialogSelectionStyle.RADIO_BUTTONS:
         return Radio<E>(
           value: entity,
@@ -89,8 +103,12 @@ class SelectEntityDialogFormState<E extends NamedEntity> extends State<SelectEnt
 
   void _onOkayPressed() {
     if (_selection != null) {
-      config.onSendInput(_selection!);
-      Navigator.pop(context, _selection);
+      _confirmSelection(_selection!);
     }
+  }
+
+  void _confirmSelection(E selection) {
+    config.onSendInput(selection);
+    Navigator.pop(context, selection);
   }
 }

@@ -137,6 +137,11 @@ class Repository with LibrarySubscriptionManager {
         List.from(importedTags.map((tag) => TagsCompanion.insert(name: tag.name, category: tag.category.id))));
   }
 
+  Future<DbRequestResponse> changeCategoryForTag(Tag tag, TagCategory tagCategory) async {
+    Future<int> changeCategoryForTagFuture = db.changeCategoryForTag(tag.id, tagCategory.id);
+    return helper.wrapExceptionsAndReturnResponse(changeCategoryForTagFuture);
+  }
+
   Future<DbRequestResponse> deleteTag(Tag tag) {
     Future deleteArtistFuture = db.deleteTagById(tag.id);
     return helper.wrapExceptionsAndReturnResponse(deleteArtistFuture);

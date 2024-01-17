@@ -50,6 +50,16 @@ class CreateEntityBlocHelper {
     return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
   }
 
+  Future<UserReadableException?> handleChangeCategoryForTagEvent(
+      ChangeCategoryForTag changeCategoryForTag, Repository repository) async {
+    final response = await repository.changeCategoryForTag(changeCategoryForTag.tag, changeCategoryForTag.tagCategory);
+    if (response.didFail()) {
+      return response.getUserFeedbackException();
+    }
+
+    return Future.value(null);
+  }
+
   Future<UserReadableException?> handleAddArtistsForTagEvent(AddArtistsForTag event, Repository repository) async {
     List<String> inputElements = processMultilineInput(event.input);
     List<UserReadableException> exceptions = [];

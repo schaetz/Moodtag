@@ -214,6 +214,10 @@ class MoodtagDB extends _$MoodtagDB {
   //
   // UPDATE
   //
+  Future<int> changeCategoryForTag(int tagId, int tagCategoryId) {
+    return (update(tags)..where((row) => row.id.equals(tagId))).write(TagsCompanion(category: Value(tagCategoryId)));
+  }
+
   Future<int> updateTagCategory(int categoryId, TagCategoriesCompanion newValues) {
     return (update(tagCategories)..where((row) => row.id.equals(categoryId))).write(newValues);
   }

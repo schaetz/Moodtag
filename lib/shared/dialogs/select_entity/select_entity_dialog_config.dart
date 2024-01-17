@@ -18,8 +18,9 @@ class SelectEntityDialogConfig<E extends NamedEntity> {
       this.iconSelector});
 
   bool get showBoxOutlineOnSelectedTile =>
+      selectionStyle == EntityDialogSelectionStyle.ONE_TAP ||
       selectionStyle == EntityDialogSelectionStyle.BOX_OUTLINE ||
       selectionStyle == EntityDialogSelectionStyle.BOX_OUTLINE_AND_LEADING_ICON;
 }
 
-enum EntityDialogSelectionStyle { RADIO_BUTTONS, BOX_OUTLINE, BOX_OUTLINE_AND_LEADING_ICON }
+enum EntityDialogSelectionStyle { ONE_TAP, RADIO_BUTTONS, BOX_OUTLINE, BOX_OUTLINE_AND_LEADING_ICON }
