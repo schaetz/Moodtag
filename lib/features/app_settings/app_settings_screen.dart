@@ -7,7 +7,7 @@ import 'package:moodtag/features/app_settings/tag_categories/create_tag_category
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
-import 'package:moodtag/shared/bloc/events/lastfm_events.dart';
+import 'package:moodtag/shared/bloc/events/app_settings_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/dialogs/add_lastfm_account_dialog.dart';
