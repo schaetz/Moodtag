@@ -66,8 +66,8 @@ mixin LibrarySubscriptionManager {
     switch (subscriptionConfig.dataType) {
       case ArtistsList:
         Set<Tag> filterTags = _getSetOfFilterEntities<Tag>(subscriptionConfig.filter.entityFilters);
-        return () =>
-            repository.getArtistsDataList(filterTags: filterTags, searchItem: subscriptionConfig.filter.searchItem);
+        return () => repository.getArtistsDataList(
+            filterTagIds: filterTags.map((tag) => tag.id).toSet(), searchItem: subscriptionConfig.filter.searchItem);
       case TagsList:
         if (subscriptionConfig.filter.entityFilters != null) {
           log.warning('Cannot apply entity filters to TagsList subscription');

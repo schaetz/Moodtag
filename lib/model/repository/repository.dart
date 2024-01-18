@@ -51,12 +51,12 @@ class Repository with LibrarySubscriptionManager {
   //
   // Artists
   //
-  Stream<List<ArtistData>> getArtistsDataList({Set<Tag> filterTags = const {}, String? searchItem = null}) {
-    return db.getArtistsDataList(filterTags, searchItem: searchItem);
+  Stream<List<ArtistData>> getArtistsDataList({Set<int> filterTagIds = const {}, String? searchItem = null}) {
+    return db.getArtistsDataList(filterTagIds, searchItem: searchItem);
   }
 
   Stream<List<ArtistData>> getArtistsDataHavingTag(Tag tag) {
-    return getArtistsDataList(filterTags: {tag});
+    return getArtistsDataList(filterTagIds: {tag.id});
   }
 
   Stream<ArtistData?> getArtistDataById(int artistId) {
@@ -72,7 +72,7 @@ class Repository with LibrarySubscriptionManager {
   }
 
   Future<bool> doesArtistHaveTag(Artist artist, Tag tag) async {
-    final List<Tag> tagsWithArtist = await db.getTagsOnce(filterArtists: {artist});
+    final List<Tag> tagsWithArtist = await db.getTagsOnce(filterArtistIds: {artist.id});
     return tagsWithArtist.contains(tag);
   }
 

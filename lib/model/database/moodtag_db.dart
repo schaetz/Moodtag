@@ -44,14 +44,14 @@ class MoodtagDB extends _$MoodtagDB {
 
   // GET Artists
 
-  Stream<List<ArtistData>> getArtistsDataList(Set<Tag> filterTags, {String? searchItem = null}) {
+  Stream<List<ArtistData>> getArtistsDataList(Set<int> filterTagIds, {String? searchItem = null}) {
     final JoinedSelectStatement query = select(artists).join(joinTagsForArtist(this));
     if (searchItem != null && searchItem.isNotEmpty) {
       query..where(artists.name.like('$searchItem%') | artists.name.like('the $searchItem%'));
     }
     query..orderBy([OrderingTerm.asc(artists.orderingName)]);
     final typedResultStream = query.watch();
-    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistsList>(this, filterTags: filterTags));
+    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistsList>(this, filterTagIds: filterTagIds));
   }
 
   Stream<ArtistData?> getArtistDataById(int artistId) {
@@ -103,10 +103,10 @@ class MoodtagDB extends _$MoodtagDB {
     return query.map(_mapTagWithArtistFreqToTagData).watchSingleOrNull();
   }
 
-  Future<List<Tag>> getTagsOnce({Set<Artist>? filterArtists}) {
+  Future<List<Tag>> getTagsOnce({Set<int>? filterArtistIds}) {
     final query = select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)]);
-    if (filterArtists != null) {
-      final filterArtistsIds = filterArtists.map((artist) => artist.id).toSet();
+    if (filterArtistIds != null) {
+      final filterArtistsIds = filterArtistIds.toSet();
       final queryWithJoin = query.join(joinArtistsForTag(this))..where(artists.id.isIn(filterArtistsIds));
       return queryWithJoin.map((row) => row.readTable(tags)).get();
     }
