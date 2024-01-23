@@ -142,11 +142,11 @@ class ArtistDetailsScreen extends StatelessWidget {
     final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),
-      onPressed: () => AddEntityDialog.openAddTagDialog(
+      onPressed: () => AddTagDialog(
         context,
-        preselectedArtist: artistData.artist,
+        preselectedOtherEntity: artistData.artist,
         onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: artistData.artist)),
-      ),
+      )..show(),
     );
   }
 }

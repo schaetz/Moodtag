@@ -11,7 +11,7 @@ import 'package:moodtag/shared/bloc/events/app_settings_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/dialogs/add_lastfm_account_dialog.dart';
-import 'package:moodtag/shared/dialogs/delete_dialog.dart';
+import 'package:moodtag/shared/dialogs/delete_entity/delete_dialog.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
@@ -77,9 +77,10 @@ class AppSettingsScreen extends StatelessWidget {
                         ),
                         IconButton(
                             icon: Icon(Icons.delete),
-                            onPressed: () => DeleteDialog.openNew<TagCategory>(context,
+                            onPressed: () => DeleteDialog<TagCategory>(context,
                                 entityToDelete: tagCategory,
-                                deleteHandler: () => bloc.add(DeleteTagCategory(tagCategory))))
+                                deleteHandler: () => bloc.add(DeleteTagCategory(tagCategory)))
+                              ..show())
                       ]),
                       shape: index < tagCategories.length - 1
                           ? Border(
@@ -153,7 +154,8 @@ class AppSettingsScreen extends StatelessWidget {
       if (newAccountName != null) {
         bloc.add(AddLastFmAccount(newAccountName));
       }
-    });
+    })
+      ..show();
   }
 
   void _handleAddLastFmAccountError(Exception e, AppSettingsBloc bloc) {
@@ -184,8 +186,7 @@ class AppSettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) {
-    DeleteDialog.openNew(context,
-        deleteHandler: () => bloc.add(ResetLibrary()), entityToDelete: null, resetLibrary: true);
-  }
+  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) =>
+      DeleteDialog(context, deleteHandler: () => bloc.add(ResetLibrary()), entityToDelete: null, resetLibrary: true)
+        ..show();
 }

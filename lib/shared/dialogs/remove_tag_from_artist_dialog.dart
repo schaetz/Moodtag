@@ -1,17 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/shared/dialogs/delete_dialog.dart';
+import 'package:moodtag/shared/dialogs/delete_entity/delete_dialog.dart';
 
 class RemoveTagFromArtistDialog extends DeleteDialog<Tag> {
-  static void openNew(BuildContext context, Tag tag, Artist artist, Function() removeTagHandler) {
-    new RemoveTagFromArtistDialog(context, tag, artist, removeTagHandler);
-  }
-
-  Function() removeTagHandler;
   Tag tagToRemove;
   Artist artistToRemoveFrom;
+  Function() removeTagHandler;
 
-  RemoveTagFromArtistDialog(BuildContext context, this.tagToRemove, this.artistToRemoveFrom, this.removeTagHandler)
+  RemoveTagFromArtistDialog(BuildContext context, this.tagToRemove, this.artistToRemoveFrom,
+      {required this.removeTagHandler})
       : super(context, entityToDelete: tagToRemove, deleteHandler: removeTagHandler);
 
   @override

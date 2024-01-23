@@ -13,28 +13,6 @@ import 'abstract_dialog.dart';
 /// S: Type of the suggested entities
 /// (E=artist => O=tag and vice versa)
 class AddEntityDialog<E, O> extends AbstractDialog<E> {
-  static AddEntityDialog<Artist, Tag> openAddArtistDialog(BuildContext context,
-          {Tag? preselectedTag,
-          required Function(String) onSendInput,
-          Function(dynamic)? onTerminate,
-          List<NamedEntity>? suggestedEntities = null}) =>
-      new AddEntityDialog<Artist, Tag>(context,
-          preselectedOtherEntity: preselectedTag,
-          onSendInput: onSendInput,
-          onTerminate: onTerminate,
-          suggestedEntities: suggestedEntities);
-
-  static AddEntityDialog<Tag, Artist> openAddTagDialog(BuildContext context,
-          {Artist? preselectedArtist,
-          required Function(String) onSendInput,
-          Function(dynamic)? onTerminate,
-          List<NamedEntity>? suggestedEntities = null}) =>
-      new AddEntityDialog<Tag, Artist>(context,
-          preselectedOtherEntity: preselectedArtist,
-          onSendInput: onSendInput,
-          onTerminate: onTerminate,
-          suggestedEntities: suggestedEntities);
-
   final O? preselectedOtherEntity;
   late final Function(String) onSendInput;
   final List<NamedEntity>? suggestedEntities;
@@ -60,3 +38,6 @@ class AddEntityDialog<E, O> extends AbstractDialog<E> {
     );
   }
 }
+
+typedef AddArtistDialog = AddEntityDialog<Artist, Tag>;
+typedef AddTagDialog = AddEntityDialog<Tag, Artist>;

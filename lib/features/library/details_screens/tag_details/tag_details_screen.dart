@@ -87,10 +87,11 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             additionalCheckData: state.allArtists,
             showPlaceholders: false,
             buildOnSuccess: (tagData) => FloatingActionButton(
-                onPressed: () => AddEntityDialog.openAddArtistDialog(context,
-                    preselectedTag: tagData.tag,
+                onPressed: () => AddArtistDialog(context,
+                    preselectedOtherEntity: tagData.tag,
                     onSendInput: (input) => bloc.add(AddArtistsForTag(input, tagData.tag)),
-                    suggestedEntities: state.allArtists.data),
+                    suggestedEntities: state.allArtists.data)
+                  ..show(),
                 child: const Icon(Icons.library_add)));
       }),
     );
@@ -131,16 +132,14 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                 ? null
                 : () => SelectEntityDialog<TagCategoryData>(
                       context,
-                      SelectEntityDialogConfig(
-                          title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
-                          availableEntities: state.allTagCategories.data!,
-                          initialSelection: categoryData,
-                          onSendInput: (newCategoryData) =>
-                              bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory)),
-                          selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
-                          iconSelector: (categoryData) =>
-                              Icon(Icons.circle, color: Color(categoryData.tagCategory.color))),
-                    ))
+                      title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
+                      availableEntities: state.allTagCategories.data!,
+                      initialSelection: categoryData,
+                      onSendInput: (newCategoryData) =>
+                          bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory)),
+                      selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
+                      iconSelector: (categoryData) => Icon(Icons.circle, color: Color(categoryData.tagCategory.color)),
+                    )..show())
       ],
     );
   }
@@ -168,7 +167,8 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
           style: listEntryStyle,
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
-        onLongPress: () =>
-            RemoveTagFromArtistDialog.openNew(_scaffoldKey.currentContext!, tag, artist, handleRemoveTagFromArtist));
+        onLongPress: () => RemoveTagFromArtistDialog(_scaffoldKey.currentContext!, tag, artist,
+            removeTagHandler: handleRemoveTagFromArtist)
+          ..show());
   }
 }

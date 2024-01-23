@@ -68,10 +68,10 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
   void handleAddButtonPressed(BuildContext context) {
     if (isArtistsListScreenSelected) {
       final artistsListBloc = context.read<ArtistsListBloc>();
-      AddEntityDialog.openAddArtistDialog(context, onSendInput: (input) => artistsListBloc.add(CreateArtists(input)));
+      AddArtistDialog(context, onSendInput: (input) => artistsListBloc.add(CreateArtists(input)))..show();
     } else {
       final tagsListBloc = context.read<TagsListBloc>();
-      AddEntityDialog.openAddTagDialog(context, onSendInput: (input) => tagsListBloc.add(CreateTags(input)));
+      AddTagDialog(context, onSendInput: (input) => tagsListBloc.add(CreateTags(input)))..show();
     }
   }
 }

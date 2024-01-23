@@ -3,22 +3,19 @@ import 'package:flutter/scheduler.dart';
 
 abstract class AbstractDialog<T> {
   BuildContext context;
-
-  AbstractDialog(this.context, {Function(T?)? onTerminate}) {
-    this._onTerminate = onTerminate;
-    show();
-  }
+  Function(T?)? onTerminate;
 
   Future<T?>? _futureResult;
-  Function(T?)? _onTerminate;
   bool _isClosed = false;
+
+  AbstractDialog(this.context, {Function(T?)? this.onTerminate});
 
   void show() async {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _futureResult = showDialog<T>(context: context, builder: (_) => buildDialog(context));
       _futureResult!.whenComplete(() => _isClosed = true);
-      if (_onTerminate != null) {
-        _futureResult!.then(_onTerminate!);
+      if (onTerminate != null) {
+        _futureResult!.then(onTerminate!);
       }
     });
   }

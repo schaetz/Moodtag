@@ -8,7 +8,22 @@ import 'select_entity_dialog_config.dart';
 class SelectEntityDialog<E extends NamedEntity> extends AbstractDialog<E> {
   final SelectEntityDialogConfig<E> config;
 
-  SelectEntityDialog(BuildContext context, this.config) : super(context);
+  SelectEntityDialog(BuildContext context,
+      {required String title,
+      required List<E> availableEntities,
+      E? initialSelection,
+      required Function(E) onSendInput,
+      required EntityDialogSelectionStyle selectionStyle,
+      Icon Function(E)? iconSelector})
+      : config = SelectEntityDialogConfig(
+            title: title,
+            availableEntities: availableEntities,
+            initialSelection: initialSelection,
+            onSendInput: onSendInput,
+            selectionStyle: selectionStyle,
+            iconSelector: iconSelector),
+        super(context);
+  SelectEntityDialog.withConfig(BuildContext context, this.config) : super(context);
 
   @override
   Widget buildDialog(BuildContext context) {
