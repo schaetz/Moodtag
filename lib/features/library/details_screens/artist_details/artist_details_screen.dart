@@ -8,7 +8,7 @@ import 'package:moodtag/model/repository/library_subscription/data_wrapper/loadi
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/add_entity_dialog.dart';
+import 'package:moodtag/shared/dialogs/create_entity_dialog/create_entity_dialog.dart';
 import 'package:moodtag/shared/widgets/data_display/chips_row_info_label.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
@@ -142,8 +142,9 @@ class ArtistDetailsScreen extends StatelessWidget {
     final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),
-      onPressed: () => AddTagDialog(
+      onPressed: () => AddTagDialog.construct(
         context,
+        options: {}, // TODO Define options
         preselectedOtherEntity: artistData.artist,
         onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: artistData.artist)),
       )..show(),

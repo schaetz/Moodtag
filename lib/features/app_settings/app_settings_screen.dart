@@ -11,7 +11,7 @@ import 'package:moodtag/shared/bloc/events/app_settings_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/dialogs/add_lastfm_account_dialog.dart';
-import 'package:moodtag/shared/dialogs/delete_entity/delete_dialog.dart';
+import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
@@ -77,7 +77,8 @@ class AppSettingsScreen extends StatelessWidget {
                         ),
                         IconButton(
                             icon: Icon(Icons.delete),
-                            onPressed: () => DeleteDialog<TagCategory>(context,
+                            onPressed: () => DeleteEntityDialog.construct<TagCategory>(context,
+                                options: {}, // TODO Define options
                                 entityToDelete: tagCategory,
                                 deleteHandler: () => bloc.add(DeleteTagCategory(tagCategory)))
                               ..show())
@@ -186,7 +187,9 @@ class AppSettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) =>
-      DeleteDialog(context, deleteHandler: () => bloc.add(ResetLibrary()), entityToDelete: null, resetLibrary: true)
-        ..show();
+  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) => DeleteEntityDialog.construct(context,
+      options: {}, // TODO Define options
+      entityToDelete: null,
+      deleteHandler: () => bloc.add(ResetLibrary()))
+    ..show();
 }

@@ -8,7 +8,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/add_entity_dialog.dart';
+import 'package:moodtag/shared/dialogs/create_entity_dialog/create_entity_dialog.dart';
 import 'package:moodtag/shared/dialogs/remove_tag_from_artist_dialog.dart';
 import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog.dart';
 import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog_config.dart';
@@ -87,7 +87,8 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             additionalCheckData: state.allArtists,
             showPlaceholders: false,
             buildOnSuccess: (tagData) => FloatingActionButton(
-                onPressed: () => AddArtistDialog(context,
+                onPressed: () => AddArtistDialog.construct(context,
+                    options: {}, // TODO Define options
                     preselectedOtherEntity: tagData.tag,
                     onSendInput: (input) => bloc.add(AddArtistsForTag(input, tagData.tag)),
                     suggestedEntities: state.allArtists.data)
@@ -130,9 +131,10 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             backgroundColor: Color(category.color),
             onPressed: state.allTagCategories.data == null
                 ? null
-                : () => SelectEntityDialog<TagCategoryData>(
+                : () => SelectEntityDialog.construct<TagCategoryData>(
                       context,
                       title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
+                      options: {}, // TODO Define options
                       availableEntities: state.allTagCategories.data!,
                       initialSelection: categoryData,
                       onSendInput: (newCategoryData) =>

@@ -1,19 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog_config.dart';
 import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog_mixin.dart';
+import 'package:moodtag/shared/dialogs/dialog_config.dart';
 
 import '../abstract_dialog.dart';
 
-class DeleteDialog<E> extends AbstractDialog<bool> with DeleteEntityDialogMixin<E, bool> {
-  @override
-  DeleteEntityDialogConfig<E> deleteEntityDialogConfig;
+typedef R = bool;
 
-  DeleteDialog(BuildContext context,
-      {required E? entityToDelete, required Function() deleteHandler, bool resetLibrary = false})
-      : this.deleteEntityDialogConfig =
-            DeleteEntityDialogConfig(entityToDelete, deleteHandler, resetLibrary: resetLibrary),
-        super(context);
-  DeleteDialog.withConfig(BuildContext context, this.deleteEntityDialogConfig) : super(context);
+/**
+ *  Dialog to confirm the deletion of an entity
+ *
+ *  R: Result type = bool
+ *  E: Type of the entity
+ */
+class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R, E>>
+    with DeleteEntityDialogMixin<E, R> {
+  static DeleteEntityDialog construct<E>(BuildContext context,
+      {String? title,
+      required OptionObjectToHandler<R> options,
+      Function(R?)? onTerminate,
+      // Dialog-specific properties
+      required E? entityToDelete,
+      required Function() deleteHandler}) {
+    return DeleteEntityDialog<E>(
+        context,
+        DeleteEntityDialogConfig<R, E>(
+            title: title,
+            options: options,
+            onTerminate: onTerminate,
+            // Dialog-specific properties
+            entityToDelete: entityToDelete,
+            deleteHandler: deleteHandler));
+  }
+
+  DeleteEntityDialog(super.context, super.config);
+
+  DeleteEntityDialog.withFuture(
+      BuildContext context, Future<DeleteEntityDialogConfig<R, E>> Function(BuildContext) getRequiredData)
+      : super.withFuture(context, getRequiredData: getRequiredData);
 
   @override
   StatelessWidget buildDialog(BuildContext context) {

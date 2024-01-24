@@ -33,7 +33,7 @@ class SelectEntityDialogFormState<E extends NamedEntity> extends State<SelectEnt
   Widget build(BuildContext context) {
     final dialogSize = _getDialogSize();
     return AlertDialog(
-      title: Text(config.title),
+      title: config.title != null ? Text(config.title!) : Text(''),
       content: SizedBox(
           width: dialogSize.width,
           height: dialogSize.height,

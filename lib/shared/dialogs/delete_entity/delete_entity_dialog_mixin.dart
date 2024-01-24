@@ -7,16 +7,18 @@ import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 
 import 'delete_entity_dialog_config.dart';
 
-mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T> {
-  abstract DeleteEntityDialogConfig<E> deleteEntityDialogConfig;
-
+/**
+ *  Mixin that provides dialogs with functionality needed
+ *  when deleting entities
+ */
+mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T, DeleteEntityDialogConfig<T, E>> {
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) async {
     final repository = context.read<Repository>();
-    final config = deleteEntityDialogConfig;
 
-    if (config.resetLibrary) {
-      return 'Are you sure that you want to reset the library and delete all artists and tags?';
-    } else if (config.entityToDelete is Artist) {
+    // if (config.resetLibrary) {
+    //   return 'Are you sure that you want to reset the library and delete all artists and tags?';
+    // }
+    if (config.entityToDelete is Artist) {
       Artist artist = config.entityToDelete as Artist;
       return 'Are you sure that you want to delete the artist "${artist.name}"?';
     } else if (config.entityToDelete is Tag) {
@@ -35,9 +37,8 @@ mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T> {
   }
 
   void deleteEntity(BuildContext context) async {
-    final config = deleteEntityDialogConfig;
-    if (config.entityToDelete == null && !config.resetLibrary) {
-      throw new InternalException("The delete dialog was called with invalid arguments.");
+    if (config.entityToDelete == null) {
+      throw InternalException("The delete dialog was called with invalid arguments.");
     }
 
     await config.deleteHandler();
@@ -45,7 +46,6 @@ mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T> {
   }
 
   Future<String> _getRelatedEntitiesMessage(Repository repository) async {
-    final config = deleteEntityDialogConfig;
     late final String deletedEntityDenotation;
     late final String relatedEntityDenotation;
     late final List relatedEntities;

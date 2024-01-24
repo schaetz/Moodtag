@@ -8,7 +8,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
-import 'package:moodtag/shared/dialogs/delete_entity/delete_dialog.dart';
+import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog.dart';
 import 'package:moodtag/shared/models/modal_and_overlay_types.dart';
 import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_options.dart';
@@ -133,8 +133,10 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
             ? _buildTagsSubtitle(context, artistWithTags)
             : null,
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
-        onLongPress: () => DeleteDialog<Artist>(widget.scaffoldKey.currentContext!,
-            entityToDelete: artistWithTags.artist, deleteHandler: handleDeleteArtist)
+        onLongPress: () => DeleteEntityDialog.construct<Artist>(widget.scaffoldKey.currentContext!,
+            options: {}, // TODO Define options
+            entityToDelete: artistWithTags.artist,
+            deleteHandler: handleDeleteArtist)
           ..show());
   }
 

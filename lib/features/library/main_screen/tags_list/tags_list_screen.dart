@@ -6,7 +6,7 @@ import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.d
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/delete_entity/delete_dialog.dart';
+import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
 import 'package:moodtag/shared/widgets/text_input/search_bar_container.dart';
@@ -72,8 +72,10 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
         ),
         leading: Icon(Icons.label),
         onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tagData.tag.id),
-        onLongPress: () =>
-            DeleteDialog<Tag>(_scaffoldKey.currentContext!, entityToDelete: tagData.tag, deleteHandler: handleDeleteTag)
-              ..show());
+        onLongPress: () => DeleteEntityDialog.construct<Tag>(_scaffoldKey.currentContext!,
+            options: {}, // TODO Define options
+            entityToDelete: tagData.tag,
+            deleteHandler: handleDeleteTag)
+          ..show());
   }
 }
