@@ -69,13 +69,13 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
     if (isArtistsListScreenSelected) {
       final artistsListBloc = context.read<ArtistsListBloc>();
       AddArtistDialog.construct(context,
-          options: {}, // TODO Define options
+          options: [], // TODO Define options
           onSendInput: (input) => artistsListBloc.add(CreateArtists(input)))
         ..show();
     } else {
       final tagsListBloc = context.read<TagsListBloc>();
       AddTagDialog.construct(context,
-          options: {}, // TODO Define options
+          options: [], // TODO Define options
           onSendInput: (input) => tagsListBloc.add(CreateTags(input)))
         ..show();
     }

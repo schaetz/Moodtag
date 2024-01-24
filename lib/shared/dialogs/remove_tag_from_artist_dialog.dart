@@ -13,7 +13,7 @@ class RemoveTagFromArtistDialog extends DeleteEntityDialog<Tag> {
       : super(
             context,
             DeleteEntityDialogConfig(
-                options: {}, // TODO Define options
+                options: [], // TODO Define options
                 entityToDelete: tagToRemove,
                 deleteHandler: removeTagHandler));
 

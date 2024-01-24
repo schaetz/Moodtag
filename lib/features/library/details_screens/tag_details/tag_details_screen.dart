@@ -88,7 +88,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             showPlaceholders: false,
             buildOnSuccess: (tagData) => FloatingActionButton(
                 onPressed: () => AddArtistDialog.construct(context,
-                    options: {}, // TODO Define options
+                    options: [], // TODO Define options
                     preselectedOtherEntity: tagData.tag,
                     onSendInput: (input) => bloc.add(AddArtistsForTag(input, tagData.tag)),
                     suggestedEntities: state.allArtists.data)
@@ -134,7 +134,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                 : () => SelectEntityDialog.construct<TagCategoryData>(
                       context,
                       title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
-                      options: {}, // TODO Define options
+                      options: [], // TODO Define options
                       availableEntities: state.allTagCategories.data!,
                       initialSelection: categoryData,
                       onSendInput: (newCategoryData) =>

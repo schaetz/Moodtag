@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/dialog_option.dart';
 import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog_form.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
@@ -14,8 +14,7 @@ import 'select_entity_dialog_config.dart';
 class SelectEntityDialog<E extends NamedEntity> extends AbstractDialog<E, SelectEntityDialogConfig<E>> {
   static SelectEntityDialog<E> construct<E extends NamedEntity>(BuildContext context,
       {String? title,
-      DialogOptionType dialogOptionType = DialogOptionType.simpleDialogOptionWithText,
-      required OptionObjectToHandler<E> options,
+      required List<DialogOption<E>> options,
       Function(E?)? onTerminate,
       // Dialog-specific properties
       required List<E> availableEntities,
@@ -27,7 +26,6 @@ class SelectEntityDialog<E extends NamedEntity> extends AbstractDialog<E, Select
         context,
         SelectEntityDialogConfig(
             title: title,
-            dialogOptionType: dialogOptionType,
             options: options,
             onTerminate: onTerminate,
             // Dialog-specific properties

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
-import 'package:moodtag/shared/dialogs/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/dialog_option.dart';
 import 'package:moodtag/shared/dialogs/simple_text_input_dialog_base.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 import 'package:moodtag/shared/utils/i10n.dart';
@@ -18,8 +18,7 @@ import 'create_entity_dialog_config.dart';
 class CreateEntityDialog<E, O, S extends NamedEntity> extends AbstractDialog<E, CreateEntityDialogConfig<E, O, S>> {
   static CreateEntityDialog construct<E, O, S extends NamedEntity>(BuildContext context,
       {String? title,
-      DialogOptionType dialogOptionType = DialogOptionType.simpleDialogOptionWithText,
-      required OptionObjectToHandler<E> options,
+      required List<DialogOption<E>> options,
       Function(E?)? onTerminate,
       // Dialog-specific properties
       O? preselectedOtherEntity,

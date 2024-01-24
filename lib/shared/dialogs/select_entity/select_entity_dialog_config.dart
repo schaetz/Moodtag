@@ -11,7 +11,6 @@ class SelectEntityDialogConfig<E extends NamedEntity> extends DialogConfig<E> {
 
   const SelectEntityDialogConfig(
       {String? super.title,
-      super.dialogOptionType = DialogOptionType.simpleDialogOptionWithText,
       required super.options,
       super.onTerminate,
       // Dialog-specific properties

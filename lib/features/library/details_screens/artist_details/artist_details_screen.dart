@@ -144,7 +144,7 @@ class ArtistDetailsScreen extends StatelessWidget {
       label: Text('+'),
       onPressed: () => AddTagDialog.construct(
         context,
-        options: {}, // TODO Define options
+        options: [], // TODO Define options
         preselectedOtherEntity: artistData.artist,
         onSendInput: (input) => bloc.add(CreateTags(input, preselectedArtist: artistData.artist)),
       )..show(),

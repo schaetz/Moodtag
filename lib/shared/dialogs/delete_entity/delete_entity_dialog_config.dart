@@ -16,7 +16,5 @@ class DeleteEntityDialogConfig<R, E> extends DialogConfig<R> {
       super.onTerminate,
       // Dialog-specific properties
       this.entityToDelete,
-      required this.deleteHandler})
-      // Preconfigured properties
-      : super(dialogOptionType: DialogOptionType.simpleDialogOptionWithText);
+      required this.deleteHandler});
 }

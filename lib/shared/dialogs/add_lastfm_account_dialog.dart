@@ -11,8 +11,7 @@ class AddLastFmAccountDialog extends AbstractDialog<String, DialogConfig<String>
       : super(
             context,
             DialogConfig(
-                options: {}, // TODO Define options
-                dialogOptionType: DialogOptionType.simpleDialogOptionWithText,
+                options: [], // TODO Define options
                 onTerminate: onTerminate));
 
   @override

@@ -73,7 +73,7 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
         leading: Icon(Icons.label),
         onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tagData.tag.id),
         onLongPress: () => DeleteEntityDialog.construct<Tag>(_scaffoldKey.currentContext!,
-            options: {}, // TODO Define options
+            options: [], // TODO Define options
             entityToDelete: tagData.tag,
             deleteHandler: handleDeleteTag)
           ..show());

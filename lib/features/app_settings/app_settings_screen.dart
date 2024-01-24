@@ -78,7 +78,7 @@ class AppSettingsScreen extends StatelessWidget {
                         IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () => DeleteEntityDialog.construct<TagCategory>(context,
-                                options: {}, // TODO Define options
+                                options: [], // TODO Define options
                                 entityToDelete: tagCategory,
                                 deleteHandler: () => bloc.add(DeleteTagCategory(tagCategory)))
                               ..show())
@@ -188,7 +188,7 @@ class AppSettingsScreen extends StatelessWidget {
   }
 
   void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) => DeleteEntityDialog.construct(context,
-      options: {}, // TODO Define options
+      options: [], // TODO Define options
       entityToDelete: null,
       deleteHandler: () => bloc.add(ResetLibrary()))
     ..show();

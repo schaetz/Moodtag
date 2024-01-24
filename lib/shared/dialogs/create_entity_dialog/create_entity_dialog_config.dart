@@ -21,5 +21,5 @@ class CreateEntityDialogConfig<E, O, S extends NamedEntity> extends DialogConfig
     this.preselectedOtherEntity,
     required this.onSendInput,
     this.suggestedEntities,
-  }) : super(dialogOptionType: DialogOptionType.simpleDialogOptionWithText);
+  });
 }

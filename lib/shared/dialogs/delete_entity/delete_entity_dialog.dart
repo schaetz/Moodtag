@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog_config.dart';
 import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog_mixin.dart';
-import 'package:moodtag/shared/dialogs/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/dialog_option.dart';
 
 import '../abstract_dialog.dart';
 
@@ -17,7 +17,7 @@ class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R
     with DeleteEntityDialogMixin<E, R> {
   static DeleteEntityDialog construct<E>(BuildContext context,
       {String? title,
-      required OptionObjectToHandler<R> options,
+      required List<DialogOption<R>> options,
       Function(R?)? onTerminate,
       // Dialog-specific properties
       required E? entityToDelete,

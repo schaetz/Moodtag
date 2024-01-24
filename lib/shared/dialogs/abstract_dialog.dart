@@ -73,14 +73,11 @@ abstract class AbstractDialog<R, C extends DialogConfig<R>> {
   }
 
   List<Widget> buildDialogOptions(C config) {
-    if (config.dialogOptionType == DialogOptionType.simpleDialogOptionWithText) {
-      return config.options.entries
-          .map((optionObjectToHandler) => SimpleDialogOption(
-                onPressed: () => optionObjectToHandler.value(context),
-                child: optionObjectToHandler.key is String ? Text(optionObjectToHandler.key as String) : const Text(''),
-              ))
-          .toList();
-    }
-    throw InternalException('A dialog could not be displayed: Invalid configuration.');
+    return config.options
+        .map((optionObject) => SimpleDialogOption(
+              onPressed: () => optionObject.getDialogResult(context),
+              child: optionObject.widget,
+            ))
+        .toList();
   }
 }

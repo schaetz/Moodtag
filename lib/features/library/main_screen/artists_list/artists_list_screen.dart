@@ -134,7 +134,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
             : null,
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
         onLongPress: () => DeleteEntityDialog.construct<Artist>(widget.scaffoldKey.currentContext!,
-            options: {}, // TODO Define options
+            options: [], // TODO Define options
             entityToDelete: artistWithTags.artist,
             deleteHandler: handleDeleteArtist)
           ..show());
