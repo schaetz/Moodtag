@@ -5,18 +5,17 @@ import 'package:moodtag/shared/models/structs/named_entity.dart';
 class SelectEntityDialogConfig<E extends NamedEntity> extends DialogConfig<E> {
   final List<E> availableEntities;
   final E? initialSelection;
-  final Function(E) onSendInput;
   final EntityDialogSelectionStyle selectionStyle;
   final Icon Function(E)? iconSelector;
 
   const SelectEntityDialogConfig(
       {String? super.title,
       required super.options,
+      required super.handleResult,
       super.onTerminate,
       // Dialog-specific properties
       required this.availableEntities,
       this.initialSelection,
-      required this.onSendInput,
       required this.selectionStyle,
       this.iconSelector});
 

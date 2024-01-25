@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:moodtag/shared/dialogs/dialog_form.dart';
 
 /**
  *  Represents an option in a dialog that is visually represented by a widget;
@@ -8,6 +9,6 @@ import 'package:flutter/widgets.dart';
  *  R: result type of the dialog
  */
 abstract class DialogOption<R> {
-  abstract R Function(BuildContext) getDialogResult;
+  abstract R Function(BuildContext, DialogFormState?) getDialogResult;
   Widget get widget;
 }

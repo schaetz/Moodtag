@@ -50,8 +50,8 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
   }
 
   Widget _buildTagRow(BuildContext context, TagData tagData, TagsListBloc bloc) {
-    final handleDeleteTag = () {
-      bloc.add(DeleteTag(tagData.tag));
+    final handleDeleteTag = (bool confirmation) {
+      if (confirmation) bloc.add(DeleteTag(tagData.tag));
     };
     return ListTile(
         title: Row(
@@ -73,9 +73,7 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
         leading: Icon(Icons.label),
         onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tagData.tag.id),
         onLongPress: () => DeleteEntityDialog.construct<Tag>(_scaffoldKey.currentContext!,
-            options: [], // TODO Define options
-            entityToDelete: tagData.tag,
-            deleteHandler: handleDeleteTag)
+            entityToDelete: tagData.tag, handleResult: handleDeleteTag)
           ..show());
   }
 }

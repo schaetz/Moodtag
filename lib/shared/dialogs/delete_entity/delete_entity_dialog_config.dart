@@ -8,13 +8,12 @@ import 'package:moodtag/shared/dialogs/dialog_config.dart';
  */
 class DeleteEntityDialogConfig<R, E> extends DialogConfig<R> {
   E? entityToDelete;
-  Function() deleteHandler;
 
   DeleteEntityDialogConfig(
       {super.title,
       required super.options,
+      required super.handleResult,
       super.onTerminate,
       // Dialog-specific properties
-      this.entityToDelete,
-      required this.deleteHandler});
+      this.entityToDelete});
 }

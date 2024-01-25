@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:moodtag/shared/dialogs/dialog_form.dart';
 import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 
 import 'dialog_config.dart';
+import 'dialog_option.dart';
 
 /**
  *  Wrapper for all dialogs in the application;
@@ -17,17 +19,23 @@ import 'dialog_config.dart';
  */
 abstract class AbstractDialog<R, C extends DialogConfig<R>> {
   final BuildContext context;
+  final DialogFormFactory dialogFormFactory;
   late final C config;
 
-  Future<C>? _getRequiredDataFuture;
-  Future<R?>? _showDialogFuture;
+  late final Future<C>? _getRequiredDataFuture;
+  late final Future<R?>? _showDialogFuture;
+
+  DialogFormState? _currentFormState;
   bool _isClosed = false;
 
-  AbstractDialog(this.context, this.config) : _getRequiredDataFuture = null;
-  AbstractDialog.withFuture(this.context, {required Future<C> Function(BuildContext) getRequiredData}) {
-    _getRequiredDataFuture = getRequiredData(context)
-        .then((_config) => this.config = _config)
-        .onError((error, stackTrace) => throw InternalException('A dialog could not be displayed.'));
+  AbstractDialog(this.context, this.config, {this.dialogFormFactory = const DialogFormFactory()})
+      : _getRequiredDataFuture = null;
+  AbstractDialog.withFuture(this.context,
+      {this.dialogFormFactory = const DialogFormFactory(), required Future<C> Function(BuildContext) getRequiredData}) {
+    _getRequiredDataFuture = getRequiredData(context).then((_config) {
+      this.config = _config;
+      return _config;
+    }).onError((error, stackTrace) => throw InternalException('A dialog could not be displayed.'));
   }
 
   void show() async {
@@ -60,24 +68,42 @@ abstract class AbstractDialog<R, C extends DialogConfig<R>> {
       title: config.title != null ? Text(config.title!) : Text(''),
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: buildDialogOptions(config)
-                  .map((optionWidget) => Padding(padding: const EdgeInsets.only(left: 16.0), child: optionWidget))
-                  .toList()),
-        )
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [buildForm(config), buildDialogOptions(config)]))
       ],
     );
   }
 
-  List<Widget> buildDialogOptions(C config) {
-    return config.options
-        .map((optionObject) => SimpleDialogOption(
-              onPressed: () => optionObject.getDialogResult(context),
-              child: optionObject.widget,
-            ))
-        .toList();
+  Widget buildForm(
+    C config,
+  ) {
+    if (config.formFields == null) {
+      return Container();
+    }
+    final formStateCallback = (DialogFormState newFormState) => _currentFormState = newFormState;
+    return dialogFormFactory.createForm(config.formFields!, formStateCallback);
+  }
+
+  Widget buildDialogOptions(C config) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: config.options
+            .map((option) => Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: SimpleDialogOption(
+                  onPressed: () => _onOptionPressed(option),
+                  child: option.widget,
+                )))
+            .toList());
+  }
+
+  void _onOptionPressed(DialogOption<R> option) {
+    final result = option.getDialogResult(context, _currentFormState);
+    closeDialog(context, result: result);
+    config.handleResult(result);
   }
 }

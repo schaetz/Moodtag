@@ -10,6 +10,9 @@ import 'delete_entity_dialog_config.dart';
 /**
  *  Mixin that provides dialogs with functionality needed
  *  when deleting entities
+ *
+ *  // TODO Delete/Replace this mixin?
+ *  @deprecated Currently no longer in use
  */
 mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T, DeleteEntityDialogConfig<T, E>> {
   Future<String> determineDialogTextForDeleteEntity(BuildContext context) async {
@@ -41,7 +44,7 @@ mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T, DeleteEntityDialogConfi
       throw InternalException("The delete dialog was called with invalid arguments.");
     }
 
-    await config.deleteHandler();
+    // await config.handleResult();
     closeDialog(context);
   }
 

@@ -108,7 +108,7 @@ class SelectEntityDialogFormState<E extends NamedEntity> extends State<SelectEnt
   }
 
   void _confirmSelection(E selection) {
-    config.onSendInput(selection);
+    config.handleResult(selection);
     Navigator.pop(context, selection);
   }
 }

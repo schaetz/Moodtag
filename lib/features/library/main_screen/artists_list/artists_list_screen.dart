@@ -121,8 +121,8 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
   }
 
   Widget _buildArtistRow(BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc) {
-    final handleDeleteArtist = () {
-      bloc.add(DeleteArtist(artistWithTags.artist));
+    final handleDeleteArtist = (bool confirmation) {
+      if (confirmation) bloc.add(DeleteArtist(artistWithTags.artist));
     };
     return ListTile(
         title: Text(
@@ -134,9 +134,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
             : null,
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
         onLongPress: () => DeleteEntityDialog.construct<Artist>(widget.scaffoldKey.currentContext!,
-            options: [], // TODO Define options
-            entityToDelete: artistWithTags.artist,
-            deleteHandler: handleDeleteArtist)
+            entityToDelete: artistWithTags.artist, handleResult: handleDeleteArtist)
           ..show());
   }
 

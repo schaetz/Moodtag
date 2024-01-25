@@ -78,9 +78,9 @@ class AppSettingsScreen extends StatelessWidget {
                         IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () => DeleteEntityDialog.construct<TagCategory>(context,
-                                options: [], // TODO Define options
                                 entityToDelete: tagCategory,
-                                deleteHandler: () => bloc.add(DeleteTagCategory(tagCategory)))
+                                handleResult: (bool confirmation) =>
+                                    confirmation ? bloc.add(DeleteTagCategory(tagCategory)) : {})
                               ..show())
                       ]),
                       shape: index < tagCategories.length - 1
@@ -151,7 +151,7 @@ class AppSettingsScreen extends StatelessWidget {
   void _showLastFmImportScreen(BuildContext context) => Navigator.of(context).pushNamed(Routes.lastFmImport);
 
   void _openSetLastFmAccountNameDialog(BuildContext context, AppSettingsBloc bloc) async {
-    AddLastFmAccountDialog(context, serviceName, onTerminate: (newAccountName) {
+    AddLastFmAccountDialog(context, serviceName, handleResult: (newAccountName) {
       if (newAccountName != null) {
         bloc.add(AddLastFmAccount(newAccountName));
       }
@@ -187,9 +187,9 @@ class AppSettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) => DeleteEntityDialog.construct(context,
-      options: [], // TODO Define options
-      entityToDelete: null,
-      deleteHandler: () => bloc.add(ResetLibrary()))
-    ..show();
+  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) {
+    DeleteEntityDialog.construct(context,
+        entityToDelete: null, handleResult: (confirmation) => confirmation ? bloc.add(ResetLibrary()) : {})
+      ..show();
+  }
 }

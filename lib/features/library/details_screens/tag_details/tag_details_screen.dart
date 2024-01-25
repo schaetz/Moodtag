@@ -8,10 +8,10 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/create_entity_dialog/create_entity_dialog.dart';
 import 'package:moodtag/shared/dialogs/remove_tag_from_artist_dialog.dart';
 import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog.dart';
 import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog_config.dart';
+import 'package:moodtag/shared/dialogs/single_text_input_dialog/single_text_input_dialog.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
@@ -87,10 +87,9 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             additionalCheckData: state.allArtists,
             showPlaceholders: false,
             buildOnSuccess: (tagData) => FloatingActionButton(
-                onPressed: () => AddArtistDialog.construct(context,
-                    options: [], // TODO Define options
-                    preselectedOtherEntity: tagData.tag,
-                    onSendInput: (input) => bloc.add(AddArtistsForTag(input, tagData.tag)),
+                onPressed: () => SingleTextInputDialog.construct(context,
+                    title: 'Add artists for tag',
+                    handleResult: (input) => (input != null) ? bloc.add(AddArtistsForTag(input, tagData.tag)) : {},
                     suggestedEntities: state.allArtists.data)
                   ..show(),
                 child: const Icon(Icons.library_add)));
@@ -137,7 +136,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                       options: [], // TODO Define options
                       availableEntities: state.allTagCategories.data!,
                       initialSelection: categoryData,
-                      onSendInput: (newCategoryData) =>
+                      handleResult: (newCategoryData) =>
                           bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory)),
                       selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
                       iconSelector: (categoryData) => Icon(Icons.circle, color: Color(categoryData.tagCategory.color)),
@@ -160,8 +159,8 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
   }
 
   Widget _buildRowForAssociatedArtist(BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc) {
-    final handleRemoveTagFromArtist = () {
-      bloc.add(RemoveTagFromArtist(artist, tag));
+    final handleRemoveTagFromArtist = (confirmation) {
+      if (confirmation) bloc.add(RemoveTagFromArtist(artist, tag));
     };
     return ListTile(
         title: Text(
@@ -170,7 +169,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
         onLongPress: () => RemoveTagFromArtistDialog(_scaffoldKey.currentContext!, tag, artist,
-            removeTagHandler: handleRemoveTagFromArtist)
+            handleResult: handleRemoveTagFromArtist)
           ..show());
   }
 }
