@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/abstract_dialog.dart';
-import 'package:moodtag/shared/dialogs/dialog_option.dart';
-import 'package:moodtag/shared/dialogs/simple_text_dialog_option.dart';
+import 'package:moodtag/shared/dialogs/components/abstract_dialog.dart';
+import 'package:moodtag/shared/dialogs/components/options/dialog_option.dart';
+import 'package:moodtag/shared/dialogs/components/options/simple_text_dialog_option.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import 'single_text_input_dialog_config.dart';

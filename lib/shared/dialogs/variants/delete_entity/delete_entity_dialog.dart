@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog_config.dart';
-import 'package:moodtag/shared/dialogs/delete_entity/delete_entity_dialog_mixin.dart';
-import 'package:moodtag/shared/dialogs/dialog_option.dart';
-import 'package:moodtag/shared/dialogs/simple_text_dialog_option.dart';
+import 'package:moodtag/shared/dialogs/components/abstract_dialog.dart';
+import 'package:moodtag/shared/dialogs/components/options/dialog_option.dart';
+import 'package:moodtag/shared/dialogs/components/options/simple_text_dialog_option.dart';
 
-import '../abstract_dialog.dart';
+import 'delete_entity_dialog_config.dart';
 
 typedef R = bool;
 
@@ -14,8 +13,7 @@ typedef R = bool;
  *  R: Result type = bool
  *  E: Type of the entity
  */
-class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R, E>>
-    with DeleteEntityDialogMixin<E, R> {
+class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R, E>> {
   static DeleteEntityDialog construct<E>(BuildContext context,
       {String? title,
       Function(R?)? onTerminate,

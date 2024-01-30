@@ -1,5 +1,5 @@
-import 'dialog_form_field.dart';
-import 'dialog_option.dart';
+import 'form/dialog_form_field.dart';
+import 'options/dialog_option.dart';
 
 /**
  *  Configuration for AbstractDialog and dialog classes inheriting from it

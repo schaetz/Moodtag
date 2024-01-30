@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/dialog_option.dart';
-import 'package:moodtag/shared/dialogs/select_entity/select_entity_dialog_form.dart';
+import 'package:moodtag/shared/dialogs/components/abstract_dialog.dart';
+import 'package:moodtag/shared/dialogs/components/options/dialog_option.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import '../abstract_dialog.dart';
 import 'select_entity_dialog_config.dart';
+import 'select_entity_dialog_form.dart';
 
 /**
  *  Dialog that allows the user to select a single entity from a list

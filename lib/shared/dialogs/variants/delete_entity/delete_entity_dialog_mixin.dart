@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/shared/dialogs/abstract_dialog.dart';
+import 'package:moodtag/shared/dialogs/components/abstract_dialog.dart';
 import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 
 import 'delete_entity_dialog_config.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/dialog_option.dart';
 
-import 'dialog_form.dart';
+import '../form/dialog_form.dart';
+import 'dialog_option.dart';
 
 /**
  *  Represents an option in a dialog that is visually represented by a simple

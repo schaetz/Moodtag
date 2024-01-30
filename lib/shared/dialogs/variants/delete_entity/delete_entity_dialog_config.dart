@@ -1,4 +1,4 @@
-import 'package:moodtag/shared/dialogs/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_config.dart';
 
 /**
  *  Configuration for dialogs to confirm the deletion of an entity

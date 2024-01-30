@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:moodtag/shared/dialogs/dialog_form.dart';
+import 'package:moodtag/shared/dialogs/components/form/dialog_form.dart';
 
 /**
  *  Represents an option in a dialog that is visually represented by a widget;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 class SelectEntityDialogConfig<E extends NamedEntity> extends DialogConfig<E> {

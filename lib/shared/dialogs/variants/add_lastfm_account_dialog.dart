@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_config.dart';
 
-import 'abstract_dialog.dart';
-import 'dialog_config.dart';
+import '../components/abstract_dialog.dart';
 
 class AddLastFmAccountDialog extends AbstractDialog<String?, DialogConfig<String?>> {
   final String serviceName;

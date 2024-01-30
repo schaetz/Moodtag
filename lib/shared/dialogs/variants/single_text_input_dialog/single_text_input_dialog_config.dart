@@ -1,5 +1,5 @@
-import 'package:moodtag/shared/dialogs/dialog_config.dart';
-import 'package:moodtag/shared/dialogs/dialog_form_field.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/components/form/dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 /**

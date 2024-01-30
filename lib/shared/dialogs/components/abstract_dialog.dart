@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:moodtag/shared/dialogs/dialog_form.dart';
+import 'package:moodtag/shared/dialogs/components/form/dialog_form.dart';
 import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 
 import 'dialog_config.dart';

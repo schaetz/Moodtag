@@ -8,7 +8,7 @@ import 'package:moodtag/model/repository/library_subscription/data_wrapper/loadi
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/single_text_input_dialog/single_text_input_dialog.dart';
+import 'package:moodtag/shared/dialogs/variants/single_text_input_dialog/single_text_input_dialog.dart';
 import 'package:moodtag/shared/widgets/data_display/chips_row_info_label.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
