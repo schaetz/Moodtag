@@ -15,7 +15,6 @@ class SelectEntityDialog<E extends NamedEntity> extends AbstractDialog<E, Select
   static SelectEntityDialog<E> construct<E extends NamedEntity>(BuildContext context,
       {String? title,
       required List<DialogOption<E>> options,
-      required Function(E) handleResult,
       Function(E?)? onTerminate,
       // Dialog-specific properties
       required List<E> availableEntities,
@@ -27,7 +26,6 @@ class SelectEntityDialog<E extends NamedEntity> extends AbstractDialog<E, Select
         SelectEntityDialogConfig(
             title: title,
             options: options,
-            handleResult: handleResult,
             onTerminate: onTerminate,
             // Dialog-specific properties
             availableEntities: availableEntities,

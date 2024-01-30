@@ -12,6 +12,5 @@ class AddLastFmAccountDialog extends AbstractDialog<String?, DialogConfig<String
             context,
             DialogConfig(
                 options: [], // TODO Define options
-                handleResult: handleResult,
                 onTerminate: onTerminate));
 }

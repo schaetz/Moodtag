@@ -44,7 +44,6 @@ mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T, DeleteEntityDialogConfi
       throw InternalException("The delete dialog was called with invalid arguments.");
     }
 
-    // await config.handleResult();
     closeDialog(context);
   }
 

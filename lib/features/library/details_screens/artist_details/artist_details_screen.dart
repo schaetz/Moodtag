@@ -142,11 +142,8 @@ class ArtistDetailsScreen extends StatelessWidget {
     final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),
-      onPressed: () => SingleTextInputDialog.construct(context,
-          title: 'Create new tag(s)',
-          handleResult: (input) =>
-              input != null ? bloc.add(CreateTags(input, preselectedArtist: artistData.artist)) : {})
-        ..show(),
+      onPressed: () => SingleTextInputDialog.construct(context, title: 'Create new tag(s)')
+        ..show(onTruthyResult: (input) => bloc.add(CreateTags(input!, preselectedArtist: artistData.artist))),
     );
   }
 }

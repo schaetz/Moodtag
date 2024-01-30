@@ -38,15 +38,22 @@ abstract class AbstractDialog<R, C extends DialogConfig<R>> {
     }).onError((error, stackTrace) => throw InternalException('A dialog could not be displayed.'));
   }
 
-  void show() async {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+  void show({Function(R)? onTruthyResult}) {
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
       _showDialogFuture = showDialog<R>(context: context, builder: (_) => buildDialog(context));
       _showDialogFuture!.whenComplete(() => _isClosed = true);
       if (config.onTerminate != null) {
         _showDialogFuture!.then(config.onTerminate!);
       }
+      final result = await _showDialogFuture;
+      if (onTruthyResult != null && _isResultTruthy(result)) {
+        onTruthyResult(result as R);
+      }
     });
   }
+
+  bool _isResultTruthy(R? result) =>
+      (result != null && !(result is bool && result == false) && !(result is String && result.isEmpty));
 
   Widget buildDialog(BuildContext context) {
     return _getRequiredDataFuture == null
@@ -104,6 +111,5 @@ abstract class AbstractDialog<R, C extends DialogConfig<R>> {
   void _onOptionPressed(DialogOption<R> option) {
     final result = option.getDialogResult(context, _currentFormState);
     closeDialog(context, result: result);
-    config.handleResult(result);
   }
 }

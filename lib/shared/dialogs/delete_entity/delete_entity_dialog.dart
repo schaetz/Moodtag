@@ -18,7 +18,6 @@ class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R
     with DeleteEntityDialogMixin<E, R> {
   static DeleteEntityDialog construct<E>(BuildContext context,
       {String? title,
-      required Function(R) handleResult,
       Function(R?)? onTerminate,
       // Dialog-specific properties
       required E? entityToDelete}) {
@@ -27,7 +26,6 @@ class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R
         DeleteEntityDialogConfig<R, E>(
             title: title,
             options: _getYesNoOptions(),
-            handleResult: handleResult,
             onTerminate: onTerminate,
             // Dialog-specific properties
             entityToDelete: entityToDelete));

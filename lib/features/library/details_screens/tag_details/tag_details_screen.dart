@@ -88,10 +88,8 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             showPlaceholders: false,
             buildOnSuccess: (tagData) => FloatingActionButton(
                 onPressed: () => SingleTextInputDialog.construct(context,
-                    title: 'Add artists for tag',
-                    handleResult: (input) => (input != null) ? bloc.add(AddArtistsForTag(input, tagData.tag)) : {},
-                    suggestedEntities: state.allArtists.data)
-                  ..show(),
+                        title: 'Add artists for tag', suggestedEntities: state.allArtists.data)
+                    .show(onTruthyResult: (input) => bloc.add(AddArtistsForTag(input!, tagData.tag))),
                 child: const Icon(Icons.library_add)));
       }),
     );
@@ -130,17 +128,16 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             backgroundColor: Color(category.color),
             onPressed: state.allTagCategories.data == null
                 ? null
-                : () => SelectEntityDialog.construct<TagCategoryData>(
-                      context,
-                      title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
-                      options: [], // TODO Define options
-                      availableEntities: state.allTagCategories.data!,
-                      initialSelection: categoryData,
-                      handleResult: (newCategoryData) =>
-                          bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory)),
-                      selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
-                      iconSelector: (categoryData) => Icon(Icons.circle, color: Color(categoryData.tagCategory.color)),
-                    )..show())
+                : () => SelectEntityDialog.construct<TagCategoryData>(context,
+                    title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
+                    options: [], // TODO Define options
+                    availableEntities: state.allTagCategories.data!,
+                    initialSelection: categoryData,
+                    selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
+                    iconSelector: (categoryData) =>
+                        Icon(Icons.circle, color: Color(categoryData.tagCategory.color))).show(
+                    onTruthyResult: (newCategoryData) =>
+                        bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory))))
       ],
     );
   }
