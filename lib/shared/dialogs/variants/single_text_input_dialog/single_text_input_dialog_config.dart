@@ -15,6 +15,7 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends DialogConfig<St
 
   SingleTextInputDialogConfig({
     super.title,
+    super.subtitle,
     required super.options,
     super.onTerminate,
     // Dialog-specific properties

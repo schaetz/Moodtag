@@ -8,9 +8,10 @@ import 'options/dialog_option.dart';
  */
 class DialogConfig<R> {
   final String? title;
+  final String? subtitle;
   final List<DialogFormField>? formFields;
   final List<DialogOption<R>> options; // The key can be a string (for simpleDialogOptionWithText) or a Widget
   final Function(R?)? onTerminate;
 
-  const DialogConfig({this.title, this.formFields, required this.options, this.onTerminate});
+  const DialogConfig({this.title, this.subtitle, this.formFields, required this.options, this.onTerminate});
 }

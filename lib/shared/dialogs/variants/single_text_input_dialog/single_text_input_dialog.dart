@@ -15,6 +15,7 @@ import 'single_text_input_dialog_config.dart';
 class SingleTextInputDialog<S extends NamedEntity> extends AbstractDialog<String?, SingleTextInputDialogConfig<S>> {
   static SingleTextInputDialog construct<S extends NamedEntity>(BuildContext context,
       {String? title,
+      String? subtitle,
       Function(String?)? onTerminate,
       // Dialog-specific properties
       List<S>? suggestedEntities = null}) {
@@ -22,6 +23,7 @@ class SingleTextInputDialog<S extends NamedEntity> extends AbstractDialog<String
         context,
         SingleTextInputDialogConfig<S>(
             title: title,
+            subtitle: subtitle,
             options: _getDefaultOptions(),
             onTerminate: onTerminate,
             // Dialog-specific properties

@@ -16,6 +16,7 @@ typedef R = bool;
 class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R, E>> {
   static DeleteEntityDialog construct<E>(BuildContext context,
       {String? title,
+      String? subtitle,
       Function(R?)? onTerminate,
       // Dialog-specific properties
       required E? entityToDelete}) {
@@ -23,6 +24,7 @@ class DeleteEntityDialog<E> extends AbstractDialog<R, DeleteEntityDialogConfig<R
         context,
         DeleteEntityDialogConfig<R, E>(
             title: title,
+            subtitle: subtitle,
             options: _getYesNoOptions(),
             onTerminate: onTerminate,
             // Dialog-specific properties

@@ -37,16 +37,28 @@ class _DialogContentState<R, C extends DialogConfig<R>> extends State<DialogCont
       title: config.title != null ? Text(config.title!) : Text(''),
       children: <Widget>[
         Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [buildForm(config), buildDialogOptions(config)]))
+                children: [buildSubtitle(), buildForm(), buildDialogOptions()]))
       ],
     );
   }
 
-  Widget buildForm(C config) {
+  Widget buildSubtitle() {
+    if (config.subtitle == null) {
+      return SizedBox(height: 20.0);
+    }
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 20.0),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Text(config.subtitle!),
+        ));
+  }
+
+  Widget buildForm() {
     if (config.formFields == null) {
       return Container();
     }
@@ -56,7 +68,7 @@ class _DialogContentState<R, C extends DialogConfig<R>> extends State<DialogCont
     return dialogFormFactory.createForm(config.formFields!, formStateCallback);
   }
 
-  Widget buildDialogOptions(C config) {
+  Widget buildDialogOptions() {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,

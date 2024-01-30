@@ -189,7 +189,8 @@ class AppSettingsScreen extends StatelessWidget {
 
   void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) {
     DeleteEntityDialog.construct(context,
-            title: 'Are you sure that you want to reset the library, deleting all artists and tags?',
+            title: 'Are you sure that you want to reset the library?',
+            subtitle: 'This will delete all artists and tags.',
             entityToDelete: null)
         .show(onTruthyResult: (_) => bloc.add(ResetLibrary()));
   }

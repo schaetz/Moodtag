@@ -14,6 +14,7 @@ import 'select_entity_dialog_form.dart';
 class SelectEntityDialog<E extends NamedEntity> extends AbstractDialog<E, SelectEntityDialogConfig<E>> {
   static SelectEntityDialog<E> construct<E extends NamedEntity>(BuildContext context,
       {String? title,
+      String? subtitle,
       required List<DialogOption<E>> options,
       Function(E?)? onTerminate,
       // Dialog-specific properties
@@ -25,6 +26,7 @@ class SelectEntityDialog<E extends NamedEntity> extends AbstractDialog<E, Select
         context,
         SelectEntityDialogConfig(
             title: title,
+            subtitle: subtitle,
             options: options,
             onTerminate: onTerminate,
             // Dialog-specific properties

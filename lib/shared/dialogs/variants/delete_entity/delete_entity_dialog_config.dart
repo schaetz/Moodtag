@@ -11,6 +11,7 @@ class DeleteEntityDialogConfig<R, E> extends DialogConfig<R> {
 
   DeleteEntityDialogConfig(
       {super.title,
+      super.subtitle,
       required super.options,
       super.onTerminate,
       // Dialog-specific properties
