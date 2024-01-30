@@ -77,7 +77,7 @@ class DialogFormState extends State<DialogForm> {
           onChanged: (value) => _updateValue(formField.identifier, value));
 
   void _updateValue(String fieldId, Object? newValue) {
-    final newValues = Map<String, Object?>.from(_values)..putIfAbsent(fieldId, () => newValue);
+    final newValues = Map<String, Object?>.from(_values)..update(fieldId, (_) => newValue);
     setState(() {
       _values = newValues;
     });
