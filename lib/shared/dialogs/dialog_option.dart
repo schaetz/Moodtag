@@ -10,5 +10,6 @@ import 'package:moodtag/shared/dialogs/dialog_form.dart';
  */
 abstract class DialogOption<R> {
   abstract R Function(BuildContext, DialogFormState?) getDialogResult;
+  abstract bool Function(BuildContext, DialogFormState?)? validate;
   Widget get widget;
 }

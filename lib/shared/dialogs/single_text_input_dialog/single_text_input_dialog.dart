@@ -32,7 +32,9 @@ class SingleTextInputDialog<S extends NamedEntity> extends AbstractDialog<String
   static List<DialogOption<String?>> _getDefaultOptions() => [
         SimpleTextDialogOption<String?>('Discard', (context, formState) => null),
         SimpleTextDialogOption<String?>('Confirm',
-            (context, formState) => formState?.get<String>(SingleTextInputDialogConfig.singleTextInputId) ?? null)
+            (context, formState) => formState?.get<String>(SingleTextInputDialogConfig.singleTextInputId) ?? null,
+            validate: (context, formState) =>
+                formState?.get<String>(SingleTextInputDialogConfig.singleTextInputId)?.isNotEmpty == true)
       ];
 
   SingleTextInputDialog(super.context, super.config);

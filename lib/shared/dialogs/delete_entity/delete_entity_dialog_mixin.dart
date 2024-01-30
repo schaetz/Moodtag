@@ -43,8 +43,6 @@ mixin DeleteEntityDialogMixin<E, T> on AbstractDialog<T, DeleteEntityDialogConfi
     if (config.entityToDelete == null) {
       throw InternalException("The delete dialog was called with invalid arguments.");
     }
-
-    closeDialog(context);
   }
 
   Future<String> _getRelatedEntitiesMessage(Repository repository) async {

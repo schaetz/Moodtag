@@ -14,9 +14,12 @@ class SimpleTextDialogOption<R> implements DialogOption<R> {
   R Function(BuildContext context, DialogFormState?) getDialogResult;
 
   @override
+  bool Function(BuildContext context, DialogFormState?)? validate;
+
+  @override
   Widget get widget => Text(text);
 
   final String text;
 
-  SimpleTextDialogOption(this.text, this.getDialogResult);
+  SimpleTextDialogOption(this.text, this.getDialogResult, {this.validate});
 }
