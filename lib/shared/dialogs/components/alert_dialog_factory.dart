@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/shared/dialogs/components/options/dialog_option.dart';
+import 'package:moodtag/shared/dialogs/components/options/dialog_action.dart';
 import 'package:moodtag/shared/dialogs/variants/select_entity/select_entity_dialog_config.dart';
 import 'package:moodtag/shared/dialogs/variants/single_text_input_dialog/single_text_input_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import 'dialog_config.dart';
-import 'dialog_wrapper.dart';
+import 'alert_dialog_config.dart';
+import 'alert_dialog_wrapper.dart';
 
-class DialogFactory {
+class AlertDialogFactory {
   final Repository _repository;
 
-  const DialogFactory(this._repository);
+  const AlertDialogFactory(this._repository);
 
   Future<BooleanDialogWrapper> getDeleteTagDialog(BuildContext context, {required Tag tag}) async {
     final artistsWithTag = await _repository.getArtistsDataHavingTag(tag).first;
@@ -26,8 +26,10 @@ class DialogFactory {
 
   BooleanDialogWrapper getConfirmationDialog(BuildContext context,
       {String? title, String? subtitle, Function(bool?)? onTerminate}) {
-    return BooleanDialogWrapper(context,
-        DialogConfig<bool>(title: title, subtitle: subtitle, options: _getYesNoOptions(), onTerminate: onTerminate));
+    return BooleanDialogWrapper(
+        context,
+        AlertDialogConfig<bool>(
+            title: title, subtitle: subtitle, actions: _getYesNoOptions(), onTerminate: onTerminate));
   }
 
   /// S: Type of the suggested entities
@@ -38,7 +40,7 @@ class DialogFactory {
         SingleTextInputDialogConfig(
             title: title,
             subtitle: subtitle,
-            options: _getTextInputConfirmationOptions(SingleTextInputDialogConfig.singleTextInputId),
+            actions: _getTextInputConfirmationActions(SingleTextInputDialogConfig.singleTextInputId),
             onTerminate: onTerminate,
             suggestedEntities: suggestedEntities));
   }
@@ -60,7 +62,7 @@ class DialogFactory {
         SelectEntityDialogConfig<E>(
             title: title,
             subtitle: subtitle,
-            options: _getSelectEntityConfirmationOptions<E>(
+            actions: _getSelectEntityConfirmationActions<E>(
                 SingleTextInputDialogConfig.singleTextInputId), // TODO Wrong input ID
             onTerminate: onTerminate,
             availableEntities: availableEntities,
@@ -69,28 +71,28 @@ class DialogFactory {
             iconSelector: iconSelector));
   }
 
-  List<DialogOption<bool>> _getYesNoOptions() {
+  List<DialogAction<bool>> _getYesNoOptions() {
     return [
-      DialogOption.getSimpleTextDialogOption<bool>('Yes', getDialogResult: (context, formState) => true),
-      DialogOption.getSimpleTextDialogOption<bool>('No', getDialogResult: (context, formState) => false),
+      DialogAction.getSimpleTextDialogAction<bool>('Yes', getDialogResult: (context, formState) => true),
+      DialogAction.getSimpleTextDialogAction<bool>('No', getDialogResult: (context, formState) => false),
     ];
   }
 
-  static List<DialogOption<String>> _getTextInputConfirmationOptions(String mainInputId) => [
-        DialogOption.getSimpleTextDialogOption<String>('Discard', getDialogResult: (context, formState) => null),
-        DialogOption.getSimpleTextDialogOption<String>('Confirm',
+  static List<DialogAction<String>> _getTextInputConfirmationActions(String mainInputId) => [
+        DialogAction.getSimpleTextDialogAction<String>('Discard', getDialogResult: (context, formState) => null),
+        DialogAction.getSimpleTextDialogAction<String>('Confirm',
             getDialogResult: (context, formState) => formState?.get<String>(mainInputId) ?? null,
             validate: (context, formState) => formState?.get<String>(mainInputId)?.isNotEmpty == true)
       ];
 
-  static List<DialogOption<E>> _getSelectEntityConfirmationOptions<E extends NamedEntity>(String mainInputId) => [
-        DialogOption.getSimpleTextDialogOption<E>('Discard', getDialogResult: (context, formState) => null),
-        DialogOption.getSimpleTextDialogOption<E>('Confirm',
+  static List<DialogAction<E>> _getSelectEntityConfirmationActions<E extends NamedEntity>(String mainInputId) => [
+        DialogAction.getSimpleTextDialogAction<E>('Discard', getDialogResult: (context, formState) => null),
+        DialogAction.getSimpleTextDialogAction<E>('Confirm',
             getDialogResult: (context, formState) => formState?.get<E>(mainInputId) ?? null,
             validate: (context, formState) => formState?.get<E>(mainInputId) != null)
       ];
 }
 
-typedef BooleanDialogWrapper = DialogWrapper<bool, DialogConfig<bool>>;
-typedef SingleTextInputDialogWrapper = DialogWrapper<String?, DialogConfig<String?>>;
-typedef SelectEntityDialogWrapper<E extends NamedEntity> = DialogWrapper<E, SelectEntityDialogConfig<E>>;
+typedef BooleanDialogWrapper = AlertDialogWrapper<bool, AlertDialogConfig<bool>>;
+typedef SingleTextInputDialogWrapper = AlertDialogWrapper<String?, AlertDialogConfig<String?>>;
+typedef SelectEntityDialogWrapper<E extends NamedEntity> = AlertDialogWrapper<E, SelectEntityDialogConfig<E>>;

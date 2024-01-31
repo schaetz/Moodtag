@@ -8,7 +8,7 @@ import 'package:moodtag/model/repository/library_subscription/data_wrapper/loadi
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
 import 'package:moodtag/shared/widgets/data_display/chips_row_info_label.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
@@ -23,7 +23,7 @@ class ArtistDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistDetailsBloc>();
-    final dialogFactory = context.read<DialogFactory>();
+    final dialogFactory = context.read<AlertDialogFactory>();
 
     return MtMainScaffold(
         scaffoldKey: _scaffoldKey,
@@ -85,7 +85,7 @@ class ArtistDetailsScreen extends StatelessWidget {
     context.read<ArtistDetailsBloc>().add(ToggleTagEditMode());
   }
 
-  Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state, DialogFactory dialogFactory) {
+  Widget _buildTagChipsRow(BuildContext context, ArtistDetailsState state, AlertDialogFactory dialogFactory) {
     if (state.tagEditMode) {
       if (state.allTags.loadingStatus.isError || state.allTags.data == null) {
         return ChipsRowInfoLabel('Error loading the tags');
@@ -140,7 +140,7 @@ class ArtistDetailsScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildAddTagChip(BuildContext context, ArtistData artistData, DialogFactory dialogFactory) {
+  Widget _buildAddTagChip(BuildContext context, ArtistData artistData, AlertDialogFactory dialogFactory) {
     final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),

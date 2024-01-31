@@ -8,7 +8,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
 import 'package:moodtag/shared/models/modal_and_overlay_types.dart';
 import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_options.dart';
@@ -39,7 +39,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<ArtistsListBloc>();
-    final dialogFactory = context.read<DialogFactory>();
+    final dialogFactory = context.read<AlertDialogFactory>();
 
     return BlocConsumer<ArtistsListBloc, ArtistsListState>(
         listener: (context, state) => _checkFilterModalState(context, state, bloc),
@@ -123,7 +123,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
   }
 
   Widget _buildArtistRow(
-      BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc, DialogFactory dialogFactory) {
+      BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc, AlertDialogFactory dialogFactory) {
     return ListTile(
         title: Text(
           artistWithTags.artist.name,

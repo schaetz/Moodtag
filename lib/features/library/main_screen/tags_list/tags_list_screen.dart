@@ -5,7 +5,7 @@ import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.da
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.dart';
 import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
 import 'package:moodtag/shared/widgets/text_input/search_bar_container.dart';
@@ -20,7 +20,7 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagsListBloc>();
-    final dialogFactory = context.read<DialogFactory>();
+    final dialogFactory = context.read<AlertDialogFactory>();
 
     return BlocBuilder<TagsListBloc, TagsListState>(builder: (context, state) {
       return SearchBarContainer(
@@ -46,7 +46,7 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
     });
   }
 
-  Widget _buildTagRow(BuildContext context, TagData tagData, TagsListBloc bloc, DialogFactory dialogFactory) {
+  Widget _buildTagRow(BuildContext context, TagData tagData, TagsListBloc bloc, AlertDialogFactory dialogFactory) {
     return ListTile(
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,

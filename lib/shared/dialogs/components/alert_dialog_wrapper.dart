@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:moodtag/shared/dialogs/components/form/dialog_form.dart';
 
-import 'dialog_config.dart';
-import 'dialog_content.dart';
+import 'alert_dialog_config.dart';
+import 'alert_dialog_content.dart';
 
 /**
- *  Wrapper for all dialogs in the application;
+ *  Wrapper for alert dialogs;
  *  takes care of acquiring the required data before building
  *  and using addPostFrameCallback() to display the dialog.
  *
@@ -16,7 +16,7 @@ import 'dialog_content.dart';
  *  R: Result type of the dialog
  *  C: Type of the dialog configuration
  */
-class DialogWrapper<R, C extends DialogConfig<R>> {
+class AlertDialogWrapper<R, C extends AlertDialogConfig<R>> {
   static bool isResultTruthy(Object? result) => (result != null &&
       !(result is bool && result == false) &&
       !(result is String && result.isEmpty) &&
@@ -30,7 +30,7 @@ class DialogWrapper<R, C extends DialogConfig<R>> {
 
   bool _isClosed = false;
 
-  DialogWrapper(this.context, this.config) : _getRequiredDataFuture = null;
+  AlertDialogWrapper(this.context, this.config) : _getRequiredDataFuture = null;
 
   void show({Function(R)? onTruthyResult}) {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
@@ -48,10 +48,10 @@ class DialogWrapper<R, C extends DialogConfig<R>> {
 
   Widget buildDialog(BuildContext context) {
     return _getRequiredDataFuture == null
-        ? DialogContent<R, C>(config, dialogFormFactory: const DialogFormFactory(), closeDialog: this.closeDialog)
+        ? AlertDialogContent<R, C>(config, dialogFormFactory: const DialogFormFactory(), closeDialog: this.closeDialog)
         : FutureBuilder(
             future: _getRequiredDataFuture,
-            builder: (context, _config) => DialogContent<R, C>(_config.data!,
+            builder: (context, _config) => AlertDialogContent<R, C>(_config.data!,
                 dialogFormFactory: const DialogFormFactory(), closeDialog: this.closeDialog));
   }
 

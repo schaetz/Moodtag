@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-class SelectEntityDialogConfig<E extends NamedEntity> extends DialogConfig<E> {
+class SelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogConfig<E> {
   final List<E> availableEntities;
   final E? initialSelection;
   final EntityDialogSelectionStyle selectionStyle;
@@ -11,7 +11,7 @@ class SelectEntityDialogConfig<E extends NamedEntity> extends DialogConfig<E> {
   const SelectEntityDialogConfig(
       {String? super.title,
       super.subtitle,
-      required super.options,
+      required super.actions,
       super.onTerminate,
       // Dialog-specific properties
       required this.availableEntities,

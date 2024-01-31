@@ -1,4 +1,4 @@
-import 'package:moodtag/shared/dialogs/components/dialog_config.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_config.dart';
 import 'package:moodtag/shared/dialogs/components/form/dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
@@ -8,7 +8,7 @@ import 'package:moodtag/shared/models/structs/named_entity.dart';
  *
  *  S: Type of the suggested entities
  */
-class SingleTextInputDialogConfig<S extends NamedEntity> extends DialogConfig<String> {
+class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConfig<String> {
   static const singleTextInputId = 'input';
 
   final List<S>? suggestedEntities;
@@ -16,7 +16,7 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends DialogConfig<St
   const SingleTextInputDialogConfig({
     super.title,
     super.subtitle,
-    required super.options,
+    required super.actions,
     super.onTerminate,
     // Dialog-specific properties
     this.suggestedEntities,

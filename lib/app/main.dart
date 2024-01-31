@@ -23,7 +23,7 @@ import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/logging/mt_bloc_observer.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -62,8 +62,8 @@ class _AppState extends State<MoodtagApp> {
         create: (context) => _repository,
         child: Provider<RouteObserver>(
             create: (context) => _routeObserver,
-            child: Provider<DialogFactory>(
-                create: (context) => DialogFactory(_repository),
+            child: Provider<AlertDialogFactory>(
+                create: (context) => AlertDialogFactory(_repository),
                 child: MultiBlocProvider(
                     providers: [
                       BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),

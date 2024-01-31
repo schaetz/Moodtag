@@ -8,7 +8,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
 import 'package:moodtag/shared/dialogs/variants/select_entity/select_entity_dialog_config.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
@@ -27,7 +27,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagDetailsBloc>();
-    final dialogFactory = context.read<DialogFactory>();
+    final dialogFactory = context.read<AlertDialogFactory>();
 
     return MtMainScaffold(
       scaffoldKey: _scaffoldKey,
@@ -114,7 +114,8 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
     );
   }
 
-  Widget _buildChipsRow(BuildContext context, TagDetailsState state, TagDetailsBloc bloc, DialogFactory dialogFactory) {
+  Widget _buildChipsRow(
+      BuildContext context, TagDetailsState state, TagDetailsBloc bloc, AlertDialogFactory dialogFactory) {
     if (state.loadedTagData.data == null) {
       return Container();
     }
@@ -158,7 +159,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
   }
 
   Widget _buildRowForAssociatedArtist(
-      BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc, DialogFactory dialogFactory) {
+      BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc, AlertDialogFactory dialogFactory) {
     return ListTile(
         title: Text(
           artist.name,

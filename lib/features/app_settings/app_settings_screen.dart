@@ -9,7 +9,7 @@ import 'package:moodtag/model/repository/library_subscription/data_wrapper/loadi
 import 'package:moodtag/shared/bloc/events/app_settings_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
@@ -21,7 +21,7 @@ class AppSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<AppSettingsBloc>();
-    final dialogFactory = context.read<DialogFactory>();
+    final dialogFactory = context.read<AlertDialogFactory>();
 
     return Scaffold(
         appBar: MtAppBar(context),
@@ -48,7 +48,7 @@ class AppSettingsScreen extends StatelessWidget {
   Padding _buildDividerWithPadding() => Padding(padding: const EdgeInsets.symmetric(vertical: 16.0), child: Divider());
 
   Widget _buildTagCategoriesSection(
-      BuildContext context, AppSettingsBloc bloc, AppSettingsState state, DialogFactory dialogFactory) {
+      BuildContext context, AppSettingsBloc bloc, AppSettingsState state, AlertDialogFactory dialogFactory) {
     return Column(children: [
       Card(
           child: LoadedDataDisplayWrapper(
@@ -107,7 +107,7 @@ class AppSettingsScreen extends StatelessWidget {
   }
 
   Widget _buildImportSection(
-      BuildContext context, AppSettingsBloc bloc, AppSettingsState state, DialogFactory dialogFactory) {
+      BuildContext context, AppSettingsBloc bloc, AppSettingsState state, AlertDialogFactory dialogFactory) {
     // TODO Why does the FractionallySizedBox not work as expected, but widthFactor=1 leads to the content being
     // centered while decreasing the widthFactor makes it move to the left?
     return FractionallySizedBox(
@@ -139,7 +139,7 @@ class AppSettingsScreen extends StatelessWidget {
         ]));
   }
 
-  Widget _buildLibrarySection(BuildContext context, AppSettingsBloc bloc, DialogFactory dialogFactory) {
+  Widget _buildLibrarySection(BuildContext context, AppSettingsBloc bloc, AlertDialogFactory dialogFactory) {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(children: [
@@ -154,7 +154,8 @@ class AppSettingsScreen extends StatelessWidget {
 
   void _showLastFmImportScreen(BuildContext context) => Navigator.of(context).pushNamed(Routes.lastFmImport);
 
-  void _openSetLastFmAccountNameDialog(BuildContext context, AppSettingsBloc bloc, DialogFactory dialogFactory) async {
+  void _openSetLastFmAccountNameDialog(
+      BuildContext context, AppSettingsBloc bloc, AlertDialogFactory dialogFactory) async {
     dialogFactory
         .getSingleTextInputDialog(context, title: 'Enter your Last.fm account name:')
         .show(onTruthyResult: (newAccountName) => bloc.add(AddLastFmAccount(newAccountName!)));
@@ -188,7 +189,7 @@ class AppSettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc, DialogFactory dialogFactory) {
+  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc, AlertDialogFactory dialogFactory) {
     dialogFactory
         .getConfirmationDialog(context,
             title: 'Are you sure that you want to reset the library?',

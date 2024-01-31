@@ -4,7 +4,7 @@ import 'package:moodtag/features/library/main_screen/artists_list/artists_list_b
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 
 import 'artists_list/artists_list_screen.dart';
@@ -30,7 +30,7 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
   late final TabController _tabController;
   bool isArtistsListScreenSelected;
 
-  DialogFactory? _dialogFactory;
+  AlertDialogFactory? _dialogFactory;
 
   _LibraryMainScreenState(this.isArtistsListScreenSelected);
 
@@ -49,7 +49,7 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
-    this._dialogFactory = context.read<DialogFactory>();
+    this._dialogFactory = context.read<AlertDialogFactory>();
 
     return MtMainScaffold(
         scaffoldKey: _scaffoldKey,
