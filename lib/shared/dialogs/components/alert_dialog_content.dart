@@ -73,7 +73,7 @@ class _AlertDialogContentState<R, C extends AlertDialogConfig<R>> extends State<
             child: TextButton(
               onPressed: action.validate == null || action.validate!(context, _currentFormState)
                   ? () => _onOptionPressed(action)
-                  : () => {},
+                  : null,
               child: action.getWidget(),
             )))
         .toList();

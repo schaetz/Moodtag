@@ -35,7 +35,8 @@ class DialogFormState extends State<DialogForm> {
   Widget build(BuildContext context) => Row(
           children: widget.formFields.map((field) {
         switch (field.type) {
-          case DialogFormFieldType.textInput:
+          case DialogFormFieldType.textInputSingleLine:
+          case DialogFormFieldType.textInputMultiline:
             return Expanded(child: _buildTextInput(context, field));
         }
       }).toList());
@@ -72,9 +73,20 @@ class DialogFormState extends State<DialogForm> {
       TextField(
           controller: textEditingController,
           focusNode: focusNode,
-          maxLines: null,
+          minLines: 1,
+          maxLines: _getMaxLines(formField),
           maxLength: 255,
           onChanged: (value) => _updateValue(formField.identifier, value));
+
+  int _getMaxLines(DialogFormField formField) {
+    if (formField.type == DialogFormFieldType.textInputMultiline) {
+      if (formField.maxLines != null && formField.maxLines! > 0) {
+        return formField.maxLines!;
+      }
+      return 10;
+    }
+    return 1;
+  }
 
   void _updateValue(String fieldId, Object? newValue) {
     final newValues = Map<String, Object?>.from(_values)..update(fieldId, (_) => newValue);

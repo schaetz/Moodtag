@@ -13,12 +13,27 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConf
 
   final List<S>? suggestedEntities;
 
-  const SingleTextInputDialogConfig({
+  const SingleTextInputDialogConfig.singleLine({
     super.title,
     super.subtitle,
     required super.actions,
     super.onTerminate,
     // Dialog-specific properties
     this.suggestedEntities,
-  }) : super(formFields: const [DialogFormField(singleTextInputId, DialogFormFieldType.textInput, initialValue: '')]);
+  }) : super(formFields: const [
+          DialogFormField(singleTextInputId, DialogFormFieldType.textInputSingleLine, initialValue: '')
+        ]);
+
+  SingleTextInputDialogConfig.multiline({
+    super.title,
+    super.subtitle,
+    required super.actions,
+    super.onTerminate,
+    // Dialog-specific properties
+    final int? maxLines,
+    this.suggestedEntities,
+  }) : super(formFields: [
+          DialogFormField(singleTextInputId, DialogFormFieldType.textInputMultiline,
+              maxLines: maxLines, initialValue: '')
+        ]);
 }

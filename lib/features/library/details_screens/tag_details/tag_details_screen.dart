@@ -89,7 +89,11 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             buildOnSuccess: (tagData) => FloatingActionButton(
                 onPressed: () => dialogFactory
                     .getSingleTextInputDialog(context,
-                        title: 'Add artists for tag', suggestedEntities: state.allArtists.data)
+                        title: 'Add artists for tag',
+                        subtitle: 'Separate multiple artists by line breaks',
+                        multiline: true,
+                        maxLines: 10,
+                        suggestedEntities: state.allArtists.data)
                     .show(onTruthyResult: (input) => bloc.add(AddArtistsForTag(input!, tagData.tag))),
                 child: const Icon(Icons.library_add)));
       }),

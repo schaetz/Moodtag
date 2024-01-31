@@ -145,7 +145,11 @@ class ArtistDetailsScreen extends StatelessWidget {
     return InputChip(
       label: Text('+'),
       onPressed: () => dialogFactory
-          .getSingleTextInputDialog(context, title: 'Create new tag(s)')
+          .getSingleTextInputDialog(context,
+              title: 'Create new tag(s)',
+              subtitle: 'Separate multiple tags by line breaks',
+              multiline: true,
+              maxLines: 10)
           .show(onTruthyResult: (input) => bloc.add(CreateTags(input!, preselectedArtist: artistData.artist))),
     );
   }

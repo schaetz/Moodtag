@@ -73,12 +73,20 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
     if (isArtistsListScreenSelected) {
       final artistsListBloc = context.read<ArtistsListBloc>();
       _dialogFactory
-          ?.getSingleTextInputDialog(context, title: 'Create new artist(s)')
+          ?.getSingleTextInputDialog(context,
+              title: 'Create new artist(s)',
+              subtitle: 'Separate multiple artists by line breaks',
+              multiline: true,
+              maxLines: 10)
           .show(onTruthyResult: (input) => artistsListBloc.add(CreateArtists(input!)));
     } else {
       final tagsListBloc = context.read<TagsListBloc>();
       _dialogFactory
-          ?.getSingleTextInputDialog(context, title: 'Create new tag(s)')
+          ?.getSingleTextInputDialog(context,
+              title: 'Create new tag(s)',
+              subtitle: 'Separate multiple tags by line breaks',
+              multiline: true,
+              maxLines: 10)
           .show(onTruthyResult: (input) => tagsListBloc.add(CreateTags(input!)));
     }
   }

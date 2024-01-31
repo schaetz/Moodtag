@@ -41,7 +41,7 @@ class CreateTagCategoryDialogFormState extends State<CreateTagCategoryDialogForm
         TextField(
             controller: _nameInputController,
             decoration: InputDecoration(label: const Text('Name')),
-            maxLines: null,
+            maxLines: 1,
             maxLength: 30,
             onChanged: (value) => setState(() {
                   _nameInput = value;

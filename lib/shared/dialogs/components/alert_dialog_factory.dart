@@ -34,15 +34,27 @@ class AlertDialogFactory {
 
   /// S: Type of the suggested entities
   SingleTextInputDialogWrapper getSingleTextInputDialog<S extends NamedEntity>(BuildContext context,
-      {String? title, String? subtitle, Function(String?)? onTerminate, List<S>? suggestedEntities}) {
-    return SingleTextInputDialogWrapper(
-        context,
-        SingleTextInputDialogConfig(
+      {bool multiline = false,
+      String? title,
+      String? subtitle,
+      Function(String?)? onTerminate,
+      int? maxLines,
+      List<S>? suggestedEntities}) {
+    final textInputDialogConfig = multiline
+        ? SingleTextInputDialogConfig.multiline(
             title: title,
             subtitle: subtitle,
             actions: _getTextInputConfirmationActions(SingleTextInputDialogConfig.singleTextInputId),
             onTerminate: onTerminate,
-            suggestedEntities: suggestedEntities));
+            maxLines: maxLines,
+            suggestedEntities: suggestedEntities)
+        : SingleTextInputDialogConfig.singleLine(
+            title: title,
+            subtitle: subtitle,
+            actions: _getTextInputConfirmationActions(SingleTextInputDialogConfig.singleTextInputId),
+            onTerminate: onTerminate,
+            suggestedEntities: suggestedEntities);
+    return SingleTextInputDialogWrapper(context, textInputDialogConfig);
   }
 
   /// E: Type of the selectable entities

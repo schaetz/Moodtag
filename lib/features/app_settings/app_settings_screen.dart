@@ -157,7 +157,7 @@ class AppSettingsScreen extends StatelessWidget {
   void _openSetLastFmAccountNameDialog(
       BuildContext context, AppSettingsBloc bloc, AlertDialogFactory dialogFactory) async {
     dialogFactory
-        .getSingleTextInputDialog(context, title: 'Enter your Last.fm account name:')
+        .getSingleTextInputDialog(context, title: 'Enter your Last.fm account name:', multiline: false)
         .show(onTruthyResult: (newAccountName) => bloc.add(AddLastFmAccount(newAccountName!)));
   }
 
