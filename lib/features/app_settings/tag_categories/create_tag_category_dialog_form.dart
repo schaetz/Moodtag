@@ -37,7 +37,7 @@ class CreateTagCategoryDialogFormState extends State<CreateTagCategoryDialogForm
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),
-      content: Column(children: [
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
         TextField(
             controller: _nameInputController,
             decoration: InputDecoration(label: const Text('Name')),
