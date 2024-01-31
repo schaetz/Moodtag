@@ -1,5 +1,5 @@
 import 'package:moodtag/shared/dialogs/components/alert_dialog_config.dart';
-import 'package:moodtag/shared/dialogs/components/form/dialog_form_field.dart';
+import 'package:moodtag/shared/dialogs/components/form/text_dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 /**
@@ -20,9 +20,7 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConf
     super.onTerminate,
     // Dialog-specific properties
     this.suggestedEntities,
-  }) : super(formFields: const [
-          DialogFormField(singleTextInputId, DialogFormFieldType.textInputSingleLine, initialValue: '')
-        ]);
+  }) : super(formFields: const [TextDialogFormField(singleTextInputId, initialValue: '', multiline: false)]);
 
   SingleTextInputDialogConfig.multiline({
     super.title,
@@ -33,7 +31,11 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConf
     final int? maxLines,
     this.suggestedEntities,
   }) : super(formFields: [
-          DialogFormField(singleTextInputId, DialogFormFieldType.textInputMultiline,
-              maxLines: maxLines, initialValue: '')
+          TextDialogFormField(
+            singleTextInputId,
+            initialValue: '',
+            multiline: true,
+            maxLines: maxLines,
+          )
         ]);
 }

@@ -3,6 +3,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import 'dialog_form_field.dart';
+import 'text_dialog_form_field.dart';
 
 class DialogFormFactory {
   const DialogFormFactory();
@@ -34,14 +35,15 @@ class DialogFormState extends State<DialogForm> {
   @override
   Widget build(BuildContext context) => Row(
           children: widget.formFields.map((field) {
-        switch (field.type) {
-          case DialogFormFieldType.textInputSingleLine:
-          case DialogFormFieldType.textInputMultiline:
-            return Expanded(child: _buildTextInput(context, field));
+        switch (field.runtimeType) {
+          case TextDialogFormField:
+            return Expanded(child: _buildTextInput(context, field as TextDialogFormField));
+          default:
+            return Container();
         }
       }).toList());
 
-  Widget _buildTextInput(BuildContext context, DialogFormField formField) {
+  Widget _buildTextInput(BuildContext context, TextDialogFormField formField) {
     if (formField.suggestions == null) {
       return _buildTextFieldWidget(formField, null, null);
     }
@@ -69,7 +71,7 @@ class DialogFormState extends State<DialogForm> {
   }
 
   Widget _buildTextFieldWidget(
-          DialogFormField formField, TextEditingController? textEditingController, FocusNode? focusNode) =>
+          TextDialogFormField formField, TextEditingController? textEditingController, FocusNode? focusNode) =>
       TextField(
           controller: textEditingController,
           focusNode: focusNode,
@@ -78,8 +80,8 @@ class DialogFormState extends State<DialogForm> {
           maxLength: 255,
           onChanged: (value) => _updateValue(formField.identifier, value));
 
-  int _getMaxLines(DialogFormField formField) {
-    if (formField.type == DialogFormFieldType.textInputMultiline) {
+  int _getMaxLines(TextDialogFormField formField) {
+    if (formField.multiline) {
       if (formField.maxLines != null && formField.maxLines! > 0) {
         return formField.maxLines!;
       }

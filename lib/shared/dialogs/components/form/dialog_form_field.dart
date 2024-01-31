@@ -1,13 +1,10 @@
-import 'package:moodtag/shared/models/structs/named_entity.dart';
-
-class DialogFormField<T> {
+/**
+ *  Superclass for all types of form fields that may occur
+ *  in alert dialogs, such as text inputs
+ */
+abstract class DialogFormField<T> {
   final String identifier;
-  final DialogFormFieldType type;
   final T initialValue;
-  final int? maxLines;
-  final List<NamedEntity>? suggestions;
 
-  const DialogFormField(this.identifier, this.type, {required this.initialValue, this.maxLines, this.suggestions});
+  const DialogFormField(this.identifier, {required this.initialValue});
 }
-
-enum DialogFormFieldType { textInputSingleLine, textInputMultiline }
