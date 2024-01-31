@@ -6,7 +6,7 @@ class DialogFormField<T> {
   final T initialValue;
   final List<NamedEntity>? suggestions;
 
-  DialogFormField(this.identifier, this.type, {required this.initialValue, this.suggestions});
+  const DialogFormField(this.identifier, this.type, {required this.initialValue, this.suggestions});
 }
 
 enum DialogFormFieldType { textInput }

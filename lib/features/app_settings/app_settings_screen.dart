@@ -5,13 +5,11 @@ import 'package:moodtag/features/app_settings/app_settings_bloc.dart';
 import 'package:moodtag/features/app_settings/lastfm_account_management/lastfm_account_selector.dart';
 import 'package:moodtag/features/app_settings/tag_categories/create_tag_category_dialog_form.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/app_settings_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
-import 'package:moodtag/shared/dialogs/variants/add_lastfm_account_dialog.dart';
-import 'package:moodtag/shared/dialogs/variants/delete_entity/delete_entity_dialog.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
@@ -23,6 +21,8 @@ class AppSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<AppSettingsBloc>();
+    final dialogFactory = context.read<DialogFactory>();
+
     return Scaffold(
         appBar: MtAppBar(context),
         body: Padding(
@@ -33,13 +33,13 @@ class AppSettingsScreen extends StatelessWidget {
                 return SingleChildScrollView(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('Tag categories', style: headlineTextStyle),
-                  _buildTagCategoriesSection(context, bloc, state),
+                  _buildTagCategoriesSection(context, bloc, state, dialogFactory),
                   _buildDividerWithPadding(),
                   Text('Import', style: headlineTextStyle),
-                  _buildImportSection(context, bloc, state),
+                  _buildImportSection(context, bloc, state, dialogFactory),
                   _buildDividerWithPadding(),
                   Text('Library', style: headlineTextStyle),
-                  _buildLibrarySection(context, bloc),
+                  _buildLibrarySection(context, bloc, dialogFactory),
                 ]));
               }),
         ));
@@ -47,7 +47,8 @@ class AppSettingsScreen extends StatelessWidget {
 
   Padding _buildDividerWithPadding() => Padding(padding: const EdgeInsets.symmetric(vertical: 16.0), child: Divider());
 
-  Widget _buildTagCategoriesSection(BuildContext context, AppSettingsBloc bloc, AppSettingsState state) {
+  Widget _buildTagCategoriesSection(
+      BuildContext context, AppSettingsBloc bloc, AppSettingsState state, DialogFactory dialogFactory) {
     return Column(children: [
       Card(
           child: LoadedDataDisplayWrapper(
@@ -77,10 +78,11 @@ class AppSettingsScreen extends StatelessWidget {
                         ),
                         IconButton(
                             icon: Icon(Icons.delete),
-                            onPressed: () => DeleteEntityDialog.construct<TagCategory>(context,
-                                    title:
-                                        'Are you sure that you want to delete the tag category "${tagCategory.name}"?',
-                                    entityToDelete: tagCategory)
+                            onPressed: () => dialogFactory
+                                .getConfirmationDialog(
+                                  context,
+                                  title: 'Are you sure that you want to delete the tag category "${tagCategory.name}"?',
+                                )
                                 .show(onTruthyResult: (_) => bloc.add(DeleteTagCategory(tagCategory))))
                       ]),
                       shape: index < tagCategories.length - 1
@@ -104,7 +106,8 @@ class AppSettingsScreen extends StatelessWidget {
     ]);
   }
 
-  Widget _buildImportSection(BuildContext context, AppSettingsBloc bloc, AppSettingsState state) {
+  Widget _buildImportSection(
+      BuildContext context, AppSettingsBloc bloc, AppSettingsState state, DialogFactory dialogFactory) {
     // TODO Why does the FractionallySizedBox not work as expected, but widthFactor=1 leads to the content being
     // centered while decreasing the widthFactor makes it move to the left?
     return FractionallySizedBox(
@@ -118,7 +121,7 @@ class AppSettingsScreen extends StatelessWidget {
               playCount: state.lastFmAccount?.playCount,
               lastAccountUpdate: state.lastFmAccount?.lastAccountUpdate,
               lastTopArtistsUpdate: state.lastFmAccount?.lastTopArtistsUpdate,
-              onAddAccountClick: () => _openSetLastFmAccountNameDialog(context, bloc),
+              onAddAccountClick: () => _openSetLastFmAccountNameDialog(context, bloc, dialogFactory),
               onRemoveAccountClick: () => bloc.add(RemoveLastFmAccount()),
               onUpdateAccountInfoClick: () => bloc.add(UpdateLastFmAccountInfo()),
               onAddAccountError: (e) => _handleAddLastFmAccountError(e, bloc),
@@ -136,7 +139,7 @@ class AppSettingsScreen extends StatelessWidget {
         ]));
   }
 
-  Widget _buildLibrarySection(BuildContext context, AppSettingsBloc bloc) {
+  Widget _buildLibrarySection(BuildContext context, AppSettingsBloc bloc, DialogFactory dialogFactory) {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(children: [
@@ -144,19 +147,17 @@ class AppSettingsScreen extends StatelessWidget {
               child: FractionallySizedBox(
                   widthFactor: 0.75,
                   child: ElevatedButton(
-                      child: Text('Reset library'), onPressed: () => _showResetLibraryDialog(context, bloc))))
+                      child: Text('Reset library'),
+                      onPressed: () => _showResetLibraryDialog(context, bloc, dialogFactory))))
         ]));
   }
 
   void _showLastFmImportScreen(BuildContext context) => Navigator.of(context).pushNamed(Routes.lastFmImport);
 
-  void _openSetLastFmAccountNameDialog(BuildContext context, AppSettingsBloc bloc) async {
-    AddLastFmAccountDialog(context, serviceName, handleResult: (newAccountName) {
-      if (newAccountName != null) {
-        bloc.add(AddLastFmAccount(newAccountName));
-      }
-    })
-      ..show();
+  void _openSetLastFmAccountNameDialog(BuildContext context, AppSettingsBloc bloc, DialogFactory dialogFactory) async {
+    dialogFactory
+        .getSingleTextInputDialog(context, title: 'Enter your Last.fm account name:')
+        .show(onTruthyResult: (newAccountName) => bloc.add(AddLastFmAccount(newAccountName!)));
   }
 
   void _handleAddLastFmAccountError(Exception e, AppSettingsBloc bloc) {
@@ -187,11 +188,11 @@ class AppSettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc) {
-    DeleteEntityDialog.construct(context,
+  void _showResetLibraryDialog(BuildContext context, AppSettingsBloc bloc, DialogFactory dialogFactory) {
+    dialogFactory
+        .getConfirmationDialog(context,
             title: 'Are you sure that you want to reset the library?',
-            subtitle: 'This will delete all artists and tags.',
-            entityToDelete: null)
+            subtitle: 'This will delete all artists and tags.')
         .show(onTruthyResult: (_) => bloc.add(ResetLibrary()));
   }
 }

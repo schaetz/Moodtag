@@ -4,7 +4,7 @@ import 'package:moodtag/features/library/main_screen/artists_list/artists_list_b
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/variants/single_text_input_dialog/single_text_input_dialog.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 
 import 'artists_list/artists_list_screen.dart';
@@ -30,6 +30,8 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
   late final TabController _tabController;
   bool isArtistsListScreenSelected;
 
+  DialogFactory? _dialogFactory;
+
   _LibraryMainScreenState(this.isArtistsListScreenSelected);
 
   @override
@@ -47,6 +49,8 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
+    this._dialogFactory = context.read<DialogFactory>();
+
     return MtMainScaffold(
         scaffoldKey: _scaffoldKey,
         tabController: _tabController,
@@ -54,7 +58,7 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
           controller: _tabController,
           children: [
             ArtistsListScreen(_scaffoldKey, parentTabController: _tabController, parentTabViewIndex: 0),
-            TagsListScreen(_scaffoldKey)
+            TagsListScreen()
           ],
         ),
         bottomNavigationBar:
@@ -68,11 +72,13 @@ class _LibraryMainScreenState extends State<LibraryMainScreen> with TickerProvid
   void handleAddButtonPressed(BuildContext context) {
     if (isArtistsListScreenSelected) {
       final artistsListBloc = context.read<ArtistsListBloc>();
-      SingleTextInputDialog.construct(context, title: 'Create new artist(s)')
+      _dialogFactory
+          ?.getSingleTextInputDialog(context, title: 'Create new artist(s)')
           .show(onTruthyResult: (input) => artistsListBloc.add(CreateArtists(input!)));
     } else {
       final tagsListBloc = context.read<TagsListBloc>();
-      SingleTextInputDialog.construct(context, title: 'Create new tag(s)')
+      _dialogFactory
+          ?.getSingleTextInputDialog(context, title: 'Create new tag(s)')
           .show(onTruthyResult: (input) => tagsListBloc.add(CreateTags(input!)));
     }
   }

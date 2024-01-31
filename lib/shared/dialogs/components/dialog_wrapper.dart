@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:moodtag/shared/dialogs/components/form/dialog_form.dart';
-import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
 
 import 'dialog_config.dart';
 import 'dialog_content.dart';
@@ -17,7 +16,7 @@ import 'dialog_content.dart';
  *  R: Result type of the dialog
  *  C: Type of the dialog configuration
  */
-abstract class AbstractDialog<R, C extends DialogConfig<R>> {
+class DialogWrapper<R, C extends DialogConfig<R>> {
   static bool isResultTruthy(Object? result) => (result != null &&
       !(result is bool && result == false) &&
       !(result is String && result.isEmpty) &&
@@ -31,13 +30,7 @@ abstract class AbstractDialog<R, C extends DialogConfig<R>> {
 
   bool _isClosed = false;
 
-  AbstractDialog(this.context, this.config) : _getRequiredDataFuture = null;
-  AbstractDialog.withFuture(this.context, {required Future<C> Function(BuildContext) getRequiredData}) {
-    _getRequiredDataFuture = getRequiredData(context).then((_config) {
-      this.config = _config;
-      return _config;
-    }).onError((error, stackTrace) => throw InternalException('A dialog could not be displayed.'));
-  }
+  DialogWrapper(this.context, this.config) : _getRequiredDataFuture = null;
 
   void show({Function(R)? onTruthyResult}) {
     SchedulerBinding.instance.addPostFrameCallback((_) async {

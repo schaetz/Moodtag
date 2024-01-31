@@ -8,10 +8,8 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
-import 'package:moodtag/shared/dialogs/variants/remove_tag_from_artist_dialog.dart';
-import 'package:moodtag/shared/dialogs/variants/select_entity/select_entity_dialog.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
 import 'package:moodtag/shared/dialogs/variants/select_entity/select_entity_dialog_config.dart';
-import 'package:moodtag/shared/dialogs/variants/single_text_input_dialog/single_text_input_dialog.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
@@ -29,6 +27,8 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TagDetailsBloc>();
+    final dialogFactory = context.read<DialogFactory>();
+
     return MtMainScaffold(
       scaffoldKey: _scaffoldKey,
       pageWidget: BlocBuilder<TagDetailsBloc, TagDetailsState>(
@@ -44,7 +44,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                           padding: EdgeInsets.only(bottom: 12.0),
                           child: _buildHeadline(context, state),
                         ),
-                        _buildChipsRow(context, state, bloc),
+                        _buildChipsRow(context, state, bloc, dialogFactory),
                         Expanded(
                             child: SearchBarContainer(
                           searchBarHintText: 'Search artist',
@@ -71,7 +71,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                                     ? _buildRowForArtistSelection(
                                         context, tagData.tag, state.loadedDataFilteredArtists.data![i], bloc)
                                     : _buildRowForAssociatedArtist(context, tagData.tag,
-                                        state.loadedDataFilteredArtistsWithTag.data![i].artist, bloc);
+                                        state.loadedDataFilteredArtistsWithTag.data![i].artist, bloc, dialogFactory);
                               },
                             ),
                           ),
@@ -87,7 +87,8 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             additionalCheckData: state.allArtists,
             showPlaceholders: false,
             buildOnSuccess: (tagData) => FloatingActionButton(
-                onPressed: () => SingleTextInputDialog.construct(context,
+                onPressed: () => dialogFactory
+                    .getSingleTextInputDialog(context,
                         title: 'Add artists for tag', suggestedEntities: state.allArtists.data)
                     .show(onTruthyResult: (input) => bloc.add(AddArtistsForTag(input!, tagData.tag))),
                 child: const Icon(Icons.library_add)));
@@ -113,7 +114,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
     );
   }
 
-  Widget _buildChipsRow(BuildContext context, TagDetailsState state, TagDetailsBloc bloc) {
+  Widget _buildChipsRow(BuildContext context, TagDetailsState state, TagDetailsBloc bloc, DialogFactory dialogFactory) {
     if (state.loadedTagData.data == null) {
       return Container();
     }
@@ -128,16 +129,17 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             backgroundColor: Color(category.color),
             onPressed: state.allTagCategories.data == null
                 ? null
-                : () => SelectEntityDialog.construct<TagCategoryData>(context,
-                    title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
-                    options: [], // TODO Define options
-                    availableEntities: state.allTagCategories.data!,
-                    initialSelection: categoryData,
-                    selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
-                    iconSelector: (categoryData) =>
-                        Icon(Icons.circle, color: Color(categoryData.tagCategory.color))).show(
-                    onTruthyResult: (newCategoryData) =>
-                        bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory))))
+                : () => dialogFactory
+                    .getSelectEntityDialog(context,
+                        title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
+                        availableEntities: state.allTagCategories.data!,
+                        initialSelection: categoryData,
+                        selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
+                        iconSelector: (categoryData) =>
+                            Icon(Icons.circle, color: Color(categoryData.tagCategory.color)))
+                    .show(
+                        onTruthyResult: (newCategoryData) =>
+                            bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory))))
       ],
     );
   }
@@ -155,18 +157,17 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
     );
   }
 
-  Widget _buildRowForAssociatedArtist(BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc) {
-    final handleRemoveTagFromArtist = (confirmation) {
-      if (confirmation) bloc.add(RemoveTagFromArtist(artist, tag));
-    };
+  Widget _buildRowForAssociatedArtist(
+      BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc, DialogFactory dialogFactory) {
     return ListTile(
         title: Text(
           artist.name,
           style: listEntryStyle,
         ),
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
-        onLongPress: () => RemoveTagFromArtistDialog(_scaffoldKey.currentContext!, tag, artist,
-            handleResult: handleRemoveTagFromArtist)
-          ..show());
+        onLongPress: () => dialogFactory
+            .getConfirmationDialog(_scaffoldKey.currentContext!,
+                title: 'Remove the tag "${tag.name}" from the artist "${artist.name}"?')
+            .show(onTruthyResult: (_) => bloc.add(RemoveTagFromArtist(artist, tag))));
   }
 }

@@ -23,6 +23,7 @@ import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/logging/mt_bloc_observer.dart';
+import 'package:moodtag/shared/dialogs/components/dialog_factory.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -52,39 +53,42 @@ class _AppState extends State<MoodtagApp> {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: mainColor, brightness: Brightness.light));
 
+  final _repository = Repository();
   final _routeObserver = RouteObserver<PageRoute>();
 
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider(
-        create: (context) => Repository(),
+        create: (context) => _repository,
         child: Provider<RouteObserver>(
             create: (context) => _routeObserver,
-            child: MultiBlocProvider(
-                providers: [
-                  BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),
-                  BlocProvider<SpotifyAuthBloc>(create: (context) => SpotifyAuthBloc(context)),
-                ],
-                child: MaterialApp(
-                  title: MoodtagApp.appTitle,
-                  theme: baseTheme.copyWith(
-                      colorScheme: baseTheme.colorScheme
-                          .copyWith(tertiary: Color.fromRGBO(255, 200, 200, 1), onTertiary: Colors.black),
-                      chipTheme: ChipThemeData(backgroundColor: baseTheme.colorScheme.primaryContainer),
-                      appBarTheme: const AppBarTheme(
-                        color: mainColor,
-                        iconTheme: IconThemeData(color: Colors.white),
-                      ),
-                      tabBarTheme: TabBarTheme(
-                        indicatorSize: TabBarIndicatorSize.tab,
-                      ),
-                      // Adjust ElevatedButton text size for the ArtistsList filter modal
-                      elevatedButtonTheme: ElevatedButtonThemeData(
-                          style: ButtonStyle(
-                              textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 18))))),
-                  initialRoute: Routes.initialRoute,
-                  routes: Routes.instance().getRoutes(),
-                  navigatorObservers: [_routeObserver],
-                ))));
+            child: Provider<DialogFactory>(
+                create: (context) => DialogFactory(_repository),
+                child: MultiBlocProvider(
+                    providers: [
+                      BlocProvider<AppBarBloc>(create: (context) => AppBarBloc(context)),
+                      BlocProvider<SpotifyAuthBloc>(create: (context) => SpotifyAuthBloc(context)),
+                    ],
+                    child: MaterialApp(
+                      title: MoodtagApp.appTitle,
+                      theme: baseTheme.copyWith(
+                          colorScheme: baseTheme.colorScheme
+                              .copyWith(tertiary: Color.fromRGBO(255, 200, 200, 1), onTertiary: Colors.black),
+                          chipTheme: ChipThemeData(backgroundColor: baseTheme.colorScheme.primaryContainer),
+                          appBarTheme: const AppBarTheme(
+                            color: mainColor,
+                            iconTheme: IconThemeData(color: Colors.white),
+                          ),
+                          tabBarTheme: TabBarTheme(
+                            indicatorSize: TabBarIndicatorSize.tab,
+                          ),
+                          // Adjust ElevatedButton text size for the ArtistsList filter modal
+                          elevatedButtonTheme: ElevatedButtonThemeData(
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 18))))),
+                      initialRoute: Routes.initialRoute,
+                      routes: Routes.instance().getRoutes(),
+                      navigatorObservers: [_routeObserver],
+                    )))));
   }
 }

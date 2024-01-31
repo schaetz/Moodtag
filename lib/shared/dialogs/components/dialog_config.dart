@@ -4,7 +4,7 @@ import 'options/dialog_option.dart';
 /**
  *  Configuration for AbstractDialog and dialog classes inheriting from it
  *
- *  R: Result type of the dialog
+ *  R: Result type of the dialog (pass as not nullable - null will be added)
  */
 class DialogConfig<R> {
   final String? title;

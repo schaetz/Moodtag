@@ -6,10 +6,19 @@ import 'package:moodtag/shared/dialogs/components/form/dialog_form.dart';
  *  clicking the widget should result in calling the attached handler to determine
  *  the result of the dialog
  *
- *  R: result type of the dialog
+ *  R: result type of the dialog (pass as not nullable - null will be added)
  */
-abstract class DialogOption<R> {
-  abstract R Function(BuildContext, DialogFormState?) getDialogResult;
-  abstract bool Function(BuildContext, DialogFormState?)? validate;
-  Widget get widget;
+class DialogOption<R> {
+  static DialogOption<R> getSimpleTextDialogOption<R>(String text,
+          {required DialogResultFunction<R> getDialogResult, ValidatorFunction validate}) =>
+      DialogOption(getDialogResult: getDialogResult, validate: validate, getWidget: () => Text(text));
+
+  final DialogResultFunction<R> getDialogResult;
+  final ValidatorFunction validate;
+  final Widget Function() getWidget;
+
+  const DialogOption({required this.getDialogResult, this.validate, required this.getWidget});
 }
+
+typedef DialogResultFunction<R> = R? Function(BuildContext, DialogFormState?);
+typedef ValidatorFunction = bool Function(BuildContext, DialogFormState?)?;

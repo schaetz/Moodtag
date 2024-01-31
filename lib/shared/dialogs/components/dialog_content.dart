@@ -79,7 +79,7 @@ class _DialogContentState<R, C extends DialogConfig<R>> extends State<DialogCont
                   onPressed: option.validate == null || option.validate!(context, _currentFormState)
                       ? () => _onOptionPressed(option)
                       : () => {},
-                  child: option.widget,
+                  child: option.getWidget(),
                 )))
             .toList());
   }
