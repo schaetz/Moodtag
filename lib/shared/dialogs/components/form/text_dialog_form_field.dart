@@ -9,4 +9,14 @@ class TextDialogFormField extends DialogFormField {
 
   const TextDialogFormField(super.identifier,
       {required super.initialValue, required this.multiline, this.maxLines, this.suggestions});
+
+  int getMaxLines({int multilineDefault = 10}) {
+    if (multiline) {
+      if (maxLines != null && maxLines! > 0) {
+        return maxLines!;
+      }
+      return multilineDefault;
+    }
+    return 1;
+  }
 }

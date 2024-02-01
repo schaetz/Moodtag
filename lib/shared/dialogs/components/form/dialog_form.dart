@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/shared/models/structs/named_entity.dart';
+import 'package:moodtag/shared/dialogs/components/form/components/multiline_autocomplete.dart';
 
 import 'dialog_form_field.dart';
 import 'text_dialog_form_field.dart';
@@ -23,14 +22,14 @@ class DialogForm extends StatefulWidget {
 }
 
 class DialogFormState extends State<DialogForm> {
-  final Function(DialogFormState) formStateCallback;
+  final Function(DialogFormState) _formStateCallback;
 
-  Map<String, Object?> _values; // Map from field id to current state
+  Map<String, Object?> _fieldValues; // Map from field id to current state
 
-  DialogFormState.init(List<DialogFormField> formFields, this.formStateCallback)
-      : _values = Map.fromEntries(formFields.map((field) => MapEntry(field.identifier, field.initialValue)));
+  DialogFormState.init(List<DialogFormField> formFields, this._formStateCallback)
+      : _fieldValues = Map.fromEntries(formFields.map((field) => MapEntry(field.identifier, field.initialValue)));
 
-  T? get<T>(String fieldId) => _values[fieldId] is T ? _values[fieldId] as T : null;
+  T? get<T>(String fieldId) => _fieldValues[fieldId] is T ? _fieldValues[fieldId] as T : null;
 
   @override
   Widget build(BuildContext context) => Row(
@@ -44,30 +43,10 @@ class DialogFormState extends State<DialogForm> {
       }).toList());
 
   Widget _buildTextInput(BuildContext context, TextDialogFormField formField) {
-    if (formField.suggestions == null) {
-      return _buildTextFieldWidget(formField, null, null);
+    if (formField.suggestions != null) {
+      return MultilineAutocomplete(formField, updateFormState: (value) => _updateValue(formField.identifier, value));
     }
-
-    return Autocomplete<String>(
-      fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode,
-              VoidCallback onFieldSubmitted) =>
-          _buildTextFieldWidget(formField, textEditingController, focusNode),
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text == '') {
-          return const Iterable<String>.empty();
-        }
-
-        final trimmedTextEditingValue = textEditingValue.text.toLowerCase().trim();
-        // TODO There should not be references to DataClassWithEntityName and orderingName here (tight coupling!)
-        return formField.suggestions!.where((NamedEntity option) {
-          final optionName = option.name.toLowerCase();
-          final optionOrderingName = option is DataClassWithEntityName ? option.orderingName : optionName;
-          return optionName.startsWith(trimmedTextEditingValue) ||
-              optionOrderingName.startsWith(trimmedTextEditingValue);
-        }).map((matchingEntity) => matchingEntity.name);
-      },
-      onSelected: (selectedValue) => _updateValue(formField.identifier, selectedValue),
-    );
+    return _buildTextFieldWidget(formField, null, null);
   }
 
   Widget _buildTextFieldWidget(
@@ -76,25 +55,15 @@ class DialogFormState extends State<DialogForm> {
           controller: textEditingController,
           focusNode: focusNode,
           minLines: 1,
-          maxLines: _getMaxLines(formField),
+          maxLines: formField.getMaxLines(multilineDefault: 10),
           maxLength: 255,
           onChanged: (value) => _updateValue(formField.identifier, value));
 
-  int _getMaxLines(TextDialogFormField formField) {
-    if (formField.multiline) {
-      if (formField.maxLines != null && formField.maxLines! > 0) {
-        return formField.maxLines!;
-      }
-      return 10;
-    }
-    return 1;
-  }
-
   void _updateValue(String fieldId, Object? newValue) {
-    final newValues = Map<String, Object?>.from(_values)..update(fieldId, (_) => newValue);
+    final newValues = Map<String, Object?>.from(_fieldValues)..update(fieldId, (_) => newValue);
     setState(() {
-      _values = newValues;
+      _fieldValues = newValues;
     });
-    formStateCallback(this);
+    _formStateCallback(this);
   }
 }

@@ -11,16 +11,16 @@ import 'package:moodtag/shared/models/structs/named_entity.dart';
 class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConfig<String> {
   static const singleTextInputId = 'input';
 
-  final List<S>? suggestedEntities;
-
-  const SingleTextInputDialogConfig.singleLine({
+  SingleTextInputDialogConfig.singleLine({
     super.title,
     super.subtitle,
     required super.actions,
     super.onTerminate,
     // Dialog-specific properties
-    this.suggestedEntities,
-  }) : super(formFields: const [TextDialogFormField(singleTextInputId, initialValue: '', multiline: false)]);
+    List<S>? suggestedEntities,
+  }) : super(formFields: [
+          TextDialogFormField(singleTextInputId, initialValue: '', multiline: false, suggestions: suggestedEntities)
+        ]);
 
   SingleTextInputDialogConfig.multiline({
     super.title,
@@ -28,14 +28,15 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConf
     required super.actions,
     super.onTerminate,
     // Dialog-specific properties
-    final int? maxLines,
-    this.suggestedEntities,
+    int? maxLines,
+    List<S>? suggestedEntities,
   }) : super(formFields: [
           TextDialogFormField(
             singleTextInputId,
             initialValue: '',
             multiline: true,
             maxLines: maxLines,
+            suggestions: suggestedEntities,
           )
         ]);
 }
