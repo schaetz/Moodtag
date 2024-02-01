@@ -2,13 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/shared/dialogs/components/form/text_dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-class MultilineAutocomplete extends StatelessWidget {
+class MultilineAutocomplete extends StatefulWidget {
+  final TextDialogFormField _formField;
+  final Function(String) updateFormState;
+
+  const MultilineAutocomplete(this._formField, {super.key, required this.updateFormState});
+
+  @override
+  State<StatefulWidget> createState() =>
+      _MultilineAutocompleteState(this._formField, updateFormState: this.updateFormState);
+}
+
+class _MultilineAutocompleteState extends State<MultilineAutocomplete> {
   final TextDialogFormField _formField;
   final Map<String, Set<String>> _optionsByInputPatterns;
   final Function(String) updateFormState;
 
-  MultilineAutocomplete(this._formField, {super.key, required this.updateFormState})
-      : _optionsByInputPatterns =
+  TextEditingController? _textEditingController;
+  String _lastInput;
+
+  _MultilineAutocompleteState(this._formField, {required this.updateFormState})
+      : _lastInput = _formField.initialValue,
+        _optionsByInputPatterns =
             _formField.suggestions != null ? _getOptionsFromNamedEntities(_formField.suggestions!) : {};
 
   static Map<String, Set<String>> _getOptionsFromNamedEntities(Set<NamedEntity> suggestions) {
@@ -32,13 +47,14 @@ class MultilineAutocomplete extends StatelessWidget {
                 VoidCallback onFieldSubmitted) =>
             _buildTextFieldWidget(_formField, textEditingController, focusNode),
         optionsBuilder: (TextEditingValue textEditingValue) {
-          if (textEditingValue.text.trim() == '') {
+          final currentLine = textEditingValue.text.split('\n').last;
+          final currentLineNormalized = currentLine.toLowerCase().trim();
+          if (currentLineNormalized.isEmpty) {
             return const Iterable<String>.empty();
           }
 
-          final currentLine = textEditingValue.text.split('\n').last.toLowerCase().trim();
-          final matchingPatternsWithOptions =
-              _optionsByInputPatterns.entries.where((entry) => entry.key.startsWith(currentLine));
+          final matchingPatternsWithOptions = _optionsByInputPatterns.entries
+              .where((entry) => entry.key.startsWith(currentLineNormalized) && currentLine != entry.key);
           return matchingPatternsWithOptions.map((entry) => entry.value).expand((setOfOptions) => setOfOptions).toSet();
         },
         onSelected: (selectedValue) => _formField.multiline
@@ -47,24 +63,30 @@ class MultilineAutocomplete extends StatelessWidget {
   }
 
   Widget _buildTextFieldWidget(
-          TextDialogFormField formField, TextEditingController? textEditingController, FocusNode? focusNode) =>
-      TextField(
-          controller: textEditingController,
-          focusNode: focusNode,
-          minLines: 1,
-          maxLines: formField.getMaxLines(multilineDefault: 10),
-          maxLength: 255,
-          onChanged: (value) => updateFormState(value));
+      TextDialogFormField formField, TextEditingController? textEditingController, FocusNode? focusNode) {
+    _textEditingController = textEditingController;
+    return TextField(
+        controller: textEditingController,
+        focusNode: focusNode,
+        minLines: 1,
+        maxLines: formField.getMaxLines(multilineDefault: 10),
+        maxLength: 255,
+        onChanged: (value) {
+          _lastInput = value;
+          updateFormState(value);
+        });
+  }
 
   void _addValueAtLastLineOfTextInput(TextDialogFormField formField, String selectedValue) {
-    // Selected option will currently just overwrite all existing lines;
-    // How do I access the TextEditingController here?
-    final currentTextValue = '';
+    if (_textEditingController == null) return;
+
+    final currentTextValue = _lastInput;
     final newLines = currentTextValue.split('\n')
       ..removeLast()
       ..add(selectedValue);
-    print(newLines);
-    final newInput = newLines.join('\n');
+    final newInput = newLines.join('\n') + '\n';
+    _textEditingController!.value =
+        TextEditingValue(text: newInput, selection: TextSelection.collapsed(offset: newInput.length));
     updateFormState(newInput);
   }
 }
