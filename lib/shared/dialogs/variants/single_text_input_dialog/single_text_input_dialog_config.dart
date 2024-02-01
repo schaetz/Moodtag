@@ -17,7 +17,7 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConf
     required super.actions,
     super.onTerminate,
     // Dialog-specific properties
-    List<S>? suggestedEntities,
+    Set<S>? suggestedEntities,
   }) : super(formFields: [
           TextDialogFormField(singleTextInputId, initialValue: '', multiline: false, suggestions: suggestedEntities)
         ]);
@@ -29,7 +29,7 @@ class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConf
     super.onTerminate,
     // Dialog-specific properties
     int? maxLines,
-    List<S>? suggestedEntities,
+    Set<S>? suggestedEntities,
   }) : super(formFields: [
           TextDialogFormField(
             singleTextInputId,

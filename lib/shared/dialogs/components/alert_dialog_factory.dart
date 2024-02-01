@@ -39,7 +39,7 @@ class AlertDialogFactory {
       String? subtitle,
       Function(String?)? onTerminate,
       int? maxLines,
-      List<S>? suggestedEntities}) {
+      Set<S>? suggestedEntities}) {
     final textInputDialogConfig = multiline
         ? SingleTextInputDialogConfig.multiline(
             title: title,

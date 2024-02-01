@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/shared/dialogs/components/form/text_dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 class MultilineAutocomplete extends StatelessWidget {
   final TextDialogFormField _formField;
+  final Map<String, Set<String>> _optionsByInputPatterns;
   final Function(String) updateFormState;
 
-  const MultilineAutocomplete(this._formField, {super.key, required this.updateFormState});
+  MultilineAutocomplete(this._formField, {super.key, required this.updateFormState})
+      : _optionsByInputPatterns =
+            _formField.suggestions != null ? _getOptionsFromNamedEntities(_formField.suggestions!) : {};
+
+  static Map<String, Set<String>> _getOptionsFromNamedEntities(Set<NamedEntity> suggestions) {
+    final _optionsMap = Map<String, Set<String>>();
+    suggestions.forEach((entity) {
+      final name = entity.name;
+      final normalizedName = entity.name.toLowerCase();
+      _optionsMap.update(normalizedName, (value) => value..add(name), ifAbsent: () => {name});
+      if (entity is OrderingName) {
+        final normalizedOrderingName = (entity as OrderingName).orderingName.toLowerCase();
+        _optionsMap.update(normalizedOrderingName, (value) => value..add(name), ifAbsent: () => {name});
+      }
+    });
+    return _optionsMap;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +37,9 @@ class MultilineAutocomplete extends StatelessWidget {
           }
 
           final currentLine = textEditingValue.text.split('\n').last.toLowerCase().trim();
-          // TODO There should not be references to DataClassWithEntityName and orderingName here (tight coupling!)
-          return _formField.suggestions!.where((NamedEntity option) {
-            final optionName = option.name.toLowerCase();
-            final optionOrderingName = option is DataClassWithEntityName ? option.orderingName : optionName;
-            return optionName.startsWith(currentLine) || optionOrderingName.startsWith(currentLine);
-          }).map((matchingEntity) => matchingEntity.name);
+          final matchingPatternsWithOptions =
+              _optionsByInputPatterns.entries.where((entry) => entry.key.startsWith(currentLine));
+          return matchingPatternsWithOptions.map((entry) => entry.value).expand((setOfOptions) => setOfOptions).toSet();
         },
         onSelected: (selectedValue) => _formField.multiline
             ? _addValueAtLastLineOfTextInput(_formField, selectedValue)
