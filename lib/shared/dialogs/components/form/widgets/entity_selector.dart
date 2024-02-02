@@ -5,7 +5,7 @@ import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 class EntitySelector<E extends NamedEntity> extends StatefulWidget {
   final EntitySelectionDialogFormField<E> _formField;
-  final Function(String) updateFormState;
+  final Function(E) updateFormState;
 
   const EntitySelector(this._formField, {super.key, required this.updateFormState});
 
@@ -15,7 +15,7 @@ class EntitySelector<E extends NamedEntity> extends StatefulWidget {
 
 class _EntitySelectorState<E extends NamedEntity> extends State<EntitySelector<E>> {
   final EntitySelectionDialogFormField<E> _formField;
-  final Function(String) updateFormState;
+  final Function(E) updateFormState;
 
   E? _selection;
 

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:moodtag/shared/dialogs/components/form/widgets/multiline_autocomplete.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import 'dialog_form_field.dart';
@@ -19,4 +21,20 @@ class TextDialogFormField extends DialogFormField {
     }
     return 1;
   }
+
+  @override
+  Widget buildWidget(Function(String fieldId, String newValue) formUpdateCallback) {
+    if (this.suggestions != null) {
+      return MultilineAutocomplete(this, updateFormState: (newValue) => formUpdateCallback(this.identifier, newValue));
+    }
+    return _buildTextFieldWidget(this, formUpdateCallback);
+  }
+
+  Widget _buildTextFieldWidget(
+          TextDialogFormField formField, Function(String fieldId, String newValue) formUpdateCallback) =>
+      TextField(
+          minLines: 1,
+          maxLines: formField.getMaxLines(multilineDefault: 10),
+          maxLength: 255,
+          onChanged: (value) => formUpdateCallback(formField.identifier, value));
 }
