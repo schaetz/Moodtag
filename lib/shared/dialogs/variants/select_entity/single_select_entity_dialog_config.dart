@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/shared/dialogs/components/alert_dialog_config.dart';
+import 'package:moodtag/shared/dialogs/components/form/fields/entity_selection_dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-class SelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogConfig<E> {
+class SingleSelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogConfig<E> {
+  static const singleSelectionInputId = 'selection';
+
   final List<E> availableEntities;
-  final E? initialSelection;
+  final E initialSelection;
   final EntityDialogSelectionStyle selectionStyle;
   final Icon Function(E)? iconSelector;
 
-  const SelectEntityDialogConfig(
+  SingleSelectEntityDialogConfig(
       {String? super.title,
       super.subtitle,
       required super.actions,
       super.onTerminate,
       // Dialog-specific properties
       required this.availableEntities,
-      this.initialSelection,
+      required this.initialSelection,
       required this.selectionStyle,
-      this.iconSelector});
+      this.iconSelector})
+      : super(formFields: [
+          EntitySelectionDialogFormField<E>(singleSelectionInputId,
+              entities: availableEntities,
+              initialValue: initialSelection,
+              selectionStyle: selectionStyle,
+              iconSelector: iconSelector)
+        ]);
 
   bool get showBoxOutlineOnSelectedTile =>
       selectionStyle == EntityDialogSelectionStyle.ONE_TAP ||

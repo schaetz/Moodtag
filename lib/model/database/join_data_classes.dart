@@ -1,9 +1,7 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-abstract class DataClassWithEntityName extends NamedEntity with OrderingName {
-  String get name;
-}
+abstract class DataClassWithEntityName extends NamedEntity with OrderingName {}
 
 class ArtistData implements DataClassWithEntityName {
   final Artist artist;

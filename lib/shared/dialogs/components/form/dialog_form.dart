@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/components/form/components/multiline_autocomplete.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/shared/dialogs/components/form/fields/entity_selection_dialog_form_field.dart';
 
-import 'dialog_form_field.dart';
-import 'text_dialog_form_field.dart';
+import 'fields/dialog_form_field.dart';
+import 'fields/text_dialog_form_field.dart';
+import 'widgets/entity_selector.dart';
+import 'widgets/multiline_autocomplete.dart';
 
 class DialogFormFactory {
   const DialogFormFactory();
@@ -32,15 +35,21 @@ class DialogFormState extends State<DialogForm> {
   T? get<T>(String fieldId) => _fieldValues[fieldId] is T ? _fieldValues[fieldId] as T : null;
 
   @override
-  Widget build(BuildContext context) => Row(
-          children: widget.formFields.map((field) {
-        switch (field.runtimeType) {
-          case TextDialogFormField:
-            return Expanded(child: _buildTextInput(context, field as TextDialogFormField));
-          default:
-            return Container();
-        }
-      }).toList());
+  Widget build(BuildContext context) => Row(children: widget.formFields.map(_getWidgetForFormField).toList());
+
+  Widget _getWidgetForFormField(DialogFormField formField) {
+    final getMainFormFieldWidget = () {
+      if (formField is TextDialogFormField) {
+        return _buildTextInput(context, formField);
+      } else if (formField is EntitySelectionDialogFormField) {
+        // TODO The NamedEntity is not necessarily TagCategoryData here
+        return EntitySelector<TagCategoryData>(formField as EntitySelectionDialogFormField<TagCategoryData>,
+            updateFormState: (value) => _updateValue(formField.identifier, value));
+      }
+      return Container();
+    };
+    return Expanded(child: getMainFormFieldWidget());
+  }
 
   Widget _buildTextInput(BuildContext context, TextDialogFormField formField) {
     if (formField.suggestions != null) {

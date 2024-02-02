@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/dialogs/components/options/dialog_action.dart';
-import 'package:moodtag/shared/dialogs/variants/select_entity/select_entity_dialog_config.dart';
+import 'package:moodtag/shared/dialogs/variants/select_entity/single_select_entity_dialog_config.dart';
 import 'package:moodtag/shared/dialogs/variants/single_text_input_dialog/single_text_input_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
@@ -58,26 +58,25 @@ class AlertDialogFactory {
   }
 
   /// E: Type of the selectable entities
-  SelectEntityDialogWrapper<E> getSelectEntityDialog<E extends NamedEntity>(
+  SingleSelectEntityDialogWrapper<E> getSelectEntityDialog<E extends NamedEntity>(
     BuildContext context, {
     String? title,
     String? subtitle,
     Function(E?)? onTerminate,
     // SelectEntityDialog-specific parameters
-    required List<E> availableEntities,
-    E? initialSelection,
+    required List<E> entities,
+    required E initialSelection,
     required EntityDialogSelectionStyle selectionStyle,
-    Icon Function(E)? iconSelector,
+    required Icon Function(E)? iconSelector,
   }) {
-    return SelectEntityDialogWrapper<E>(
+    return SingleSelectEntityDialogWrapper<E>(
         context,
-        SelectEntityDialogConfig<E>(
+        SingleSelectEntityDialogConfig<E>(
             title: title,
             subtitle: subtitle,
-            actions: _getSelectEntityConfirmationActions<E>(
-                SingleTextInputDialogConfig.singleTextInputId), // TODO Wrong input ID
+            actions: _getSelectEntityConfirmationActions<E>(SingleSelectEntityDialogConfig.singleSelectionInputId),
             onTerminate: onTerminate,
-            availableEntities: availableEntities,
+            availableEntities: entities,
             initialSelection: initialSelection,
             selectionStyle: selectionStyle,
             iconSelector: iconSelector));
@@ -107,4 +106,5 @@ class AlertDialogFactory {
 
 typedef BooleanDialogWrapper = AlertDialogWrapper<bool, AlertDialogConfig<bool>>;
 typedef SingleTextInputDialogWrapper = AlertDialogWrapper<String?, AlertDialogConfig<String?>>;
-typedef SelectEntityDialogWrapper<E extends NamedEntity> = AlertDialogWrapper<E, SelectEntityDialogConfig<E>>;
+typedef SingleSelectEntityDialogWrapper<E extends NamedEntity>
+    = AlertDialogWrapper<E, SingleSelectEntityDialogConfig<E>>;

@@ -1,4 +1,4 @@
-import 'form/dialog_form_field.dart';
+import 'form/fields/dialog_form_field.dart';
 import 'options/dialog_action.dart';
 
 /**

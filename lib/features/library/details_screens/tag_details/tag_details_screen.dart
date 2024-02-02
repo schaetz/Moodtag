@@ -9,7 +9,7 @@ import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
-import 'package:moodtag/shared/dialogs/variants/select_entity/select_entity_dialog_config.dart';
+import 'package:moodtag/shared/dialogs/variants/select_entity/single_select_entity_dialog_config.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
@@ -132,14 +132,14 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             label: Text(category.name),
             avatar: Icon(Icons.category, color: Colors.black),
             backgroundColor: Color(category.color),
-            onPressed: state.allTagCategories.data == null
+            onPressed: state.allTagCategories.data == null || categoryData == null
                 ? null
                 : () => dialogFactory
-                    .getSelectEntityDialog(context,
+                    .getSelectEntityDialog<TagCategoryData>(context,
                         title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
-                        availableEntities: state.allTagCategories.data!,
+                        entities: state.allTagCategories.data!,
                         initialSelection: categoryData,
-                        selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
+                        selectionStyle: EntityDialogSelectionStyle.BOX_OUTLINE_AND_LEADING_ICON,
                         iconSelector: (categoryData) =>
                             Icon(Icons.circle, color: Color(categoryData.tagCategory.color)))
                     .show(
