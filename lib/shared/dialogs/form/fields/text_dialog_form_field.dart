@@ -23,7 +23,8 @@ class TextDialogFormField extends DialogFormField {
   }
 
   @override
-  Widget buildWidget(Function(String fieldId, String newValue) formUpdateCallback) {
+  Widget buildWidget(
+      {required final FormUpdateCallback<String> formUpdateCallback, required final CloseDialogHandle closeDialog}) {
     if (this.suggestions != null) {
       return MultilineAutocomplete(this, updateFormState: (newValue) => formUpdateCallback(this.identifier, newValue));
     }

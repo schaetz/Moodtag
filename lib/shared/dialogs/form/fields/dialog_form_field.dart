@@ -7,7 +7,12 @@ import 'package:flutter/material.dart';
 abstract class DialogFormField<T> {
   final String identifier;
   final T initialValue;
-  Widget buildWidget(Function(String fieldId, T newValue) formUpdateCallback);
 
   const DialogFormField(this.identifier, {required this.initialValue});
+
+  Widget buildWidget(
+      {required final FormUpdateCallback<T> formUpdateCallback, required final CloseDialogHandle closeDialog});
 }
+
+typedef FormUpdateCallback<T> = Function(String fieldId, T newValue);
+typedef CloseDialogHandle<R> = Function(BuildContext context, {R? result});

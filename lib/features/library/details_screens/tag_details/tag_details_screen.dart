@@ -139,7 +139,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                         title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
                         entities: state.allTagCategories.data!,
                         initialSelection: categoryData,
-                        selectionStyle: EntityDialogSelectionStyle.BOX_OUTLINE_AND_LEADING_ICON,
+                        selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
                         iconSelector: (categoryData) =>
                             Icon(Icons.circle, color: Color(categoryData.tagCategory.color)))
                     .show(

@@ -63,7 +63,7 @@ class _AlertDialogContentState<R, C extends AlertDialogConfig<R>> extends State<
     final formStateCallback = (DialogFormState newFormState) => setState(() {
           _currentFormState = newFormState;
         });
-    return dialogFormFactory.createForm(config.formFields!, formStateCallback);
+    return dialogFormFactory.createForm<R>(config.formFields!, formStateCallback, widget.closeDialog);
   }
 
   List<Widget> buildDialogActions() {

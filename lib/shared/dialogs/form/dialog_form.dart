@@ -5,15 +5,24 @@ import 'fields/dialog_form_field.dart';
 class DialogFormFactory {
   const DialogFormFactory();
 
-  DialogForm createForm(List<DialogFormField> formFields, Function(DialogFormState) formStateCallback, {Key? key}) =>
-      DialogForm(formFields, formStateCallback, key: key);
+  DialogForm createForm<R>(List<DialogFormField> formFields, Function(DialogFormState) formStateCallback,
+          CloseDialogHandle<R> closeDialog,
+          {Key? key}) =>
+      DialogForm<R>(formFields, formStateCallback, closeDialog, key: key);
 }
 
-class DialogForm extends StatefulWidget {
+/**
+ *  Widget that includes all configured form fields
+ *  of an AlertDialog
+ *
+ *  R: result type of the dialog
+ */
+class DialogForm<R> extends StatefulWidget {
   final List<DialogFormField> formFields;
   final Function(DialogFormState) formStateCallback;
+  final Function(BuildContext context, {R? result}) closeDialog;
 
-  const DialogForm(this.formFields, this.formStateCallback, {super.key});
+  const DialogForm(this.formFields, this.formStateCallback, this.closeDialog, {super.key});
 
   @override
   State<StatefulWidget> createState() => DialogFormState.init(formFields, formStateCallback);
@@ -32,8 +41,10 @@ class DialogFormState extends State<DialogForm> {
   @override
   Widget build(BuildContext context) => Row(
       children: widget.formFields
-          .map((formField) =>
-              Expanded(child: formField.buildWidget((fieldId, newValue) => _updateValue(fieldId, newValue))))
+          .map((formField) => Expanded(
+              child: formField.buildWidget(
+                  formUpdateCallback: (fieldId, newValue) => _updateValue(fieldId, newValue),
+                  closeDialog: widget.closeDialog)))
           .toList());
 
   void _updateValue(String fieldId, Object? newValue) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/shared/dialogs/form/fields/dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import '../../../configurations/single_select_entity_dialog_config.dart';
@@ -7,20 +8,23 @@ import '../entity_selection_dialog_form_field.dart';
 class EntitySelector<E extends NamedEntity> extends StatefulWidget {
   final EntitySelectionDialogFormField<E> _formField;
   final Function(E) updateFormState;
+  final CloseDialogHandle closeDialog;
 
-  const EntitySelector(this._formField, {super.key, required this.updateFormState});
+  const EntitySelector(this._formField, {super.key, required this.updateFormState, required this.closeDialog});
 
   @override
-  State<StatefulWidget> createState() => _EntitySelectorState<E>(_formField, updateFormState: this.updateFormState);
+  State<StatefulWidget> createState() =>
+      _EntitySelectorState<E>(_formField, updateFormState: this.updateFormState, closeDialog: this.closeDialog);
 }
 
 class _EntitySelectorState<E extends NamedEntity> extends State<EntitySelector<E>> {
   final EntitySelectionDialogFormField<E> _formField;
   final Function(E) updateFormState;
+  final CloseDialogHandle closeDialog;
 
   E? _selection;
 
-  _EntitySelectorState(this._formField, {required this.updateFormState});
+  _EntitySelectorState(this._formField, {required this.updateFormState, required this.closeDialog});
 
   @override
   void initState() {
@@ -51,8 +55,9 @@ class _EntitySelectorState<E extends NamedEntity> extends State<EntitySelector<E
       this._selection = entity;
     });
     if (_formField.selectionStyle == EntityDialogSelectionStyle.ONE_TAP) {
-      // TODO Confirm the selection on a single tap
+      closeDialog(context, result: entity);
     }
+    updateFormState(entity);
   }
 
   Widget? _getLeadingWidgetOnListTile(E entity) {

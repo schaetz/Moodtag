@@ -19,7 +19,9 @@ class EntitySelectionDialogFormField<E extends NamedEntity> extends DialogFormFi
       selectionStyle == EntityDialogSelectionStyle.BOX_OUTLINE_AND_LEADING_ICON;
 
   @override
-  Widget buildWidget(Function(String fieldId, E newValue) formUpdateCallback) {
-    return EntitySelector<E>(this, updateFormState: (E newValue) => formUpdateCallback(this.identifier, newValue));
+  Widget buildWidget(
+      {required final FormUpdateCallback<E> formUpdateCallback, required final CloseDialogHandle closeDialog}) {
+    return EntitySelector<E>(this,
+        updateFormState: (E newValue) => formUpdateCallback(this.identifier, newValue), closeDialog: closeDialog);
   }
 }

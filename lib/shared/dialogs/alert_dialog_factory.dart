@@ -74,7 +74,9 @@ class AlertDialogFactory {
         SingleSelectEntityDialogConfig<E>(
             title: title,
             subtitle: subtitle,
-            actions: _getSelectEntityConfirmationActions<E>(SingleSelectEntityDialogConfig.singleSelectionInputId),
+            actions: selectionStyle == EntityDialogSelectionStyle.ONE_TAP
+                ? []
+                : _getSelectEntityConfirmationActions<E>(SingleSelectEntityDialogConfig.singleSelectionInputId),
             onTerminate: onTerminate,
             availableEntities: entities,
             initialSelection: initialSelection,
@@ -100,7 +102,7 @@ class AlertDialogFactory {
         DialogAction.getSimpleTextDialogAction<E>('Discard', getDialogResult: (context, formState) => null),
         DialogAction.getSimpleTextDialogAction<E>('Confirm',
             getDialogResult: (context, formState) => formState?.get<E>(mainInputId) ?? null,
-            validate: (context, formState) => formState?.get<E>(mainInputId) != null)
+            validate: (context, formState) => true)
       ];
 }
 
