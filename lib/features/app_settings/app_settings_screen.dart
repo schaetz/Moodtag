@@ -79,11 +79,9 @@ class AppSettingsScreen extends StatelessWidget {
                         IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () => dialogFactory
-                                .getConfirmationDialog(
-                                  context,
-                                  title: 'Are you sure that you want to delete the tag category "${tagCategory.name}"?',
-                                )
-                                .show(onTruthyResult: (_) => bloc.add(DeleteTagCategory(tagCategory))))
+                                .getDeleteTagCategoryDialog(context, category: tagCategory)
+                                .then((dialog) =>
+                                    dialog.show(onTruthyResult: (_) => bloc.add(DeleteTagCategory(tagCategory)))))
                       ]),
                       shape: index < tagCategories.length - 1
                           ? Border(

@@ -24,6 +24,16 @@ class AlertDialogFactory {
         onTerminate: null);
   }
 
+  Future<BooleanDialogWrapper> getDeleteTagCategoryDialog(BuildContext context, {required TagCategory category}) async {
+    final tagsWithCategory = await _repository.getTagsWithCategory(category).first;
+    return getConfirmationDialog(context,
+        title: 'Are you sure that you want to delete the tag category "${category.name}"?',
+        subtitle: tagsWithCategory.isEmpty
+            ? 'It is not assigned to any tags.'
+            : 'It is assigned to ${tagsWithCategory.length} tag(s).',
+        onTerminate: null);
+  }
+
   BooleanDialogWrapper getConfirmationDialog(BuildContext context,
       {String? title, String? subtitle, Function(bool?)? onTerminate}) {
     return BooleanDialogWrapper(
