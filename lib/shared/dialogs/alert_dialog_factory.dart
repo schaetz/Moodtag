@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/shared/dialogs/components/options/dialog_action.dart';
-import 'package:moodtag/shared/dialogs/variants/select_entity/single_select_entity_dialog_config.dart';
-import 'package:moodtag/shared/dialogs/variants/single_text_input_dialog/single_text_input_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import 'alert_dialog_config.dart';
-import 'alert_dialog_wrapper.dart';
+import 'configurations/single_select_entity_dialog_config.dart';
+import 'configurations/single_text_input_dialog_config.dart';
+import 'core/alert_dialog_config.dart';
+import 'core/alert_dialog_wrapper.dart';
+import 'core/dialog_action.dart';
 
 class AlertDialogFactory {
   final Repository _repository;

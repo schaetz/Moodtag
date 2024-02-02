@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/components/form/fields/text_dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
+
+import '../text_dialog_form_field.dart';
 
 class MultilineAutocomplete extends StatefulWidget {
   final TextDialogFormField _formField;

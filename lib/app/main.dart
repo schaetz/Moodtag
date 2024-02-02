@@ -23,7 +23,7 @@ import 'package:moodtag/features/app_bar/app_bar_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/logging/mt_bloc_observer.dart';
-import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
 import 'package:provider/provider.dart';
 
 void main() {

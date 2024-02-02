@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/components/form/widgets/multiline_autocomplete.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import 'dialog_form_field.dart';
+import 'widgets/multiline_autocomplete.dart';
 
 class TextDialogFormField extends DialogFormField {
   final bool multiline;

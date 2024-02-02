@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/components/alert_dialog_config.dart';
+import 'package:moodtag/shared/dialogs/core/alert_dialog_config.dart';
 
-import 'form/dialog_form.dart';
-import 'options/dialog_action.dart';
+import '../form/dialog_form.dart';
+import 'dialog_action.dart';
 
 /**
  *  Stateful widget containing the actual dialog widget

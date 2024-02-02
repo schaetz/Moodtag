@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:moodtag/shared/dialogs/components/form/dialog_form.dart';
 
+import '../form/dialog_form.dart';
 import 'alert_dialog_config.dart';
 import 'alert_dialog_content.dart';
 

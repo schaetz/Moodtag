@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/components/alert_dialog_config.dart';
-import 'package:moodtag/shared/dialogs/components/form/fields/entity_selection_dialog_form_field.dart';
+import 'package:moodtag/shared/dialogs/core/alert_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
+
+import '../form/fields/entity_selection_dialog_form_field.dart';
 
 class SingleSelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogConfig<E> {
   static const singleSelectionInputId = 'selection';

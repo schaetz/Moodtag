@@ -1,5 +1,5 @@
-import 'form/fields/dialog_form_field.dart';
-import 'options/dialog_action.dart';
+import '../form/fields/dialog_form_field.dart';
+import 'dialog_action.dart';
 
 /**
  *  Configuration for AlertDialogWrapper

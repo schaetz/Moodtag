@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:moodtag/shared/dialogs/components/form/dialog_form.dart';
+
+import '../form/dialog_form.dart';
 
 /**
  *  Represents an action in a dialog that is visually represented by a widget;

@@ -8,7 +8,7 @@ import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
-import 'package:moodtag/shared/dialogs/components/alert_dialog_factory.dart';
+import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
 import 'package:moodtag/shared/models/modal_and_overlay_types.dart';
 import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud.dart';
 import 'package:moodtag/shared/widgets/data_display/chip_cloud/chip_cloud_options.dart';

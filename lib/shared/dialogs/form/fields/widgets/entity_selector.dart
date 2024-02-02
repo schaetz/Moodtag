@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/components/form/fields/entity_selection_dialog_form_field.dart';
-import 'package:moodtag/shared/dialogs/variants/select_entity/single_select_entity_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
+
+import '../../../configurations/single_select_entity_dialog_config.dart';
+import '../entity_selection_dialog_form_field.dart';
 
 class EntitySelector<E extends NamedEntity> extends StatefulWidget {
   final EntitySelectionDialogFormField<E> _formField;

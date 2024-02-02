@@ -1,6 +1,7 @@
-import 'package:moodtag/shared/dialogs/components/alert_dialog_config.dart';
-import 'package:moodtag/shared/dialogs/components/form/fields/text_dialog_form_field.dart';
+import 'package:moodtag/shared/dialogs/core/alert_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
+
+import '../form/fields/text_dialog_form_field.dart';
 
 /**
  *  Configuration for dialogs with a single text field;
