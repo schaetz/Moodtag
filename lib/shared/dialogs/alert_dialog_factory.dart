@@ -126,7 +126,7 @@ class AlertDialogFactory {
             subtitle: subtitle,
             actions: selectionStyle == EntityDialogSelectionStyle.ONE_TAP && replacementActive
                 ? [
-                    DialogAction.getSimpleTextDialogAction<DeleteWithReplacementResult<E>>('Discard',
+                    DialogAction<DeleteWithReplacementResult<E>>('Discard',
                         getDialogResult: (context, formState) => DeleteWithReplacementResult<E>(confirmDeletion: false))
                   ]
                 : _getDeleteWithReplacementActions<E>(
@@ -141,40 +141,40 @@ class AlertDialogFactory {
 
   List<DialogAction<bool>> _getYesNoOptions() {
     return [
-      DialogAction.getSimpleTextDialogAction<bool>('Yes', getDialogResult: (context, formState) => true),
-      DialogAction.getSimpleTextDialogAction<bool>('No', getDialogResult: (context, formState) => false),
+      DialogAction<bool>('Yes', getDialogResult: (context, formState) => true),
+      DialogAction<bool>('No', getDialogResult: (context, formState) => false),
     ];
   }
 
   static List<DialogAction<String>> _getTextInputConfirmationActions(String mainInputId) => [
-        DialogAction.getSimpleTextDialogAction<String>('Confirm',
+        DialogAction<String>('Confirm',
             getDialogResult: (context, formState) => formState?.get<String>(mainInputId) ?? null,
             validate: (context, formState) => formState?.get<String>(mainInputId)?.isNotEmpty == true),
-        DialogAction.getSimpleTextDialogAction<String>('Discard', getDialogResult: (context, formState) => null),
+        DialogAction<String>('Discard', getDialogResult: (context, formState) => null),
       ];
 
   static List<DialogAction<E>> _getSelectEntityConfirmationActions<E extends NamedEntity>(String mainInputId) => [
-        DialogAction.getSimpleTextDialogAction<E>('Confirm',
+        DialogAction<E>('Confirm',
             getDialogResult: (context, formState) => formState?.get<E>(mainInputId) ?? null,
             validate: (context, formState) => true),
-        DialogAction.getSimpleTextDialogAction<E>('Discard', getDialogResult: (context, formState) => null),
+        DialogAction<E>('Discard', getDialogResult: (context, formState) => null),
       ];
 
   static List<DialogAction<DeleteWithReplacementResult<E>>> _getDeleteWithReplacementActions<E extends NamedEntity>(
           String mainInputId, bool replacementActive) =>
       replacementActive
           ? [
-              DialogAction.getSimpleTextDialogAction<DeleteWithReplacementResult<E>>('Confirm',
+              DialogAction<DeleteWithReplacementResult<E>>('Confirm',
                   getDialogResult: (context, formState) => DeleteWithReplacementResult<E>(
                       confirmDeletion: true, replacement: formState?.get<E>(mainInputId)),
                   validate: (context, formState) => true),
-              DialogAction.getSimpleTextDialogAction<DeleteWithReplacementResult<E>>('Discard',
+              DialogAction<DeleteWithReplacementResult<E>>('Discard',
                   getDialogResult: (context, formState) => DeleteWithReplacementResult<E>(confirmDeletion: false)),
             ]
           : [
-              DialogAction.getSimpleTextDialogAction<DeleteWithReplacementResult<E>>('Yes',
+              DialogAction<DeleteWithReplacementResult<E>>('Yes',
                   getDialogResult: (context, formState) => DeleteWithReplacementResult<E>(confirmDeletion: true)),
-              DialogAction.getSimpleTextDialogAction<DeleteWithReplacementResult<E>>('No',
+              DialogAction<DeleteWithReplacementResult<E>>('No',
                   getDialogResult: (context, formState) => DeleteWithReplacementResult<E>(confirmDeletion: false)),
             ];
 }

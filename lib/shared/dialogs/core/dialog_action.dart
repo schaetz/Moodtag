@@ -10,15 +10,11 @@ import '../form/dialog_form.dart';
  *  R: result type of the dialog (pass as not nullable - null will be added)
  */
 class DialogAction<R> {
-  static DialogAction<R> getSimpleTextDialogAction<R>(String text,
-          {required DialogResultFunction<R> getDialogResult, ValidatorFunction validate}) =>
-      DialogAction(getDialogResult: getDialogResult, validate: validate, getWidget: () => Text(text));
-
+  final String text;
   final DialogResultFunction<R> getDialogResult;
   final ValidatorFunction validate;
-  final Widget Function() getWidget;
 
-  const DialogAction({required this.getDialogResult, this.validate, required this.getWidget});
+  const DialogAction(this.text, {required this.getDialogResult, this.validate});
 }
 
 typedef DialogResultFunction<R> = R? Function(BuildContext, DialogFormState?);
