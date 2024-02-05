@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import '../../configurations/single_select_entity_dialog_config.dart';
-import 'dialog_form_field.dart';
-import 'widgets/entity_selector.dart';
+import '../../../configurations/single_select_entity_dialog_config.dart';
+import '../dialog_form_field.dart';
+import 'entity_selector.dart';
 
 /**
  *  Configuration class for the EntitySelector widget

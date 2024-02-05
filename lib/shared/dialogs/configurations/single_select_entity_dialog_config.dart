@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moodtag/shared/dialogs/core/alert_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import '../form/fields/entity_selection_dialog_form_field.dart';
+import '../form/fields/entity_selection/entity_selection_dialog_form_field.dart';
 
 /**
  *  Configuration for a dialog with a single widget
@@ -19,7 +19,7 @@ class SingleSelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogC
   final Icon Function(E)? iconSelector;
 
   SingleSelectEntityDialogConfig(
-      {String? super.title,
+      {super.title,
       super.subtitle,
       required super.actions,
       super.onTerminate,

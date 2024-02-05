@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import 'dialog_form_field.dart';
-import 'widgets/multiline_autocomplete.dart';
+import '../dialog_form_field.dart';
+import 'multiline_autocomplete_widget.dart';
 
 class TextDialogFormField extends DialogFormField {
   final bool multiline;
@@ -26,7 +26,8 @@ class TextDialogFormField extends DialogFormField {
   Widget buildWidget(
       {required final FormUpdateCallback<String> formUpdateCallback, required final CloseDialogHandle closeDialog}) {
     if (this.suggestions != null) {
-      return MultilineAutocomplete(this, updateFormState: (newValue) => formUpdateCallback(this.identifier, newValue));
+      return MultilineAutocompleteWidget(this,
+          updateFormState: (newValue) => formUpdateCallback(this.identifier, newValue));
     }
     return _buildTextFieldWidget(this, formUpdateCallback);
   }

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import '../text_dialog_form_field.dart';
+import 'text_dialog_form_field.dart';
 
-class MultilineAutocomplete extends StatefulWidget {
+class MultilineAutocompleteWidget extends StatefulWidget {
   final TextDialogFormField _formField;
   final Function(String) updateFormState;
 
-  const MultilineAutocomplete(this._formField, {super.key, required this.updateFormState});
+  const MultilineAutocompleteWidget(this._formField, {super.key, required this.updateFormState});
 
   @override
   State<StatefulWidget> createState() =>
-      _MultilineAutocompleteState(this._formField, updateFormState: this.updateFormState);
+      _MultilineAutocompleteWidgetState(this._formField, updateFormState: this.updateFormState);
 }
 
-class _MultilineAutocompleteState extends State<MultilineAutocomplete> {
+class _MultilineAutocompleteWidgetState extends State<MultilineAutocompleteWidget> {
   final TextDialogFormField _formField;
   final Map<String, Set<String>> _optionsByInputPatterns;
   final Function(String) updateFormState;
@@ -22,7 +22,7 @@ class _MultilineAutocompleteState extends State<MultilineAutocomplete> {
   TextEditingController? _textEditingController;
   String _lastInput;
 
-  _MultilineAutocompleteState(this._formField, {required this.updateFormState})
+  _MultilineAutocompleteWidgetState(this._formField, {required this.updateFormState})
       : _lastInput = _formField.initialValue,
         _optionsByInputPatterns =
             _formField.suggestions != null ? _getOptionsFromNamedEntities(_formField.suggestions!) : {};

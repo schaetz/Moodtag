@@ -3,7 +3,7 @@ import 'package:moodtag/shared/dialogs/form/fields/dialog_form_field.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import '../../../configurations/single_select_entity_dialog_config.dart';
-import '../entity_selection_dialog_form_field.dart';
+import 'entity_selection_dialog_form_field.dart';
 
 /**
  *  A widget to select a named entity from a list by either tapping it
