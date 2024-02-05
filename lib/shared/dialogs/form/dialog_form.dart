@@ -15,12 +15,12 @@ class DialogFormFactory {
  *  Widget that includes all configured form fields
  *  of an AlertDialog
  *
- *  R: result type of the dialog
+ *  R: Result type of the dialog
  */
 class DialogForm<R> extends StatefulWidget {
   final List<DialogFormField> formFields;
   final Function(DialogFormState) formStateCallback;
-  final Function(BuildContext context, {R? result}) closeDialog;
+  final CloseDialogHandle<R> closeDialog;
 
   const DialogForm(this.formFields, this.formStateCallback, this.closeDialog, {super.key});
 

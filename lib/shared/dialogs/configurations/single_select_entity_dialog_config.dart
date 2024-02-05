@@ -4,6 +4,12 @@ import 'package:moodtag/shared/models/structs/named_entity.dart';
 
 import '../form/fields/entity_selection_dialog_form_field.dart';
 
+/**
+ *  Configuration for a dialog with a single widget
+ *  to select a NamedEntity from a list
+ *
+ *  E: Type of the selected entity = result type of the dialog
+ */
 class SingleSelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogConfig<E> {
   static const singleSelectionInputId = 'selection';
 
@@ -23,11 +29,12 @@ class SingleSelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogC
       required this.selectionStyle,
       this.iconSelector})
       : super(formFields: [
-          EntitySelectionDialogFormField<E>(singleSelectionInputId,
+          EntitySelectionDialogFormField<E, E>(singleSelectionInputId,
               entities: availableEntities,
               initialValue: initialSelection,
               selectionStyle: selectionStyle,
-              iconSelector: iconSelector)
+              iconSelector: iconSelector,
+              oneTapResultConverter: (entity) => entity)
         ]);
 
   bool get showBoxOutlineOnSelectedTile =>

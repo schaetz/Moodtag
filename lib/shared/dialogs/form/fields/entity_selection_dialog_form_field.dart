@@ -5,13 +5,24 @@ import '../../configurations/single_select_entity_dialog_config.dart';
 import 'dialog_form_field.dart';
 import 'widgets/entity_selector.dart';
 
-class EntitySelectionDialogFormField<E extends NamedEntity> extends DialogFormField<E> {
+/**
+ *  Configuration class for the EntitySelector widget
+ *
+ *  R: Result type of the dialog
+ *  E: Type of the selected entity
+ */
+class EntitySelectionDialogFormField<R, E extends NamedEntity> extends DialogFormField<E> {
   final List<E> entities;
   final EntityDialogSelectionStyle selectionStyle;
   final Icon Function(E)? iconSelector;
+  final R Function(E) oneTapResultConverter;
 
   const EntitySelectionDialogFormField(super.identifier,
-      {required super.initialValue, required this.entities, required this.selectionStyle, this.iconSelector});
+      {required super.initialValue,
+      required this.entities,
+      required this.selectionStyle,
+      this.iconSelector,
+      required this.oneTapResultConverter});
 
   bool get showBoxOutlineOnSelectedTile =>
       selectionStyle == EntityDialogSelectionStyle.ONE_TAP ||
@@ -21,7 +32,9 @@ class EntitySelectionDialogFormField<E extends NamedEntity> extends DialogFormFi
   @override
   Widget buildWidget(
       {required final FormUpdateCallback<E> formUpdateCallback, required final CloseDialogHandle closeDialog}) {
-    return EntitySelector<E>(this,
-        updateFormState: (E newValue) => formUpdateCallback(this.identifier, newValue), closeDialog: closeDialog);
+    return EntitySelector<R, E>(this,
+        updateFormState: (E newValue) => formUpdateCallback(this.identifier, newValue),
+        closeDialog: closeDialog,
+        oneTapResultConverter: this.oneTapResultConverter);
   }
 }

@@ -72,15 +72,15 @@ class _AlertDialogContentState<R, C extends AlertDialogConfig<R>> extends State<
             padding: const EdgeInsets.only(left: 16.0),
             child: TextButton(
               onPressed: action.validate == null || action.validate!(context, _currentFormState)
-                  ? () => _onOptionPressed(action)
+                  ? () => _onActionPressed(action)
                   : null,
               child: action.getWidget(),
             )))
         .toList();
   }
 
-  void _onOptionPressed(DialogAction<R> option) {
-    final result = option.getDialogResult(context, _currentFormState);
+  void _onActionPressed(DialogAction<R> action) {
+    final result = action.getDialogResult(context, _currentFormState);
     widget.closeDialog(context, result: result);
   }
 }

@@ -80,8 +80,11 @@ class AppSettingsScreen extends StatelessWidget {
                             icon: Icon(Icons.delete),
                             onPressed: () => dialogFactory
                                 .getDeleteTagCategoryDialog(context, category: tagCategory)
-                                .then((dialog) =>
-                                    dialog.show(onTruthyResult: (_) => bloc.add(DeleteTagCategory(tagCategory)))))
+                                .then((dialog) => dialog.show(
+                                    handleResult: (result) => result != null && result.confirmDeletion == true
+                                        ? bloc.add(DeleteTagCategory(tagCategory,
+                                            insertedCategory: result.replacement?.tagCategory))
+                                        : {})))
                       ]),
                       shape: index < tagCategories.length - 1
                           ? Border(

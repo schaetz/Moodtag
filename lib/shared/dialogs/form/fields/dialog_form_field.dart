@@ -12,6 +12,9 @@ abstract class DialogFormField<T> {
 
   Widget buildWidget(
       {required final FormUpdateCallback<T> formUpdateCallback, required final CloseDialogHandle closeDialog});
+
+  @override
+  String toString() => '{$identifier, ${initialValue.toString()}}';
 }
 
 typedef FormUpdateCallback<T> = Function(String fieldId, T newValue);

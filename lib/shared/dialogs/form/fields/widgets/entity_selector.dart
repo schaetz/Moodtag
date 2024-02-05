@@ -5,26 +5,39 @@ import 'package:moodtag/shared/models/structs/named_entity.dart';
 import '../../../configurations/single_select_entity_dialog_config.dart';
 import '../entity_selection_dialog_form_field.dart';
 
-class EntitySelector<E extends NamedEntity> extends StatefulWidget {
-  final EntitySelectionDialogFormField<E> _formField;
+/**
+ *  A widget to select a named entity from a list by either tapping it
+ *  or marking it and pressing confirm
+ *
+ *  R: Result type of the dialog
+ *  E: Type of the selected entity
+ */
+class EntitySelector<R, E extends NamedEntity> extends StatefulWidget {
+  final EntitySelectionDialogFormField<R, E> _formField;
   final Function(E) updateFormState;
   final CloseDialogHandle closeDialog;
+  final R Function(E) oneTapResultConverter;
 
-  const EntitySelector(this._formField, {super.key, required this.updateFormState, required this.closeDialog});
+  const EntitySelector(this._formField,
+      {super.key, required this.updateFormState, required this.closeDialog, required this.oneTapResultConverter});
 
   @override
-  State<StatefulWidget> createState() =>
-      _EntitySelectorState<E>(_formField, updateFormState: this.updateFormState, closeDialog: this.closeDialog);
+  State<StatefulWidget> createState() => _EntitySelectorState<R, E>(_formField,
+      updateFormState: this.updateFormState,
+      closeDialog: this.closeDialog,
+      oneTapResultConverter: this.oneTapResultConverter);
 }
 
-class _EntitySelectorState<E extends NamedEntity> extends State<EntitySelector<E>> {
-  final EntitySelectionDialogFormField<E> _formField;
+class _EntitySelectorState<R, E extends NamedEntity> extends State<EntitySelector<R, E>> {
+  final EntitySelectionDialogFormField<R, E> _formField;
   final Function(E) updateFormState;
   final CloseDialogHandle closeDialog;
+  final R Function(E) oneTapResultConverter;
 
   E? _selection;
 
-  _EntitySelectorState(this._formField, {required this.updateFormState, required this.closeDialog});
+  _EntitySelectorState(this._formField,
+      {required this.updateFormState, required this.closeDialog, required this.oneTapResultConverter});
 
   @override
   void initState() {
@@ -55,7 +68,7 @@ class _EntitySelectorState<E extends NamedEntity> extends State<EntitySelector<E
       this._selection = entity;
     });
     if (_formField.selectionStyle == EntityDialogSelectionStyle.ONE_TAP) {
-      closeDialog(context, result: entity);
+      closeDialog(context, result: oneTapResultConverter(entity));
     }
     updateFormState(entity);
   }
