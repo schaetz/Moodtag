@@ -12,32 +12,17 @@ import '../form/fields/text_dialog_form_field.dart';
 class SingleTextInputDialogConfig<S extends NamedEntity> extends AlertDialogConfig<String> {
   static const singleTextInputId = 'input';
 
-  SingleTextInputDialogConfig.singleLine({
+  SingleTextInputDialogConfig({
     super.title,
     super.subtitle,
     required super.actions,
     super.onTerminate,
     // Dialog-specific properties
-    Set<S>? suggestedEntities,
-  }) : super(formFields: [
-          TextDialogFormField(singleTextInputId, initialValue: '', multiline: false, suggestions: suggestedEntities)
-        ]);
-
-  SingleTextInputDialogConfig.multiline({
-    super.title,
-    super.subtitle,
-    required super.actions,
-    super.onTerminate,
-    // Dialog-specific properties
+    bool multiline = false,
     int? maxLines,
     Set<S>? suggestedEntities,
   }) : super(formFields: [
-          TextDialogFormField(
-            singleTextInputId,
-            initialValue: '',
-            multiline: true,
-            maxLines: maxLines,
-            suggestions: suggestedEntities,
-          )
+          TextDialogFormField(singleTextInputId,
+              initialValue: '', multiline: multiline, maxLines: maxLines, suggestions: suggestedEntities)
         ]);
 }

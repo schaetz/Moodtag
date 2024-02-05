@@ -33,6 +33,7 @@ class AlertDialogFactory {
     final remainingTagCategories = await _repository.getTagCategories().first
       ..removeWhere((tagCategoryData) => tagCategoryData.tagCategory == category);
     final replacementActive = tagsWithCategory.length > 0;
+
     return getDeleteWithReplacementDialog<TagCategoryData>(context,
         title: 'Are you sure that you want to delete the tag category "${category.name}"?',
         subtitle: tagsWithCategory.isEmpty
@@ -47,10 +48,9 @@ class AlertDialogFactory {
 
   BooleanDialogWrapper getConfirmationDialog(BuildContext context,
       {String? title, String? subtitle, Function(bool?)? onTerminate}) {
-    return BooleanDialogWrapper(
-        context,
-        AlertDialogConfig<bool>(
-            title: title, subtitle: subtitle, actions: _getYesNoOptions(), onTerminate: onTerminate));
+    final config = AlertDialogConfig<bool>(
+        title: title, subtitle: subtitle, actions: _getYesNoOptions(), onTerminate: onTerminate);
+    return BooleanDialogWrapper(context, config);
   }
 
   /// S: Type of the suggested entities
@@ -61,20 +61,14 @@ class AlertDialogFactory {
       Function(String?)? onTerminate,
       int? maxLines,
       Set<S>? suggestedEntities}) {
-    final textInputDialogConfig = multiline
-        ? SingleTextInputDialogConfig.multiline(
-            title: title,
-            subtitle: subtitle,
-            actions: _getTextInputConfirmationActions(SingleTextInputDialogConfig.singleTextInputId),
-            onTerminate: onTerminate,
-            maxLines: maxLines,
-            suggestedEntities: suggestedEntities)
-        : SingleTextInputDialogConfig.singleLine(
-            title: title,
-            subtitle: subtitle,
-            actions: _getTextInputConfirmationActions(SingleTextInputDialogConfig.singleTextInputId),
-            onTerminate: onTerminate,
-            suggestedEntities: suggestedEntities);
+    final textInputDialogConfig = SingleTextInputDialogConfig(
+        title: title,
+        subtitle: subtitle,
+        actions: _getTextInputConfirmationActions(SingleTextInputDialogConfig.singleTextInputId),
+        onTerminate: onTerminate,
+        multiline: multiline,
+        maxLines: maxLines,
+        suggestedEntities: suggestedEntities);
     return SingleTextInputDialogWrapper(context, textInputDialogConfig);
   }
 
@@ -90,19 +84,18 @@ class AlertDialogFactory {
     required EntityDialogSelectionStyle selectionStyle,
     required Icon Function(E)? iconSelector,
   }) {
-    return SingleSelectEntityDialogWrapper<E>(
-        context,
-        SingleSelectEntityDialogConfig<E>(
-            title: title,
-            subtitle: subtitle,
-            actions: selectionStyle == EntityDialogSelectionStyle.ONE_TAP
-                ? []
-                : _getSelectEntityConfirmationActions<E>(SingleSelectEntityDialogConfig.singleSelectionInputId),
-            onTerminate: onTerminate,
-            availableEntities: entities,
-            initialSelection: initialSelection,
-            selectionStyle: selectionStyle,
-            iconSelector: iconSelector));
+    final config = SingleSelectEntityDialogConfig<E>(
+        title: title,
+        subtitle: subtitle,
+        actions: selectionStyle == EntityDialogSelectionStyle.ONE_TAP
+            ? []
+            : _getSelectEntityConfirmationActions<E>(SingleSelectEntityDialogConfig.singleSelectionInputId),
+        onTerminate: onTerminate,
+        availableEntities: entities,
+        initialSelection: initialSelection,
+        selectionStyle: selectionStyle,
+        iconSelector: iconSelector);
+    return SingleSelectEntityDialogWrapper<E>(context, config);
   }
 
   /// E: Type of the entity to be deleted and replaced
@@ -119,24 +112,23 @@ class AlertDialogFactory {
     // DeleteWithReplacementDialog-specific parameters
     required bool replacementActive,
   }) {
-    return DeleteWithReplacementDialogWrapper<E>(
-        context,
-        DeleteWithReplacementConfig<E>(
-            title: title,
-            subtitle: subtitle,
-            actions: selectionStyle == EntityDialogSelectionStyle.ONE_TAP && replacementActive
-                ? [
-                    DialogAction<DeleteWithReplacementResult<E>>('Discard',
-                        getDialogResult: (context, formState) => DeleteWithReplacementResult<E>(confirmDeletion: false))
-                  ]
-                : _getDeleteWithReplacementActions<E>(
-                    DeleteWithReplacementConfig.singleSelectionInputId, replacementActive),
-            onTerminate: onTerminate,
-            availableEntities: entities,
-            initialSelection: initialSelection,
-            selectionStyle: selectionStyle,
-            iconSelector: iconSelector,
-            replacementActive: replacementActive));
+    final config = DeleteWithReplacementConfig<E>(
+        title: title,
+        subtitle: subtitle,
+        actions: selectionStyle == EntityDialogSelectionStyle.ONE_TAP && replacementActive
+            ? [
+                DialogAction<DeleteWithReplacementResult<E>>('Discard',
+                    getDialogResult: (context, formState) => DeleteWithReplacementResult<E>(confirmDeletion: false))
+              ]
+            : _getDeleteWithReplacementActions<E>(
+                DeleteWithReplacementConfig.singleSelectionInputId, replacementActive),
+        onTerminate: onTerminate,
+        availableEntities: entities,
+        initialSelection: initialSelection,
+        selectionStyle: selectionStyle,
+        iconSelector: iconSelector,
+        replacementActive: replacementActive);
+    return DeleteWithReplacementDialogWrapper<E>(context, config);
   }
 
   List<DialogAction<bool>> _getYesNoOptions() {
