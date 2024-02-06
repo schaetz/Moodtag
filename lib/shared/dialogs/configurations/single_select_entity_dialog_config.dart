@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/core/alert_dialog_config.dart';
+import 'package:moodtag/shared/dialogs/configurations/alert_dialog_config.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
+import '../core/dialog_action.dart';
+import '../form/fields/dialog_form_field.dart';
 import '../form/fields/entity_selection/entity_selection_dialog_form_field.dart';
 
 /**
@@ -11,36 +13,44 @@ import '../form/fields/entity_selection/entity_selection_dialog_form_field.dart'
  *  E: Type of the selected entity = result type of the dialog
  */
 class SingleSelectEntityDialogConfig<E extends NamedEntity> extends AlertDialogConfig<E> {
-  static const singleSelectionInputId = 'selection';
+  final EntitySelectionDialogFormField<E, E> selectionFormField;
 
-  final List<E> availableEntities;
-  final E initialSelection;
-  final EntityDialogSelectionStyle selectionStyle;
-  final Icon Function(E)? iconSelector;
-
-  SingleSelectEntityDialogConfig(
-      {super.title,
-      super.subtitle,
-      required super.actions,
-      super.onTerminate,
+  static SingleSelectEntityDialogConfig<E> create<E extends NamedEntity>(
+      String? title,
+      String? subtitle,
+      Function(E?)? onTerminate,
       // Dialog-specific properties
-      required this.availableEntities,
-      required this.initialSelection,
-      required this.selectionStyle,
-      this.iconSelector})
-      : super(formFields: [
-          EntitySelectionDialogFormField<E, E>(singleSelectionInputId,
-              entities: availableEntities,
-              initialValue: initialSelection,
-              selectionStyle: selectionStyle,
-              iconSelector: iconSelector,
-              oneTapResultConverter: (entity) => entity)
-        ]);
+      List<E> entities,
+      E initialSelection,
+      EntityDialogSelectionStyle selectionStyle,
+      Icon Function(E)? iconSelector) {
+    final List<DialogAction<E>> actions = selectionStyle == EntityDialogSelectionStyle.ONE_TAP
+        ? const []
+        : _getSelectEntityConfirmationActions<E>(EntitySelectionDialogFormField.singleSelectionInputId);
+    final selectionFormField = EntitySelectionDialogFormField.getSingleSelectionField<E, E>(
+        entities, initialSelection, selectionStyle, iconSelector, (entity) => entity);
 
-  bool get showBoxOutlineOnSelectedTile =>
-      selectionStyle == EntityDialogSelectionStyle.ONE_TAP ||
-      selectionStyle == EntityDialogSelectionStyle.BOX_OUTLINE ||
-      selectionStyle == EntityDialogSelectionStyle.BOX_OUTLINE_AND_LEADING_ICON;
+    return SingleSelectEntityDialogConfig<E>._construct(title, subtitle, [selectionFormField], actions, onTerminate,
+        entities, initialSelection, selectionStyle, iconSelector, selectionFormField);
+  }
+
+  SingleSelectEntityDialogConfig._construct(
+      String? super.title,
+      String? super.subtitle,
+      List<DialogFormField> super.formFields,
+      List<DialogAction<E>> super.actions,
+      Function(E?)? super.onTerminate,
+      // Dialog-specific properties
+      List<E> entities,
+      E initialSelection,
+      EntityDialogSelectionStyle selectionStyle,
+      Icon Function(E)? iconSelector,
+      this.selectionFormField);
+
+  static List<DialogAction<E>> _getSelectEntityConfirmationActions<E extends NamedEntity>(String mainInputId) => [
+        DialogAction<E>('Confirm',
+            getDialogResult: (context, formState) => formState?.get<E>(mainInputId) ?? null,
+            validate: (context, formState) => true),
+        DialogAction<E>('Discard', getDialogResult: (context, formState) => null),
+      ];
 }
-
-enum EntityDialogSelectionStyle { ONE_TAP, RADIO_BUTTONS, BOX_OUTLINE, BOX_OUTLINE_AND_LEADING_ICON }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
 
-import '../../../configurations/single_select_entity_dialog_config.dart';
 import '../dialog_form_field.dart';
 import 'entity_selector.dart';
 
@@ -17,12 +16,19 @@ class EntitySelectionDialogFormField<R, E extends NamedEntity> extends DialogFor
   final Icon Function(E)? iconSelector;
   final R Function(E) oneTapResultConverter;
 
-  const EntitySelectionDialogFormField(super.identifier,
-      {required super.initialValue,
-      required this.entities,
-      required this.selectionStyle,
-      this.iconSelector,
-      required this.oneTapResultConverter});
+  static const singleSelectionInputId = 'selection';
+
+  static EntitySelectionDialogFormField<R, E> getSingleSelectionField<R, E extends NamedEntity>(
+          List<E> entities,
+          E initialSelection,
+          EntityDialogSelectionStyle selectionStyle,
+          Icon Function(E)? iconSelector,
+          R Function(E) oneTapResultConverter) =>
+      EntitySelectionDialogFormField<R, E>(
+          singleSelectionInputId, initialSelection, entities, selectionStyle, iconSelector, oneTapResultConverter);
+
+  const EntitySelectionDialogFormField(super.identifier, super.initialValue, this.entities, this.selectionStyle,
+      this.iconSelector, this.oneTapResultConverter);
 
   bool get showBoxOutlineOnSelectedTile =>
       selectionStyle == EntityDialogSelectionStyle.ONE_TAP ||
@@ -38,3 +44,5 @@ class EntitySelectionDialogFormField<R, E extends NamedEntity> extends DialogFor
         oneTapResultConverter: this.oneTapResultConverter);
   }
 }
+
+enum EntityDialogSelectionStyle { ONE_TAP, RADIO_BUTTONS, BOX_OUTLINE, BOX_OUTLINE_AND_LEADING_ICON }

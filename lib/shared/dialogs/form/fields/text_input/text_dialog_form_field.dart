@@ -9,8 +9,8 @@ class TextDialogFormField extends DialogFormField {
   final int? maxLines;
   final Set<NamedEntity>? suggestions;
 
-  const TextDialogFormField(super.identifier,
-      {required super.initialValue, required this.multiline, this.maxLines, this.suggestions});
+  const TextDialogFormField(super.identifier, super.initialValue,
+      {required this.multiline, this.maxLines, this.suggestions});
 
   int getMaxLines({int multilineDefault = 10}) {
     if (multiline) {

@@ -1,6 +1,6 @@
-class DeleteWithReplacementResult<O> {
+class DeleteReplaceResult<O> {
   final bool confirmDeletion;
   final O? replacement;
 
-  DeleteWithReplacementResult({required this.confirmDeletion, this.replacement});
+  DeleteReplaceResult({required this.confirmDeletion, this.replacement});
 }

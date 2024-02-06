@@ -8,7 +8,7 @@ abstract class DialogFormField<T> {
   final String identifier;
   final T initialValue;
 
-  const DialogFormField(this.identifier, {required this.initialValue});
+  const DialogFormField(this.identifier, this.initialValue);
 
   Widget buildWidget(
       {required final FormUpdateCallback<T> formUpdateCallback, required final CloseDialogHandle closeDialog});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/shared/dialogs/core/alert_dialog_config.dart';
+import 'package:moodtag/shared/dialogs/configurations/alert_dialog_config.dart';
 
 import '../form/dialog_form.dart';
 import 'dialog_action.dart';
@@ -57,13 +57,13 @@ class _AlertDialogContentState<R, C extends AlertDialogConfig<R>> extends State<
   }
 
   Widget buildForm() {
-    if (config.formFields == null) {
+    if (config.formFields.isEmpty) {
       return Container();
     }
     final formStateCallback = (DialogFormState newFormState) => setState(() {
           _currentFormState = newFormState;
         });
-    return dialogFormFactory.createForm<R>(config.formFields!, formStateCallback, widget.closeDialog);
+    return dialogFormFactory.createForm<R>(config.formFields, formStateCallback, widget.closeDialog);
   }
 
   List<Widget> buildDialogActions() {

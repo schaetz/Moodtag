@@ -1,5 +1,5 @@
+import '../core/dialog_action.dart';
 import '../form/fields/dialog_form_field.dart';
-import 'dialog_action.dart';
 
 /**
  *  Configuration for AlertDialogWrapper
@@ -9,9 +9,9 @@ import 'dialog_action.dart';
 class AlertDialogConfig<R> {
   final String? title;
   final String? subtitle;
-  final List<DialogFormField>? formFields;
+  final List<DialogFormField> formFields;
   final List<DialogAction<R>> actions; // The key can be a string (for simpleDialogActionWithText) or a Widget
   final Function(R?)? onTerminate;
 
-  const AlertDialogConfig({this.title, this.subtitle, this.formFields, required this.actions, this.onTerminate});
+  AlertDialogConfig(this.title, this.subtitle, this.formFields, this.actions, this.onTerminate);
 }

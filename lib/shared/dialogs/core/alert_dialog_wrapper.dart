@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:logging/logging.dart';
 
+import '../configurations/alert_dialog_config.dart';
 import '../form/dialog_form.dart';
-import 'alert_dialog_config.dart';
 import 'alert_dialog_content.dart';
 
 /**
@@ -38,10 +38,10 @@ class AlertDialogWrapper<R, C extends AlertDialogConfig<R>> {
   void show({Function(R?)? handleResult, Function(R)? onTruthyResult}) {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _showDialogFuture = showDialog<R>(context: context, builder: (_) => buildDialog(context));
-      _showDialogFuture!.then((value) => config.formFields!.isEmpty
+      _showDialogFuture!.then((value) => config.formFields.isEmpty
           ? log.fine('Dialog with no form fields successfully opened.')
           : log.fine(
-              'Dialog successfully opened with form fields [${config.formFields?.map((field) => field.toString()).join('], [')}].'));
+              'Dialog successfully opened with form fields [${config.formFields.map((field) => field.toString()).join('], [')}].'));
 
       _showDialogFuture!.whenComplete(() => _isClosed = true);
       if (config.onTerminate != null) {
