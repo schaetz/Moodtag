@@ -3,6 +3,12 @@
 Moodtag is a personal music library allowing you to import your most played artists
 from Spotify or Last.fm and assigning tags to organize and rediscover them.
 
+## Build
+
+To build the app for iOS, run
+
+`flutter build ios -t lib/app/main.dart`
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0. You may not use
