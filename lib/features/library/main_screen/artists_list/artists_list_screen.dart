@@ -158,7 +158,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
           labelPadding: EdgeInsets.symmetric(horizontal: 4.0),
           label: Text(tag.name),
           labelStyle: tagChipLabelStyle,
-          onPressed: () => {},
+          onPressed: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag.id),
         ));
   }
 
