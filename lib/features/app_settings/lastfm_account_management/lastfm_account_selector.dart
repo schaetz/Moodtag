@@ -15,6 +15,7 @@ class LastFmAccountSelector extends StatelessWidget {
   final Function onAddAccountClick;
   final Function onRemoveAccountClick;
   final Function onUpdateAccountInfoClick;
+  final Function onImportClick;
   final Function(Exception) onAddAccountError;
   final Function(Exception) onRemoveAccountError;
   final Function(Exception) onUpdateAccountInfoError;
@@ -30,6 +31,7 @@ class LastFmAccountSelector extends StatelessWidget {
     required this.onAddAccountClick,
     required this.onRemoveAccountClick,
     required this.onUpdateAccountInfoClick,
+    required this.onImportClick,
     required this.onAddAccountError,
     required this.onRemoveAccountError,
     required this.onUpdateAccountInfoError,
@@ -52,6 +54,7 @@ class LastFmAccountSelector extends StatelessWidget {
             ..._accountInfo(),
             _accountChangeButton(),
             if (hasAccountName) _updateAccountInfoButton(),
+            ElevatedButton(child: Text('Import from Last.fm'), onPressed: onImportClick()),
           ])),
     ));
   }

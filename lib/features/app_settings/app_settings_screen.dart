@@ -125,14 +125,10 @@ class AppSettingsScreen extends StatelessWidget {
               onAddAccountClick: () => _openSetLastFmAccountNameDialog(context, bloc, dialogFactory),
               onRemoveAccountClick: () => bloc.add(RemoveLastFmAccount()),
               onUpdateAccountInfoClick: () => bloc.add(UpdateLastFmAccountInfo()),
+              onImportClick: () => bloc.state.hasAccount ? () => _showLastFmImportScreen(context) : null,
               onAddAccountError: (e) => _handleAddLastFmAccountError(e, bloc),
               onRemoveAccountError: (e) => _handleRemoveLastFmAccountError(e, bloc),
               onUpdateAccountInfoError: (e) => _handleUpdateLastFmAccountInfoError(e, bloc)),
-          Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: ElevatedButton(
-                  child: Text('Import from Last.fm'),
-                  onPressed: bloc.state.hasAccount ? () => _showLastFmImportScreen(context) : null)),
           Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: ElevatedButton(
