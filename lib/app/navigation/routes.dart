@@ -16,6 +16,7 @@ import 'package:moodtag/features/library/main_screen/artists_list/artists_list_b
 import 'package:moodtag/features/library/main_screen/library_main_screen.dart';
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/model/repository/repository.dart';
+import 'package:moodtag/shared/bloc/events/import_events.dart';
 
 class Routes {
   static const libraryMainScreen = '/library';
@@ -60,8 +61,9 @@ class Routes {
           child: TagDetailsScreen()),
       appSettings: (context) =>
           BlocProvider(create: (_) => AppSettingsBloc(context.read<Repository>(), context), child: AppSettingsScreen()),
-      lastFmImport: (context) =>
-          BlocProvider(create: (_) => LastFmImportBloc(context.read<Repository>(), context), child: LastFmImportFlow()),
+      lastFmImport: (context) => BlocProvider(
+          create: (_) => LastFmImportBloc(context.read<Repository>(), context)..add(InitializeImport()),
+          child: LastFmImportFlow()),
       spotifyAuth: (context) => SpotifyLoginWebview(),
       spotifyImport: (context) => BlocProvider(
           create: (_) => SpotifyImportBloc(context.read<Repository>(), context, context.read<SpotifyAuthBloc>()),

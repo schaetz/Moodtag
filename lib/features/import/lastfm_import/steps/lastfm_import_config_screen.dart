@@ -20,19 +20,23 @@ class LastFmImportConfigScreen extends StatelessWidget {
         appBar: MtAppBar(context),
         body: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(
-                child: ImportConfigForm(
-          headlineCaption: 'Select what should be imported:',
-          sendButtonCaption: 'Start LastFm Import',
-          configItemsWithCaption: _getConfigItemsWithCaption(),
-          initialConfig: _getConfigItemsWithInitialValues(bloc.state),
-          onChangeSelection: (Map<String, bool> newSelection) => _onChangeSelection(newSelection, bloc),
-        ))),
+                child: BlocBuilder<LastFmImportBloc, LastFmImportState>(
+                    builder: (context, state) => !state.isInitialized
+                        ? Container()
+                        : ImportConfigForm(
+                            headlineCaption: 'Select what should be imported:',
+                            sendButtonCaption: 'Start LastFm Import',
+                            configItemsWithCaption: _getConfigItemsWithCaption(),
+                            initialConfig: _getConfigItemsWithInitialValues(bloc.state),
+                            onChangeSelection: (Map<String, bool> newSelection) =>
+                                _onChangeSelection(newSelection, bloc),
+                          )))),
         floatingActionButton: BlocBuilder<LastFmImportBloc, LastFmImportState>(
             builder: (context, state) => FloatingActionButton.extended(
-                  onPressed: state.isConfigurationValid ? () => _confirmImportConfiguration(bloc) : null,
+                  onPressed: state.importConfig.isValid ? () => _confirmImportConfiguration(bloc) : null,
                   label: Text('OK'),
                   icon: const Icon(Icons.library_add),
-                  backgroundColor: state.isConfigurationValid
+                  backgroundColor: state.importConfig.isValid
                       ? Theme.of(context).colorScheme.secondary
                       : Colors.grey, // TODO Define color in theme
                 )));
@@ -45,7 +49,7 @@ class LastFmImportConfigScreen extends StatelessWidget {
   Map<String, bool> _getConfigItemsWithInitialValues(LastFmImportState state) {
     final Map<String, bool> configItemsWithInitialValues = {};
     LastFmImportOption.values.forEach((option) {
-      configItemsWithInitialValues[option.name] = state.configuration[option] ?? false;
+      configItemsWithInitialValues[option.name] = state.importConfig.options[option] ?? false;
     });
     return configItemsWithInitialValues;
   }

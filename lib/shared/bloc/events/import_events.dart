@@ -7,6 +7,13 @@ abstract class ImportEvent extends LibraryEvent {
   const ImportEvent();
 }
 
+class InitializeImport extends ImportEvent {
+  const InitializeImport();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class ReturnToPreviousImportScreen extends ImportEvent {
   final AbstractImportFlow importFlow;
 

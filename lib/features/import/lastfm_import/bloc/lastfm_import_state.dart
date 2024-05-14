@@ -1,51 +1,52 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_state.dart';
-import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
+import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_config.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
 
 import '../flow/lastfm_import_flow_step.dart';
 
 class LastFmImportState extends Equatable implements AbstractImportState {
+  final bool isInitialized;
   final LastFmImportFlowStep step;
   final bool isFinished;
-  final Map<LastFmImportOption, bool> configuration;
+  final LastFmImportConfig importConfig;
 
   final UniqueImportEntitySet<LastFmArtist>? availableLastFmArtists;
   final List<LastFmArtist>? selectedArtists;
 
   const LastFmImportState({
+    this.isInitialized = false,
     this.step = LastFmImportFlowStep.config,
     this.isFinished = false,
-    this.configuration = const {},
+    this.importConfig = const LastFmImportConfig(),
     this.availableLastFmArtists,
     this.selectedArtists,
   });
 
   @override
   List<Object?> get props => [
+        isInitialized,
         step,
         isFinished,
-        configuration,
+        importConfig,
         availableLastFmArtists,
         selectedArtists,
       ];
 
-  bool get isConfigurationValid =>
-      configuration[LastFmImportOption.allTimeTopArtists] == true ||
-      configuration[LastFmImportOption.lastMonthTopArtists] == true;
-
   LastFmImportState copyWith({
+    bool? isInitialized,
     LastFmImportFlowStep? step,
     bool? isFinished,
-    Map<LastFmImportOption, bool>? configuration,
+    LastFmImportConfig? importConfig,
     UniqueImportEntitySet<LastFmArtist>? availableLastFmArtists,
     List<LastFmArtist>? selectedArtists,
   }) {
     return LastFmImportState(
+      isInitialized: isInitialized ?? this.isInitialized,
       step: step ?? this.step,
       isFinished: isFinished ?? this.isFinished,
-      configuration: configuration ?? this.configuration,
+      importConfig: importConfig ?? this.importConfig,
       availableLastFmArtists: availableLastFmArtists ?? this.availableLastFmArtists,
       selectedArtists: selectedArtists ?? this.selectedArtists,
     );

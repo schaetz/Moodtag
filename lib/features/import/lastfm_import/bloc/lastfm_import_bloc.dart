@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_bloc.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_state.dart';
+import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_config.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow_step.dart';
@@ -22,16 +23,11 @@ import '../connectors/lastfm_import_processor.dart';
 class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorStreamHandling {
   final LastFmImportProcessor _lastFmImportProcessor = LastFmImportProcessor();
 
-  LastFmImportBloc(Repository repository, BuildContext mainContext)
-      : super(LastFmImportState(configuration: _getInitialImportConfig()), repository) {
-    on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
-    on<ChangeImportConfig>(_handleChangeImportConfigEvent);
-    on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
-    on<ConfirmLastFmArtistsForImport>(_handleConfirmLastFmArtistsForImportEvent);
-    on<CompleteLastFmImport>(_handleCompleteImportEvent);
+  LastFmImportBloc(Repository repository, BuildContext mainContext) : super(LastFmImportState(), repository) {
+    on<InitializeImport>(_handleInitializeImport);
 
     // TODO Context seems not to be correct for LastFmImportScreen;
-    //  some Snackbars are only shown after returning to ArtistsList
+    //      some Snackbars are only shown after returning to ArtistsList
     setupErrorHandler(mainContext);
   }
 
@@ -41,12 +37,25 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     closeErrorStreamController();
   }
 
-  static Map<LastFmImportOption, bool> _getInitialImportConfig() {
-    Map<LastFmImportOption, bool> initialConfig = {};
+  Future<LastFmImportConfig> _getInitialImportConfig(Repository repository) async {
+    Map<LastFmImportOption, bool> initialImportOptions = {};
     LastFmImportOption.values.forEach((option) {
-      initialConfig[option] = true;
+      initialImportOptions[option] = true;
     });
-    return initialConfig;
+    final tagCategories = await repository.getTagCategoriesOnce();
+    final defaultTagCategory = tagCategories.first.tagCategory;
+    return LastFmImportConfig(categoryForTagsVal: defaultTagCategory, options: initialImportOptions);
+  }
+
+  void _handleInitializeImport(InitializeImport event, Emitter<LastFmImportState> emit) async {
+    on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
+    on<ChangeImportConfig>(_handleChangeImportConfigEvent);
+    on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
+    on<ConfirmLastFmArtistsForImport>(_handleConfirmLastFmArtistsForImportEvent);
+    on<CompleteLastFmImport>(_handleCompleteImportEvent);
+
+    final initialImportConfig = await _getInitialImportConfig(repository);
+    emit(state.copyWith(isInitialized: true, importConfig: initialImportConfig));
   }
 
   void _handleReturnToPreviousImportScreenEvent(ReturnToPreviousImportScreen event, Emitter<LastFmImportState> emit) {
@@ -57,17 +66,21 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
 
   void _handleChangeImportConfigEvent(ChangeImportConfig event, Emitter<LastFmImportState> emit) async {
     final selectedOptions = event.selectedOptions;
-    final Map<LastFmImportOption, bool> configItemsWithSelection = {
+    final Map<LastFmImportOption, bool> importOptions = {
       LastFmImportOption.allTimeTopArtists: selectedOptions[LastFmImportOption.allTimeTopArtists.name] ?? false,
       LastFmImportOption.lastMonthTopArtists: selectedOptions[LastFmImportOption.lastMonthTopArtists.name] ?? false,
     };
-    emit(state.copyWith(configuration: configItemsWithSelection));
+    emit(state.copyWith(importConfig: state.importConfig.copyWith(options: importOptions)));
   }
 
   void _handleConfirmImportConfigEvent(ConfirmImportConfig event, Emitter<LastFmImportState> emit) async {
     try {
-      if (!state.isConfigurationValid) {
-        errorStreamController.add(InvalidUserInputException("Nothing selected for import."));
+      if (!state.isInitialized) return;
+
+      if (!state.importConfig.isValid) {
+        final errorMessage =
+            state.importConfig.categoryForTags == null ? "No tag category selected." : "Nothing selected for import.";
+        errorStreamController.add(InvalidUserInputException(errorMessage));
         return;
       }
 
@@ -97,11 +110,11 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   Future<UniqueImportEntitySet<LastFmArtist>> _getAvailableLastFmArtists(LastFmAccount lastFmAccount) async {
     final availableLastFmArtists = UniqueImportEntitySet<LastFmArtist>();
 
-    if (state.configuration[LastFmImportOption.allTimeTopArtists] == true) {
+    if (state.importConfig.options[LastFmImportOption.allTimeTopArtists] == true) {
       availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.overall, 1000));
     }
 
-    if (state.configuration[LastFmImportOption.lastMonthTopArtists] == true) {
+    if (state.importConfig.options[LastFmImportOption.lastMonthTopArtists] == true) {
       final lastMonthTopArtists = await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.one_month, 1000);
       availableLastFmArtists.addOrUpdateAll(lastMonthTopArtists, _combineLastFmArtistPlays);
     }
