@@ -6,7 +6,9 @@ import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_confi
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow_step.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
 import 'package:moodtag/shared/bloc/events/lastfm_import_events.dart';
@@ -37,16 +39,6 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     closeErrorStreamController();
   }
 
-  Future<LastFmImportConfig> _getInitialImportConfig(Repository repository) async {
-    Map<LastFmImportOption, bool> initialImportOptions = {};
-    LastFmImportOption.values.forEach((option) {
-      initialImportOptions[option] = true;
-    });
-    final tagCategories = await repository.getTagCategoriesOnce();
-    final defaultTagCategory = tagCategories.first.tagCategory;
-    return LastFmImportConfig(categoryForTagsVal: defaultTagCategory, options: initialImportOptions);
-  }
-
   void _handleInitializeImport(InitializeImport event, Emitter<LastFmImportState> emit) async {
     on<ReturnToPreviousImportScreen>(_handleReturnToPreviousImportScreenEvent);
     on<ChangeImportConfig>(_handleChangeImportConfigEvent);
@@ -54,8 +46,24 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     on<ConfirmLastFmArtistsForImport>(_handleConfirmLastFmArtistsForImportEvent);
     on<CompleteLastFmImport>(_handleCompleteImportEvent);
 
-    final initialImportConfig = await _getInitialImportConfig(repository);
-    emit(state.copyWith(isInitialized: true, importConfig: initialImportConfig));
+    final tagCategories = await repository.getTagCategoriesOnce();
+    final tags = await repository.getTagsOnce();
+    final initialImportConfig = _getInitialImportConfig(tagCategories);
+    emit(state.copyWith(
+        isInitialized: true,
+        allTagCategories: LoadedData.success(tagCategories),
+        allTags: LoadedData.success(tags),
+        importConfig: initialImportConfig));
+  }
+
+  LastFmImportConfig _getInitialImportConfig(List<TagCategoryData> tagCategories) {
+    Map<LastFmImportOption, bool> initialImportOptions = {};
+    LastFmImportOption.values.forEach((option) {
+      initialImportOptions[option] = true;
+    });
+
+    final defaultTagCategory = tagCategories.first.tagCategory;
+    return LastFmImportConfig(categoryForTags: defaultTagCategory, options: initialImportOptions);
   }
 
   void _handleReturnToPreviousImportScreenEvent(ReturnToPreviousImportScreen event, Emitter<LastFmImportState> emit) {
@@ -70,16 +78,16 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
       LastFmImportOption.allTimeTopArtists: selectedOptions[LastFmImportOption.allTimeTopArtists.name] ?? false,
       LastFmImportOption.lastMonthTopArtists: selectedOptions[LastFmImportOption.lastMonthTopArtists.name] ?? false,
     };
-    emit(state.copyWith(importConfig: state.importConfig.copyWith(options: importOptions)));
+    emit(state.copyWith(importConfig: state.importConfig!.copyWith(options: importOptions)));
   }
 
   void _handleConfirmImportConfigEvent(ConfirmImportConfig event, Emitter<LastFmImportState> emit) async {
     try {
-      if (!state.isInitialized) return;
+      if (!state.isInitialized || state.importConfig == null) return;
 
-      if (!state.importConfig.isValid) {
+      if (!state.importConfig!.isValid) {
         final errorMessage =
-            state.importConfig.categoryForTags == null ? "No tag category selected." : "Nothing selected for import.";
+            state.importConfig!.categoryForTags == null ? "No tag category selected." : "Nothing selected for import.";
         errorStreamController.add(InvalidUserInputException(errorMessage));
         return;
       }
@@ -110,11 +118,11 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   Future<UniqueImportEntitySet<LastFmArtist>> _getAvailableLastFmArtists(LastFmAccount lastFmAccount) async {
     final availableLastFmArtists = UniqueImportEntitySet<LastFmArtist>();
 
-    if (state.importConfig.options[LastFmImportOption.allTimeTopArtists] == true) {
+    if (state.importConfig!.options[LastFmImportOption.allTimeTopArtists] == true) {
       availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.overall, 1000));
     }
 
-    if (state.importConfig.options[LastFmImportOption.lastMonthTopArtists] == true) {
+    if (state.importConfig!.options[LastFmImportOption.lastMonthTopArtists] == true) {
       final lastMonthTopArtists = await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.one_month, 1000);
       availableLastFmArtists.addOrUpdateAll(lastMonthTopArtists, _combineLastFmArtistPlays);
     }

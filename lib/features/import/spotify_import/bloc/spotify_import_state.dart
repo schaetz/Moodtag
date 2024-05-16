@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_state.dart';
-import 'package:moodtag/features/import/spotify_import/config/spotify_import_option.dart';
+import 'package:moodtag/features/import/spotify_import/config/spotify_import_config.dart';
+import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
@@ -8,9 +11,14 @@ import 'package:moodtag/shared/models/structs/imported_entities/unique_import_en
 import '../flow/spotify_import_flow_step.dart';
 
 class SpotifyImportState extends Equatable implements AbstractImportState {
+  final bool isInitialized;
   final SpotifyImportFlowStep step;
   final bool isFinished;
-  final Map<SpotifyImportOption, bool> configuration;
+  final SpotifyImportConfig? importConfig;
+
+  // We are not using the LibraryUserBlocMixin for this bloc as we don't need to update the screen when entities change
+  final LoadedData<List<TagCategoryData>> allTagCategories;
+  final LoadedData<List<Tag>> allTags;
 
   final UniqueImportEntitySet<SpotifyArtist>? availableSpotifyArtists;
   final UniqueImportEntitySet<ImportedTag>? availableGenresForSelectedArtists;
@@ -18,9 +26,12 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
   final List<ImportedTag>? selectedGenres;
 
   const SpotifyImportState({
+    this.isInitialized = false,
     this.step = SpotifyImportFlowStep.config,
     this.isFinished = false,
-    this.configuration = const {},
+    this.importConfig,
+    this.allTagCategories = const LoadedData.loading(),
+    this.allTags = const LoadedData.loading(),
     this.availableSpotifyArtists,
     this.availableGenresForSelectedArtists,
     this.selectedArtists,
@@ -29,22 +40,25 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
 
   @override
   List<Object?> get props => [
+        isInitialized,
         step,
         isFinished,
-        configuration,
+        importConfig,
+        allTagCategories,
+        allTags,
         availableSpotifyArtists,
         availableGenresForSelectedArtists,
         selectedArtists,
         selectedGenres
       ];
 
-  bool get isConfigurationValid => configuration.values.where((selection) => selection == true).toList().isNotEmpty;
-  bool get doImportGenres => configuration[SpotifyImportOption.artistGenres] == true;
-
   SpotifyImportState copyWith({
+    bool? isInitialized,
     SpotifyImportFlowStep? step,
     bool? isFinished,
-    Map<SpotifyImportOption, bool>? configuration,
+    SpotifyImportConfig? importConfig,
+    LoadedData<List<TagCategoryData>>? allTagCategories,
+    LoadedData<List<Tag>>? allTags,
     UniqueImportEntitySet<SpotifyArtist>? availableSpotifyArtists,
     UniqueImportEntitySet<ImportedTag>? availableGenresForSelectedArtists,
     List<SpotifyArtist>? selectedArtists,
@@ -53,7 +67,9 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
     return SpotifyImportState(
       step: step ?? this.step,
       isFinished: isFinished ?? this.isFinished,
-      configuration: configuration ?? this.configuration,
+      importConfig: importConfig ?? this.importConfig,
+      allTagCategories: allTagCategories ?? this.allTagCategories,
+      allTags: allTags ?? this.allTags,
       availableSpotifyArtists: availableSpotifyArtists ?? this.availableSpotifyArtists,
       availableGenresForSelectedArtists: availableGenresForSelectedArtists ?? this.availableGenresForSelectedArtists,
       selectedArtists: selectedArtists ?? this.selectedArtists,

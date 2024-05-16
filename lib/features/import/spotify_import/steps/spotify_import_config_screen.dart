@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/bloc/spotify_import_state.dart';
+import 'package:moodtag/features/import/spotify_import/config/spotify_import_config.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
+import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/import/import_config_form.dart';
 import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
@@ -21,37 +23,37 @@ class SpotifyImportConfigScreen extends StatelessWidget {
         scaffoldKey: GlobalKey<ScaffoldState>(),
         pageWidget: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(
-                child: ImportConfigForm(
-          headlineCaption: 'Select what should be imported:',
-          sendButtonCaption: 'Start Spotify Import',
-          configItemsWithCaption: _getConfigItemsWithCaption(),
-          initialConfig: _getConfigItemsWithInitialValues(bloc.state),
-          onChangeSelection: (Map<String, bool> newSelection) => _onChangeSelection(newSelection, bloc),
-        ))),
+                child: LoadedDataDisplayWrapper(
+                    loadedData: bloc.state.allTagCategories,
+                    additionalCheckData: bloc.state.allTags,
+                    buildOnSuccess: (tagCategories) => ImportConfigForm<SpotifyImportConfig, SpotifyImportOption>(
+                          headlineCaption: 'Select what should be imported:',
+                          sendButtonCaption: 'Start Spotify Import',
+                          optionsWithCaption: _getOptionsWithCaption(),
+                          tagCategories: tagCategories,
+                          tags: bloc.state.allTags.data!,
+                          initialConfig: bloc.state.importConfig!,
+                          onChangeSelection: (Map<SpotifyImportOption, bool> newSelection) =>
+                              _onChangeSelection(newSelection, bloc),
+                        )))),
         floatingActionButton: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(
-            builder: (context, state) => FloatingActionButton.extended(
-                  onPressed: state.isConfigurationValid ? () => _confirmImportConfiguration(bloc) : null,
-                  label: Text('OK'),
-                  icon: const Icon(Icons.library_add),
-                  backgroundColor: state.isConfigurationValid
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.grey, // TODO Define color in theme
-                )));
+            builder: (context, state) => state.importConfig == null
+                ? Container()
+                : FloatingActionButton.extended(
+                    onPressed: state.importConfig!.isValid ? () => _confirmImportConfiguration(bloc) : null,
+                    label: Text('OK'),
+                    icon: const Icon(Icons.library_add),
+                    backgroundColor: state.importConfig!.isValid
+                        ? Theme.of(context).colorScheme.secondary
+                        : Colors.grey, // TODO Define color in theme
+                  )));
   }
 
-  Map<String, String> _getConfigItemsWithCaption() {
-    return Map.fromEntries(SpotifyImportOption.values.map((option) => MapEntry(option.name, option.caption)));
+  Map<SpotifyImportOption, String> _getOptionsWithCaption() {
+    return Map.fromEntries(SpotifyImportOption.values.map((option) => MapEntry(option, option.caption)));
   }
 
-  Map<String, bool> _getConfigItemsWithInitialValues(SpotifyImportState state) {
-    final Map<String, bool> configItemsWithInitialValues = {};
-    SpotifyImportOption.values.forEach((option) {
-      configItemsWithInitialValues[option.name] = state.configuration[option] ?? false;
-    });
-    return configItemsWithInitialValues;
-  }
-
-  void _onChangeSelection(Map<String, bool> newSelection, SpotifyImportBloc bloc) {
+  void _onChangeSelection(Map<SpotifyImportOption, bool> newSelection, SpotifyImportBloc bloc) {
     bloc.add(ChangeImportConfig(newSelection));
   }
 

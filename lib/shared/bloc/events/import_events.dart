@@ -1,3 +1,4 @@
+import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_option.dart';
 import 'package:moodtag/features/import/abstract_import_flow/flow/abstract_import_flow.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 
@@ -24,7 +25,7 @@ class ReturnToPreviousImportScreen extends ImportEvent {
 }
 
 class ChangeImportConfig extends ImportEvent {
-  final Map<String, bool> selectedOptions;
+  final Map<AbstractImportOption, bool> selectedOptions;
 
   const ChangeImportConfig(this.selectedOptions);
 

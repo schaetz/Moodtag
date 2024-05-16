@@ -118,6 +118,10 @@ class Repository with LibrarySubscriptionManager {
     return db.getTagDataById(id);
   }
 
+  Future<List<Tag>> getTagsOnce() {
+    return db.getTagsOnce();
+  }
+
   Future<List<Tag>> getLatestTagsOnce(int number) {
     return db.getLatestTagsOnce(number);
   }

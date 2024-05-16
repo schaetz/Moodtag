@@ -1,27 +1,27 @@
 import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_config.dart';
+import 'package:moodtag/features/import/spotify_import/config/spotify_import_option.dart';
 import 'package:moodtag/model/database/moodtag_db.dart';
 
-import 'lastfm_import_option.dart';
-
-class LastFmImportConfig extends AbstractImportConfig<LastFmImportOption> {
-  const LastFmImportConfig(
+class SpotifyImportConfig extends AbstractImportConfig<SpotifyImportOption> {
+  const SpotifyImportConfig(
       {TagCategory? categoryForTags = null,
       Tag? initialTagForArtists = null,
-      Map<LastFmImportOption, bool> options = const {}})
+      Map<SpotifyImportOption, bool> options = const {}})
       : super(categoryForTags, initialTagForArtists, options);
 
   @override
   bool get isValid =>
       categoryForTags != null &&
-      (options[LastFmImportOption.allTimeTopArtists] == true ||
-          options[LastFmImportOption.lastMonthTopArtists] == true);
+      (options[SpotifyImportOption.topArtists] == true || options[SpotifyImportOption.followedArtists] == true);
+
+  bool get doImportGenres => options[SpotifyImportOption.artistGenres] == true;
 
   @override
   List<Object?> get props => [categoryForTags, initialTagForArtists, options];
 
-  LastFmImportConfig copyWith(
-      {TagCategory? categoryForTags, Tag? initialTagForArtists, Map<LastFmImportOption, bool>? options}) {
-    return LastFmImportConfig(
+  SpotifyImportConfig copyWith(
+      {TagCategory? categoryForTags, Tag? initialTagForArtists, Map<SpotifyImportOption, bool>? options}) {
+    return SpotifyImportConfig(
         categoryForTags: categoryForTags ?? this.categoryForTags,
         initialTagForArtists: initialTagForArtists ?? this.initialTagForArtists,
         options: options ?? this.options);

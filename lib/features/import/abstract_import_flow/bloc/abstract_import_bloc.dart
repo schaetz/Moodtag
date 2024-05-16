@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_state.dart';
 import 'package:moodtag/model/repository/repository.dart';
-import 'package:moodtag/shared/bloc/events/import_events.dart';
+import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
@@ -10,7 +10,7 @@ import 'package:moodtag/shared/utils/db_request_success_counter.dart';
 
 import 'import_sub_process.dart';
 
-class AbstractImportBloc<S extends AbstractImportState> extends Bloc<ImportEvent, S> {
+class AbstractImportBloc<S extends AbstractImportState> extends Bloc<LibraryEvent, S> {
   final Repository _repository;
   Repository get repository => _repository;
   final CreateEntityBlocHelper createEntityBlocHelper = CreateEntityBlocHelper();

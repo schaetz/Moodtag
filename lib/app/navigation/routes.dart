@@ -66,7 +66,8 @@ class Routes {
           child: LastFmImportFlow()),
       spotifyAuth: (context) => SpotifyLoginWebview(),
       spotifyImport: (context) => BlocProvider(
-          create: (_) => SpotifyImportBloc(context.read<Repository>(), context, context.read<SpotifyAuthBloc>()),
+          create: (_) => SpotifyImportBloc(context.read<Repository>(), context, context.read<SpotifyAuthBloc>())
+            ..add(InitializeImport()),
           child: SpotifyImportFlow()),
     };
   }

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_bloc.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_state.dart';
+import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_config.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
+import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/import/import_config_form.dart';
 import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
@@ -23,38 +25,37 @@ class LastFmImportConfigScreen extends StatelessWidget {
                 child: BlocBuilder<LastFmImportBloc, LastFmImportState>(
                     builder: (context, state) => !state.isInitialized
                         ? Container()
-                        : ImportConfigForm(
-                            headlineCaption: 'Select what should be imported:',
-                            sendButtonCaption: 'Start LastFm Import',
-                            configItemsWithCaption: _getConfigItemsWithCaption(),
-                            initialConfig: _getConfigItemsWithInitialValues(bloc.state),
-                            onChangeSelection: (Map<String, bool> newSelection) =>
-                                _onChangeSelection(newSelection, bloc),
-                          )))),
+                        : LoadedDataDisplayWrapper(
+                            loadedData: state.allTagCategories,
+                            additionalCheckData: state.allTags,
+                            buildOnSuccess: (tagCategories) => ImportConfigForm<LastFmImportConfig, LastFmImportOption>(
+                                  headlineCaption: 'Select what should be imported:',
+                                  sendButtonCaption: 'Start LastFm Import',
+                                  optionsWithCaption: _getOptionsWithCaption(),
+                                  tagCategories: tagCategories,
+                                  tags: state.allTags.data!,
+                                  initialConfig: bloc.state.importConfig!,
+                                  onChangeSelection: (Map<LastFmImportOption, bool> newSelection) =>
+                                      _onChangeSelection(newSelection, bloc),
+                                ))))),
         floatingActionButton: BlocBuilder<LastFmImportBloc, LastFmImportState>(
-            builder: (context, state) => FloatingActionButton.extended(
-                  onPressed: state.importConfig.isValid ? () => _confirmImportConfiguration(bloc) : null,
-                  label: Text('OK'),
-                  icon: const Icon(Icons.library_add),
-                  backgroundColor: state.importConfig.isValid
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.grey, // TODO Define color in theme
-                )));
+            builder: (context, state) => state.importConfig == null
+                ? Container()
+                : FloatingActionButton.extended(
+                    onPressed: state.importConfig!.isValid ? () => _confirmImportConfiguration(bloc) : null,
+                    label: Text('OK'),
+                    icon: const Icon(Icons.library_add),
+                    backgroundColor: state.importConfig!.isValid
+                        ? Theme.of(context).colorScheme.secondary
+                        : Colors.grey, // TODO Define color in theme
+                  )));
   }
 
-  Map<String, String> _getConfigItemsWithCaption() {
-    return Map.fromEntries(LastFmImportOption.values.map((option) => MapEntry(option.name, option.caption)));
+  Map<LastFmImportOption, String> _getOptionsWithCaption() {
+    return Map.fromEntries(LastFmImportOption.values.map((option) => MapEntry(option, option.caption)));
   }
 
-  Map<String, bool> _getConfigItemsWithInitialValues(LastFmImportState state) {
-    final Map<String, bool> configItemsWithInitialValues = {};
-    LastFmImportOption.values.forEach((option) {
-      configItemsWithInitialValues[option.name] = state.importConfig.options[option] ?? false;
-    });
-    return configItemsWithInitialValues;
-  }
-
-  void _onChangeSelection(Map<String, bool> newSelection, LastFmImportBloc bloc) {
+  void _onChangeSelection(Map<LastFmImportOption, bool> newSelection, LastFmImportBloc bloc) {
     bloc.add(ChangeImportConfig(newSelection));
   }
 
