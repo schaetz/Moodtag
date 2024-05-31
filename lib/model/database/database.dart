@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+@DataClassName('ArtistDataClass')
 class Artists extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique().withLength(min: 1, max: 255)();
@@ -7,6 +8,7 @@ class Artists extends Table {
   TextColumn get spotifyId => text().withLength(max: 255).nullable()();
 }
 
+@DataClassName('TagDataClass')
 class Tags extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique().withLength(min: 1, max: 255)();
@@ -16,6 +18,7 @@ class Tags extends Table {
   IntColumn get color => integer().nullable()();
 }
 
+@DataClassName('AssignedTagDataClass')
 class AssignedTags extends Table {
   IntColumn get artist => integer().references(Artists, #id)();
   IntColumn get tag => integer().references(Tags, #id)();
@@ -24,13 +27,14 @@ class AssignedTags extends Table {
   Set<Column> get primaryKey => {artist, tag};
 }
 
-@DataClassName('TagCategory')
+@DataClassName('TagCategoryDataClass')
 class TagCategories extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique().withLength(min: 1, max: 255)();
   IntColumn get color => integer()();
 }
 
+@DataClassName('LastFmAccountDataClass')
 class LastFmAccounts extends Table {
   TextColumn get accountName => text().withLength(min: 1, max: 255)();
   TextColumn get realName => text().withLength(max: 255).nullable()();

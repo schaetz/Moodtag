@@ -19,7 +19,7 @@ class AlertDialogFactory {
   const AlertDialogFactory(this._repository);
 
   Future<BooleanDialogWrapper> getDeleteTagDialog(BuildContext context, {required Tag tag}) async {
-    final artistsWithTag = await _repository.getArtistsDataHavingTag(tag).first;
+    final artistsWithTag = await _repository.getArtistsHavingTag(tag).first;
     return getConfirmationDialog(context,
         title: 'Are you sure that you want to delete the tag "${tag.name}"?',
         subtitle: artistsWithTag.isEmpty

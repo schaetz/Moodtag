@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/repository/helpers/dto.dart';
+import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -44,66 +45,67 @@ class MoodtagDB extends _$MoodtagDB {
 
   // GET Artists
 
-  Stream<List<ArtistData>> getArtistsDataList(Set<int> filterTagIds, {String? searchItem = null}) {
+  Stream<List<ArtistWithTagsDTO>> getArtists(Set<int> filterTagIds, {String? searchItem = null}) {
     final JoinedSelectStatement query = select(artists).join(joinTagsForArtist(this));
     if (searchItem != null && searchItem.isNotEmpty) {
       query..where(artists.name.like('$searchItem%') | artists.name.like('the $searchItem%'));
     }
     query..orderBy([OrderingTerm.asc(artists.orderingName)]);
     final typedResultStream = query.watch();
-    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistsList>(this, filterTagIds: filterTagIds));
+    return typedResultStream
+        .transform(ArtistsWithTagTransformer<List<ArtistWithTagsDTO>>(this, filterTagIds: filterTagIds));
   }
 
-  Stream<ArtistData?> getArtistDataById(int artistId) {
+  Stream<ArtistWithTagsDTO?> getArtistById(int artistId) {
     final query = select(artists).join(joinTagsForArtist(this))..where(artists.id.equals(artistId));
     final typedResultStream = query.watch();
-    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistData?>(this));
+    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistWithTagsDTO?>(this));
   }
 
-  Future<List<Artist>> getArtistsOnce() {
+  Future<List<ArtistDataClass>> getBaseArtistsOnce() {
     return (select(artists)..orderBy([(a) => OrderingTerm.asc(a.orderingName)])).get();
   }
 
-  Future<List<Artist>> getLatestArtistsOnce(int number) {
+  Future<List<ArtistDataClass>> getLatestBaseArtistsOnce(int number) {
     return (select(artists)
           ..orderBy([(a) => OrderingTerm.desc(a.id)])
           ..limit(number))
         .get();
   }
 
-  Future<Artist?> getArtistByIdOnce(int artistId) {
+  Future<ArtistDataClass?> getBaseArtistByIdOnce(int artistId) {
     return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull();
   }
 
   // GET Tags
 
-  Stream<List<TagData>> getTagsDataList({String? searchItem = null, TagCategory? tagCategory}) {
+  Stream<List<TagWithDataDTO>> getTags({String? searchItem = null, int? tagCategoryId}) {
     final query = select(tags).join(joinAssignedTagsForTag(this)).join(joinTagCategoriesForTag(this))
       ..addColumns([assignedTags.artist.count()]);
 
     if (searchItem != null && searchItem.isNotEmpty) {
       query..where(tags.name.like('$searchItem%'));
     }
-    if (tagCategory != null) {
-      query..where(tags.category.equals(tagCategory.id));
+    if (tagCategoryId != null) {
+      query..where(tags.category.equals(tagCategoryId));
     }
     query
       ..groupBy([tags.id])
       ..orderBy([OrderingTerm.asc(tags.name)]);
 
     final typedResultStream = query.watch();
-    return typedResultStream.map((r) => r.map(_mapTagWithArtistFreqToTagData).toList());
+    return typedResultStream.map((r) => r.map(_mapTagQueryResultsToDto).toList());
   }
 
-  Stream<TagData?> getTagDataById(int tagId) {
+  Stream<TagWithDataDTO?> getTagById(int tagId) {
     final query = select(tags).join(joinAssignedTagsForTag(this)).join(joinTagCategoriesForTag(this))
       ..addColumns([assignedTags.artist.count()])
       ..groupBy([tags.id])
       ..where(tags.id.equals(tagId));
-    return query.map(_mapTagWithArtistFreqToTagData).watchSingleOrNull();
+    return query.map(_mapTagQueryResultsToDto).watchSingleOrNull();
   }
 
-  Future<List<Tag>> getTagsOnce({Set<int>? filterArtistIds}) {
+  Future<List<TagDataClass>> getBaseTagsOnce({Set<int>? filterArtistIds}) {
     final query = select(tags)..orderBy([(t) => OrderingTerm.asc(t.name)]);
     if (filterArtistIds != null) {
       final filterArtistsIds = filterArtistIds.toSet();
@@ -113,40 +115,40 @@ class MoodtagDB extends _$MoodtagDB {
     return query.get();
   }
 
-  Future<List<Tag>> getLatestTagsOnce(int number) {
+  Future<List<TagDataClass>> getLatestBaseTagsOnce(int number) {
     return (select(tags)
           ..orderBy([(t) => OrderingTerm.desc(t.id)])
           ..limit(number))
         .get();
   }
 
-  Future<Tag?> getTagByIdOnce(int tagId) {
+  Future<TagDataClass?> getTagByIdOnce(int tagId) {
     return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
   }
 
-  TagData _mapTagWithArtistFreqToTagData(TypedResult row) {
-    return TagData(
-      row.readTable(tags),
-      row.readTable(tagCategories),
-      row.read(assignedTags.artist.count()),
-    );
+  TagWithDataDTO _mapTagQueryResultsToDto(TypedResult row) {
+    final frequency = row.read(assignedTags.artist.count());
+    if (frequency == null) {
+      throw new DatabaseError('The tag frequency could not be read from the database.');
+    }
+    return TagWithDataDTO(tag: row.readTable(tags), category: row.readTable(tagCategories), frequency: frequency);
   }
 
   // GET Tag categories
 
-  Stream<TagCategoriesList> getTagCategories() {
-    return (select(tagCategories)).map(_mapTagCategoryToTagCategoryData).watch();
+  Stream<List<TagCategoryDataClass>> getTagCategories() {
+    return select(tagCategories).watch();
   }
 
-  Future<TagCategoriesList> getTagCategoriesOnce() {
-    return (select(tagCategories)).map(_mapTagCategoryToTagCategoryData).get();
+  Future<List<TagCategoryDataClass>> getTagCategoriesOnce() {
+    return select(tagCategories).get();
   }
 
-  Future<TagCategory?> getTagCategoryByIdOnce(int categoryId) {
+  Future<TagCategoryDataClass?> getTagCategoryByIdOnce(int categoryId) {
     return (select(tagCategories)..where((c) => c.id.equals(categoryId))).getSingleOrNull();
   }
 
-  Future<TagCategory?> getDefaultTagCategoryOnce({int? excludeId}) {
+  Future<TagCategoryDataClass?> getDefaultTagCategoryOnce({int? excludeId}) {
     final selectStatement = select(tagCategories);
     if (excludeId != null) {
       selectStatement..where((row) => row.id.equals(excludeId).not());
@@ -157,16 +159,14 @@ class MoodtagDB extends _$MoodtagDB {
         .getSingleOrNull();
   }
 
-  TagCategoryData _mapTagCategoryToTagCategoryData(TagCategory tagCategory) => TagCategoryData(tagCategory);
-
   // GET LastFmAccount
 
-  Stream<LastFmAccount?> getLastFmAccount() {
-    return (select(lastFmAccounts)).watchSingleOrNull();
+  Stream<LastFmAccountDataClass?> getLastFmAccount() {
+    return select(lastFmAccounts).watchSingleOrNull();
   }
 
-  Future<LastFmAccount?> getLastFmAccountOnce() {
-    return (select(lastFmAccounts)).getSingleOrNull();
+  Future<LastFmAccountDataClass?> getLastFmAccountOnce() {
+    return select(lastFmAccounts).getSingleOrNull();
   }
 
   //
@@ -207,7 +207,7 @@ class MoodtagDB extends _$MoodtagDB {
     return into(tagCategories).insert(tagCategory);
   }
 
-  Future<int> createOrUpdateLastFmAccount(LastFmAccount lastFmAccount) {
+  Future<int> createOrUpdateLastFmAccount(LastFmAccountsCompanion lastFmAccount) {
     return into(lastFmAccounts).insertOnConflictUpdate(lastFmAccount);
   }
 

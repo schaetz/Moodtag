@@ -45,7 +45,7 @@ class SpotifyImportProcessor {
 
   Future<Map<String, Artist>> _getCreatedArtistsByName(
       Repository repository, List<SpotifyArtist> artistsToImport) async {
-    final createdArtists = await repository.getLatestArtistsOnce(artistsToImport.length);
+    final createdArtists = await repository.getLatestBaseArtistsOnce(artistsToImport.length);
     final createdArtistsByName = Map.fromEntries(
         createdArtists.map((createdArtist) => MapEntry<String, Artist>(createdArtist.name, createdArtist)));
     return createdArtistsByName;

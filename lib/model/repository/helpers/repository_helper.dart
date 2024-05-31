@@ -1,4 +1,5 @@
 import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/exceptions/db_request_response.dart';
 import 'package:moodtag/shared/exceptions/internal/invalid_argument_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
@@ -41,7 +42,7 @@ class RepositoryHelper {
     }
 
     if (E == Artist) {
-      return _db.getArtistByIdOnce(id) as Future<E?>;
+      return _db.getBaseArtistByIdOnce(id) as Future<E?>;
     } else if (E == Tag) {
       return _db.getTagByIdOnce(id) as Future<E?>;
     } else if (E == TagCategory) {

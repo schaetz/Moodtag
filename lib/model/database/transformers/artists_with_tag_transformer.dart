@@ -1,53 +1,54 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+import 'package:moodtag/model/repository/helpers/dto.dart';
 
-import '../join_data_classes.dart';
 import '../moodtag_db.dart';
 
-typedef ArtistDataOpt = ArtistData?;
+typedef OptionalArtistWithTagsDTO = ArtistWithTagsDTO?;
 
 /**
  *  Transformer to transform raw SQL results with pairs of artists and joined tags (containing redundancy)
- *  to ArtistData / ArtistsList objects; The results can be filtered by tags.
- *  It is important to filter by tag IDs rather than the Tag objects themselves, as other properties of Tag
+ *  to ArtistWithTagsDTO objects; The results can be filtered by tags.
+ *  It is important to filter by tag IDs rather than the TagDataClass objects themselves, as other properties of Tag
  *  such as category may have changed since setting up the subscription and may lead to false inequality.
  */
-// Result type is either ArtistData or ArtistsList (= List<ArtistData>)
+// Result type is either ArtistWithTagsDTO or List<ArtistWithTagsDTO>
 class ArtistsWithTagTransformer<ResultType> implements StreamTransformer<List<TypedResult>, ResultType> {
   final MoodtagDB _moodtagDB;
   final Set<int>? filterTagIds;
 
   StreamController<ResultType> _controller = StreamController();
-  Map<Artist, ArtistData> artistToEnhancedArtistMap = {};
+  Map<ArtistDataClass, ArtistWithTagsDTO> artistToDtoMap = {};
 
   ArtistsWithTagTransformer(this._moodtagDB, {this.filterTagIds});
 
   @override
   Stream<ResultType> bind(Stream<List<TypedResult>> stream) {
     stream.listen((List<TypedResult> typedResults) {
-      artistToEnhancedArtistMap = {};
+      artistToDtoMap = {};
       typedResults.forEach((queryResult) {
-        final artist = queryResult.readTable(_moodtagDB.artists);
-        final tag = queryResult.readTableOrNull(_moodtagDB.tags);
+        final artistDataClass = queryResult.readTable(_moodtagDB.artists);
+        final tagDataClass = queryResult.readTableOrNull(_moodtagDB.tags);
         // Create new ArtistData object or get the existing one for artist
-        final artistWithTags = artistToEnhancedArtistMap.putIfAbsent(artist, () => ArtistData(artist, Set<Tag>()));
-        if (tag != null) {
-          artistWithTags.tags.add(tag);
+        final artistWithTags =
+            artistToDtoMap.putIfAbsent(artistDataClass, () => ArtistWithTagsDTO(artist: artistDataClass, tags: []));
+        if (tagDataClass != null) {
+          artistWithTags.tags.add(tagDataClass);
         }
       });
 
       if (filterTagIds != null && filterTagIds!.isNotEmpty) {
-        artistToEnhancedArtistMap.removeWhere((artist, artistWithTags) =>
+        artistToDtoMap.removeWhere((artist, artistWithTags) =>
             artistWithTags.tags.map((tag) => tag.id).toSet().intersection(filterTagIds!).isEmpty);
       }
 
-      if (ResultType == ArtistData || ResultType == ArtistDataOpt) {
-        if (artistToEnhancedArtistMap.values.isNotEmpty) {
-          _controller.add(artistToEnhancedArtistMap.values.first as ResultType);
+      if (ResultType == ArtistWithTagsDTO || ResultType == OptionalArtistWithTagsDTO) {
+        if (artistToDtoMap.values.isNotEmpty) {
+          _controller.add(artistToDtoMap.values.first as ResultType);
         }
-      } else if (ResultType == ArtistsList) {
-        _controller.add(artistToEnhancedArtistMap.values.toList() as ResultType);
+      } else if (ResultType == List<ArtistWithTagsDTO>) {
+        _controller.add(artistToDtoMap.values.toList() as ResultType);
       }
     });
     return _controller.stream;

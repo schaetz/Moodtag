@@ -16,7 +16,7 @@ void main() {
   test('artists can be created', () async {
     final artistId =
         await db!.createArtist(ArtistsCompanion(id: Value(123), name: Value('AC/DC'), orderingName: Value('AC/DC')));
-    final artist = await db!.getArtistByIdOnce(artistId);
+    final artist = await db!.getBaseArtistByIdOnce(artistId);
 
     expect(artist?.name, 'AC/DC');
   });
@@ -43,9 +43,9 @@ void main() {
 
     await db!.assignTagToArtist(AssignedTagsCompanion(artist: Value(artistId), tag: Value(tag1Id)));
 
-    final artistData = await db!.getArtistDataById(artistId).first;
-    expect(artistData?.hasTag(tag1!), true);
-    expect(artistData?.hasTag(tag2!), false);
+    final artistWithTagsDto = await db!.getArtistById(artistId).first;
+    expect(artistWithTagsDto?.tags.contains(tag1!), true);
+    expect(artistWithTagsDto?.tags.contains(tag2!), false);
   });
 
   test('artists can be joined with their tags to return ArtistData objects', () async {
@@ -54,7 +54,7 @@ void main() {
     final artist2Id =
         await db!.createArtist(ArtistsCompanion(id: Value(456), name: Value('Queen'), orderingName: Value('Queen')));
 
-    final artistsData = await db!.getArtistsDataList({}).first;
+    final artistsData = await db!.getArtists({}).first;
     expect(artistsData.length, 2);
 
     // Assign a tag and filter by it
@@ -64,14 +64,14 @@ void main() {
     await db!.assignTagToArtist(AssignedTagsCompanion(artist: Value(artist1Id), tag: Value(tag1Id)));
     await db!.assignTagToArtist(AssignedTagsCompanion(artist: Value(artist2Id), tag: Value(tag1Id)));
 
-    final artistsDataWithTag = await db!.getArtistsDataList({tag1!.id}).first;
+    final artistsDataWithTag = await db!.getArtists({tag1!.id}).first;
     expect(artistsDataWithTag.length, 2);
 
     // Filtering by a unassigned tag should return an empty list
     final tag2Id = await db!.createTag(TagsCompanion(id: Value(456), name: Value('Pop'), category: Value(1)));
     final tag2 = await db!.getTagByIdOnce(tag2Id);
 
-    final artistsDataWithOtherTag = await db!.getArtistsDataList({tag2!.id}).first;
+    final artistsDataWithOtherTag = await db!.getArtists({tag2!.id}).first;
     expect(artistsDataWithOtherTag.length, 0);
   });
 }

@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
+import 'package:moodtag/model/repository/helpers/entity_converter.dart';
 import 'package:moodtag/model/repository/helpers/repository_helper.dart';
 import 'package:moodtag/model/repository/library_subscription/repository_mixin/library_subscription_manager.dart';
 import 'package:moodtag/shared/exceptions/db_request_response.dart';
@@ -17,9 +18,11 @@ import '../database/moodtag_db.dart';
 class Repository with LibrarySubscriptionManager {
   final MoodtagDB db;
   late final RepositoryHelper helper;
+  late final EntityConverter converter;
 
   Repository() : db = MoodtagDB() {
     helper = RepositoryHelper(db);
+    converter = EntityConverter();
     initializeLibraryIfNecessary();
   }
 
@@ -29,7 +32,7 @@ class Repository with LibrarySubscriptionManager {
   }
 
   Future initializeLibraryIfNecessary() async {
-    List<TagCategoryData> tagCategories = await getTagCategoriesOnce();
+    List<TagCategory> tagCategories = await getTagCategoriesOnce();
     if (tagCategories.isEmpty) {
       _initializeLibrary();
     }
@@ -51,40 +54,48 @@ class Repository with LibrarySubscriptionManager {
   //
   // Artists
   //
-  Stream<List<ArtistData>> getArtistsDataList({Set<int> filterTagIds = const {}, String? searchItem = null}) {
-    return db.getArtistsDataList(filterTagIds, searchItem: searchItem);
+  Stream<List<Artist>> getArtists({Set<int> filterTagIds = const {}, String? searchItem = null}) {
+    return db.getArtists(filterTagIds, searchItem: searchItem).map(converter.createArtistsListFromDTOs);
   }
 
-  Stream<List<ArtistData>> getArtistsDataHavingTag(Tag tag) {
-    return getArtistsDataList(filterTagIds: {tag.id});
+  Stream<List<Artist>> getArtistsHavingTag(Tag tag) {
+    return getArtists(filterTagIds: {tag.id});
   }
 
-  Stream<ArtistData?> getArtistDataById(int artistId) {
-    return db.getArtistDataById(artistId);
+  Stream<Artist?> getArtistById(int artistId) {
+    return db.getArtistById(artistId).map(converter.createArtistFromOptionalDTO);
   }
 
-  Future<List<Artist>> getArtistsOnce() {
-    return db.getArtistsOnce();
+  Future<List<Artist>> getArtistsOnce({Set<int> filterTagIds = const {}, String? searchItem = null}) {
+    return getArtists(filterTagIds: filterTagIds, searchItem: searchItem).first;
   }
 
-  Future<List<Artist>> getLatestArtistsOnce(int number) {
-    return db.getLatestArtistsOnce(number);
+  Future<List<BaseArtist>> getBaseArtistsOnce() {
+    return db
+        .getBaseArtistsOnce()
+        .then((dataClassList) => converter.createBaseArtistsListFromDataClasses(dataClassList));
   }
 
-  Future<bool> doesArtistHaveTag(Artist artist, Tag tag) async {
-    final List<Tag> tagsWithArtist = await db.getTagsOnce(filterArtistIds: {artist.id});
+  Future<List<BaseArtist>> getLatestBaseArtistsOnce(int number) {
+    return db
+        .getLatestBaseArtistsOnce(number)
+        .then((dataClassList) => converter.createBaseArtistsListFromDataClasses(dataClassList));
+  }
+
+  Future<bool> doesArtistHaveTag(BaseArtist artist, Tag tag) async {
+    final List<BaseTag> tagsWithArtist = await getBaseTagsOnce(filterArtistIds: {artist.id});
     return tagsWithArtist.contains(tag);
   }
 
   Future<Set<String>> getSetOfExistingArtistNames() async {
-    final allArtists = await db.getArtistsOnce();
+    final allArtists = await db.getBaseArtistsOnce();
     return allArtists.map((artist) => artist.name).toSet();
   }
 
-  Future<DbRequestResponse<Artist>> createArtist(String name, {String? spotifyId}) async {
+  Future<DbRequestResponse<BaseArtist>> createArtist(String name, {String? spotifyId}) async {
     Future<int> createArtistFuture = db.createArtist(
         ArtistsCompanion.insert(name: name, orderingName: getOrderingNameForArtist(name), spotifyId: Value(spotifyId)));
-    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<BaseArtist>(createArtistFuture, name);
   }
 
   Future<void> createImportedArtistsInBatch(List<ImportedArtist> importedArtists) async {
@@ -94,7 +105,7 @@ class Repository with LibrarySubscriptionManager {
         spotifyId: Value(artist is SpotifyArtist ? artist.spotifyId : null)))));
   }
 
-  Future<DbRequestResponse> deleteArtist(Artist artist) async {
+  Future<DbRequestResponse> deleteArtist(BaseArtist artist) async {
     Future deleteArtistFuture = db.deleteArtistById(artist.id);
     return helper.wrapExceptionsAndReturnResponse(deleteArtistFuture);
   }
@@ -106,29 +117,37 @@ class Repository with LibrarySubscriptionManager {
   //
   // Tags
   //
-  Stream<List<TagData>> getTagsDataList({String? searchItem = null}) {
-    return db.getTagsDataList(searchItem: searchItem);
+  Stream<List<Tag>> getTags({String? searchItem = null}) {
+    return db.getTags(searchItem: searchItem).map(converter.createTagsListFromDTOs);
   }
 
-  Stream<List<TagData>> getTagsWithCategory(TagCategory tagCategory) {
-    return db.getTagsDataList(tagCategory: tagCategory);
+  Stream<List<Tag>> getTagsWithCategory(TagCategory tagCategory) {
+    return db.getTags(tagCategoryId: tagCategory.id).map(converter.createTagsListFromDTOs);
   }
 
-  Stream<TagData?> getTagDataById(int id) {
-    return db.getTagDataById(id);
+  Stream<Tag?> getTagById(int id) {
+    return db.getTagById(id).map(converter.createTagFromOptionalDTO);
   }
 
-  Future<List<Tag>> getTagsOnce() {
-    return db.getTagsOnce();
+  Future<List<Tag>> getTagsOnce({String? searchItem = null}) {
+    return getTags(searchItem: searchItem).first;
   }
 
-  Future<List<Tag>> getLatestTagsOnce(int number) {
-    return db.getLatestTagsOnce(number);
+  Future<List<BaseTag>> getBaseTagsOnce({Set<int>? filterArtistIds}) {
+    return db
+        .getBaseTagsOnce(filterArtistIds: filterArtistIds)
+        .then((dataClassList) => converter.createBaseTagsListFromDataClasses(dataClassList));
+  }
+
+  Future<List<BaseTag>> getLatestBaseTagsOnce(int number) {
+    return db
+        .getLatestBaseTagsOnce(number)
+        .then((dataClassList) => converter.createBaseTagsListFromDataClasses(dataClassList));
   }
 
   Future<Set<String>> getSetOfExistingTagNames() async {
-    final allTags = await db.getTagsOnce();
-    return allTags.map((tag) => tag.name).toSet();
+    final allBaseTags = await getBaseTagsOnce();
+    return allBaseTags.map((tag) => tag.name).toSet();
   }
 
   Future<DbRequestResponse<Tag>> createTag(String name, TagCategory tagCategory) {
@@ -158,19 +177,19 @@ class Repository with LibrarySubscriptionManager {
   //
   // Assigned tags
   //
-  Future<DbRequestResponse> assignTagToArtist(Artist artist, Tag tag) async {
+  Future<DbRequestResponse> assignTagToArtist(BaseArtist artist, Tag tag) async {
     Future<int> assignTagFuture = db.assignTagToArtist(AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id));
     return helper.wrapExceptionsAndReturnResponse(assignTagFuture);
   }
 
-  Future<void> assignTagsToArtistsInBatch(Map<Artist, List<Tag>> tagsForArtistsMap) async {
+  Future<void> assignTagsToArtistsInBatch(Map<BaseArtist, List<Tag>> tagsForArtistsMap) async {
     await db.assignTagsToArtistsInBatch(tagsForArtistsMap.entries
         .expand((mapEntry) =>
             mapEntry.value.map((tag) => AssignedTagsCompanion.insert(artist: mapEntry.key.id, tag: tag.id)))
         .toList());
   }
 
-  Future<DbRequestResponse> removeTagFromArtist(Artist artist, Tag tag) {
+  Future<DbRequestResponse> removeTagFromArtist(BaseArtist artist, Tag tag) {
     return helper.wrapExceptionsAndReturnResponse(db.removeTagFromArtist(artist.id, tag.id));
   }
 
@@ -188,16 +207,20 @@ class Repository with LibrarySubscriptionManager {
     return helper.wrapExceptionsAndReturnResponse(updateTagCategoryFuture);
   }
 
-  Stream<TagCategoriesList> getTagCategories() {
-    return db.getTagCategories();
+  Stream<List<TagCategory>> getTagCategories() {
+    return db.getTagCategories().map(converter.createTagCategoriesListFromDataClasses);
   }
 
-  Future<TagCategoriesList> getTagCategoriesOnce() {
-    return db.getTagCategoriesOnce();
+  Future<List<TagCategory>> getTagCategoriesOnce() {
+    return db
+        .getTagCategoriesOnce()
+        .then((dataClassList) => converter.createTagCategoriesListFromDataClasses(dataClassList));
   }
 
   Future<TagCategory?> getDefaultTagCategoryOnce({int? excludeId}) {
-    return db.getDefaultTagCategoryOnce(excludeId: excludeId);
+    return db
+        .getDefaultTagCategoryOnce(excludeId: excludeId)
+        .then((dataClass) => converter.createTagCategoryFromOptionalDataClass(dataClass));
   }
 
   /** Deletes a tag category, making sure that it is not the last remaining category
@@ -229,16 +252,17 @@ class Repository with LibrarySubscriptionManager {
   // Last.fm accounts
   //
   Stream<LastFmAccount?> getLastFmAccount() {
-    return db.getLastFmAccount();
+    return db.getLastFmAccount().map(converter.createLastFmAccountFromOptionalDataClass);
   }
 
   Future<LastFmAccount?> getLastFmAccountOnce() {
-    return db.getLastFmAccountOnce();
+    return db.getLastFmAccountOnce().then((dataClass) => converter.createLastFmAccountFromOptionalDataClass(dataClass));
   }
 
   Future<DbRequestResponse<LastFmAccount>> createOrUpdateLastFmAccount(LastFmAccount lastFmAccount) async {
     await db.deleteAllLastFmAccounts();
-    Future<int> createAccountFuture = db.createOrUpdateLastFmAccount(lastFmAccount);
+    Future<int> createAccountFuture =
+        db.createOrUpdateLastFmAccount(converter.convertLastFmAccountToDataClass(lastFmAccount).toCompanion(false));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<LastFmAccount>(
         createAccountFuture, lastFmAccount.accountName);
   }

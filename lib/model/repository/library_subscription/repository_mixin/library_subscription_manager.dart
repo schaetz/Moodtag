@@ -66,14 +66,14 @@ mixin LibrarySubscriptionManager {
     switch (subscriptionConfig.dataType) {
       case ArtistsList:
         Set<Tag> filterTags = _getSetOfFilterEntities<Tag>(subscriptionConfig.filter.entityFilters);
-        return () => repository.getArtistsDataList(
+        return () => repository.getArtists(
             filterTagIds: filterTags.map((tag) => tag.id).toSet(), searchItem: subscriptionConfig.filter.searchItem);
       case TagsList:
         if (subscriptionConfig.filter.entityFilters != null) {
           log.warning('Cannot apply entity filters to TagsList subscription');
           throw InternalException('Cannot apply entity filters to TagsList subscription');
         }
-        return () => repository.getTagsDataList(searchItem: subscriptionConfig.filter.searchItem);
+        return () => repository.getTags(searchItem: subscriptionConfig.filter.searchItem);
       case TagCategoriesList:
         if (!subscriptionConfig.filter.includesAll) {
           log.warning('Cannot apply filters to TagCategoriesList subscription');
@@ -88,7 +88,7 @@ mixin LibrarySubscriptionManager {
           log.warning('Cannot apply entity filters to ArtistData subscription');
           throw InternalException('Cannot apply entity filters to ArtistData subscription');
         }
-        return () => repository.getArtistDataById(subscriptionConfig.filter.searchId!);
+        return () => repository.getArtistById(subscriptionConfig.filter.searchId!);
       case TagData:
         if (subscriptionConfig.filter.searchId == null) {
           log.warning('No tag Id supplied for TagData subscription');
@@ -97,7 +97,7 @@ mixin LibrarySubscriptionManager {
           log.warning('Cannot apply entity filters to TagData subscription');
           throw InternalException('Cannot apply entity filters to Tag subscription');
         }
-        return () => repository.getTagDataById(subscriptionConfig.filter.searchId!);
+        return () => repository.getTagById(subscriptionConfig.filter.searchId!);
       default:
         log.warning('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');
         throw InternalException('Unknown data type for stream subscription: ${subscriptionConfig.dataType}');

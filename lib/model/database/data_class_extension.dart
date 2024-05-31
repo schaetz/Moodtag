@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
-
-import 'moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 extension DataClassExtension on DataClass {
   String getName() {
