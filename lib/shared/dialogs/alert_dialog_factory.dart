@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/dialogs/configurations/result_types/delete_with_replacement_result.dart';
 import 'package:moodtag/shared/models/structs/named_entity.dart';
@@ -28,14 +27,14 @@ class AlertDialogFactory {
         onTerminate: null);
   }
 
-  Future<DeleteWithReplacementDialogWrapper<TagCategoryData>> getDeleteTagCategoryDialog(BuildContext context,
+  Future<DeleteWithReplacementDialogWrapper<TagCategory>> getDeleteTagCategoryDialog(BuildContext context,
       {required TagCategory category}) async {
     final tagsWithCategory = await _repository.getTagsWithCategory(category).first;
     final remainingTagCategories = await _repository.getTagCategories().first
-      ..removeWhere((tagCategoryData) => tagCategoryData.tagCategory == category);
+      ..removeWhere((tagCategory) => tagCategory == category);
     final replacementActive = tagsWithCategory.length > 0;
 
-    return getDeleteWithReplacementDialog<TagCategoryData>(context,
+    return getDeleteWithReplacementDialog<TagCategory>(context,
         title: 'Are you sure that you want to delete the tag category "${category.name}"?',
         subtitle: tagsWithCategory.isEmpty
             ? 'It is not assigned to any tags.'
@@ -43,7 +42,7 @@ class AlertDialogFactory {
         entities: replacementActive ? remainingTagCategories : [],
         initialSelection: remainingTagCategories.first,
         selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
-        iconSelector: (categoryData) => Icon(Icons.circle, color: Color(categoryData.tagCategory.color)),
+        iconSelector: (tagCategory) => Icon(Icons.circle, color: Color(tagCategory.color)),
         replacementActive: replacementActive);
   }
 
@@ -67,7 +66,7 @@ class AlertDialogFactory {
   }
 
   /// E: Type of the selectable entities
-  SingleSelectEntityDialogWrapper<E> getSelectEntityDialog<E extends NamedEntity>(
+  SingleSelectEntityDialogWrapper<E> getSelectEntityDialog<E extends LibraryEntity>(
     BuildContext context, {
     String? title,
     String? subtitle,

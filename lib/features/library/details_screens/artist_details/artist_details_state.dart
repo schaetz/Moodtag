@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/extensions/library_user/library_subscriber_state_mixin.dart';
@@ -8,7 +8,7 @@ import 'package:moodtag/shared/bloc/extensions/library_user/library_subscription
 class ArtistDetailsState extends Equatable with LibrarySubscriberStateMixin {
   final int artistId;
   final LibrarySubscriptionSubState librarySubscription;
-  final LoadedData<ArtistData> loadedArtistData;
+  final LoadedData<Artist> loadedArtist;
   final bool tagEditMode;
 
   @override
@@ -17,23 +17,23 @@ class ArtistDetailsState extends Equatable with LibrarySubscriberStateMixin {
   ArtistDetailsState(
       {required this.artistId,
       this.librarySubscription = const LibrarySubscriptionSubState(),
-      this.loadedArtistData = const LoadedData.initial(),
+      this.loadedArtist = const LoadedData.initial(),
       this.tagEditMode = false});
 
-  bool get isArtistLoaded => loadedArtistData.loadingStatus == LoadingStatus.success;
+  bool get isArtistLoaded => loadedArtist.loadingStatus == LoadingStatus.success;
 
   @override
-  List<Object> get props => [artistId, librarySubscription, loadedArtistData, tagEditMode];
+  List<Object> get props => [artistId, librarySubscription, loadedArtist, tagEditMode];
 
   ArtistDetailsState copyWith(
       {int? artistId,
       LibrarySubscriptionSubState? librarySubscription,
-      LoadedData<ArtistData>? loadedArtistData,
+      LoadedData<Artist>? loadedArtistData,
       bool? tagEditMode}) {
     return ArtistDetailsState(
         artistId: artistId ?? this.artistId,
         librarySubscription: librarySubscription ?? this.librarySubscription,
-        loadedArtistData: loadedArtistData ?? this.loadedArtistData,
+        loadedArtist: loadedArtistData ?? this.loadedArtist,
         tagEditMode: tagEditMode ?? this.tagEditMode);
   }
 }

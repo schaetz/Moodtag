@@ -1,5 +1,5 @@
 import 'package:drift/native.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/exceptions/user_readable/database_error.dart';
 import 'package:moodtag/shared/exceptions/user_readable/name_already_taken_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';

@@ -1,4 +1,4 @@
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/import_entity.dart';
 
 class ImportedTag extends ImportEntity {

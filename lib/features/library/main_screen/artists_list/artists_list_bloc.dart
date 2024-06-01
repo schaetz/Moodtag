@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
@@ -159,6 +158,6 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
         entityFilters: filterTags != null ? filterTags : state.filterTags,
         searchItem: applySearchItem ? newSearchItem : '');
 
-    add(RequestOrUpdateSubscription(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilter));
+    add(RequestOrUpdateSubscription(List<Artist>, name: filteredArtistsSubscriptionName, filter: newFilter));
   }
 }

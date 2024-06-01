@@ -1,4 +1,4 @@
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 import 'library_events.dart';
 

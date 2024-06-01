@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moodtag/features/import/lastfm_import/connectors/lastfm_connector.dart' as LastFmConnector;
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/model/repository/repository.dart';
@@ -122,7 +122,7 @@ class AppSettingsBloc extends Bloc<LibraryEvent, AppSettingsState> with LibraryU
       return;
     }
 
-    final updatedUserInfo = await _createOrUpdateLastFmAccount(state.lastFmAccount!.accountName);
+    final updatedUserInfo = await _createOrUpdateLastFmAccount(state.lastFmAccount!.name);
     if (updatedUserInfo != null) {
       emit(state.copyWith(lastFmAccount: updatedUserInfo));
     }

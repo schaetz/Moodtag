@@ -1,4 +1,4 @@
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 import 'library_events.dart';
 
@@ -33,10 +33,10 @@ class LoginWebviewUrlChange extends SpotifyEvent {
 // }
 
 class PlayArtist extends SpotifyEvent {
-  final ArtistData artistData;
+  final Artist artist;
 
-  PlayArtist(this.artistData);
+  PlayArtist(this.artist);
 
   @override
-  List<Object?> get props => [artistData];
+  List<Object?> get props => [artist];
 }

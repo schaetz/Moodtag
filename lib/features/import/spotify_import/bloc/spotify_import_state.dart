@@ -1,8 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_state.dart';
 import 'package:moodtag/features/import/spotify_import/config/spotify_import_config.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
@@ -17,7 +16,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
   final SpotifyImportConfig? importConfig;
 
   // We are not using the LibraryUserBlocMixin for this bloc as we don't need to update the screen when entities change
-  final LoadedData<List<TagCategoryData>> allTagCategories;
+  final LoadedData<List<TagCategory>> allTagCategories;
   final LoadedData<List<Tag>> allTags;
 
   final UniqueImportEntitySet<SpotifyArtist>? availableSpotifyArtists;
@@ -57,7 +56,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
     SpotifyImportFlowStep? step,
     bool? isFinished,
     SpotifyImportConfig? importConfig,
-    LoadedData<List<TagCategoryData>>? allTagCategories,
+    LoadedData<List<TagCategory>>? allTagCategories,
     LoadedData<List<Tag>>? allTags,
     UniqueImportEntitySet<SpotifyArtist>? availableSpotifyArtists,
     UniqueImportEntitySet<ImportedTag>? availableGenresForSelectedArtists,

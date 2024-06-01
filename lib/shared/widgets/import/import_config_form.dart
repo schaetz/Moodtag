@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_config.dart';
 import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_option.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 class ImportConfigForm<C extends AbstractImportConfig, O extends AbstractImportOption> extends StatefulWidget {
   final String headlineCaption;
   final String sendButtonCaption;
   final Map<O, String> optionsWithCaption;
-  final List<TagCategoryData> tagCategories;
+  final List<TagCategory> tagCategories;
   final List<Tag> tags;
   final C initialConfig;
   final Function(Map<O, bool>) onChangeSelection;
@@ -36,7 +35,7 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
   final TextEditingController defaultTagController = TextEditingController();
 
   late final Map<O, bool> _selectionsState;
-  TagCategoryData? selectedTagCategory;
+  TagCategory? selectedTagCategory;
   Tag? selectedInitialTag;
 
   @override
@@ -83,7 +82,7 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
   }
 
   Widget _buildTagCategoryDropdown() {
-    return DropdownMenu<TagCategoryData>(
+    return DropdownMenu<TagCategory>(
       controller: tagCategoryController,
       enableFilter: true,
       requestFocusOnTap: false,
@@ -94,19 +93,19 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
         filled: true,
         contentPadding: EdgeInsets.symmetric(vertical: 5.0),
       ),
-      onSelected: (TagCategoryData? category) {
+      onSelected: (TagCategory? category) {
         setState(() {
           selectedTagCategory = category;
         });
       },
-      dropdownMenuEntries: widget.tagCategories.map<DropdownMenuEntry<TagCategoryData>>(
-        (TagCategoryData tagCategory) {
-          return DropdownMenuEntry<TagCategoryData>(
+      dropdownMenuEntries: widget.tagCategories.map<DropdownMenuEntry<TagCategory>>(
+        (TagCategory tagCategory) {
+          return DropdownMenuEntry<TagCategory>(
             value: tagCategory,
-            label: tagCategory.tagCategory.name,
+            label: tagCategory.name,
             leadingIcon: Icon(
               Icons.circle,
-              color: Color(tagCategory.tagCategory.color),
+              color: Color(tagCategory.color),
             ),
           );
         },

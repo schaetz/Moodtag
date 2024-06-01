@@ -56,8 +56,7 @@ class AppSettingsScreen extends StatelessWidget {
               buildOnSuccess: (tagCategories) => Column(
                       children: tagCategories.asMap().entries.map((entry) {
                     final index = entry.key;
-                    final categoryData = entry.value;
-                    final tagCategory = categoryData.tagCategory;
+                    final tagCategory = entry.value;
                     return ListTile(
                       leading: Icon(
                         Icons.circle,
@@ -82,8 +81,7 @@ class AppSettingsScreen extends StatelessWidget {
                                 .getDeleteTagCategoryDialog(context, category: tagCategory)
                                 .then((dialog) => dialog.show(
                                     handleResult: (result) => result != null && result.confirmDeletion == true
-                                        ? bloc.add(DeleteTagCategory(tagCategory,
-                                            insertedCategory: result.replacement?.tagCategory))
+                                        ? bloc.add(DeleteTagCategory(tagCategory, insertedCategory: result.replacement))
                                         : {})))
                       ]),
                       shape: index < tagCategories.length - 1
@@ -117,7 +115,7 @@ class AppSettingsScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           LastFmAccountSelector(
               serviceName: serviceName,
-              accountName: state.lastFmAccount?.accountName,
+              accountName: state.lastFmAccount?.name,
               artistCount: state.lastFmAccount?.artistCount,
               playCount: state.lastFmAccount?.playCount,
               lastAccountUpdate: state.lastFmAccount?.lastAccountUpdate,

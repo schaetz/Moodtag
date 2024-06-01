@@ -1,11 +1,16 @@
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final Tag tag234 = Tag(id: 234, name: 'tag234', category: 0, colorMode: 0);
+  final Tag tag234 = Tag(
+      id: 234,
+      name: 'tag234',
+      color: 0,
+      colorMode: 0,
+      category: TagCategory(id: 987, name: 'cat987', color: 3),
+      frequency: 3);
 
   test('Subscription configs should be equal if the data type is equal and there are no filters', () async {
     final config1 = SubscriptionConfig(ArtistsList);
@@ -79,9 +84,7 @@ void main() {
     final config1 = SubscriptionConfig(ArtistsList, filter: filter1);
 
     final filter2 = LibraryQueryFilter(
-        searchId: 123,
-        searchItem: 'some item',
-        entityFilters: {Tag(id: 789, name: 'tag789', category: 0, colorMode: 0)});
+        searchId: 123, searchItem: 'some item', entityFilters: {BaseTag(id: 789, name: 'tag789', colorMode: 0)});
     final config2 = SubscriptionConfig(ArtistsList, filter: filter2);
 
     expect(config1 == config2, false);

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
@@ -109,7 +109,7 @@ LastFmAccount _extractLastFmAccountFromUserInfoResults(dynamic responseBodyJSON)
 
   final userJSON = responseBodyJSON['user'];
   return LastFmAccount(
-      accountName: userJSON['name'],
+      name: userJSON['name'],
       realName: userJSON['realname'] ?? null,
       playCount: _parseNumberFromJson(userJSON, 'playcount'),
       artistCount: _parseNumberFromJson(userJSON, 'artist_count'),

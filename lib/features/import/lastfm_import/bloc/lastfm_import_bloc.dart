@@ -6,8 +6,7 @@ import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_confi
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
 import 'package:moodtag/features/import/lastfm_import/flow/lastfm_import_flow_step.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
@@ -56,13 +55,13 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
         importConfig: initialImportConfig));
   }
 
-  LastFmImportConfig _getInitialImportConfig(List<TagCategoryData> tagCategories) {
+  LastFmImportConfig _getInitialImportConfig(List<TagCategory> tagCategories) {
     Map<LastFmImportOption, bool> initialImportOptions = {};
     LastFmImportOption.values.forEach((option) {
       initialImportOptions[option] = true;
     });
 
-    final defaultTagCategory = tagCategories.first.tagCategory;
+    final defaultTagCategory = tagCategories.first;
     return LastFmImportConfig(categoryForTags: defaultTagCategory, options: initialImportOptions);
   }
 
@@ -119,11 +118,11 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     final availableLastFmArtists = UniqueImportEntitySet<LastFmArtist>();
 
     if (state.importConfig!.options[LastFmImportOption.allTimeTopArtists] == true) {
-      availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.overall, 1000));
+      availableLastFmArtists.addAll(await getTopArtists(lastFmAccount.name, LastFmImportPeriod.overall, 1000));
     }
 
     if (state.importConfig!.options[LastFmImportOption.lastMonthTopArtists] == true) {
-      final lastMonthTopArtists = await getTopArtists(lastFmAccount.accountName, LastFmImportPeriod.one_month, 1000);
+      final lastMonthTopArtists = await getTopArtists(lastFmAccount.name, LastFmImportPeriod.one_month, 1000);
       availableLastFmArtists.addOrUpdateAll(lastMonthTopArtists, _combineLastFmArtistPlays);
     }
 

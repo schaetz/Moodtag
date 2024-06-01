@@ -82,7 +82,7 @@ class Repository with LibrarySubscriptionManager {
         .then((dataClassList) => converter.createBaseArtistsListFromDataClasses(dataClassList));
   }
 
-  Future<bool> doesArtistHaveTag(BaseArtist artist, Tag tag) async {
+  Future<bool> doesArtistHaveTag(BaseArtist artist, BaseTag tag) async {
     final List<BaseTag> tagsWithArtist = await getBaseTagsOnce(filterArtistIds: {artist.id});
     return tagsWithArtist.contains(tag);
   }
@@ -177,19 +177,19 @@ class Repository with LibrarySubscriptionManager {
   //
   // Assigned tags
   //
-  Future<DbRequestResponse> assignTagToArtist(BaseArtist artist, Tag tag) async {
+  Future<DbRequestResponse> assignTagToArtist(BaseArtist artist, BaseTag tag) async {
     Future<int> assignTagFuture = db.assignTagToArtist(AssignedTagsCompanion.insert(artist: artist.id, tag: tag.id));
     return helper.wrapExceptionsAndReturnResponse(assignTagFuture);
   }
 
-  Future<void> assignTagsToArtistsInBatch(Map<BaseArtist, List<Tag>> tagsForArtistsMap) async {
+  Future<void> assignTagsToArtistsInBatch(Map<BaseArtist, List<BaseTag>> tagsForArtistsMap) async {
     await db.assignTagsToArtistsInBatch(tagsForArtistsMap.entries
         .expand((mapEntry) =>
             mapEntry.value.map((tag) => AssignedTagsCompanion.insert(artist: mapEntry.key.id, tag: tag.id)))
         .toList());
   }
 
-  Future<DbRequestResponse> removeTagFromArtist(BaseArtist artist, Tag tag) {
+  Future<DbRequestResponse> removeTagFromArtist(BaseArtist artist, BaseTag tag) {
     return helper.wrapExceptionsAndReturnResponse(db.removeTagFromArtist(artist.id, tag.id));
   }
 
@@ -264,7 +264,7 @@ class Repository with LibrarySubscriptionManager {
     Future<int> createAccountFuture =
         db.createOrUpdateLastFmAccount(converter.convertLastFmAccountToDataClass(lastFmAccount).toCompanion(false));
     return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<LastFmAccount>(
-        createAccountFuture, lastFmAccount.accountName);
+        createAccountFuture, lastFmAccount.name);
   }
 
   Future removeLastFmAccount() {

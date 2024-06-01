@@ -4,8 +4,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/artists_list/artists_list_state.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
@@ -50,7 +49,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
             onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
             onSearchBarClosed: () => onSearchBarClosed(bloc),
             contentWidget: Stack(children: [
-              LoadedDataDisplayWrapper<ArtistsList>(
+              LoadedDataDisplayWrapper<List<Artist>>(
                   loadedData: state.loadedDataFilteredArtists,
                   additionalCheckData: state.allTags,
                   captionForError: 'Artists could not be loaded',
@@ -122,34 +121,31 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
                 options: ChipCloudOptions(elementSpacing: 8, padding: EdgeInsets.all(8), debug: false))));
   }
 
-  Widget _buildArtistRow(
-      BuildContext context, ArtistData artistWithTags, ArtistsListBloc bloc, AlertDialogFactory dialogFactory) {
+  Widget _buildArtistRow(BuildContext context, Artist artist, ArtistsListBloc bloc, AlertDialogFactory dialogFactory) {
     return ListTile(
         title: Text(
-          artistWithTags.artist.name,
+          artist.name,
           style: listEntryStyle,
         ),
-        subtitle: bloc.state.displayTagSubtitles && artistWithTags.tags.isNotEmpty
-            ? _buildTagsSubtitle(context, artistWithTags)
-            : null,
-        onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artistWithTags.artist.id),
+        subtitle: bloc.state.displayTagSubtitles && artist.tags.isNotEmpty ? _buildTagsSubtitle(context, artist) : null,
+        onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
         onLongPress: () => dialogFactory
             .getConfirmationDialog(widget.scaffoldKey.currentContext!,
-                title: 'Are you sure that you want to delete the artist "${artistWithTags.artist.name}"?')
-            .show(onTruthyResult: (_) => bloc.add(DeleteArtist(artistWithTags.artist))));
+                title: 'Are you sure that you want to delete the artist "${artist.name}"?')
+            .show(onTruthyResult: (_) => bloc.add(DeleteArtist(artist))));
   }
 
-  Widget _buildTagsSubtitle(BuildContext context, ArtistData artistWithTags) {
+  Widget _buildTagsSubtitle(BuildContext context, Artist artist) {
     return SizedBox(
         height: 42,
         child: Wrap(
           clipBehavior: Clip.hardEdge,
           alignment: WrapAlignment.start,
-          children: artistWithTags.tags.map((tag) => _getTagChipWithPadding(context, tag)).toList(),
+          children: artist.tags.map((tag) => _getTagChipWithPadding(context, tag)).toList(),
         ));
   }
 
-  Widget _getTagChipWithPadding(BuildContext context, Tag tag) {
+  Widget _getTagChipWithPadding(BuildContext context, BaseTag tag) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 3.0),
         child: InputChip(
@@ -163,7 +159,7 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
   }
 
   Future<FilterSelectionModal?> _displayFilterBottomSheet(
-      BuildContext context, TagsList allTagsList, Set<Tag> filterTags, ArtistsListBloc bloc) {
+      BuildContext context, List<Tag> allTags, Set<Tag> filterTags, ArtistsListBloc bloc) {
     return showMaterialModalBottomSheet<FilterSelectionModal>(
       context: context,
       expand: false,
@@ -174,10 +170,10 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
       )),
-      builder: (context) => FilterSelectionModal<TagData>(
-          entitiesWithInitialSelection: _getSelectionForFilterOverlay(allTagsList, filterTags),
-          onConfirmSelection: (Set<TagData> newFilterTagsData) =>
-              _onConfirmFilterChanges(newFilterTagsData.map((tagData) => tagData.tag).toSet(), bloc),
+      builder: (context) => FilterSelectionModal<Tag>(
+          entitiesWithInitialSelection: _getSelectionForFilterOverlay(allTags, filterTags),
+          onConfirmSelection: (Set<Tag> newFilterTags) =>
+              _onConfirmFilterChanges(newFilterTags.map((tag) => tag).toSet(), bloc),
           onCloseModal: () => _onCloseModal(bloc)),
     );
   }
@@ -190,7 +186,6 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
     bloc.add(ToggleFilterSelectionModal(wantedOpen: false));
   }
 
-  Map<TagData, bool> _getSelectionForFilterOverlay(TagsList allTagsList, Set<Tag> filterTags) =>
-      Map<TagData, bool>.fromIterable(allTagsList,
-          key: (tagData) => tagData, value: (tagData) => filterTags.contains(tagData.tag));
+  Map<Tag, bool> _getSelectionForFilterOverlay(List<Tag> allTags, Set<Tag> filterTags) =>
+      Map<Tag, bool>.fromIterable(allTags, key: (tagData) => tagData, value: (tag) => filterTags.contains(tag));
 }

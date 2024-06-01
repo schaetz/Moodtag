@@ -1,5 +1,5 @@
 import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_config.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 import 'lastfm_import_option.dart';
 

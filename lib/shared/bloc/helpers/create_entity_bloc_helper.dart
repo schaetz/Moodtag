@@ -1,4 +1,4 @@
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/helpers/entity_processing_helper.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/app_settings_events.dart';
@@ -64,12 +64,12 @@ class CreateEntityBlocHelper {
     List<String> inputElements = processMultilineInput(event.input);
     List<UserReadableException> exceptions = [];
 
-    final artistNameToObjectMap = await getMapFromArtistNameToObject(repository);
+    final artistNameToObjectMap = await getMapFromArtistNameToBaseArtistObject(repository);
 
     for (String artistName in inputElements) {
       // create artist if not existing
       if (!artistNameToObjectMap.containsKey(artistName)) {
-        final DbRequestResponse<Artist> createArtistResponse = await repository.createArtist(artistName);
+        final DbRequestResponse<BaseArtist> createArtistResponse = await repository.createArtist(artistName);
         if (createArtistResponse.didSucceed()) {
           artistNameToObjectMap[artistName] = createArtistResponse.changedEntity!;
         }
@@ -143,7 +143,7 @@ class CreateEntityBlocHelper {
     return Future.value(null);
   }
 
-  Future<UserReadableException?> _addTagToArtist(Artist artist, Tag tag, Repository repository) async {
+  Future<UserReadableException?> _addTagToArtist(BaseArtist artist, BaseTag tag, Repository repository) async {
     final assignTagResponse = await repository.assignTagToArtist(artist, tag);
     if (assignTagResponse.didFail()) {
       if (assignTagResponse.isSqliteExceptionWithErrorCode(DbRequestResponse.sqliteConstraintPrimaryKey)) {
@@ -155,7 +155,7 @@ class CreateEntityBlocHelper {
     return Future.value(null);
   }
 
-  Future<UserReadableException?> _removeTagFromArtist(Artist artist, Tag tag, Repository repository) async {
+  Future<UserReadableException?> _removeTagFromArtist(BaseArtist artist, BaseTag tag, Repository repository) async {
     final removeTagResponse = await repository.removeTagFromArtist(artist, tag);
     if (removeTagResponse.didFail()) {
       return removeTagResponse.getUserFeedbackException();

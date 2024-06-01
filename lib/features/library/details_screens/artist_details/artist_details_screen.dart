@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/features/library/details_screens/artist_details/artist_details_bloc.dart';
 import 'package:moodtag/features/library/details_screens/artist_details/artist_details_state.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
@@ -31,20 +30,19 @@ class ArtistDetailsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: BlocBuilder<ArtistDetailsBloc, ArtistDetailsState>(
             builder: (context, state) {
-              return LoadedDataDisplayWrapper<ArtistData>(
-                  loadedData: state.loadedArtistData,
+              return LoadedDataDisplayWrapper<Artist>(
+                  loadedData: state.loadedArtist,
                   captionForError: 'Artist could not be loaded',
                   captionForEmptyData: 'Artist does not exist',
-                  buildOnSuccess: (artistData) => ListView(children: [
+                  buildOnSuccess: (artist) => ListView(children: [
                         Padding(
                           padding: EdgeInsets.only(bottom: 12.0),
                           child: _buildHeadline(context, state),
                         ),
-                        if (artistData.artist.spotifyId != null)
+                        if (artist.spotifyId != null)
                           Padding(
-                              padding: EdgeInsets.only(bottom: 8.0),
-                              child: Text('Spotify ID: ' + artistData.artist.spotifyId!)),
-                        if (artistData.artist.spotifyId != null)
+                              padding: EdgeInsets.only(bottom: 8.0), child: Text('Spotify ID: ' + artist.spotifyId!)),
+                        if (artist.spotifyId != null)
                           Padding(
                               padding: EdgeInsets.only(bottom: 12.0),
                               child: ElevatedButton(
@@ -52,7 +50,7 @@ class ArtistDetailsScreen extends StatelessWidget {
                                       backgroundColor: MaterialStateColor.resolveWith((states) => Colors.green),
                                       foregroundColor: MaterialStateColor.resolveWith((states) => Colors.white)),
                                   child: Text('Play on Spotify'),
-                                  onPressed: () => bloc.add(PlayArtist(artistData)))), // TODO Implement event mapper
+                                  onPressed: () => bloc.add(PlayArtist(artist)))), // TODO Implement event mapper
                         _buildTagChipsRow(context, state, dialogFactory),
                         Padding(
                             padding: EdgeInsets.only(top: 8.0),
@@ -75,7 +73,7 @@ class ArtistDetailsScreen extends StatelessWidget {
               child: SizedBox(width: 4),
             ),
             TextSpan(
-                text: state.loadedArtistData.data?.name ?? 'Unknown tag',
+                text: state.loadedArtist.data?.name ?? 'Unknown tag',
                 style: artistNameStyle.copyWith(color: Theme.of(context).colorScheme.onBackground)),
           ],
         ),
@@ -89,27 +87,27 @@ class ArtistDetailsScreen extends StatelessWidget {
     if (state.tagEditMode) {
       if (state.allTags.loadingStatus.isError || state.allTags.data == null) {
         return ChipsRowInfoLabel('Error loading the tags');
-      } else if (state.loadedArtistData.data == null) {
+      } else if (state.loadedArtist.data == null) {
         return ChipsRowInfoLabel('Something went wrong');
       }
     } else {
       // TODO Improve loading / error labels
-      if (state.loadedArtistData.loadingStatus.isInitialOrLoading) {
+      if (state.loadedArtist.loadingStatus.isInitialOrLoading) {
         return ChipsRowInfoLabel('Loading tags...');
       }
-      if (state.loadedArtistData.loadingStatus.isError || state.loadedArtistData.data == null) {
+      if (state.loadedArtist.loadingStatus.isError || state.loadedArtist.data == null) {
         return ChipsRowInfoLabel('Error loading the tags for the artist');
       }
     }
 
-    final ArtistData artistData = state.loadedArtistData.data!;
-    List<Tag> tagsToDisplay =
-        state.tagEditMode ? _convertTagDataListToTagList(state.allTags.data!) : artistData.tags.toList();
+    final artist = state.loadedArtist.data!;
+    List<BaseTag> tagsToDisplay =
+        state.tagEditMode ? _convertTagDataListToTagList(state.allTags.data!) : artist.tags.toList();
 
     List<Widget> chipsList =
-        tagsToDisplay.map((tag) => _buildTagChip(context, state.tagEditMode, artistData, tag, (_value) {})).toList();
+        tagsToDisplay.map((tag) => _buildTagChip(context, state.tagEditMode, artist, tag, (_value) {})).toList();
     if (state.tagEditMode) {
-      chipsList.add(_buildAddTagChip(context, artistData, dialogFactory));
+      chipsList.add(_buildAddTagChip(context, artist, dialogFactory));
     }
 
     return Wrap(
@@ -120,19 +118,18 @@ class ArtistDetailsScreen extends StatelessWidget {
   }
 
   // TODO Maybe find a less costly solution
-  List<Tag> _convertTagDataListToTagList(List<TagData> tagDataList) =>
-      tagDataList.map((tagData) => tagData.tag).toList();
+  List<Tag> _convertTagDataListToTagList(List<Tag> tagList) => tagList.map((tag) => tag).toList();
 
   Widget _buildTagChip(
-      BuildContext context, bool tagEditMode, ArtistData artistData, Tag tag, ValueChanged<Tag> onTapped) {
+      BuildContext context, bool tagEditMode, Artist artist, BaseTag tag, ValueChanged<BaseTag> onTapped) {
     return InputChip(
         label: Text(tag.name),
-        selected: tagEditMode && artistData.tags.contains(tag),
-        onPressed: () => _onTagChipPressed(context, artistData.artist, tag, tagEditMode, onTapped));
+        selected: tagEditMode && artist.tags.contains(tag),
+        onPressed: () => _onTagChipPressed(context, artist, tag, tagEditMode, onTapped));
   }
 
   void _onTagChipPressed(
-      BuildContext context, Artist artist, Tag tag, bool tagEditMode, ValueChanged<Tag> onTapped) async {
+      BuildContext context, Artist artist, BaseTag tag, bool tagEditMode, ValueChanged<BaseTag> onTapped) async {
     if (tagEditMode) {
       context.read<ArtistDetailsBloc>().add(ToggleTagForArtist(artist, tag));
     } else {
@@ -140,7 +137,7 @@ class ArtistDetailsScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildAddTagChip(BuildContext context, ArtistData artistData, AlertDialogFactory dialogFactory) {
+  Widget _buildAddTagChip(BuildContext context, Artist artist, AlertDialogFactory dialogFactory) {
     final bloc = context.read<ArtistDetailsBloc>();
     return InputChip(
       label: Text('+'),
@@ -150,7 +147,7 @@ class ArtistDetailsScreen extends StatelessWidget {
               subtitle: 'Separate multiple tags by line breaks',
               multiline: true,
               maxLines: 10)
-          .show(onTruthyResult: (input) => bloc.add(CreateTags(input!, preselectedArtist: artistData.artist))),
+          .show(onTruthyResult: (input) => bloc.add(CreateTags(input!, preselectedArtist: artist))),
     );
   }
 }

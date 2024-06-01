@@ -1,4 +1,4 @@
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 import 'library_events.dart';
 
@@ -40,8 +40,8 @@ class ToggleTagEditMode extends ArtistEvent {
 }
 
 class ToggleTagForArtist extends ArtistEvent {
-  final Artist artist;
-  final Tag tag;
+  final BaseArtist artist;
+  final BaseTag tag;
 
   const ToggleTagForArtist(this.artist, this.tag);
 

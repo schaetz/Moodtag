@@ -98,14 +98,14 @@ class EntityConverter {
   LastFmAccount? createLastFmAccountFromOptionalDataClass(LastFmAccountDataClass? dataClass) {
     if (dataClass == null) return null;
     return LastFmAccount(
-        accountName: dataClass.accountName,
+        name: dataClass.accountName,
         lastAccountUpdate: dataClass.lastAccountUpdate,
         lastTopArtistsUpdate: dataClass.lastTopArtistsUpdate);
   }
 
   LastFmAccountDataClass convertLastFmAccountToDataClass(LastFmAccount lastFmAccount) {
     return LastFmAccountDataClass(
-        accountName: lastFmAccount.accountName,
+        accountName: lastFmAccount.name,
         lastAccountUpdate: lastFmAccount.lastAccountUpdate,
         lastTopArtistsUpdate: lastFmAccount.lastTopArtistsUpdate);
   }

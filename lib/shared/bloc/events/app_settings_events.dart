@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 
 abstract class AppSettingsEvent extends LibraryEvent {

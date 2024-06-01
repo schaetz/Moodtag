@@ -1,12 +1,11 @@
-import 'package:drift/drift.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:moodtag/model/database/data_class_extension.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 class LibraryQueryFilter extends Equatable {
   final int? searchId;
   final String? searchItem;
-  final Set<DataClass>? entityFilters;
+  final Set<LibraryEntity>? entityFilters;
 
   bool get includesAll => searchId == null && searchItem == null && (entityFilters == null || entityFilters!.isEmpty);
 
@@ -25,7 +24,7 @@ class LibraryQueryFilter extends Equatable {
 
     final entityFiltersString = (entityFilters == null || entityFilters!.isEmpty)
         ? null
-        : 'entities: (' + entityFilters!.map((DataClass dataObject) => dataObject.getName()).join(',') + ')';
+        : 'entities: (' + entityFilters!.map((LibraryEntity entity) => entity.name).join(',') + ')';
 
     if (idString == null && searchItemString == null && entityFiltersString == null) {
       return 'null';

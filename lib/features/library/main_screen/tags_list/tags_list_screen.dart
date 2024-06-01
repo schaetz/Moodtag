@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_bloc.dart';
 import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
@@ -29,7 +29,7 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
           searchBarVisible: state.displaySearchBar,
           onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
           onSearchBarClosed: () => onSearchBarClosed(bloc),
-          contentWidget: LoadedDataDisplayWrapper<TagsList>(
+          contentWidget: LoadedDataDisplayWrapper<List<Tag>>(
               loadedData: state.loadedDataFilteredTags,
               captionForError: 'Tags could not be loaded',
               captionForEmptyData: !state.displaySearchBar || state.searchItem.isEmpty
@@ -46,7 +46,7 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
     });
   }
 
-  Widget _buildTagRow(BuildContext context, TagData tagData, TagsListBloc bloc, AlertDialogFactory dialogFactory) {
+  Widget _buildTagRow(BuildContext context, Tag tag, TagsListBloc bloc, AlertDialogFactory dialogFactory) {
     return ListTile(
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -54,20 +54,20 @@ class TagsListScreen extends StatelessWidget with SearchableListScreenMixin<Tags
           children: <Widget>[
             Expanded(
               child: Text(
-                tagData.tag.name,
+                tag.name,
                 style: listEntryStyle,
               ),
             ),
             Text(
-              tagData.freq.toString(),
+              tag.frequency.toString(),
               style: listEntryStylePale,
             )
           ],
         ),
         leading: Icon(Icons.label),
-        onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tagData.tag.id),
+        onTap: () => Navigator.of(context).pushNamed(Routes.tagsDetails, arguments: tag.id),
         onLongPress: () => dialogFactory
-            .getDeleteTagDialog(context, tag: tagData.tag)
-            .then((dialog) => dialog.show(onTruthyResult: (_) => bloc.add(DeleteTag(tagData.tag)))));
+            .getDeleteTagDialog(context, tag: tag)
+            .then((dialog) => dialog.show(onTruthyResult: (_) => bloc.add(DeleteTag(tag)))));
   }
 }

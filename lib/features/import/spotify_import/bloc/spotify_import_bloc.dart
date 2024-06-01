@@ -8,8 +8,7 @@ import 'package:moodtag/features/import/spotify_import/config/spotify_import_con
 import 'package:moodtag/features/import/spotify_import/config/spotify_import_option.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_connector.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_import_processor.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
@@ -64,13 +63,13 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
         importConfig: initialImportConfig));
   }
 
-  SpotifyImportConfig _getInitialImportConfig(List<TagCategoryData> tagCategories) {
+  SpotifyImportConfig _getInitialImportConfig(List<TagCategory> tagCategories) {
     Map<SpotifyImportOption, bool> initialImportOptions = {};
     SpotifyImportOption.values.forEach((option) {
       initialImportOptions[option] = true;
     });
 
-    final defaultTagCategory = tagCategories.first.tagCategory;
+    final defaultTagCategory = tagCategories.first;
     return SpotifyImportConfig(categoryForTags: defaultTagCategory, options: initialImportOptions);
   }
 

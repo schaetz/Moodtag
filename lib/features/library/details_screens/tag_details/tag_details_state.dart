@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/shared/bloc/extensions/library_user/library_subscriber_state_mixin.dart';
 import 'package:moodtag/shared/bloc/extensions/library_user/library_subscription_sub_state.dart';
@@ -7,9 +7,9 @@ import 'package:moodtag/shared/bloc/extensions/library_user/library_subscription
 class TagDetailsState extends Equatable with LibrarySubscriberStateMixin {
   final int tagId;
   final LibrarySubscriptionSubState librarySubscription;
-  final LoadedData<TagData> loadedTagData;
-  late final LoadedData<List<ArtistData>> loadedDataFilteredArtists;
-  late final LoadedData<List<ArtistData>> loadedDataFilteredArtistsWithTag;
+  final LoadedData<Tag> loadedTagData;
+  late final LoadedData<List<Artist>> loadedDataFilteredArtists;
+  late final LoadedData<List<Artist>> loadedDataFilteredArtistsWithTag;
   final bool checklistMode;
   final bool displaySearchBar;
   final String searchItem;
@@ -43,9 +43,9 @@ class TagDetailsState extends Equatable with LibrarySubscriberStateMixin {
   TagDetailsState copyWith({
     int? tagId,
     LibrarySubscriptionSubState? librarySubscription,
-    LoadedData<TagData>? loadedTagData,
-    LoadedData<ArtistsList>? loadedDataFilteredArtists,
-    LoadedData<ArtistsList>? loadedDataFilteredArtistsWithTag,
+    LoadedData<Tag>? loadedTagData,
+    LoadedData<List<Artist>>? loadedDataFilteredArtists,
+    LoadedData<List<Artist>>? loadedDataFilteredArtistsWithTag,
     bool? checklistMode,
     bool? displaySearchBar,
     String? searchItem,

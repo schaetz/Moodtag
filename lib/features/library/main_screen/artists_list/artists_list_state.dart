@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loaded_data.dart';
 import 'package:moodtag/shared/bloc/extensions/library_user/library_subscriber_state_mixin.dart';
 import 'package:moodtag/shared/bloc/extensions/library_user/library_subscription_sub_state.dart';
@@ -8,7 +7,7 @@ import 'package:moodtag/shared/models/modal_and_overlay_types.dart';
 
 class ArtistsListState extends Equatable with LibrarySubscriberStateMixin {
   final LibrarySubscriptionSubState librarySubscription;
-  final LoadedData<ArtistsList> loadedDataFilteredArtists;
+  final LoadedData<List<Artist>> loadedDataFilteredArtists;
   final bool displaySearchBar;
   final String searchItem;
   final bool displayTagSubtitles;
@@ -42,7 +41,7 @@ class ArtistsListState extends Equatable with LibrarySubscriberStateMixin {
 
   ArtistsListState copyWith({
     LibrarySubscriptionSubState? librarySubscription,
-    LoadedData<ArtistsList>? loadedDataFilteredArtists,
+    LoadedData<List<Artist>>? loadedDataFilteredArtists,
     bool? displaySearchBar,
     String? searchItem,
     bool? displayTagSubtitles,

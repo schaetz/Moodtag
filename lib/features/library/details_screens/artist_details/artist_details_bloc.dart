@@ -95,7 +95,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
     }
 
     try {
-      playArtist(accessToken.token, event.artistData.artist);
+      playArtist(accessToken.token, event.artist);
     } catch (e) {
       errorStreamController.add(UnknownError('Could not start playback.', cause: e));
     }

@@ -1,7 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
@@ -106,6 +106,6 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
     final newSearchItem = searchItem != null ? searchItem : state.searchItem;
     final newFilter = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : '');
 
-    add(RequestOrUpdateSubscription(TagsList, name: filteredTagsSubscriptionName, filter: newFilter));
+    add(RequestOrUpdateSubscription(List<Tag>, name: filteredTagsSubscriptionName, filter: newFilter));
   }
 }

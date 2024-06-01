@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:logging/logging.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/extensions/library_user/library_user_bloc_mixin.dart';
 import 'package:moodtag/shared/exceptions/internal/internal_exception.dart';
@@ -80,7 +78,7 @@ mixin LibrarySubscriptionManager {
           throw InternalException('Cannot apply filters to TagCategoriesList subscription');
         }
         return () => repository.getTagCategories();
-      case ArtistData:
+      case Artist:
         if (subscriptionConfig.filter.searchId == null) {
           log.warning('No artist Id supplied for ArtistData subscription');
           throw InternalException('No artist Id supplied for ArtistData subscription');
@@ -89,7 +87,7 @@ mixin LibrarySubscriptionManager {
           throw InternalException('Cannot apply entity filters to ArtistData subscription');
         }
         return () => repository.getArtistById(subscriptionConfig.filter.searchId!);
-      case TagData:
+      case Tag:
         if (subscriptionConfig.filter.searchId == null) {
           log.warning('No tag Id supplied for TagData subscription');
           throw InternalException('No tag Id supplied for Tag subscription');
@@ -104,7 +102,7 @@ mixin LibrarySubscriptionManager {
     }
   }
 
-  Set<T> _getSetOfFilterEntities<T extends DataClass>(Set<DataClass>? entityFilters) {
+  Set<T> _getSetOfFilterEntities<T extends LibraryEntity>(Set<LibraryEntity>? entityFilters) {
     if (entityFilters != null && entityFilters.isNotEmpty) {
       try {
         return Set<T>.from(entityFilters);

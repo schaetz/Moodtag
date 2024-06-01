@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-class FilterSelectionModal<T extends DataClassWithEntityName> extends StatefulWidget {
+class FilterSelectionModal<T extends LibraryEntity> extends StatefulWidget {
   final Map<T, bool> entitiesWithInitialSelection;
   final Function(Set<T>)? onConfirmSelection;
   final Function? onCloseModal;
@@ -14,7 +14,7 @@ class FilterSelectionModal<T extends DataClassWithEntityName> extends StatefulWi
   State<StatefulWidget> createState() => _FilterSelectionModalState<T>();
 }
 
-class _FilterSelectionModalState<T extends DataClassWithEntityName> extends State<FilterSelectionModal<T>> {
+class _FilterSelectionModalState<T extends LibraryEntity> extends State<FilterSelectionModal<T>> {
   static const headlineLabelStyle = TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
   static const tagCloudOuterPadding = 8.0;
   static const modalHeight = 500.0;

@@ -4,8 +4,7 @@ import 'package:moodtag/app/navigation/routes.dart';
 import 'package:moodtag/features/library/details_screens/tag_details/tag_details_bloc.dart';
 import 'package:moodtag/features/library/details_screens/tag_details/tag_details_screen_bottom_app_bar.dart';
 import 'package:moodtag/features/library/details_screens/tag_details/tag_details_state.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
-import 'package:moodtag/model/database/moodtag_db.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
@@ -35,11 +34,11 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
         builder: (context, state) {
           return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: LoadedDataDisplayWrapper<TagData>(
+              child: LoadedDataDisplayWrapper<Tag>(
                   loadedData: state.loadedTagData,
                   captionForError: 'Tag could not be loaded',
                   captionForEmptyData: 'Tag does not exist',
-                  buildOnSuccess: (tagData) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  buildOnSuccess: (tag) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Padding(
                           padding: EdgeInsets.only(bottom: 12.0),
                           child: _buildHeadline(context, state),
@@ -51,7 +50,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                           searchBarVisible: state.displaySearchBar,
                           onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
                           onSearchBarClosed: () => onSearchBarClosed(bloc),
-                          contentWidget: LoadedDataDisplayWrapper<ArtistsList>(
+                          contentWidget: LoadedDataDisplayWrapper<List<Artist>>(
                             loadedData: state.checklistMode
                                 ? state.loadedDataFilteredArtists
                                 : state.loadedDataFilteredArtistsWithTag,
@@ -69,9 +68,9 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                               itemBuilder: (context, i) {
                                 return state.checklistMode
                                     ? _buildRowForArtistSelection(
-                                        context, tagData.tag, state.loadedDataFilteredArtists.data![i], bloc)
-                                    : _buildRowForAssociatedArtist(context, tagData.tag,
-                                        state.loadedDataFilteredArtistsWithTag.data![i].artist, bloc, dialogFactory);
+                                        context, tag, state.loadedDataFilteredArtists.data![i], bloc)
+                                    : _buildRowForAssociatedArtist(context, tag,
+                                        state.loadedDataFilteredArtistsWithTag.data![i], bloc, dialogFactory);
                               },
                             ),
                           ),
@@ -82,11 +81,11 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
       ),
       bottomNavigationBar: TagDetailsScreenBottomAppBar(),
       floatingActionButton: BlocBuilder<TagDetailsBloc, TagDetailsState>(builder: (context, state) {
-        return LoadedDataDisplayWrapper<TagData>(
+        return LoadedDataDisplayWrapper<Tag>(
             loadedData: state.loadedTagData,
             additionalCheckData: state.allArtists,
             showPlaceholders: false,
-            buildOnSuccess: (tagData) => FloatingActionButton(
+            buildOnSuccess: (tag) => FloatingActionButton(
                 onPressed: () => dialogFactory
                     .getSingleTextInputDialog(context,
                         title: 'Add artists for tag',
@@ -94,7 +93,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                         multiline: true,
                         maxLines: 10,
                         suggestedEntities: state.allArtists.data?.toSet())
-                    .show(onTruthyResult: (input) => bloc.add(AddArtistsForTag(input!, tagData.tag))),
+                    .show(onTruthyResult: (input) => bloc.add(AddArtistsForTag(input!, tag))),
                 child: const Icon(Icons.library_add)));
       }),
     );
@@ -123,9 +122,9 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
     if (state.loadedTagData.data == null) {
       return Container();
     }
-    final tag = state.loadedTagData.data!.tag;
+    final tag = state.loadedTagData.data!;
     final category = state.loadedTagData.data!.category;
-    final categoryData = state.allTagCategories.data?.firstWhere((data) => data.tagCategory.id == category.id);
+    final categoryData = state.allTagCategories.data?.firstWhere((tagCategory) => tagCategory.id == category.id);
     return Row(
       children: [
         ActionChip(
@@ -135,30 +134,28 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
             onPressed: state.allTagCategories.data == null || categoryData == null
                 ? null
                 : () => dialogFactory
-                    .getSelectEntityDialog<TagCategoryData>(context,
+                    .getSelectEntityDialog<TagCategory>(context,
                         title: 'Select the tag category for "${state.loadedTagData.data?.name}"',
                         entities: state.allTagCategories.data!,
                         initialSelection: categoryData,
                         selectionStyle: EntityDialogSelectionStyle.ONE_TAP,
-                        iconSelector: (categoryData) =>
-                            Icon(Icons.circle, color: Color(categoryData.tagCategory.color)))
-                    .show(
-                        onTruthyResult: (newCategoryData) =>
-                            bloc.add(ChangeCategoryForTag(tag, newCategoryData.tagCategory))))
+                        iconSelector: (selectableCategory) =>
+                            Icon(Icons.circle, color: Color(selectableCategory.color)))
+                    .show(onTruthyResult: (newTagCategory) => bloc.add(ChangeCategoryForTag(tag, newTagCategory))))
       ],
     );
   }
 
-  Widget _buildRowForArtistSelection(BuildContext context, Tag tag, ArtistData artistData, TagDetailsBloc bloc) {
+  Widget _buildRowForArtistSelection(BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc) {
     return CheckboxListTile(
       title: Text(
-        artistData.artist.name,
+        artist.name,
         style: listEntryStyle,
       ),
       controlAffinity: ListTileControlAffinity.leading,
       contentPadding: EdgeInsets.only(right: 4.0),
-      value: artistData.hasTag(tag),
-      onChanged: (bool? value) => bloc.add(ToggleTagForArtist(artistData.artist, tag)),
+      value: artist.hasTag(tag),
+      onChanged: (bool? value) => bloc.add(ToggleTagForArtist(artist, tag)),
     );
   }
 

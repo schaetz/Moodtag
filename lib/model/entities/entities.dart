@@ -1,28 +1,55 @@
-class BaseArtist {
+import 'package:moodtag/shared/models/structs/named_entity.dart';
+
+abstract class LibraryEntity implements NamedEntity {
+  final String _name;
+
+  const LibraryEntity({required name}) : _name = name;
+
+  @override
+  String get name => _name;
+}
+
+abstract class LibraryEntityWithId extends LibraryEntity {
   final int id;
-  final String name;
-  final String orderingName;
+
+  const LibraryEntityWithId({required super.name, required this.id});
+}
+
+///
+///
+///
+
+// BaseArtist only contains the properties from the "artists" table, without any joins
+class BaseArtist extends LibraryEntityWithId with OrderingName {
+  final String _orderingName;
   final String? spotifyId;
 
-  const BaseArtist({required this.id, required this.name, required this.orderingName, this.spotifyId});
+  const BaseArtist({required super.id, required super.name, required orderingName, this.spotifyId})
+      : _orderingName = orderingName;
+
+  @override
+  String get orderingName => _orderingName;
 }
 
 class Artist extends BaseArtist {
   final Set<BaseTag> tags;
 
   const Artist(
-      {required super.id, required super.name, required super.orderingName, required this.tags, super.spotifyId});
+      {required super.id, required super.name, required super.orderingName, super.spotifyId, required this.tags});
+
+  bool hasTag(BaseTag tag) => tags.contains(tag);
 }
 
 // BaseTag only contains the properties from the "tags" table, without any joins
-class BaseTag {
-  final int id;
-  final String name;
+class BaseTag extends LibraryEntityWithId with OrderingName {
   final Tag? parentTag;
   final int colorMode;
   final int? color;
 
-  const BaseTag({required this.id, required this.name, this.parentTag, required this.colorMode, this.color});
+  const BaseTag({required super.id, required super.name, this.parentTag, required this.colorMode, this.color});
+
+  @override
+  String get orderingName => name;
 }
 
 class Tag extends BaseTag {
@@ -39,16 +66,16 @@ class Tag extends BaseTag {
       required this.frequency});
 }
 
-class TagCategory {
-  final int id;
-  final String name;
+class TagCategory extends LibraryEntityWithId with OrderingName {
   final int color;
 
-  const TagCategory({required this.id, required this.name, required this.color});
+  const TagCategory({required super.id, required super.name, required this.color});
+
+  @override
+  String get orderingName => name;
 }
 
-class LastFmAccount {
-  final String accountName;
+class LastFmAccount extends LibraryEntity {
   final String? realName;
   final int? playCount;
   final int? artistCount;
@@ -57,7 +84,7 @@ class LastFmAccount {
   final DateTime lastAccountUpdate;
   final DateTime lastTopArtistsUpdate;
   const LastFmAccount(
-      {required this.accountName,
+      {required super.name,
       this.realName,
       this.playCount,
       this.artistCount,
@@ -67,6 +94,6 @@ class LastFmAccount {
       required this.lastTopArtistsUpdate});
 }
 
-typedef ArtistsList = List<BaseArtist>;
+typedef ArtistsList = List<Artist>;
 typedef TagsList = List<Tag>;
 typedef TagCategoriesList = List<TagCategory>;

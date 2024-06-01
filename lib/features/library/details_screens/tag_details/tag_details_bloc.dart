@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moodtag/model/database/join_data_classes.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/config/library_query_filter.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config.dart';
 import 'package:moodtag/model/repository/library_subscription/config/subscription_config_factory.dart';
@@ -60,10 +60,10 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
       final newState =
           state.copyWith(loadedTagData: LoadedData(loadedData.data, loadingStatus: loadedData.loadingStatus));
       if (loadedData.loadingStatus.isSuccess && state.loadedDataFilteredArtistsWithTag.loadingStatus.isInitial) {
-        final tagData = loadedData.data as TagData;
-        add(RequestOrUpdateSubscription(ArtistsList,
+        final tag = loadedData.data as Tag;
+        add(RequestOrUpdateSubscription(List<Artist>,
             name: filteredArtistsWithTagSubscriptionName,
-            filter: LibraryQueryFilter(searchItem: state.searchItem, entityFilters: {tagData.tag})));
+            filter: LibraryQueryFilter(searchItem: state.searchItem, entityFilters: {tag})));
       }
       return newState;
     } else if (subscriptionConfig.name == filteredArtistsWithTagSubscriptionName) {
@@ -155,12 +155,11 @@ class TagDetailsBloc extends Bloc<LibraryEvent, TagDetailsState> with LibraryUse
 
     // TODO Problem: If the tag has not been loaded before this method is called the first time,
     //  we cannot load the artists with tag here
-    final tagData = state.loadedTagData.data as TagData;
-    final newFilterWithTag =
-        LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : '', entityFilters: {tagData.tag});
+    final tag = state.loadedTagData.data as Tag;
+    final newFilterWithTag = LibraryQueryFilter(searchItem: applySearchItem ? newSearchItem : '', entityFilters: {tag});
 
-    add(RequestOrUpdateSubscription(ArtistsList, name: filteredArtistsSubscriptionName, filter: newFilterForAll));
-    add(RequestOrUpdateSubscription(ArtistsList,
+    add(RequestOrUpdateSubscription(List<Artist>, name: filteredArtistsSubscriptionName, filter: newFilterForAll));
+    add(RequestOrUpdateSubscription(List<Artist>,
         name: filteredArtistsWithTagSubscriptionName, filter: newFilterWithTag));
   }
 }
