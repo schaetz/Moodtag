@@ -25,8 +25,8 @@ class DeleteArtist extends ArtistEvent {
 }
 
 class RemoveTagFromArtist extends ArtistEvent {
-  final Artist artist;
-  final Tag tag;
+  final BaseArtist artist;
+  final BaseTag tag;
 
   const RemoveTagFromArtist(this.artist, this.tag);
 

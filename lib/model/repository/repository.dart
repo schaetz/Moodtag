@@ -84,7 +84,8 @@ class Repository with LibrarySubscriptionManager {
 
   Future<bool> doesArtistHaveTag(BaseArtist artist, BaseTag tag) async {
     final List<BaseTag> tagsWithArtist = await getBaseTagsOnce(filterArtistIds: {artist.id});
-    return tagsWithArtist.contains(tag);
+    final tagIDs = tagsWithArtist.map((tag) => tag.id).toSet();
+    return tagIDs.contains(tag.id);
   }
 
   Future<Set<String>> getSetOfExistingArtistNames() async {
