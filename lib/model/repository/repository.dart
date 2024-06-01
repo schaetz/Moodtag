@@ -95,7 +95,7 @@ class Repository with LibrarySubscriptionManager {
   Future<DbRequestResponse<BaseArtist>> createArtist(String name, {String? spotifyId}) async {
     Future<int> createArtistFuture = db.createArtist(
         ArtistsCompanion.insert(name: name, orderingName: getOrderingNameForArtist(name), spotifyId: Value(spotifyId)));
-    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<BaseArtist>(createArtistFuture, name);
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
   }
 
   Future<void> createImportedArtistsInBatch(List<ImportedArtist> importedArtists) async {

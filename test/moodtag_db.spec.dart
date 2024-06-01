@@ -23,7 +23,7 @@ void main() {
 
   test('tags can be created', () async {
     final tagId = await db!.createTag(TagsCompanion(id: Value(123), name: Value('Rock'), category: Value(1)));
-    final tag = await db!.getTagByIdOnce(tagId);
+    final tag = await db!.getBaseTagByIdOnce(tagId);
 
     expect(tag?.name, 'Rock');
   });
@@ -33,9 +33,9 @@ void main() {
         await db!.createArtist(ArtistsCompanion(id: Value(123), name: Value('AC/DC'), orderingName: Value('AC/DC')));
 
     final tag1Id = await db!.createTag(TagsCompanion(id: Value(123), name: Value('Rock'), category: Value(1)));
-    final tag1 = await db!.getTagByIdOnce(tag1Id);
+    final tag1 = await db!.getBaseTagByIdOnce(tag1Id);
     final tag2Id = await db!.createTag(TagsCompanion(id: Value(456), name: Value('Pop'), category: Value(1)));
-    final tag2 = await db!.getTagByIdOnce(tag2Id);
+    final tag2 = await db!.getBaseTagByIdOnce(tag2Id);
 
     await db!.assignTagToArtist(AssignedTagsCompanion(artist: Value(artistId), tag: Value(tag1Id)));
 
@@ -55,7 +55,7 @@ void main() {
 
     // Assign a tag and filter by it
     final tag1Id = await db!.createTag(TagsCompanion(id: Value(123), name: Value('Rock'), category: Value(1)));
-    final tag1 = await db!.getTagByIdOnce(tag1Id);
+    final tag1 = await db!.getBaseTagByIdOnce(tag1Id);
 
     await db!.assignTagToArtist(AssignedTagsCompanion(artist: Value(artist1Id), tag: Value(tag1Id)));
     await db!.assignTagToArtist(AssignedTagsCompanion(artist: Value(artist2Id), tag: Value(tag1Id)));
@@ -65,7 +65,7 @@ void main() {
 
     // Filtering by a unassigned tag should return an empty list
     final tag2Id = await db!.createTag(TagsCompanion(id: Value(456), name: Value('Pop'), category: Value(1)));
-    final tag2 = await db!.getTagByIdOnce(tag2Id);
+    final tag2 = await db!.getBaseTagByIdOnce(tag2Id);
 
     final artistsWithOtherTag = await db!.getArtists({tag2!.id}).first;
     expect(artistsWithOtherTag.length, 0);

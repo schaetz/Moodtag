@@ -9,7 +9,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
 import 'database.dart';
-import 'transformers/artists_with_tag_transformer.dart';
+import 'transformers/artists_dto_transformer.dart';
 
 part 'moodtag_db.g.dart';
 
@@ -53,13 +53,13 @@ class MoodtagDB extends _$MoodtagDB {
     query..orderBy([OrderingTerm.asc(artists.orderingName)]);
     final typedResultStream = query.watch();
     return typedResultStream
-        .transform(ArtistsWithTagTransformer<List<ArtistWithTagsDTO>>(this, filterTagIds: filterTagIds));
+        .transform(ArtistsDtoTransformer<List<ArtistWithTagsDTO>>(this, filterTagIds: filterTagIds));
   }
 
   Stream<ArtistWithTagsDTO?> getArtistById(int artistId) {
     final query = select(artists).join(joinTagsForArtist(this))..where(artists.id.equals(artistId));
     final typedResultStream = query.watch();
-    return typedResultStream.transform(ArtistsWithTagTransformer<ArtistWithTagsDTO?>(this));
+    return typedResultStream.transform(ArtistsDtoTransformer<ArtistWithTagsDTO?>(this));
   }
 
   Future<List<ArtistDataClass>> getBaseArtistsOnce() {
@@ -122,7 +122,7 @@ class MoodtagDB extends _$MoodtagDB {
         .get();
   }
 
-  Future<TagDataClass?> getTagByIdOnce(int tagId) {
+  Future<TagDataClass?> getBaseTagByIdOnce(int tagId) {
     return (select(tags)..where((t) => t.id.equals(tagId))).getSingleOrNull();
   }
 

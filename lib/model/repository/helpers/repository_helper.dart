@@ -41,10 +41,10 @@ class RepositoryHelper {
       return Future.error(new InvalidArgumentException('getEntityById was called without a valid ID.'));
     }
 
-    if (E == Artist) {
+    if (E == Artist || E == BaseArtist) {
       return _db.getBaseArtistByIdOnce(id) as Future<E?>;
-    } else if (E == Tag) {
-      return _db.getTagByIdOnce(id) as Future<E?>;
+    } else if (E == Tag || E == BaseTag) {
+      return _db.getBaseTagByIdOnce(id) as Future<E?>;
     } else if (E == TagCategory) {
       return _db.getTagCategoryByIdOnce(id) as Future<E?>;
     } else if (E == LastFmAccount) {

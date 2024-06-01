@@ -81,7 +81,7 @@ class EntityConverter {
 
   TagCategory? createTagCategoryFromOptionalDataClass(TagCategoryDataClass? dataClass) {
     if (dataClass == null) return null;
-    return TagCategory(id: dataClass.id, name: dataClass.name, color: dataClass.color);
+    return createTagCategoryFromDataClass(dataClass);
   }
 
   List<TagCategory> createTagCategoriesListFromDataClasses(List<TagCategoryDataClass> dataClassList) {
