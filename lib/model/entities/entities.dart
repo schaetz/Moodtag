@@ -15,6 +15,10 @@ abstract class LibraryEntityWithId extends LibraryEntity {
   const LibraryEntityWithId({required super.name, required this.id});
 }
 
+extension EntityLookupExtension<T extends LibraryEntityWithId> on Iterable<T> {
+  bool containsEntity(T lookupEntity) => this.any((element) => element.id == lookupEntity.id);
+}
+
 ///
 ///
 ///

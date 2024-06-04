@@ -124,7 +124,7 @@ class ArtistDetailsScreen extends StatelessWidget {
       BuildContext context, bool tagEditMode, Artist artist, BaseTag tag, ValueChanged<BaseTag> onTapped) {
     return InputChip(
         label: Text(tag.name),
-        selected: tagEditMode && artist.tags.contains(tag),
+        selected: tagEditMode && artist.tags.containsEntity(tag),
         onPressed: () => _onTagChipPressed(context, artist, tag, tagEditMode, onTapped));
   }
 
