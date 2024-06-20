@@ -110,6 +110,7 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
           );
         },
       ).toList(),
+      initialSelection: widget.initialConfig.categoryForTags,
     );
   }
 

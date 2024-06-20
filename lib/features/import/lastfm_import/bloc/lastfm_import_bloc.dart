@@ -74,8 +74,8 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   void _handleChangeImportConfigEvent(ChangeImportConfig event, Emitter<LastFmImportState> emit) async {
     final selectedOptions = event.selectedOptions;
     final Map<LastFmImportOption, bool> importOptions = {
-      LastFmImportOption.allTimeTopArtists: selectedOptions[LastFmImportOption.allTimeTopArtists.name] ?? false,
-      LastFmImportOption.lastMonthTopArtists: selectedOptions[LastFmImportOption.lastMonthTopArtists.name] ?? false,
+      LastFmImportOption.allTimeTopArtists: selectedOptions[LastFmImportOption.allTimeTopArtists] == true,
+      LastFmImportOption.lastMonthTopArtists: selectedOptions[LastFmImportOption.lastMonthTopArtists] == true,
     };
     emit(state.copyWith(importConfig: state.importConfig!.copyWith(options: importOptions)));
   }
