@@ -84,7 +84,7 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
   Widget _buildTagCategoryDropdown() {
     return DropdownMenu<TagCategory>(
       controller: tagCategoryController,
-      enableFilter: true,
+      enableFilter: false,
       requestFocusOnTap: false,
       leadingIcon: const Icon(Icons.search),
       label: const Text('Tag category for all tags'),
@@ -117,7 +117,7 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
   Widget _buildInitialTagDropdown() {
     return DropdownMenu<Tag>(
       controller: defaultTagController,
-      enableFilter: true,
+      enableFilter: false,
       requestFocusOnTap: false,
       leadingIcon: const Icon(Icons.search),
       label: const Text('Initial tag for all artists'),
