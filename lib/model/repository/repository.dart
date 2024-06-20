@@ -21,7 +21,7 @@ class Repository with LibrarySubscriptionManager {
   late final EntityConverter converter;
 
   Repository() : db = MoodtagDB() {
-    helper = RepositoryHelper(db);
+    helper = RepositoryHelper(this);
     converter = EntityConverter();
     initializeLibraryIfNecessary();
   }
@@ -82,6 +82,12 @@ class Repository with LibrarySubscriptionManager {
         .then((dataClassList) => converter.createBaseArtistsListFromDataClasses(dataClassList));
   }
 
+  Future<BaseArtist?> getBaseArtistByIdOnce(int id) {
+    return db
+        .getBaseArtistByIdOnce(id)
+        .then((dataClass) => dataClass != null ? converter.createBaseArtistFromDataClass(dataClass) : null);
+  }
+
   Future<bool> doesArtistHaveTag(BaseArtist artist, BaseTag tag) async {
     final List<BaseTag> tagsWithArtist = await getBaseTagsOnce(filterArtistIds: {artist.id});
     final tagIDs = tagsWithArtist.map((tag) => tag.id).toSet();
@@ -96,7 +102,7 @@ class Repository with LibrarySubscriptionManager {
   Future<DbRequestResponse<BaseArtist>> createArtist(String name, {String? spotifyId}) async {
     Future<int> createArtistFuture = db.createArtist(
         ArtistsCompanion.insert(name: name, orderingName: getOrderingNameForArtist(name), spotifyId: Value(spotifyId)));
-    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Artist>(createArtistFuture, name);
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<BaseArtist>(createArtistFuture, name);
   }
 
   Future<void> createImportedArtistsInBatch(List<ImportedArtist> importedArtists) async {
@@ -146,14 +152,20 @@ class Repository with LibrarySubscriptionManager {
         .then((dataClassList) => converter.createBaseTagsListFromDataClasses(dataClassList));
   }
 
+  Future<BaseTag?> getBaseTagByIdOnce(int id) {
+    return db
+        .getBaseTagByIdOnce(id)
+        .then((dataClass) => dataClass != null ? converter.createBaseTagFromDataClass(dataClass) : null);
+  }
+
   Future<Set<String>> getSetOfExistingTagNames() async {
     final allBaseTags = await getBaseTagsOnce();
     return allBaseTags.map((tag) => tag.name).toSet();
   }
 
-  Future<DbRequestResponse<Tag>> createTag(String name, TagCategory tagCategory) {
+  Future<DbRequestResponse<BaseTag>> createTag(String name, TagCategory tagCategory) {
     Future<int> createTagFuture = db.createTag(TagsCompanion.insert(name: name, category: tagCategory.id));
-    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<Tag>(createTagFuture, name);
+    return helper.wrapExceptionsAndReturnResponseWithCreatedEntity<BaseTag>(createTagFuture, name);
   }
 
   Future<void> createImportedTagsInBatch(List<ImportedTag> importedTags) async {
@@ -222,6 +234,12 @@ class Repository with LibrarySubscriptionManager {
     return db
         .getDefaultTagCategoryOnce(excludeId: excludeId)
         .then((dataClass) => converter.createTagCategoryFromOptionalDataClass(dataClass));
+  }
+
+  Future<TagCategory?> getTagCategoryByIdOnce(int id) {
+    return db
+        .getTagCategoryByIdOnce(id)
+        .then((dataClass) => dataClass != null ? converter.createTagCategoryFromDataClass(dataClass) : null);
   }
 
   /** Deletes a tag category, making sure that it is not the last remaining category

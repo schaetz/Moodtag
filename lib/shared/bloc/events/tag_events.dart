@@ -9,7 +9,7 @@ abstract class TagEvent extends LibraryEvent {
 class CreateTags extends TagEvent {
   final String input;
   final TagCategory? tagCategory;
-  final Artist? preselectedArtist;
+  final BaseArtist? preselectedArtist;
 
   const CreateTags(this.input, {this.tagCategory, this.preselectedArtist});
 
