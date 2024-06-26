@@ -22,7 +22,10 @@ class LastFmImportConfirmationScreen extends AbstractImportConfirmationScreen {
         appBar: MtAppBar(context),
         body: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(child: BlocBuilder<LastFmImportBloc, LastFmImportState>(builder: (context, state) {
-          return getImportedEntitiesOverviewList(_getEntityFrequencies(state));
+          if (state.importConfig == null) {
+            return Container();
+          }
+          return getImportedEntitiesOverviewList(_getEntityFrequencies(state), state.importConfig!);
         }))),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {

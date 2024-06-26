@@ -19,7 +19,10 @@ class SpotifyImportConfirmationScreen extends AbstractImportConfirmationScreen {
         scaffoldKey: GlobalKey<ScaffoldState>(),
         pageWidget: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(child: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(builder: (context, state) {
-          return getImportedEntitiesOverviewList(_getEntityFrequencies(state));
+          if (state.importConfig == null) {
+            return Container();
+          }
+          return getImportedEntitiesOverviewList(_getEntityFrequencies(state), state.importConfig!);
         }))),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {

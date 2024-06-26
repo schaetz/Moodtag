@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_config.dart';
+import 'package:moodtag/shared/widgets/data_display/data_list.dart';
 import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 
 abstract class AbstractImportConfirmationScreen extends StatelessWidget {
@@ -10,37 +13,13 @@ abstract class AbstractImportConfirmationScreen extends StatelessWidget {
 
   AbstractImportConfirmationScreen({super.key, required this.scaffoldBodyWrapperFactory});
 
-  Widget getImportedEntitiesOverviewList(Map<String, int> entityFrequencies) {
+  Widget getImportedEntitiesOverviewList(Map<String, int> entityFrequencies, AbstractImportConfig importConfig) {
     return Column(children: [
-      Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16.0, 16.0, 0, 0),
-            child: Text('Confirm import:', style: headlineStyle),
-          )),
-      Expanded(
-          child: ListView.separated(
-              separatorBuilder: (context, _) => Divider(),
-              padding: EdgeInsets.all(16.0),
-              itemCount: entityFrequencies.length,
-              itemBuilder: (context, i) => ListTile(
-                    title: Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            entityFrequencies.keys.elementAt(i),
-                            style: listEntryStyle,
-                          ),
-                        ),
-                        Text(
-                          entityFrequencies.values.elementAt(i).toString(),
-                          style: listEntryStyle,
-                        ),
-                      ],
-                    ),
-                  )))
+      DataList<int>(headline: 'Entities to import:', data: entityFrequencies),
+      DataList<String>(headline: 'Settings:', data: {
+        'Tag category:': importConfig.categoryForTags?.name ?? '',
+        'Initial tag:': importConfig.initialTagForArtists?.name ?? '',
+      }),
     ]);
   }
 }
