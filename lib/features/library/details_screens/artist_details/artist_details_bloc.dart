@@ -74,7 +74,7 @@ class ArtistDetailsBloc extends Bloc<LibraryEvent, ArtistDetailsState> with Libr
   }
 
   void _handleCreateTagsEvent(CreateTags event, Emitter<ArtistDetailsState> emit) async {
-    final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    final (_, exception) = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }

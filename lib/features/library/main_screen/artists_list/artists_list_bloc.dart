@@ -71,7 +71,7 @@ class ArtistsListBloc extends Bloc<LibraryEvent, ArtistsListState> with LibraryU
   }
 
   void _handleCreateArtistsEvent(CreateArtists event, Emitter<ArtistsListState> emit) async {
-    final exception = await _createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
+    final (_, exception) = await _createEntityBlocHelper.handleCreateArtistsEvent(event, _repository);
     if (exception is NameAlreadyTakenException) {
       errorStreamController.add(exception);
     }

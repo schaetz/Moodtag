@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_option.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_bloc.dart';
 import 'package:moodtag/features/import/lastfm_import/bloc/lastfm_import_state.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_config.dart';
 import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_option.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
+import 'package:moodtag/shared/bloc/events/tag_events.dart';
+import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
+import 'package:moodtag/shared/utils/optional.dart';
 import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/import/import_config_form.dart';
 import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
@@ -18,6 +23,7 @@ class LastFmImportConfigScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<LastFmImportBloc>();
+    final dialogFactory = context.read<AlertDialogFactory>();
     return Scaffold(
         appBar: MtAppBar(context),
         body: scaffoldBodyWrapperFactory.create(
@@ -28,16 +34,24 @@ class LastFmImportConfigScreen extends StatelessWidget {
                         : LoadedDataDisplayWrapper(
                             loadedData: state.allTagCategories,
                             additionalCheckData: state.allTags,
-                            buildOnSuccess: (tagCategories) => ImportConfigForm<LastFmImportConfig, LastFmImportOption>(
-                                  headlineCaption: 'Select what should be imported:',
-                                  sendButtonCaption: 'Start LastFm Import',
-                                  optionsWithCaption: _getOptionsWithCaption(),
-                                  tagCategories: tagCategories,
-                                  tags: state.allTags.data!,
-                                  initialConfig: bloc.state.importConfig!,
-                                  onChangeSelection: (Map<LastFmImportOption, bool> newSelection) =>
-                                      _onChangeSelection(newSelection, bloc),
-                                ))))),
+                            buildOnSuccess: (tagCategories) =>
+                                ImportConfigForm<LastFmImportConfig, LastFmImportOption, LastFmImportBloc, LastFmImportState>(
+                                    headlineCaption: 'Select what should be imported:',
+                                    sendButtonCaption: 'Start LastFm Import',
+                                    optionsWithCaption: _getOptionsWithCaption(),
+                                    tagCategories: tagCategories,
+                                    tags: state.allTags.data!,
+                                    initialConfig: bloc.state.importConfig!,
+                                    onChangeImportConfig: (Optional<Map<AbstractImportOption, bool>> checkboxSelections,
+                                            Optional<TagCategory> newTagCategory, Optional<BaseTag?> newBaseTag) =>
+                                        _onChangeImportConfig(checkboxSelections, newTagCategory, newBaseTag, bloc),
+                                    onPressAddTagButton: () => dialogFactory
+                                        .getSingleTextInputDialog(context,
+                                            title: 'Create new tag(s)',
+                                            subtitle: 'Separate multiple tags by line breaks',
+                                            multiline: true,
+                                            maxLines: 10)
+                                        .show(onTruthyResult: (input) => bloc.add(CreateTags(input!)))))))),
         floatingActionButton: BlocBuilder<LastFmImportBloc, LastFmImportState>(
             builder: (context, state) => state.importConfig == null
                 ? Container()
@@ -55,8 +69,9 @@ class LastFmImportConfigScreen extends StatelessWidget {
     return Map.fromEntries(LastFmImportOption.values.map((option) => MapEntry(option, option.caption)));
   }
 
-  void _onChangeSelection(Map<LastFmImportOption, bool> newSelection, LastFmImportBloc bloc) {
-    bloc.add(ChangeImportConfig(newSelection));
+  void _onChangeImportConfig(Optional<Map<AbstractImportOption, bool>> checkboxSelections,
+      Optional<TagCategory> newTagCategory, Optional<BaseTag?> newBaseTag, LastFmImportBloc bloc) {
+    bloc.add(ChangeImportConfig(checkboxSelections, newTagCategory, newBaseTag));
   }
 
   void _confirmImportConfiguration(LastFmImportBloc bloc) async {

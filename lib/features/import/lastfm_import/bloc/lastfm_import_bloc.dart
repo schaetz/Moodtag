@@ -11,12 +11,15 @@ import 'package:moodtag/model/repository/library_subscription/data_wrapper/loade
 import 'package:moodtag/model/repository/repository.dart';
 import 'package:moodtag/shared/bloc/events/import_events.dart';
 import 'package:moodtag/shared/bloc/events/lastfm_import_events.dart';
+import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/bloc/extensions/error_handling/error_stream_handling.dart';
+import 'package:moodtag/shared/bloc/helpers/create_entity_bloc_helper.dart';
 import 'package:moodtag/shared/exceptions/user_readable/external_service_query_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/invalid_user_input_exception.dart';
 import 'package:moodtag/shared/exceptions/user_readable/user_info.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/lastfm_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
+import 'package:moodtag/shared/utils/optional.dart';
 
 import '../connectors/lastfm_connector.dart';
 import '../connectors/lastfm_import_processor.dart';
@@ -24,7 +27,11 @@ import '../connectors/lastfm_import_processor.dart';
 class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorStreamHandling {
   final LastFmImportProcessor _lastFmImportProcessor = LastFmImportProcessor();
 
-  LastFmImportBloc(Repository repository, BuildContext mainContext) : super(LastFmImportState(), repository) {
+  final Repository _repository;
+
+  final CreateEntityBlocHelper _createEntityBlocHelper = CreateEntityBlocHelper();
+
+  LastFmImportBloc(this._repository, BuildContext mainContext) : super(LastFmImportState(), _repository) {
     on<InitializeImport>(_handleInitializeImport);
 
     // TODO Context seems not to be correct for LastFmImportScreen;
@@ -44,6 +51,7 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     on<ConfirmImportConfig>(_handleConfirmImportConfigEvent);
     on<ConfirmLastFmArtistsForImport>(_handleConfirmLastFmArtistsForImportEvent);
     on<CompleteLastFmImport>(_handleCompleteImportEvent);
+    on<CreateTags>(_handleCreateTags);
 
     final tagCategories = await repository.getTagCategoriesOnce();
     final tags = await repository.getTagsOnce();
@@ -72,12 +80,18 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   }
 
   void _handleChangeImportConfigEvent(ChangeImportConfig event, Emitter<LastFmImportState> emit) async {
-    final selectedOptions = event.selectedOptions;
-    final Map<LastFmImportOption, bool> importOptions = {
-      LastFmImportOption.allTimeTopArtists: selectedOptions[LastFmImportOption.allTimeTopArtists] == true,
-      LastFmImportOption.lastMonthTopArtists: selectedOptions[LastFmImportOption.lastMonthTopArtists] == true,
-    };
-    emit(state.copyWith(importConfig: state.importConfig!.copyWith(options: importOptions)));
+    Optional<Map<LastFmImportOption, bool>> importOptions = event.checkboxSelections.isPresent
+        ? Optional({
+            LastFmImportOption.allTimeTopArtists:
+                event.checkboxSelections.content![LastFmImportOption.allTimeTopArtists] == true,
+            LastFmImportOption.lastMonthTopArtists:
+                event.checkboxSelections.content![LastFmImportOption.lastMonthTopArtists] == true,
+          })
+        : Optional<Map<LastFmImportOption, bool>>.none();
+
+    final newImportConfig = state.importConfig!.copyWith(
+        options: importOptions, categoryForTags: event.newTagCategory, initialTagForArtists: event.newInitialTag);
+    emit(state.copyWith(importConfig: newImportConfig));
   }
 
   void _handleConfirmImportConfigEvent(ConfirmImportConfig event, Emitter<LastFmImportState> emit) async {
@@ -156,6 +170,16 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
     errorStreamController.add(UserInfo(resultMessage));
 
     emit(state.copyWith(isFinished: true));
+  }
+
+  void _handleCreateTags(CreateTags event, Emitter<LastFmImportState> emit) async {
+    final (_, exception) = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    if (exception != null) {
+      errorStreamController.add(exception);
+    } else {
+      final updatedTags = await repository.getTagsOnce();
+      emit(state.copyWith(allTags: LoadedData.success(updatedTags)));
+    }
   }
 
   LastFmImportFlowStep _getNextFlowStep(LastFmImportState currentState) {

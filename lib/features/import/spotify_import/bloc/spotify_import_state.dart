@@ -13,7 +13,9 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
   final bool isInitialized;
   final SpotifyImportFlowStep step;
   final bool isFinished;
-  final SpotifyImportConfig? importConfig;
+  final SpotifyImportConfig? _importConfig;
+  @override
+  SpotifyImportConfig? get importConfig => _importConfig;
 
   // We are not using the LibraryUserBlocMixin for this bloc as we don't need to update the screen when entities change
   final LoadedData<List<TagCategory>> allTagCategories;
@@ -28,14 +30,14 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
     this.isInitialized = false,
     this.step = SpotifyImportFlowStep.config,
     this.isFinished = false,
-    this.importConfig,
+    final SpotifyImportConfig? importConfigVal,
     this.allTagCategories = const LoadedData.loading(),
     this.allTags = const LoadedData.loading(),
     this.availableSpotifyArtists,
     this.availableGenresForSelectedArtists,
     this.selectedArtists,
     this.selectedGenres,
-  });
+  }) : this._importConfig = importConfigVal;
 
   @override
   List<Object?> get props => [
@@ -66,7 +68,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
     return SpotifyImportState(
       step: step ?? this.step,
       isFinished: isFinished ?? this.isFinished,
-      importConfig: importConfig ?? this.importConfig,
+      importConfigVal: importConfig ?? this.importConfig,
       allTagCategories: allTagCategories ?? this.allTagCategories,
       allTags: allTags ?? this.allTags,
       availableSpotifyArtists: availableSpotifyArtists ?? this.availableSpotifyArtists,

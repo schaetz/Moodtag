@@ -67,7 +67,7 @@ class TagsListBloc extends Bloc<LibraryEvent, TagsListState> with LibraryUserBlo
   }
 
   void _handleCreateTagsEvent(CreateTags event, Emitter<TagsListState> emit) async {
-    final exception = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
+    final (_, exception) = await _createEntityBlocHelper.handleCreateTagsEvent(event, _repository);
     if (exception != null) {
       errorStreamController.add(exception);
     }

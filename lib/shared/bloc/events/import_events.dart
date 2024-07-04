@@ -1,6 +1,8 @@
 import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_option.dart';
 import 'package:moodtag/features/import/abstract_import_flow/flow/abstract_import_flow.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dart';
+import 'package:moodtag/shared/utils/optional.dart';
 
 import 'library_events.dart';
 
@@ -25,12 +27,14 @@ class ReturnToPreviousImportScreen extends ImportEvent {
 }
 
 class ChangeImportConfig extends ImportEvent {
-  final Map<AbstractImportOption, bool> selectedOptions;
+  final Optional<Map<AbstractImportOption, bool>> checkboxSelections;
+  final Optional<TagCategory> newTagCategory;
+  final Optional<BaseTag?> newInitialTag;
 
-  const ChangeImportConfig(this.selectedOptions);
+  const ChangeImportConfig(this.checkboxSelections, this.newTagCategory, this.newInitialTag);
 
   @override
-  List<Object?> get props => [selectedOptions];
+  List<Object?> get props => [checkboxSelections, newTagCategory, newInitialTag];
 }
 
 class ConfirmImportConfig extends ImportEvent {

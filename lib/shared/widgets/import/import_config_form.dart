@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_bloc.dart';
+import 'package:moodtag/features/import/abstract_import_flow/bloc/abstract_import_state.dart';
 import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_config.dart';
 import 'package:moodtag/features/import/abstract_import_flow/config/abstract_import_option.dart';
 import 'package:moodtag/model/entities/entities.dart';
+import 'package:moodtag/shared/utils/optional.dart';
 
-class ImportConfigForm<C extends AbstractImportConfig, O extends AbstractImportOption> extends StatefulWidget {
+class ImportConfigForm<C extends AbstractImportConfig, O extends AbstractImportOption, B extends AbstractImportBloc<S>,
+    S extends AbstractImportState> extends StatefulWidget {
   final String headlineCaption;
   final String sendButtonCaption;
   final Map<O, String> optionsWithCaption;
   final List<TagCategory> tagCategories;
   final List<Tag> tags;
   final C initialConfig;
-  final Function(Map<O, bool>) onChangeSelection;
+  final Function(Optional<Map<AbstractImportOption, bool>> checkboxSelections, Optional<TagCategory> newTagCategory,
+      Optional<BaseTag?> newBaseTag) onChangeImportConfig;
+  final Function onPressAddTagButton;
 
   const ImportConfigForm({
     Key? key,
@@ -20,23 +26,22 @@ class ImportConfigForm<C extends AbstractImportConfig, O extends AbstractImportO
     required this.tagCategories,
     required this.tags,
     required this.initialConfig,
-    required this.onChangeSelection,
+    required this.onChangeImportConfig,
+    required this.onPressAddTagButton,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ImportConfigFormState<C, O>();
+  State<StatefulWidget> createState() => _ImportConfigFormState<C, O, B, S>();
 }
 
-class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractImportOption>
-    extends State<ImportConfigForm<C, O>> {
+class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractImportOption,
+    B extends AbstractImportBloc<S>, S extends AbstractImportState> extends State<ImportConfigForm<C, O, B, S>> {
   static const headlineStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
 
   final TextEditingController tagCategoryController = TextEditingController();
-  final TextEditingController defaultTagController = TextEditingController();
+  final TextEditingController initialTagController = TextEditingController();
 
   late final Map<O, bool> _selectionsState;
-  TagCategory? selectedTagCategory;
-  Tag? selectedInitialTag;
 
   @override
   void initState() {
@@ -56,7 +61,9 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
             )),
         ..._buildCheckboxes(),
         Padding(padding: const EdgeInsets.all(16), child: _buildTagCategoryDropdown()),
-        Padding(padding: const EdgeInsets.all(16), child: _buildInitialTagDropdown())
+        Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(children: [_buildInitialTagDropdown(), SizedBox(width: 16), _buildAddTagButton()]))
       ],
     );
   }
@@ -74,7 +81,7 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
                   setState(() {
                     _selectionsState[keyAndCaption.key] = newValue;
                   });
-                  widget.onChangeSelection(_selectionsState);
+                  widget.onChangeImportConfig(Optional(_selectionsState), Optional.none(), Optional.none());
                 }
               },
             ))
@@ -93,11 +100,8 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
         filled: true,
         contentPadding: EdgeInsets.symmetric(vertical: 5.0),
       ),
-      onSelected: (TagCategory? category) {
-        setState(() {
-          selectedTagCategory = category;
-        });
-      },
+      onSelected: (TagCategory? category) =>
+          widget.onChangeImportConfig(Optional.none(), Optional(category), Optional.none()),
       dropdownMenuEntries: widget.tagCategories.map<DropdownMenuEntry<TagCategory>>(
         (TagCategory tagCategory) {
           return DropdownMenuEntry<TagCategory>(
@@ -115,8 +119,8 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
   }
 
   Widget _buildInitialTagDropdown() {
-    return DropdownMenu<Tag>(
-      controller: defaultTagController,
+    return DropdownMenu<BaseTag>(
+      controller: initialTagController,
       enableFilter: true,
       requestFocusOnTap: true,
       leadingIcon: const Icon(Icons.search),
@@ -126,14 +130,10 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
         filled: true,
         contentPadding: EdgeInsets.symmetric(vertical: 5.0),
       ),
-      onSelected: (Tag? tag) {
-        setState(() {
-          selectedInitialTag = tag;
-        });
-      },
-      dropdownMenuEntries: widget.tags.map<DropdownMenuEntry<Tag>>(
-        (Tag tag) {
-          return DropdownMenuEntry<Tag>(
+      onSelected: (BaseTag? tag) => widget.onChangeImportConfig(Optional.none(), Optional.none(), Optional(tag)),
+      dropdownMenuEntries: widget.tags.map<DropdownMenuEntry<BaseTag>>(
+        (BaseTag tag) {
+          return DropdownMenuEntry<BaseTag>(
             value: tag,
             label: tag.name,
             leadingIcon: Icon(
@@ -142,6 +142,13 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
           );
         },
       ).toList(),
+    );
+  }
+
+  Widget _buildAddTagButton() {
+    return ElevatedButton(
+      child: Icon(Icons.new_label),
+      onPressed: () => widget.onPressAddTagButton(),
     );
   }
 

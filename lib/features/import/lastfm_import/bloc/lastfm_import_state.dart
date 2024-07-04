@@ -12,7 +12,9 @@ class LastFmImportState extends Equatable implements AbstractImportState {
   final bool isInitialized;
   final LastFmImportFlowStep step;
   final bool isFinished;
-  final LastFmImportConfig? importConfig;
+  final LastFmImportConfig? _importConfig;
+  @override
+  LastFmImportConfig? get importConfig => _importConfig;
 
   // We are not using the LibraryUserBlocMixin for this bloc as we don't need to update the screen when entities change
   final LoadedData<List<TagCategory>> allTagCategories;
@@ -25,12 +27,12 @@ class LastFmImportState extends Equatable implements AbstractImportState {
     this.isInitialized = false,
     this.step = LastFmImportFlowStep.config,
     this.isFinished = false,
-    this.importConfig,
+    final LastFmImportConfig? importConfigVal,
     this.allTagCategories = const LoadedData.loading(),
     this.allTags = const LoadedData.loading(),
     this.availableLastFmArtists,
     this.selectedArtists,
-  });
+  }) : this._importConfig = importConfigVal;
 
   @override
   List<Object?> get props => [
@@ -58,7 +60,7 @@ class LastFmImportState extends Equatable implements AbstractImportState {
       isInitialized: isInitialized ?? this.isInitialized,
       step: step ?? this.step,
       isFinished: isFinished ?? this.isFinished,
-      importConfig: importConfig ?? this.importConfig,
+      importConfigVal: importConfig ?? this.importConfig,
       allTagCategories: allTagCategories ?? this.allTagCategories,
       allTags: allTags ?? this.allTags,
       availableLastFmArtists: availableLastFmArtists ?? this.availableLastFmArtists,

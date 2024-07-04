@@ -23,6 +23,7 @@ import 'package:moodtag/shared/models/structs/imported_entities/imported_tag.dar
 import 'package:moodtag/shared/models/structs/imported_entities/spotify_artist.dart';
 import 'package:moodtag/shared/models/structs/imported_entities/unique_import_entity_set.dart';
 import 'package:moodtag/shared/utils/db_request_success_counter.dart';
+import 'package:moodtag/shared/utils/optional.dart';
 
 import '../flow/spotify_import_flow_step.dart';
 import 'spotify_import_state.dart';
@@ -80,13 +81,20 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
   }
 
   void _handleChangeImportConfigEvent(ChangeImportConfig event, Emitter<SpotifyImportState> emit) async {
-    final selectedOptions = event.selectedOptions;
-    final Map<SpotifyImportOption, bool> importOptions = {
-      SpotifyImportOption.topArtists: selectedOptions[SpotifyImportOption.topArtists.name] ?? false,
-      SpotifyImportOption.followedArtists: selectedOptions[SpotifyImportOption.followedArtists.name] ?? false,
-      SpotifyImportOption.artistGenres: selectedOptions[SpotifyImportOption.artistGenres.name] ?? false,
-    };
-    emit(state.copyWith(importConfig: state.importConfig!.copyWith(options: importOptions)));
+    Optional<Map<SpotifyImportOption, bool>> importOptions = event.checkboxSelections.isPresent
+        ? Optional({
+            SpotifyImportOption.topArtists:
+                event.checkboxSelections.content![SpotifyImportOption.topArtists.name] == true,
+            SpotifyImportOption.followedArtists:
+                event.checkboxSelections.content![SpotifyImportOption.followedArtists.name] == true,
+            SpotifyImportOption.artistGenres:
+                event.checkboxSelections.content![SpotifyImportOption.artistGenres.name] == true,
+          })
+        : Optional<Map<SpotifyImportOption, bool>>.none();
+
+    final newImportConfig = state.importConfig!.copyWith(
+        options: importOptions, categoryForTags: event.newTagCategory, initialTagForArtists: event.newInitialTag);
+    emit(state.copyWith(importConfig: newImportConfig));
   }
 
   void _handleConfirmImportConfigEvent(ConfirmImportConfig event, Emitter<SpotifyImportState> emit) async {

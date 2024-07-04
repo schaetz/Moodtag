@@ -12,31 +12,43 @@ import 'package:moodtag/shared/exceptions/user_readable/user_readable_exception.
 import 'package:moodtag/shared/utils/helpers.dart';
 
 class CreateEntityBlocHelper {
-  Future<UserReadableException?> handleCreateArtistsEvent(CreateArtists event, Repository repository) async {
-    List<String> inputElements = processMultilineInput(event.input);
-    List<DbRequestResponse> exceptionResponses = [];
+  Future<(List<BaseArtist>?, UserReadableException?)> handleCreateArtistsEvent(
+      CreateArtists event, Repository repository) async {
+    final List<String> inputElements = processMultilineInput(event.input);
+    final List<DbRequestResponse> exceptionResponses = [];
+    final List<BaseArtist> createdArtistEntities = [];
 
     for (String newArtistName in inputElements) {
       final createArtistResponse = await repository.createArtist(newArtistName);
       if (createArtistResponse.didFail()) exceptionResponses.add(createArtistResponse);
+
+      if (createArtistResponse.changedEntity != null) {
+        createdArtistEntities.add(createArtistResponse.changedEntity!);
+      }
     }
 
-    return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
+    return (createdArtistEntities, getHighestSeverityExceptionForMultipleResponses(exceptionResponses));
   }
 
-  Future<UserReadableException?> handleCreateTagsEvent(CreateTags event, Repository repository) async {
-    List<String> inputElements = processMultilineInput(event.input);
-    List<DbRequestResponse> exceptionResponses = [];
+  Future<(List<BaseTag>?, UserReadableException?)> handleCreateTagsEvent(
+      CreateTags event, Repository repository) async {
+    final List<String> inputElements = processMultilineInput(event.input);
+    final List<DbRequestResponse> exceptionResponses = [];
+    final List<BaseTag> createdTagEntities = [];
 
     final defaultTagCategory = await repository.getDefaultTagCategoryOnce();
     if (defaultTagCategory == null) {
-      return DatabaseError('There is no default tag category that can be assigned.');
+      return (null, DatabaseError('There is no default tag category that can be assigned.'));
     }
 
     for (String newTagName in inputElements) {
       final tagCategory = event.tagCategory ?? defaultTagCategory;
       final createTagResponse = await repository.createTag(newTagName, tagCategory);
       if (createTagResponse.didFail()) exceptionResponses.add(createTagResponse);
+
+      if (createTagResponse.changedEntity != null) {
+        createdTagEntities.add(createTagResponse.changedEntity!);
+      }
 
       if (event.preselectedArtist != null &&
           createTagResponse.didSucceed() &&
@@ -47,7 +59,7 @@ class CreateEntityBlocHelper {
       }
     }
 
-    return getHighestSeverityExceptionForMultipleResponses(exceptionResponses);
+    return (createdTagEntities, getHighestSeverityExceptionForMultipleResponses(exceptionResponses));
   }
 
   Future<UserReadableException?> handleChangeCategoryForTagEvent(
