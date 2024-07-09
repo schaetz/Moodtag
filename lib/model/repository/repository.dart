@@ -82,6 +82,27 @@ class Repository with LibrarySubscriptionManager {
         .then((dataClassList) => converter.createBaseArtistsListFromDataClasses(dataClassList));
   }
 
+  Future<List<BaseArtist>> getBaseArtistsWithIdAboveOnce(int idThreshold) {
+    return db
+        .getBaseArtistsWithIdAboveOnce(idThreshold)
+        .then((dataClassList) => converter.createBaseArtistsListFromDataClasses(dataClassList));
+  }
+
+  Future<Map<String, BaseArtist>> getBaseArtistsByNameMap(Repository repository, {int? latestX}) async {
+    final artists =
+        latestX == null || latestX < 0 ? await getBaseArtistsOnce() : await getLatestBaseArtistsOnce(latestX);
+    final artistsByName = Map.fromEntries(artists.map((artist) => MapEntry<String, BaseArtist>(artist.name, artist)));
+    return artistsByName;
+  }
+
+  Future<int?> getLatestArtistId(Repository repository) async {
+    final latestArtists = await repository.getLatestBaseArtistsOnce(1);
+    if (latestArtists.isEmpty) {
+      return null;
+    }
+    return latestArtists[0].id;
+  }
+
   Future<BaseArtist?> getBaseArtistByIdOnce(int id) {
     return db
         .getBaseArtistByIdOnce(id)
@@ -150,6 +171,12 @@ class Repository with LibrarySubscriptionManager {
     return db
         .getLatestBaseTagsOnce(number)
         .then((dataClassList) => converter.createBaseTagsListFromDataClasses(dataClassList));
+  }
+
+  Future<Map<String, BaseTag>> getBaseTagsByNameMap(Repository repository, {int? latestX}) async {
+    final tags = latestX == null || latestX < 0 ? await getBaseTagsOnce() : await getLatestBaseTagsOnce(latestX);
+    final tagsByName = Map.fromEntries(tags.map((tag) => MapEntry<String, BaseTag>(tag.name, tag)));
+    return tagsByName;
   }
 
   Future<BaseTag?> getBaseTagByIdOnce(int id) {

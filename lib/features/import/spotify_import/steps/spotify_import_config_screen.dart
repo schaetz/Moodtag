@@ -37,6 +37,7 @@ class SpotifyImportConfigScreen extends StatelessWidget {
                         headlineCaption: 'Select what should be imported:',
                         sendButtonCaption: 'Start Spotify Import',
                         optionsWithCaption: _getOptionsWithCaption(),
+                        showTagCategoriesDropdown: true,
                         tagCategories: tagCategories,
                         tags: bloc.state.allTags.data!,
                         initialConfig: bloc.state.importConfig!,

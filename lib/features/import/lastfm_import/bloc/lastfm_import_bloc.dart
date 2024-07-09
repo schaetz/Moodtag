@@ -164,7 +164,9 @@ class LastFmImportBloc extends AbstractImportBloc<LastFmImportState> with ErrorS
   }
 
   void _handleCompleteImportEvent(CompleteLastFmImport event, Emitter<LastFmImportState> emit) async {
-    await _lastFmImportProcessor.conductImport(event.selectedArtists, repository);
+    await _lastFmImportProcessor.conductImport(
+        event.selectedArtists, state.importConfig?.initialTagForArtists, _repository);
+
     // TODO Give a more specific message, including information on potential errors
     final resultMessage = "Imported ${event.selectedArtists.length} artists.";
     errorStreamController.add(UserInfo(resultMessage));

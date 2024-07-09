@@ -11,7 +11,8 @@ class ImportConfigForm<C extends AbstractImportConfig, O extends AbstractImportO
   final String headlineCaption;
   final String sendButtonCaption;
   final Map<O, String> optionsWithCaption;
-  final List<TagCategory> tagCategories;
+  final bool showTagCategoriesDropdown;
+  final List<TagCategory>? tagCategories;
   final List<Tag> tags;
   final C initialConfig;
   final Function(Optional<Map<AbstractImportOption, bool>> checkboxSelections, Optional<TagCategory> newTagCategory,
@@ -23,6 +24,7 @@ class ImportConfigForm<C extends AbstractImportConfig, O extends AbstractImportO
     required this.headlineCaption,
     required this.sendButtonCaption,
     required this.optionsWithCaption,
+    required this.showTagCategoriesDropdown,
     required this.tagCategories,
     required this.tags,
     required this.initialConfig,
@@ -60,7 +62,9 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
               child: Text(this.widget.headlineCaption, style: headlineStyle),
             )),
         ..._buildCheckboxes(),
-        Padding(padding: const EdgeInsets.all(16), child: _buildTagCategoryDropdown()),
+        widget.showTagCategoriesDropdown
+            ? Padding(padding: const EdgeInsets.all(16), child: _buildTagCategoryDropdown())
+            : Container(),
         Padding(
             padding: const EdgeInsets.all(16),
             child: Row(children: [_buildInitialTagDropdown(), SizedBox(width: 16), _buildAddTagButton()]))
@@ -89,6 +93,8 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
   }
 
   Widget _buildTagCategoryDropdown() {
+    if (widget.tagCategories == null) return Container();
+
     return DropdownMenu<TagCategory>(
       controller: tagCategoryController,
       enableFilter: false,
@@ -102,7 +108,7 @@ class _ImportConfigFormState<C extends AbstractImportConfig, O extends AbstractI
       ),
       onSelected: (TagCategory? category) =>
           widget.onChangeImportConfig(Optional.none(), Optional(category), Optional.none()),
-      dropdownMenuEntries: widget.tagCategories.map<DropdownMenuEntry<TagCategory>>(
+      dropdownMenuEntries: widget.tagCategories!.map<DropdownMenuEntry<TagCategory>>(
         (TagCategory tagCategory) {
           return DropdownMenuEntry<TagCategory>(
             value: tagCategory,

@@ -73,6 +73,13 @@ class MoodtagDB extends _$MoodtagDB {
         .get();
   }
 
+  Future<List<ArtistDataClass>> getBaseArtistsWithIdAboveOnce(int idThreshold) {
+    return (select(artists)
+          ..where((artist) => artist.id.isBiggerThanValue(idThreshold))
+          ..orderBy([(a) => OrderingTerm.asc(a.id)]))
+        .get();
+  }
+
   Future<ArtistDataClass?> getBaseArtistByIdOnce(int artistId) {
     return (select(artists)..where((a) => a.id.equals(artistId))).getSingleOrNull();
   }

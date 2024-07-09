@@ -10,7 +10,6 @@ import 'package:moodtag/shared/bloc/events/import_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
 import 'package:moodtag/shared/utils/optional.dart';
-import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/import/import_config_form.dart';
 import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
@@ -31,27 +30,24 @@ class LastFmImportConfigScreen extends StatelessWidget {
                 child: BlocBuilder<LastFmImportBloc, LastFmImportState>(
                     builder: (context, state) => !state.isInitialized
                         ? Container()
-                        : LoadedDataDisplayWrapper(
-                            loadedData: state.allTagCategories,
-                            additionalCheckData: state.allTags,
-                            buildOnSuccess: (tagCategories) =>
-                                ImportConfigForm<LastFmImportConfig, LastFmImportOption, LastFmImportBloc, LastFmImportState>(
-                                    headlineCaption: 'Select what should be imported:',
-                                    sendButtonCaption: 'Start LastFm Import',
-                                    optionsWithCaption: _getOptionsWithCaption(),
-                                    tagCategories: tagCategories,
-                                    tags: state.allTags.data!,
-                                    initialConfig: bloc.state.importConfig!,
-                                    onChangeImportConfig: (Optional<Map<AbstractImportOption, bool>> checkboxSelections,
-                                            Optional<TagCategory> newTagCategory, Optional<BaseTag?> newBaseTag) =>
-                                        _onChangeImportConfig(checkboxSelections, newTagCategory, newBaseTag, bloc),
-                                    onPressAddTagButton: () => dialogFactory
-                                        .getSingleTextInputDialog(context,
-                                            title: 'Create new tag(s)',
-                                            subtitle: 'Separate multiple tags by line breaks',
-                                            multiline: true,
-                                            maxLines: 10)
-                                        .show(onTruthyResult: (input) => bloc.add(CreateTags(input!)))))))),
+                        : ImportConfigForm<LastFmImportConfig, LastFmImportOption, LastFmImportBloc, LastFmImportState>(
+                            headlineCaption: 'Select what should be imported:',
+                            sendButtonCaption: 'Start LastFm Import',
+                            optionsWithCaption: _getOptionsWithCaption(),
+                            showTagCategoriesDropdown: false,
+                            tagCategories: null,
+                            tags: state.allTags.data!,
+                            initialConfig: bloc.state.importConfig!,
+                            onChangeImportConfig: (Optional<Map<AbstractImportOption, bool>> checkboxSelections,
+                                    Optional<TagCategory> newTagCategory, Optional<BaseTag?> newBaseTag) =>
+                                _onChangeImportConfig(checkboxSelections, newTagCategory, newBaseTag, bloc),
+                            onPressAddTagButton: () => dialogFactory
+                                .getSingleTextInputDialog(context,
+                                    title: 'Create new tag(s)',
+                                    subtitle: 'Separate multiple tags by line breaks',
+                                    multiline: true,
+                                    maxLines: 10)
+                                .show(onTruthyResult: (input) => bloc.add(CreateTags(input!))))))),
         floatingActionButton: BlocBuilder<LastFmImportBloc, LastFmImportState>(
             builder: (context, state) => state.importConfig == null
                 ? Container()
