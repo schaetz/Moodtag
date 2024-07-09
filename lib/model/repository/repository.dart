@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:moodtag/features/import/abstract_import_flow/connectors/generic_import_processor.dart';
 import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/helpers/entity_converter.dart';
 import 'package:moodtag/model/repository/helpers/repository_helper.dart';
@@ -88,15 +89,15 @@ class Repository with LibrarySubscriptionManager {
         .then((dataClassList) => converter.createBaseArtistsListFromDataClasses(dataClassList));
   }
 
-  Future<Map<String, BaseArtist>> getBaseArtistsByNameMap(Repository repository, {int? latestX}) async {
+  Future<Map<String, BaseArtist>> getBaseArtistsByNameMap({int? latestX}) async {
     final artists =
         latestX == null || latestX < 0 ? await getBaseArtistsOnce() : await getLatestBaseArtistsOnce(latestX);
     final artistsByName = Map.fromEntries(artists.map((artist) => MapEntry<String, BaseArtist>(artist.name, artist)));
     return artistsByName;
   }
 
-  Future<int?> getLatestArtistId(Repository repository) async {
-    final latestArtists = await repository.getLatestBaseArtistsOnce(1);
+  Future<int?> getLatestArtistId() async {
+    final latestArtists = await getLatestBaseArtistsOnce(1);
     if (latestArtists.isEmpty) {
       return null;
     }
@@ -173,7 +174,7 @@ class Repository with LibrarySubscriptionManager {
         .then((dataClassList) => converter.createBaseTagsListFromDataClasses(dataClassList));
   }
 
-  Future<Map<String, BaseTag>> getBaseTagsByNameMap(Repository repository, {int? latestX}) async {
+  Future<Map<String, BaseTag>> getBaseTagsByNameMap({int? latestX}) async {
     final tags = latestX == null || latestX < 0 ? await getBaseTagsOnce() : await getLatestBaseTagsOnce(latestX);
     final tagsByName = Map.fromEntries(tags.map((tag) => MapEntry<String, BaseTag>(tag.name, tag)));
     return tagsByName;
@@ -222,7 +223,7 @@ class Repository with LibrarySubscriptionManager {
     return helper.wrapExceptionsAndReturnResponse(assignTagFuture);
   }
 
-  Future<void> assignTagsToArtistsInBatch(Map<BaseArtist, List<BaseTag>> tagsForArtistsMap) async {
+  Future<void> assignTagsToArtistsInBatch(BaseArtistsTagsMap tagsForArtistsMap) async {
     await db.assignTagsToArtistsInBatch(tagsForArtistsMap.entries
         .expand((mapEntry) =>
             mapEntry.value.map((tag) => AssignedTagsCompanion.insert(artist: mapEntry.key.id, tag: tag.id)))
