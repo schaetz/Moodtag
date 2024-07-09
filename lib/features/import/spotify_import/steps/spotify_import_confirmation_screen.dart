@@ -22,7 +22,7 @@ class SpotifyImportConfirmationScreen extends AbstractImportConfirmationScreen {
           if (state.importConfig == null) {
             return Container();
           }
-          return getImportedEntitiesOverviewList(_getEntityFrequencies(state), state.importConfig!);
+          return getImportedEntitiesOverviewList(_getEntityFrequencies(state), state.importConfig!, true);
         }))),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {

@@ -25,7 +25,7 @@ class LastFmImportConfirmationScreen extends AbstractImportConfirmationScreen {
           if (state.importConfig == null) {
             return Container();
           }
-          return getImportedEntitiesOverviewList(_getEntityFrequencies(state), state.importConfig!);
+          return getImportedEntitiesOverviewList(_getEntityFrequencies(state), state.importConfig!, false);
         }))),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {

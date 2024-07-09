@@ -13,13 +13,15 @@ abstract class AbstractImportConfirmationScreen extends StatelessWidget {
 
   AbstractImportConfirmationScreen({super.key, required this.scaffoldBodyWrapperFactory});
 
-  Widget getImportedEntitiesOverviewList(Map<String, int> entityFrequencies, AbstractImportConfig importConfig) {
+  Widget getImportedEntitiesOverviewList(
+      Map<String, int> entityFrequencies, AbstractImportConfig importConfig, bool showTagCategory) {
+    final Map<String, String> settingsData =
+        showTagCategory ? {'Tag category:': importConfig.categoryForTags?.name ?? ''} : {};
+    settingsData.putIfAbsent('Initial tag:', () => importConfig.initialTagForArtists?.name ?? '');
+
     return Column(children: [
       DataList<int>(headline: 'Entities to import:', data: entityFrequencies),
-      DataList<String>(headline: 'Settings:', data: {
-        'Tag category:': importConfig.categoryForTags?.name ?? '',
-        'Initial tag:': importConfig.initialTagForArtists?.name ?? '',
-      }),
+      DataList<String>(headline: 'Settings:', data: settingsData),
     ]);
   }
 }
