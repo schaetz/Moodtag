@@ -9,7 +9,7 @@ import 'package:moodtag/shared/bloc/events/artist_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
 import 'package:moodtag/shared/dialogs/form/fields/entity_selection/entity_selection_dialog_form_field.dart';
-import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
+import 'package:moodtag/shared/widgets/data_display/display_wrapper/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
 import 'package:moodtag/shared/widgets/text_input/search_bar_container.dart';

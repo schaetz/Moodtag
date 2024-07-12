@@ -9,7 +9,7 @@ import 'package:moodtag/shared/bloc/events/import_events.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
 import 'package:moodtag/shared/utils/optional.dart';
-import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
+import 'package:moodtag/shared/widgets/data_display/display_wrapper/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/import/import_config_form.dart';
 import 'package:moodtag/shared/widgets/import/scaffold_body_wrapper/scaffold_body_wrapper_factory.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_main_scaffold.dart';
@@ -29,30 +29,33 @@ class SpotifyImportConfigScreen extends StatelessWidget {
         scaffoldKey: GlobalKey<ScaffoldState>(),
         pageWidget: scaffoldBodyWrapperFactory.create(
             bodyWidget: Center(
-                child: LoadedDataDisplayWrapper(
-                    loadedData: bloc.state.allTagCategories,
-                    additionalCheckData: bloc.state.allTags,
-                    buildOnSuccess: (tagCategories) => ImportConfigForm<SpotifyImportConfig, SpotifyImportOption,
-                            SpotifyImportBloc, SpotifyImportState>(
-                        headlineCaption: 'Select what should be imported:',
-                        sendButtonCaption: 'Start Spotify Import',
-                        optionsWithCaption: _getOptionsWithCaption(),
-                        showTagCategoriesDropdown: true,
-                        tagCategories: tagCategories,
-                        tags: bloc.state.allTags.data!,
-                        initialConfig: bloc.state.importConfig!,
-                        onChangeImportConfig: (Optional<Map<AbstractImportOption, bool>> checkboxSelections,
-                                Optional<TagCategory> newTagCategory, Optional<BaseTag?> newBaseTag) =>
-                            _onChangeImportConfig(checkboxSelections, newTagCategory, newBaseTag, bloc),
-                        onPressAddTagButton: () => dialogFactory
-                            .getSingleTextInputDialog(context,
-                                title: 'Create new tag(s)',
-                                subtitle: 'Separate multiple tags by line breaks',
-                                multiline: true,
-                                maxLines: 10)
-                            .show(onTruthyResult: (input) => bloc.add(CreateTags(input!))))))),
+                child: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(
+                    builder: (context, state) => !state.isInitialized
+                        ? Container()
+                        : LoadedDataDisplayWrapper(
+                            loadedData: bloc.state.allTagCategories,
+                            additionalCheckData: bloc.state.allTags,
+                            buildOnSuccess: (tagCategories) =>
+                                ImportConfigForm<SpotifyImportConfig, SpotifyImportOption, SpotifyImportBloc, SpotifyImportState>(
+                                    headlineCaption: 'Select what should be imported:',
+                                    sendButtonCaption: 'Start Spotify Import',
+                                    optionsWithCaption: _getOptionsWithCaption(),
+                                    showTagCategoriesDropdown: true,
+                                    tagCategories: tagCategories,
+                                    tags: bloc.state.allTags.data!,
+                                    initialConfig: bloc.state.importConfig!,
+                                    onChangeImportConfig: (Optional<Map<AbstractImportOption, bool>> checkboxSelections,
+                                            Optional<TagCategory> newTagCategory, Optional<BaseTag?> newBaseTag) =>
+                                        _onChangeImportConfig(checkboxSelections, newTagCategory, newBaseTag, bloc),
+                                    onPressAddTagButton: () => dialogFactory
+                                        .getSingleTextInputDialog(context,
+                                            title: 'Create new tag(s)',
+                                            subtitle: 'Separate multiple tags by line breaks',
+                                            multiline: true,
+                                            maxLines: 10)
+                                        .show(onTruthyResult: (input) => bloc.add(CreateTags(input!)))))))),
         floatingActionButton: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(
-            builder: (context, state) => state.importConfig == null
+            builder: (context, state) => !state.isInitialized || state.importConfig == null
                 ? Container()
                 : FloatingActionButton.extended(
                     onPressed: state.importConfig!.isValid ? () => _confirmImportConfiguration(bloc) : null,

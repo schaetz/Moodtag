@@ -6,7 +6,7 @@ import 'package:moodtag/features/library/main_screen/tags_list/tags_list_state.d
 import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/shared/bloc/events/tag_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
-import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
+import 'package:moodtag/shared/widgets/data_display/display_wrapper/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/screen_extensions/searchable_list_screen_mixin.dart';
 import 'package:moodtag/shared/widgets/text_input/search_bar_container.dart';
 

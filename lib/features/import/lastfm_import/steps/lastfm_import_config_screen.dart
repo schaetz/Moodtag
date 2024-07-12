@@ -49,7 +49,7 @@ class LastFmImportConfigScreen extends StatelessWidget {
                                     maxLines: 10)
                                 .show(onTruthyResult: (input) => bloc.add(CreateTags(input!))))))),
         floatingActionButton: BlocBuilder<LastFmImportBloc, LastFmImportState>(
-            builder: (context, state) => state.importConfig == null
+            builder: (context, state) => !state.isInitialized || state.importConfig == null
                 ? Container()
                 : FloatingActionButton.extended(
                     onPressed: state.importConfig!.isValid ? () => _confirmImportConfiguration(bloc) : null,

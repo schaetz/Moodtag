@@ -5,13 +5,14 @@ import 'package:moodtag/features/app_settings/app_settings_bloc.dart';
 import 'package:moodtag/features/app_settings/lastfm_account_management/lastfm_account_selector.dart';
 import 'package:moodtag/features/app_settings/tag_categories/create_tag_category_dialog_form.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
+import 'package:moodtag/model/entities/entities.dart';
 import 'package:moodtag/model/repository/library_subscription/data_wrapper/loading_status.dart';
 import 'package:moodtag/shared/bloc/events/app_settings_events.dart';
 import 'package:moodtag/shared/bloc/events/library_events.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/dialogs/alert_dialog_factory.dart';
 import 'package:moodtag/shared/exceptions/user_readable/unknown_error.dart';
-import 'package:moodtag/shared/widgets/data_display/loaded_data_display_wrapper.dart';
+import 'package:moodtag/shared/widgets/data_display/display_wrapper/loaded_data_display_wrapper.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
 
 class AppSettingsScreen extends StatelessWidget {
@@ -51,8 +52,8 @@ class AppSettingsScreen extends StatelessWidget {
       BuildContext context, AppSettingsBloc bloc, AppSettingsState state, AlertDialogFactory dialogFactory) {
     return Column(children: [
       Card(
-          child: LoadedDataDisplayWrapper(
-              loadedData: state.allTagCategories,
+          child: LoadedDataDisplayWrapper<TagCategoriesList>(
+              loadedDataList: [state.allTagCategories],
               buildOnSuccess: (tagCategories) => Column(
                       children: tagCategories.asMap().entries.map((entry) {
                     final index = entry.key;
