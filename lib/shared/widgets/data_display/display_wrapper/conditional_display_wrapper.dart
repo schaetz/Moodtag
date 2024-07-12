@@ -10,7 +10,7 @@ class ConditionalDisplayWrapper<C, D> extends StatelessWidget {
   static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);
 
   final List<C Function()> conditions;
-  final Widget Function(D?) buildOnSuccess;
+  final Widget Function(List<D>) buildOnSuccess;
   final String captionForError;
 
   const ConditionalDisplayWrapper(
@@ -30,7 +30,7 @@ class ConditionalDisplayWrapper<C, D> extends StatelessWidget {
     } else if (hasUnfulfilledCondition()) {
       return buildConditionUnfulfilledPlaceholder();
     }
-    return buildOnSuccess(null);
+    return buildOnSuccess([]);
   }
 
   Widget buildConditionUnfulfilledPlaceholder() {

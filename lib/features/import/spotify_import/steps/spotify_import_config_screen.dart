@@ -32,9 +32,8 @@ class SpotifyImportConfigScreen extends StatelessWidget {
                 child: BlocBuilder<SpotifyImportBloc, SpotifyImportState>(
                     builder: (context, state) => !state.isInitialized
                         ? Container()
-                        : LoadedDataDisplayWrapper(
-                            loadedData: bloc.state.allTagCategories,
-                            additionalCheckData: bloc.state.allTags,
+                        : MultiLoadedDataDisplayWrapper<List<LibraryEntityWithId>, TagCategoriesList>.additionalChecks(
+                            loadedDataList: [bloc.state.allTagCategories, bloc.state.allTags],
                             buildOnSuccess: (tagCategories) =>
                                 ImportConfigForm<SpotifyImportConfig, SpotifyImportOption, SpotifyImportBloc, SpotifyImportState>(
                                     headlineCaption: 'Select what should be imported:',

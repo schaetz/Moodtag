@@ -49,9 +49,8 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
             onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
             onSearchBarClosed: () => onSearchBarClosed(bloc),
             contentWidget: Stack(children: [
-              LoadedDataDisplayWrapper<List<Artist>>(
-                  loadedData: state.loadedDataFilteredArtists,
-                  additionalCheckData: state.allTags,
+              MultiLoadedDataDisplayWrapper<List<LibraryEntityWithId>, ArtistsList>.additionalChecks(
+                  loadedDataList: [state.loadedDataFilteredArtists, state.allTags],
                   captionForError: 'Artists could not be loaded',
                   captionForEmptyData: state.filterTags.isEmpty && (!state.displaySearchBar || state.searchItem.isEmpty)
                       ? 'No artists yet'

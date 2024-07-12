@@ -53,7 +53,7 @@ class AppSettingsScreen extends StatelessWidget {
     return Column(children: [
       Card(
           child: LoadedDataDisplayWrapper<TagCategoriesList>(
-              loadedDataList: [state.allTagCategories],
+              loadedData: state.allTagCategories,
               buildOnSuccess: (tagCategories) => Column(
                       children: tagCategories.asMap().entries.map((entry) {
                     final index = entry.key;
