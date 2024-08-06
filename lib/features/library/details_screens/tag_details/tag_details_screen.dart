@@ -25,13 +25,9 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<TagDetailsBloc>();
     final dialogFactory = context.read<AlertDialogFactory>();
 
-    final loadedDataFilteredArtists =
-        bloc.state.checklistMode ? bloc.state.loadedDataFilteredArtists : bloc.state.loadedDataFilteredArtistsWithTag;
-    final additionalLoadedArtists =
-        bloc.state.checklistMode ? bloc.state.loadedDataFilteredArtistsWithTag : bloc.state.loadedDataFilteredArtists;
+    final bloc = context.read<TagDetailsBloc>();
 
     return MtMainScaffold(
       scaffoldKey: _scaffoldKey,
@@ -55,25 +51,7 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                           searchBarVisible: state.displaySearchBar,
                           onSearchBarTextChanged: (value) => onSearchBarTextChanged(value, bloc),
                           onSearchBarClosed: () => onSearchBarClosed(bloc),
-                          contentWidget: MultiLoadedDataDisplayWrapper<ArtistsList, ArtistsList>.additionalChecks(
-                            loadedDataList: [loadedDataFilteredArtists, additionalLoadedArtists],
-                            captionForError: 'Artists with this tag could not be loaded',
-                            captionForEmptyData: 'No artists with this tag',
-                            buildOnSuccess: (artists) => ListView.separated(
-                              separatorBuilder: (context, _) => Divider(),
-                              padding: EdgeInsets.all(4.0),
-                              itemCount: state.checklistMode
-                                  ? state.loadedDataFilteredArtists.data!.length
-                                  : state.loadedDataFilteredArtistsWithTag.data!.length,
-                              itemBuilder: (context, i) {
-                                return state.checklistMode
-                                    ? _buildRowForArtistSelection(
-                                        context, tag, state.loadedDataFilteredArtists.data![i], bloc)
-                                    : _buildRowForAssociatedArtist(context, tag,
-                                        state.loadedDataFilteredArtistsWithTag.data![i], bloc, dialogFactory);
-                              },
-                            ),
-                          ),
+                          contentWidget: _buildArtistsListWidget(context, bloc, state, tag, dialogFactory),
                           listViewKey: listViewKey,
                         )),
                       ])));
@@ -143,6 +121,34 @@ class TagDetailsScreen extends StatelessWidget with SearchableListScreenMixin<Ta
                     .show(onTruthyResult: (newTagCategory) => bloc.add(ChangeCategoryForTag(tag, newTagCategory))))
       ],
     );
+  }
+
+  Widget _buildArtistsListWidget(
+      BuildContext context, TagDetailsBloc bloc, TagDetailsState state, Tag tag, AlertDialogFactory dialogFactory) {
+    final loadedDataFilteredArtists =
+        bloc.state.checklistMode ? bloc.state.loadedDataFilteredArtists : bloc.state.loadedDataFilteredArtistsWithTag;
+    final additionalLoadedArtists =
+        bloc.state.checklistMode ? bloc.state.loadedDataFilteredArtistsWithTag : bloc.state.loadedDataFilteredArtists;
+
+    return MultiLoadedDataDisplayWrapper<ArtistsList, ArtistsList>.additionalChecks(
+        loadedDataList: [loadedDataFilteredArtists, additionalLoadedArtists],
+        captionForError: 'Artists with this tag could not be loaded',
+        captionForEmptyData: 'No artists with this tag',
+        buildOnSuccess: (artists) {
+          return ListView.separated(
+            separatorBuilder: (context, _) => Divider(),
+            padding: EdgeInsets.all(4.0),
+            itemCount: state.checklistMode
+                ? state.loadedDataFilteredArtists.data!.length
+                : state.loadedDataFilteredArtistsWithTag.data!.length,
+            itemBuilder: (context, i) {
+              return state.checklistMode
+                  ? _buildRowForArtistSelection(context, tag, state.loadedDataFilteredArtists.data![i], bloc)
+                  : _buildRowForAssociatedArtist(
+                      context, tag, state.loadedDataFilteredArtistsWithTag.data![i], bloc, dialogFactory);
+            },
+          );
+        });
   }
 
   Widget _buildRowForArtistSelection(BuildContext context, Tag tag, Artist artist, TagDetailsBloc bloc) {

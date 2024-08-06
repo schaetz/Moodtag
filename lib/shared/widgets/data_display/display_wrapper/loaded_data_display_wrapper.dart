@@ -9,7 +9,7 @@ import 'conditional_wrapper_return_type.dart';
 /// and builds a placeholder or a Widget from a given build function based on the loading status
 /// of these objects.
 ///
-/// T is the type of the result data from all of the LoadedData objects.
+/// T is the type of the result data from all of the LoadedData objects. If they have different classes, use Object.
 /// M is the type of the result data of the main LoadedData object. Hence M must be a subclass of T.
 class MultiLoadedDataDisplayWrapper<T, M extends T> extends ConditionalDisplayWrapper<LoadedDataWrapperReturnType, T> {
   static const errorLabelStyle = TextStyle(fontSize: 18.0, color: Colors.black);
