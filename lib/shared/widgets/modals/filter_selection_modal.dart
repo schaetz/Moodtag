@@ -140,7 +140,7 @@ class _FilterSelectionModalState<T extends LibraryEntity> extends State<FilterSe
         final currentAlphabetIndex = _getIndexForInitialLetter(currentInitialLetter);
         lastInitialLetter = currentInitialLetter;
         return AutoScrollTag(
-            key: ValueKey(currentInitialLetter),
+            key: ValueKey(entityWithState.key.name),
             controller: _chipsAutoScrollController,
             index: currentAlphabetIndex,
             child: _buildSingleChip(entityWithState.key.name, entityWithState.key, entityWithState.value));
