@@ -1,4 +1,6 @@
 import 'package:drift/drift.dart';
+import 'package:moodtag/features/import/lastfm_import/config/lastfm_import_period.dart';
+import 'package:moodtag/model/entities/entities.dart';
 
 @DataClassName('ArtistDataClass')
 class Artists extends Table {
@@ -47,4 +49,15 @@ class LastFmAccounts extends Table {
 
   @override
   Set<Column> get primaryKey => {accountName};
+}
+
+@DataClassName('PlayCountDataClass')
+class PlayCount extends Table {
+  IntColumn get artist => integer().references(Artists, #id)();
+  Column<String> get source => textEnum<PlayCountSource>()();
+  Column<String> get period => textEnum<LastFmImportPeriod>()();
+  IntColumn get count => integer()();
+
+  @override
+  Set<Column> get primaryKey => {artist, source, period};
 }

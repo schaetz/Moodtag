@@ -13,7 +13,7 @@ import 'transformers/artists_dto_transformer.dart';
 
 part 'moodtag_db.g.dart';
 
-@DriftDatabase(tables: [Artists, Tags, TagCategories, AssignedTags, LastFmAccounts])
+@DriftDatabase(tables: [Artists, Tags, TagCategories, AssignedTags, LastFmAccounts, PlayCount])
 class MoodtagDB extends _$MoodtagDB {
   MoodtagDB() : super(_openConnection());
   MoodtagDB.InMemory() : super(NativeDatabase.memory());

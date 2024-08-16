@@ -29,6 +29,7 @@ class ArtistsListScreen extends StatefulWidget {
 
 class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableListScreenMixin<ArtistsListBloc> {
   static const listEntryStyle = TextStyle(fontSize: 18.0);
+  static const listEntryTrailingStyle = TextStyle(fontSize: 14.0);
   static const tagChipLabelStyle = TextStyle(fontSize: 10.0, color: Colors.black87);
 
   final GlobalKey listViewKey = GlobalKey();
@@ -126,12 +127,30 @@ class _ArtistsListScreenState extends State<ArtistsListScreen> with SearchableLi
           artist.name,
           style: listEntryStyle,
         ),
+        trailing: _buildTrailingListeningInfo(context),
         subtitle: bloc.state.displayTagSubtitles && artist.tags.isNotEmpty ? _buildTagsSubtitle(context, artist) : null,
         onTap: () => Navigator.of(context).pushNamed(Routes.artistsDetails, arguments: artist.id),
         onLongPress: () => dialogFactory
             .getConfirmationDialog(widget.scaffoldKey.currentContext!,
                 title: 'Are you sure that you want to delete the artist "${artist.name}"?')
             .show(onTruthyResult: (_) => bloc.add(DeleteArtist(artist))));
+  }
+
+  RichText _buildTrailingListeningInfo(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          WidgetSpan(
+            child: Icon(Icons.headphones, size: 16),
+          ),
+          WidgetSpan(
+            child: SizedBox(width: 4),
+          ),
+          TextSpan(
+              text: '0', style: listEntryTrailingStyle.copyWith(color: Theme.of(context).colorScheme.onBackground)),
+        ],
+      ),
+    );
   }
 
   Widget _buildTagsSubtitle(BuildContext context, Artist artist) {

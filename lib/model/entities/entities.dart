@@ -98,6 +98,8 @@ class LastFmAccount extends LibraryEntity {
       required this.lastTopArtistsUpdate});
 }
 
+enum PlayCountSource { LAST_FM, SPOTIFY, OTHER }
+
 typedef ArtistsList = List<Artist>;
 typedef TagsList = List<Tag>;
 typedef TagCategoriesList = List<TagCategory>;
