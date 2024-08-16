@@ -46,8 +46,8 @@ class SpotifyImportFlow extends AbstractImportFlow {
         SpotifyImportFlowStep.values.where((step) => importFlowState.step.index >= step.index).toList();
 
     return flowStepsTillCurrentStep
-        .map((step) => createMaterialPageForImportStep(step.index,
-            screen: _getScreenForFlowStep(bloc, step), route: Routes.spotifyImport))
+        .map((step) =>
+            createMaterialPageForImportStep(screen: _getScreenForFlowStep(bloc, step), route: Routes.spotifyImport))
         .toList();
   }
 

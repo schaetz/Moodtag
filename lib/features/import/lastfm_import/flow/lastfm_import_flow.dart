@@ -45,8 +45,8 @@ class LastFmImportFlow extends AbstractImportFlow {
         LastFmImportFlowStep.values.where((step) => importFlowState.step.index >= step.index).toList();
 
     return flowStepsTillCurrentStep
-        .map((step) => createMaterialPageForImportStep(step.index,
-            screen: _getScreenForFlowStep(bloc, step), route: Routes.lastFmImport))
+        .map((step) =>
+            createMaterialPageForImportStep(screen: _getScreenForFlowStep(bloc, step), route: Routes.lastFmImport))
         .toList();
   }
 

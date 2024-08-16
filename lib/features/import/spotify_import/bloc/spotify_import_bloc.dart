@@ -83,12 +83,11 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
   void _handleChangeImportConfigEvent(ChangeImportConfig event, Emitter<SpotifyImportState> emit) async {
     Optional<Map<SpotifyImportOption, bool>> importOptions = event.checkboxSelections.isPresent
         ? Optional({
-            SpotifyImportOption.topArtists:
-                event.checkboxSelections.content![SpotifyImportOption.topArtists.name] == true,
+            SpotifyImportOption.topArtists: event.checkboxSelections.content![SpotifyImportOption.topArtists] == true,
             SpotifyImportOption.followedArtists:
-                event.checkboxSelections.content![SpotifyImportOption.followedArtists.name] == true,
+                event.checkboxSelections.content![SpotifyImportOption.followedArtists] == true,
             SpotifyImportOption.artistGenres:
-                event.checkboxSelections.content![SpotifyImportOption.artistGenres.name] == true,
+                event.checkboxSelections.content![SpotifyImportOption.artistGenres] == true,
           })
         : Optional<Map<SpotifyImportOption, bool>>.none();
 

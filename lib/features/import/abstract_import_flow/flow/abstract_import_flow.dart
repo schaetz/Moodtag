@@ -11,7 +11,7 @@ abstract class AbstractImportFlow extends StatelessWidget {
 
   AbstractImportFlow(this._importName, this._importSteps);
 
-  Page createMaterialPageForImportStep(int stepNumber, {required Widget screen, String? route}) {
+  Page createMaterialPageForImportStep({required Widget screen, String? route}) {
     return MaterialPage<void>(child: screen, name: route);
   }
 

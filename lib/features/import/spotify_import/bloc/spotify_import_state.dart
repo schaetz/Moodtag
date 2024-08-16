@@ -66,6 +66,7 @@ class SpotifyImportState extends Equatable implements AbstractImportState {
     List<ImportedTag>? selectedGenres,
   }) {
     return SpotifyImportState(
+      isInitialized: isInitialized ?? this.isInitialized,
       step: step ?? this.step,
       isFinished: isFinished ?? this.isFinished,
       importConfigVal: importConfig ?? this.importConfig,
