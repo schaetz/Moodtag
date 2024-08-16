@@ -14,4 +14,17 @@ class GenericImportProcessorMixin {
             : null)
         .nonNulls);
   }
+
+  Future<List<BaseArtist>> getCreatedArtists(int? latestArtistId, Repository repository) async {
+    final artistIdThreshold = latestArtistId == null ? 0 : latestArtistId;
+    final createdArtists = await repository.getBaseArtistsWithIdAboveOnce(artistIdThreshold);
+    return createdArtists;
+  }
+
+  Future<List<BaseArtist>> getUpdatedExistingArtists<I extends ImportedArtist>(
+      List<I> artistsToImport, Repository repository) async {
+    final existingImportArtists = artistsToImport.where((artist) => artist.alreadyExists).toSet();
+    final baseArtistsForImportArtists = await getBaseArtistsForImportArtists<I>(existingImportArtists, repository);
+    return baseArtistsForImportArtists.values.toList();
+  }
 }

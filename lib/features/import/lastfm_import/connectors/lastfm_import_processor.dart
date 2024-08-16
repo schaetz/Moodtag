@@ -11,28 +11,15 @@ class LastFmImportProcessor extends GenericImportProcessorMixin {
     await repository.createImportedArtistsInBatch(artistsToImport);
 
     if (initialTag != null) {
-      final createdArtists = await _getCreatedArtists(latestArtistId, repository);
-      final existingArtists = await _getExistingArtists(artistsToImport, repository);
+      final createdArtists = await getCreatedArtists(latestArtistId, repository);
+      final updatedExistingArtists = await getUpdatedExistingArtists<LastFmArtist>(artistsToImport, repository);
       final artistsToAssign = Set<BaseArtist>()
         ..addAll(createdArtists)
-        ..addAll(existingArtists);
+        ..addAll(updatedExistingArtists);
 
       final BaseArtistsTagsMap mapFromImportedArtistsToInitialTags =
           Map.fromEntries(artistsToAssign.map((artist) => MapEntry(artist, [initialTag])));
       await repository.assignTagsToArtistsInBatch(mapFromImportedArtistsToInitialTags);
     }
-  }
-
-  Future<List<BaseArtist>> _getCreatedArtists(int? latestArtistId, Repository repository) async {
-    final artistIdThreshold = latestArtistId == null ? 0 : latestArtistId;
-    final createdArtists = await repository.getBaseArtistsWithIdAboveOnce(artistIdThreshold);
-    return createdArtists;
-  }
-
-  Future<List<BaseArtist>> _getExistingArtists(List<LastFmArtist> artistsToImport, Repository repository) async {
-    final existingImportArtists = artistsToImport.where((artist) => artist.alreadyExists).toSet();
-    final baseArtistsForImportArtists =
-        await getBaseArtistsForImportArtists<LastFmArtist>(existingImportArtists, repository);
-    return baseArtistsForImportArtists.values.toList();
   }
 }

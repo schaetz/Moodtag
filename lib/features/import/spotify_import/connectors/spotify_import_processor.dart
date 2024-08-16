@@ -9,8 +9,9 @@ class SpotifyImportProcessor extends GenericImportProcessorMixin {
   final Map<SpotifyArtist, BaseArtist> createdArtistsByEntity = Map();
   final Map<String, BaseTag> createdTagsByGenreName = Map();
 
-  Future<DbRequestSuccessCounter> conductImport(
-      List<SpotifyArtist> artistsToImport, List<ImportedTag> tagsToImport, Repository repository) async {
+  Future<DbRequestSuccessCounter> conductImport(List<SpotifyArtist> artistsToImport, List<ImportedTag> tagsToImport,
+      BaseTag? initialTag, Repository repository) async {
+    final latestArtistId = await repository.getLatestArtistId();
     await repository.createImportedArtistsInBatch(artistsToImport);
     await repository.createImportedTagsInBatch(tagsToImport);
 
@@ -18,6 +19,18 @@ class SpotifyImportProcessor extends GenericImportProcessorMixin {
 
     final failedTagAssignments = await _assignTagsToCreatedArtists(artistsToImport, tagsToImport, repository);
     failedAssignments.addAll(failedTagAssignments);
+
+    if (initialTag != null) {
+      final createdArtists = await getCreatedArtists(latestArtistId, repository);
+      final updatedExistingArtists = await getUpdatedExistingArtists<SpotifyArtist>(artistsToImport, repository);
+      final artistsToAssign = Set<BaseArtist>()
+        ..addAll(createdArtists)
+        ..addAll(updatedExistingArtists);
+
+      final BaseArtistsTagsMap mapFromImportedArtistsToInitialTags =
+          Map.fromEntries(artistsToAssign.map((artist) => MapEntry(artist, [initialTag])));
+      await repository.assignTagsToArtistsInBatch(mapFromImportedArtistsToInitialTags);
+    }
 
     // TODO Create a better data structure for DbRequestSuccessCounter
     return DbRequestSuccessCounter.instantiate(

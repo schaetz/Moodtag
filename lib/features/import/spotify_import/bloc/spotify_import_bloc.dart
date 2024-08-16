@@ -152,14 +152,14 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
     if (event.selectedArtists.isEmpty) {
       errorStreamController.add(InvalidUserInputException("No artists selected for import."));
     } else {
-      final defaultTagCategory = await repository.getDefaultTagCategoryOnce();
-      if (defaultTagCategory == null) {
-        errorStreamController.add(DatabaseError('There is no default tag category that can be assigned.'));
+      if (state.importConfig == null || state.importConfig!.categoryForTags == null) {
+        errorStreamController
+            .add(DatabaseError('There is no tag category in the import configuration that can be assigned.'));
         return;
       }
 
       final availableGenresForSelectedArtists =
-          await _getAvailableTagsForSelectedArtists(event.selectedArtists, defaultTagCategory);
+          await _getAvailableTagsForSelectedArtists(event.selectedArtists, state.importConfig!.categoryForTags!);
 
       emit(state.copyWith(
           selectedArtists: event.selectedArtists,
@@ -194,8 +194,8 @@ class SpotifyImportBloc extends AbstractImportBloc<SpotifyImportState> with Erro
   }
 
   void _handleCompleteImportEvent(CompleteSpotifyImport event, Emitter<SpotifyImportState> emit) async {
-    final successCounter =
-        await _spotifyImportProcessor.conductImport(event.selectedArtists, event.selectedGenres, repository);
+    final successCounter = await _spotifyImportProcessor.conductImport(
+        event.selectedArtists, event.selectedGenres, state.importConfig?.initialTagForArtists, repository);
 
     // TODO Return more specific error message, not only including info on the result of the tag assignment
     errorStreamController.add(UserInfo(_getResultMessage(successCounter)));
