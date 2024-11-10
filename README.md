@@ -5,7 +5,11 @@ from Spotify or Last.fm and assigning tags to organize and rediscover them.
 
 ## Build
 
-To build the app for iOS, run
+1. Build the database with the following command from the root directory:
+
+`dart run build_runner build`
+
+2. To build the app for iOS, run
 
 `flutter build ios -t lib/app/main.dart`
 
