@@ -31,6 +31,7 @@ android {
 
     defaultConfig {
         applicationId "de.codecentric.moodtag"
+        namespace("de.codecentric.moodtag")
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
