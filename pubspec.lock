@@ -122,10 +122,10 @@ packages:
     dependency: transitive
     description:
       name: built_value
-      sha256: c7913a9737ee4007efedaffc968c049fd0f3d0e49109e778edc10de9426005cb
+      sha256: "28a712df2576b63c6c005c465989a348604960c0958d28be5303ba9baa841ac2"
       url: "https://pub.dev"
     source: hosted
-    version: "8.9.2"
+    version: "8.9.3"
   characters:
     dependency: transitive
     description:
@@ -460,10 +460,10 @@ packages:
     dependency: transitive
     description:
       name: lints
-      sha256: "4a16b3f03741e1252fda5de3ce712666d010ba2122f8e912c94f9f7b90e1a4c3"
+      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.0"
+    version: "5.1.1"
   logging:
     dependency: "direct main"
     description:
@@ -652,10 +652,10 @@ packages:
     dependency: transitive
     description:
       name: pubspec_parse
-      sha256: c799b721d79eb6ee6fa56f00c04b472dcd44a30d258fac2174a6ec57302678f8
+      sha256: "81876843eb50dc2e1e5b151792c9a985c5ed2536914115ed04e9c8528f6647b0"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.4.0"
   recase:
     dependency: transitive
     description:
@@ -761,10 +761,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite3_flutter_libs
-      sha256: "636b0fe8a2de894e5455572f6cbbc458f4ffecfe9f860b79439e27041ea4f0b9"
+      sha256: "73016db8419f019e807b7a5e5fbf2a7bd45c165fed403b8e7681230f3a102785"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.27"
+    version: "0.5.28"
   sqlparser:
     dependency: transitive
     description:
@@ -953,10 +953,10 @@ packages:
     dependency: transitive
     description:
       name: yaml
-      sha256: "75769501ea3489fca56601ff33454fe45507ea3bfb014161abc3b43ae25989d5"
+      sha256: b9da305ac7c39faa3f030eccd175340f968459dae4af175130b3fc47e40d76ce
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.2"
+    version: "3.1.3"
 sdks:
   dart: ">=3.6.0 <4.0.0"
   flutter: ">=3.24.0"
