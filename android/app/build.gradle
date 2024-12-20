@@ -23,17 +23,26 @@ if (flutterVersionName == null) {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdk 34
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId "de.codecentric.moodtag"
         namespace("de.codecentric.moodtag")
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
