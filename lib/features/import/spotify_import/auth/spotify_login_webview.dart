@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:moodtag/features/import/spotify_import/auth/spotify_auth_bloc.dart';
 import 'package:moodtag/features/import/spotify_import/connectors/spotify_connector.dart';
 import 'package:moodtag/shared/bloc/events/spotify_events.dart';
 import 'package:moodtag/shared/widgets/main_layout/mt_app_bar.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 // Webview that displays the Spotify authorization page in a WebviewScaffold;
 // after a successful login, the obtained authorization code and access token
@@ -14,20 +14,30 @@ class SpotifyLoginWebview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SpotifyAuthBloc>();
-    final flutterWebviewPlugin = new FlutterWebviewPlugin();
-    flutterWebviewPlugin.onUrlChanged.listen((url) => bloc.add(LoginWebviewUrlChange(url)));
 
-    return WebviewScaffold(
-        url: getSpotifyAuthUri().toString(),
+    final controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            // Update loading bar.
+          },
+          onPageStarted: (String url) {},
+          onPageFinished: (String url) {},
+          onHttpError: (HttpResponseError error) {},
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.youtube.com/')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse('https://flutter.dev'));
+
+    return Scaffold(
         appBar: MtAppBar(context),
-        withZoom: true,
-        withLocalStorage: true,
-        hidden: false,
-        initialChild: Container(
-          color: Colors.redAccent,
-          child: const Center(
-            child: Text('Waiting.....'),
-          ),
-        ));
+        body: WebViewWidget(controller: controller));
   }
 }
